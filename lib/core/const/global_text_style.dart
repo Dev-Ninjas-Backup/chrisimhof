@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 TextStyle getTextStyle({
@@ -10,9 +9,9 @@ TextStyle getTextStyle({
   Color color = Colors.black,
 }) {
   return GoogleFonts.plusJakartaSans(
-    fontSize: fontSize.sp,
+    fontSize: fontSize,
     fontWeight: fontWeight,
-    height: fontSize.sp / lineHeight.sp,
+    height: fontSize / lineHeight,
     color: color,
   );
 }
