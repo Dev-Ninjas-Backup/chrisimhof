@@ -1,7 +1,9 @@
+
 import 'package:chrisimhof/core/common/widgets/language_toggle_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
+
 import 'package:flutter/material.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -43,5 +45,6 @@ class SignInScreen extends StatelessWidget {
         ),
       ),
     );
+
   }
 }
