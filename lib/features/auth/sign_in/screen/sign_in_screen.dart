@@ -92,10 +92,12 @@ class SignInScreen extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: Text(
                     'Forgot Password?',
-                    style: getTextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.primaryButtonColor,
                       fontWeight: FontWeight.w700,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.primaryButtonColor,
                     ),
                   ),
                 ),
@@ -152,10 +154,11 @@ class SignInScreen extends StatelessWidget {
                             Get.toNamed(AppRoutes.createAccountScreen);
                           },
                         text: 'Create Account',
-                        style: getTextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: AppColors.primaryButtonColor,
                           fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ],
