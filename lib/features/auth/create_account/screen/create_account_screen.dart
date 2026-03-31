@@ -1,10 +1,180 @@
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
+import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
+import 'package:chrisimhof/core/common/widgets/language_toggle_widget.dart';
+import 'package:chrisimhof/core/common/widgets/social_button.dart';
+import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
+import 'package:chrisimhof/core/const/image_path.dart';
+import 'package:chrisimhof/features/auth/create_account/controller/create_account_controller.dart';
+import 'package:chrisimhof/core/common/widgets/divider_widget.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
+import 'package:flutter/gestures.dart';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CreateAccountScreen extends StatelessWidget {
   const CreateAccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    final controller = Get.put(CreateAccountController());
+    final formKey = GlobalKey<FormState>();
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Container(
+            padding: EdgeInsets.only(top: 62, left: 16, right: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: LanguageToggleWidget(),
+                ),
+                Image.asset(ImagePath.appLogo, width: 120, height: 72),
+                SizedBox(height: 56),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Create Your Account',
+                    style: getTextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                RichText(
+                  text: TextSpan(
+                    text:
+                        'Start optimizing your lifestyle and unlock your peak performance with ',
+                    style: getTextStyle(
+                      fontSize: 16,
+                      color: AppColors.secondaryTextColor,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'RYVENZA',
+                        style: getTextStyle(
+                          fontSize: 16,
+                          color: AppColors.primaryButtonColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 56),
+                CustomTextFormField(
+                  label: 'Full Name',
+                  hintText: 'Enter your full name',
+                  isRequired: true,
+                  controller: controller.fullNameController,
+                  validator: (value) => controller.validateFullName(value),
+                ),
+                SizedBox(height: 16),
+                CustomTextFormField(
+                  label: 'Email',
+                  hintText: 'Enter your email',
+                  isRequired: true,
+                  controller: controller.emailController,
+                  validator: (value) => controller.validateEmail(value),
+                ),
+                SizedBox(height: 16),
+                Obx(
+                  () => CustomTextFormField(
+                    label: 'Password',
+                    isRequired: true,
+                    hintText: 'Enter your password',
+                    controller: controller.passwordController,
+                    suffixIcon: IconButton(
+                      onPressed: controller.togglePasswordVisibility,
+                      icon: Icon(
+                        controller.isPasswordHidden.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: AppColors.secondaryTextColor,
+                      ),
+                    ),
+                    obscureText: controller.isPasswordHidden.value,
+                    textInputAction: TextInputAction.done,
+                    validator: (value) => controller.validatePassword(value),
+                  ),
+                ),
+                SizedBox(height: 40),
+                Obx(
+                  () => CustomButton(
+                    text: 'Create Account',
+                    onTap: controller.isLoading.value
+                        ? null
+                        : () {
+                            if (formKey.currentState!.validate()) {
+                              controller.createAccount();
+                            }
+                          },
+                  ),
+                ),
+                SizedBox(height: 32),
+                DividerWidget(),
+                SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SocialButton(
+                      imagePath: IconPath.google,
+                      onTap: controller.signInWithGoogle,
+                    ),
+                    SizedBox(width: 16),
+                    SocialButton(
+                      imagePath: IconPath.apple,
+                      backgroundColor: Colors.black,
+                      onTap: controller.signInWithApple,
+                    ),
+                    SizedBox(width: 16),
+                    SocialButton(
+                      imagePath: IconPath.microsoft,
+                      onTap: controller.signInWithMicrosoft,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 32),
+                RichText(
+                  text: TextSpan(
+                    text: 'Do you have an account? ',
+                    style: getTextStyle(
+                      fontSize: 14,
+                      color: AppColors.secondaryTextColor,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    children: [
+                      TextSpan(
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Get.toNamed(AppRoutes.signInScreen);
+                          },
+                        text: 'Sign In',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primaryButtonColor,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
