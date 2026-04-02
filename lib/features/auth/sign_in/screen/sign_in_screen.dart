@@ -88,16 +88,21 @@ class SignInScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.primaryButtonColor,
-                      fontWeight: FontWeight.w700,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppColors.primaryButtonColor,
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed('/changePasswordScreen');
+                  },
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primaryButtonColor,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.primaryButtonColor,
+                      ),
                     ),
                   ),
                 ),
