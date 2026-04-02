@@ -1,3 +1,4 @@
+import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ class SignInController extends GetxController {
 
     try {
       await Future.delayed(const Duration(seconds: 2));
-
+      Get.offAll(NavbarScreen());
       EasyLoading.showSuccess('Logged in successfully');
     } catch (e) {
       EasyLoading.showError('Login failed: ${e.toString()}');
