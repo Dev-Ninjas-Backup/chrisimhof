@@ -6,7 +6,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
-import 'package:chrisimhof/features/auth/sign_in/controller/sign_in_controller.dart';
+import 'package:chrisimhof/features/auth/create_account/controller/create_account_controller.dart';
 import 'package:chrisimhof/core/common/widgets/divider_widget.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/gestures.dart';
@@ -14,12 +14,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SignInScreen extends StatelessWidget {
-  const SignInScreen({super.key});
+class CreateAccountScreen extends StatelessWidget {
+  const CreateAccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SignInController());
+    final controller = Get.put(CreateAccountController());
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(
@@ -39,9 +39,8 @@ class SignInScreen extends StatelessWidget {
                 SizedBox(height: 56),
                 Align(
                   alignment: Alignment.centerLeft,
-
                   child: Text(
-                    'Welcome Back',
+                    'Create Your Account',
                     style: getTextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -50,15 +49,36 @@ class SignInScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 15),
-                Text(
-                  'Sign In to continue optimizing your lifestyle and performance.',
-                  style: getTextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.secondaryTextColor,
+                RichText(
+                  text: TextSpan(
+                    text:
+                        'Start optimizing your lifestyle and unlock your peak performance with ',
+                    style: getTextStyle(
+                      fontSize: 16,
+                      color: AppColors.secondaryTextColor,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'RYVENZA',
+                        style: getTextStyle(
+                          fontSize: 16,
+                          color: AppColors.primaryButtonColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 56),
+                CustomTextFormField(
+                  label: 'Full Name',
+                  hintText: 'Enter your full name',
+                  isRequired: true,
+                  controller: controller.fullNameController,
+                  validator: (value) => controller.validateFullName(value),
+                ),
+                SizedBox(height: 16),
                 CustomTextFormField(
                   label: 'Email',
                   hintText: 'Enter your email',
@@ -87,34 +107,15 @@ class SignInScreen extends StatelessWidget {
                     validator: (value) => controller.validatePassword(value),
                   ),
                 ),
-                SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    Get.toNamed('/changePasswordScreen');
-                  },
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.primaryButtonColor,
-                        fontWeight: FontWeight.w700,
-                        decoration: TextDecoration.underline,
-                        decorationColor: AppColors.primaryButtonColor,
-                      ),
-                    ),
-                  ),
-                ),
                 SizedBox(height: 40),
                 Obx(
                   () => CustomButton(
-                    text: 'Sign In',
+                    text: 'Create Account',
                     onTap: controller.isLoading.value
                         ? null
                         : () {
                             if (formKey.currentState!.validate()) {
-                              controller.login();
+                              controller.createAccount();
                             }
                           },
                   ),
@@ -146,7 +147,7 @@ class SignInScreen extends StatelessWidget {
                 SizedBox(height: 32),
                 RichText(
                   text: TextSpan(
-                    text: 'Don\'t have an account? ',
+                    text: 'Do you have an account? ',
                     style: getTextStyle(
                       fontSize: 14,
                       color: AppColors.secondaryTextColor,
@@ -156,9 +157,9 @@ class SignInScreen extends StatelessWidget {
                       TextSpan(
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Get.toNamed(AppRoutes.createAccountScreen);
+                            Get.toNamed(AppRoutes.signInScreen);
                           },
-                        text: 'Create Account',
+                        text: 'Sign In',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.primaryButtonColor,

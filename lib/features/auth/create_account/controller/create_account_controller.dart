@@ -1,9 +1,9 @@
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
-class SignInController extends GetxController {
+class CreateAccountController extends GetxController {
+  final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -12,6 +12,23 @@ class SignInController extends GetxController {
 
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
+  }
+
+  String? validateFullName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Full name is required';
+    }
+
+    if (value.trim().length < 3) {
+      return 'Full name must be at least 3 characters';
+    }
+
+    // Only letters and spaces allowed
+    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
+      return 'Full name can only contain letters';
+    }
+
+    return null;
   }
 
   String? validateEmail(String? value) {
@@ -34,15 +51,15 @@ class SignInController extends GetxController {
     return null;
   }
 
-  Future<void> login() async {
+  Future<void> createAccount() async {
     isLoading.value = true;
 
     try {
       await Future.delayed(const Duration(seconds: 2));
-      Get.offAll(NavbarScreen());
-      EasyLoading.showSuccess('Logged in successfully');
+
+      EasyLoading.showSuccess('Account created successfully');
     } catch (e) {
-      EasyLoading.showError('Login failed: ${e.toString()}');
+      EasyLoading.showError('Failed to create account: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
@@ -102,6 +119,7 @@ class SignInController extends GetxController {
 
   @override
   void onClose() {
+    fullNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.onClose();
