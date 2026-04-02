@@ -22,7 +22,7 @@ class CustomNavBar extends StatelessWidget {
     final controller = Get.put(NavController());
 
     return Container(
-      color: AppColors.backgroundColor,
+      color: Colors.transparent,
       padding: EdgeInsets.only(left: 56, right: 56, bottom: 32, top: 12),
       child: SizedBox(
         height: 56,
@@ -30,6 +30,18 @@ class CustomNavBar extends StatelessWidget {
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
+            // Bridge centered behind FAB, overlapping both pill ends
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 100,
+                  height: 20,
+                  color: const Color(0xFF111827),
+                ),
+              ),
+            ),
+
             Obx(() {
               final idx = controller.currentIndex.value;
               return Row(
@@ -50,11 +62,7 @@ class CustomNavBar extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Container(
-                    width: 88,
-                    height: 20,
-                    color: AppColors.primaryTextColor,
-                  ),
+                  const SizedBox(width: 88),
                   Expanded(
                     child: _Pill(
                       children: [
