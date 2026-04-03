@@ -1,8 +1,7 @@
-import 'package:chrisimhof/core/common/widgets/custom_back_button.dart';
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/auth/change_password/controller/change_password_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,20 +20,7 @@ class ChangePasswordScreen extends StatelessWidget {
           padding: EdgeInsets.only(left: 16, right: 16, top: 78),
           child: Column(
             children: [
-              Row(
-                children: [
-                  CustomBackButton(),
-                  SizedBox(width: 16),
-                  Text(
-                    'Change Password',
-                    style: getTextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryTextColor,
-                    ),
-                  ),
-                ],
-              ),
+              CustomAppBar(title: 'Change Password', showBackButton: true),
               SizedBox(height: 28),
               Obx(
                 () => CustomTextFormField(
