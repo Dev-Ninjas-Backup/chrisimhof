@@ -1,6 +1,6 @@
 import 'package:chrisimhof/features/auth/create_account/screen/create_account_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
-import 'package:chrisimhof/features/auth/change_password/screen/change_password_screen.dart';
+import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
 import 'package:get/get.dart';
 

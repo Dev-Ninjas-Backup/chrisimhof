@@ -1,7 +1,7 @@
 import 'package:chrisimhof/features/dashboard/screen/dashboard_screen.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:chrisimhof/features/nav_bar/widget/custom_navbar.dart';
-import 'package:chrisimhof/features/settings/screen/settings_screen.dart';
+import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
