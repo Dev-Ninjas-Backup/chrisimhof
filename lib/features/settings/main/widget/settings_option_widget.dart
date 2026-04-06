@@ -1,6 +1,6 @@
 import 'package:chrisimhof/features/settings/language/screens/language_screen.dart';
 import 'package:chrisimhof/features/settings/main/widget/option_item.dart';
-import 'package:chrisimhof/routes/app_routes.dart';
+import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +21,9 @@ class SettingsOptionWidget extends StatelessWidget {
           OptionItem(
             title: 'Subscriptions',
             icon: Icons.attach_money_outlined,
-            onTap: () {},
+            onTap: () {
+              Get.to(SubscriptionsScreen());
+            },
             showPremiumBadge: true,
           ),
           OptionItem(
