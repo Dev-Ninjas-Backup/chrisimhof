@@ -39,8 +39,11 @@ class LanguageButton extends StatelessWidget {
               width: 16,
               height: 16,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 2),
-                color: isSelected ? Colors.green : Colors.grey,
+                border: Border.all(
+                  color: isSelected ? Colors.black : Color(0xFFD5D7DA),
+                  width: 2,
+                ),
+                color: isSelected ? Colors.green : Colors.white,
                 shape: BoxShape.circle,
               ),
             ),

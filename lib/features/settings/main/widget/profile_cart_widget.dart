@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
+import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,8 @@ class ProfileCartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String name = 'Avijit Das';
+    String email = 'avijitavi338895@gmail.com';
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(vertical: 24),
@@ -30,7 +33,7 @@ class ProfileCartWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Avijit Das',
+                name,
                 style: getTextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -39,7 +42,7 @@ class ProfileCartWidget extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                'avijit.das@example.com',
+                email,
                 style: getTextStyle(
                   fontSize: 16,
                   color: AppColors.secondaryTextColor,
@@ -50,7 +53,9 @@ class ProfileCartWidget extends StatelessWidget {
           ),
           Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.to(EditProfileScreen(name: name, email: email));
+            },
             icon: Icon(Icons.edit, color: AppColors.primaryButtonColor),
           ),
         ],
