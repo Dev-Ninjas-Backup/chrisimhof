@@ -89,9 +89,7 @@ class SignInScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () {
-                    Get.toNamed('/changePasswordScreen');
-                  },
+                  onTap: () {},
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(

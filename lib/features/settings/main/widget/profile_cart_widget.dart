@@ -11,6 +11,7 @@ class ProfileCartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 24),
       width: Get.width,
       height: 96,
       decoration: BoxDecoration(

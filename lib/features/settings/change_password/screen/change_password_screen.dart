@@ -2,7 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/features/auth/change_password/controller/change_password_controller.dart';
+import 'package:chrisimhof/features/settings/change_password/controller/change_password_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
