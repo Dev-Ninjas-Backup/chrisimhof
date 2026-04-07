@@ -1,6 +1,5 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/history/controller/history_controller.dart';
 import 'package:chrisimhof/features/history/widget/history_widget.dart';
 import 'package:chrisimhof/features/history/widget/tab_button.dart';
