@@ -7,8 +7,6 @@ import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// Total height the floating navbar occupies from the screen bottom.
-/// Screens must add this as bottom padding so content isn't hidden.
 const double kNavBarTotalHeight =
     32 + 12 + 56; // bottom + top padding + pill height
 
