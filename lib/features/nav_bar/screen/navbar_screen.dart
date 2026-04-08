@@ -13,7 +13,7 @@ const double kNavBarTotalHeight =
 class NavbarScreen extends StatelessWidget {
   const NavbarScreen({super.key});
 
-  static const List<Widget> _screens = [
+  static final List<Widget> _screens = [
     DashboardScreen(),
     AnalyticsScreen(),
     HistoryScreen(),
