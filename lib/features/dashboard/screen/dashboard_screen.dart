@@ -19,7 +19,7 @@ class DashboardScreen extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsetsGeometry.only(top: 78, left: 16, bottom: 100),
+          padding: EdgeInsetsGeometry.only(top: 78, left: 16, bottom: 20),
           child: Column(
             children: [
               ProfileWidget(name: 'Avijit Das'),
