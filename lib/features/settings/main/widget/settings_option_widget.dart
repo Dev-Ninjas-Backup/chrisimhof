@@ -1,6 +1,8 @@
 import 'package:chrisimhof/features/settings/language/screens/language_screen.dart';
 import 'package:chrisimhof/features/settings/main/widget/option_item.dart';
+import 'package:chrisimhof/features/settings/privacy_policy/screen/privacy_policy_screen.dart';
 import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_screen.dart';
+import 'package:chrisimhof/features/settings/terms_of_use/screen/terms_of_use_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,6 +41,22 @@ class SettingsOptionWidget extends StatelessWidget {
             icon: Icons.language_outlined,
             onTap: () {
               Get.to(LanguageScreen());
+            },
+            showPremiumBadge: false,
+          ),
+          OptionItem(
+            title: 'Privacy Policy',
+            icon: Icons.lock,
+            onTap: () {
+              Get.to(PrivacyPolicyScreen());
+            },
+            showPremiumBadge: false,
+          ),
+          OptionItem(
+            title: 'Terms of Use',
+            icon: Icons.file_copy,
+            onTap: () {
+              Get.to(TermsOfUseScreen());
             },
             showPremiumBadge: false,
           ),
