@@ -19,7 +19,7 @@ class AnalyticsScreen extends StatelessWidget {
             top: 78,
             left: 16,
             right: 16,
-            bottom: 150,
+            bottom: 100,
           ),
           child: Column(
             children: [
