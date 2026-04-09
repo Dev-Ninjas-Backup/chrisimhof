@@ -24,7 +24,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Forgot Password',
+                'Forget Password',
                 style: getTextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w600,

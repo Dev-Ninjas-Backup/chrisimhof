@@ -95,7 +95,7 @@ class SignInScreen extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      'Forgot Password?',
+                      'Forget Password?',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.primaryButtonColor,
