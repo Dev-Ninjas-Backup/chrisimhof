@@ -1,4 +1,6 @@
 import 'package:chrisimhof/features/dashboard/widget/short_cut_button.dart';
+import 'package:chrisimhof/features/history/screen/history_screen.dart';
+import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
@@ -19,8 +21,18 @@ class OptionButtonWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           ShortCutButton(icon: Icons.add, onTap: () {}),
-          ShortCutButton(icon: Icons.history, onTap: () {}),
-          ShortCutButton(icon: Icons.settings, onTap: () {}),
+          ShortCutButton(
+            icon: Icons.history,
+            onTap: () {
+              Get.to(HistoryScreen());
+            },
+          ),
+          ShortCutButton(
+            icon: Icons.settings,
+            onTap: () {
+              Get.to(SettingsScreen());
+            },
+          ),
         ],
       ),
     );
