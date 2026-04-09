@@ -89,7 +89,9 @@ class SignInScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed('/forgetPasswordEmailScreen');
+                  },
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
