@@ -1,3 +1,5 @@
+import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_screen.dart';
+import 'package:chrisimhof/features/auth/forget_password/screen/success_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -5,7 +7,20 @@ import 'package:get/get.dart';
 
 class ForgetPasswordController extends GetxController {
   final emailController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  final newPasswordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  final isNewPasswordHidden = true.obs;
+  final isConfirmPasswordHidden = true.obs;
   final isLoading = false.obs;
+
+  void toggleNewPasswordVisibility() {
+    isNewPasswordHidden.value = !isNewPasswordHidden.value;
+  }
+
+  void toggleConfirmPasswordVisibility() {
+    isConfirmPasswordHidden.value = !isConfirmPasswordHidden.value;
+  }
 
   final List<TextEditingController> otpControllers = List.generate(
     4,
@@ -29,7 +44,7 @@ class ForgetPasswordController extends GetxController {
 
     try {
       await Future.delayed(const Duration(seconds: 1));
-      Get.offAll(VerifyCodeScreen());
+      Get.to(VerifyCodeScreen());
       EasyLoading.showSuccess('Code sent successfully');
     } catch (e) {
       EasyLoading.showError('Failed to send code: ${e.toString()}');
@@ -64,13 +79,45 @@ class ForgetPasswordController extends GetxController {
 
     try {
       await Future.delayed(const Duration(seconds: 1));
-      // Get.offAll(VerifyCodeScreen());
+      Get.to(ForgetPasswordScreen());
       EasyLoading.showSuccess('Code verified successfully');
     } catch (e) {
       EasyLoading.showError('Verification failed: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
+  }
+
+  String? validateNewPassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'New password is required';
+    }
+    if (value.trim().length < 6) {
+      return 'New password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? validateConfirmPassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Confirm password is required';
+    }
+    if (value.trim() != newPasswordController.text.trim()) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  Future<void> savePassword() async {
+    if (!formKey.currentState!.validate()) return;
+
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+      Get.to(SuccessScreen());
+      EasyLoading.showSuccess('Update password successfully');
+    } catch (e) {
+      EasyLoading.showError('Update password failed: ${e.toString()}');
+    } finally {}
   }
 
   @override
