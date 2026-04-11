@@ -56,7 +56,7 @@ class CreateAccountController extends GetxController {
 
     try {
       await Future.delayed(const Duration(seconds: 2));
-
+      Get.back();
       EasyLoading.showSuccess('Account created successfully');
     } catch (e) {
       EasyLoading.showError('Failed to create account: ${e.toString()}');

@@ -1,4 +1,3 @@
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -38,8 +37,8 @@ class SignInController extends GetxController {
     isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      Get.offAll(NavbarScreen());
+      await Future.delayed(const Duration(seconds: 1));
+      Get.offAllNamed('/medicalDisclaimerScreen');
       EasyLoading.showSuccess('Logged in successfully');
     } catch (e) {
       EasyLoading.showError('Login failed: ${e.toString()}');
@@ -54,12 +53,12 @@ class SignInController extends GetxController {
 
       EasyLoading.showSuccess(
         'Google Sign-In Clicked',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } catch (e) {
       EasyLoading.showError(
         'Google Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } finally {
       isLoading.value = false;
@@ -71,12 +70,12 @@ class SignInController extends GetxController {
       isLoading.value = true;
       EasyLoading.showSuccess(
         'Apple Sign-In Clicked',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } catch (e) {
       EasyLoading.showError(
         'Apple Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } finally {
       isLoading.value = false;
@@ -88,12 +87,12 @@ class SignInController extends GetxController {
       isLoading.value = true;
       EasyLoading.showSuccess(
         'Microsoft Sign-In Clicked',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } catch (e) {
       EasyLoading.showError(
         'Microsoft Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } finally {
       isLoading.value = false;
