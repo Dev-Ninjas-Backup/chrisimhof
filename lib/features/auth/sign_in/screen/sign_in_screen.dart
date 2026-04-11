@@ -50,12 +50,15 @@ class SignInScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 15),
-                Text(
-                  'Sign In to continue optimizing your lifestyle and performance.',
-                  style: getTextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.secondaryTextColor,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Your intelligent system for better performance.',
+                    style: getTextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.secondaryTextColor,
+                    ),
                   ),
                 ),
                 SizedBox(height: 56),
