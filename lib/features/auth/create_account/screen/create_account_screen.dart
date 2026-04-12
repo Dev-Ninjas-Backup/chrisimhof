@@ -15,13 +15,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreateAccountScreen extends StatelessWidget {
-  const CreateAccountScreen({super.key});
+  CreateAccountScreen({super.key});
+
+  final CreateAccountController controller = Get.put(CreateAccountController());
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateAccountController());
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
