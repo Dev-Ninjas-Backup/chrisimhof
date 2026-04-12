@@ -15,13 +15,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SignInScreen extends StatelessWidget {
-  const SignInScreen({super.key});
+  SignInScreen({super.key});
+
+  final controller = Get.put(SignInController());
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SignInController());
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
