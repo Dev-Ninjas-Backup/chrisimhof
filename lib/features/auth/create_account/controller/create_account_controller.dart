@@ -1,3 +1,5 @@
+import 'package:chrisimhof/features/auth/create_account/model/register_response_model.dart';
+import 'package:chrisimhof/features/auth/create_account/service/create_account_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -9,6 +11,10 @@ class CreateAccountController extends GetxController {
 
   final isPasswordHidden = true.obs;
   final isLoading = false.obs;
+
+  final CreateAccountService _createAccountService = CreateAccountService();
+
+  RegisterResponseModel? registerResponse;
 
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
@@ -45,19 +51,32 @@ class CreateAccountController extends GetxController {
     if (value == null || value.trim().isEmpty) {
       return 'Password is required';
     }
-    if (value.trim().length < 6) {
+    if (value.trim().length < 8) {
       return 'Password must be at least 6 characters';
     }
     return null;
   }
 
   Future<void> createAccount() async {
-    isLoading.value = true;
-
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      isLoading.value = true;
 
-      EasyLoading.showSuccess('Account created successfully');
+      final response = await _createAccountService.registerUser(
+        name: fullNameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      registerResponse = response;
+
+      if (response.success) {
+        EasyLoading.showSuccess("Registration Successful");
+        debugPrint('User ID: ${response.data?.user?.id}');
+        debugPrint('User Email: ${response.data?.user?.email}');
+        Get.back();
+      } else {
+        EasyLoading.showError(response.message);
+      }
     } catch (e) {
       EasyLoading.showError('Failed to create account: ${e.toString()}');
     } finally {

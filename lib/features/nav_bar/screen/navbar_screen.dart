@@ -1,14 +1,19 @@
+import 'package:chrisimhof/features/analytics/screen/analytics_screen.dart';
 import 'package:chrisimhof/features/dashboard/screen/dashboard_screen.dart';
+import 'package:chrisimhof/features/history/screen/history_screen.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:chrisimhof/features/nav_bar/widget/custom_navbar.dart';
-import 'package:chrisimhof/features/settings/screen/settings_screen.dart';
+import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+const double kNavBarTotalHeight =
+    32 + 12 + 56; // bottom + top padding + pill height
 
 class NavbarScreen extends StatelessWidget {
   const NavbarScreen({super.key});
 
-  static const List<Widget> _screens = [
+  static final List<Widget> _screens = [
     DashboardScreen(),
     AnalyticsScreen(),
     HistoryScreen(),
@@ -21,41 +26,11 @@ class NavbarScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Obx(() => _screens[controller.currentIndex.value]),
-      bottomNavigationBar: const CustomNavBar(),
-    );
-  }
-}
-
-class AnalyticsScreen extends StatelessWidget {
-  const AnalyticsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Text(
-          'Analytics',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-}
-
-class HistoryScreen extends StatelessWidget {
-  const HistoryScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Text(
-          'History',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
+      body: Stack(
+        children: [
+          Obx(() => _screens[controller.currentIndex.value]),
+          const Align(alignment: Alignment.bottomCenter, child: CustomNavBar()),
+        ],
       ),
     );
   }

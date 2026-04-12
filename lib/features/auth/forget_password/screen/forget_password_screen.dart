@@ -2,26 +2,31 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/features/auth/change_password/controller/change_password_controller.dart';
+import 'package:chrisimhof/features/auth/forget_password/controller/forget_password_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ChangePasswordScreen extends StatelessWidget {
-  const ChangePasswordScreen({super.key});
+class ForgetPasswordScreen extends StatelessWidget {
+  const ForgetPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ChangePasswordController());
+    final controller = Get.put(ForgetPasswordController());
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Form(
-        key: controller.formKey,
-        child: Padding(
-          padding: EdgeInsets.only(left: 16, right: 16, top: 78),
+      body: Padding(
+        padding: EdgeInsetsGeometry.only(
+          top: 76,
+          left: 16,
+          right: 16,
+          bottom: 32,
+        ),
+        child: Form(
+          key: controller.formKey,
           child: Column(
             children: [
-              CustomAppBar(title: 'Change Password', showBackButton: true),
-              SizedBox(height: 28),
+              CustomAppBar(title: 'Forget Password', showBackButton: true),
+              SizedBox(height: 44),
               Obx(
                 () => CustomTextFormField(
                   label: 'New Password',
@@ -42,7 +47,7 @@ class ChangePasswordScreen extends StatelessWidget {
                   validator: (value) => controller.validateNewPassword(value),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 36),
               Obx(
                 () => CustomTextFormField(
                   label: 'Confirm Password',
@@ -66,10 +71,9 @@ class ChangePasswordScreen extends StatelessWidget {
               ),
               Spacer(),
               CustomButton(
-                text: 'Update Password',
-                onTap: controller.updatePassword, // 👈 call updatePassword
+                text: 'Save Password',
+                onTap: controller.savePassword,
               ),
-              SizedBox(height: 32),
             ],
           ),
         ),
