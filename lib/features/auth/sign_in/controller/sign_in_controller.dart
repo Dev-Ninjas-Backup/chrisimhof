@@ -1,3 +1,7 @@
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
+import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
+import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -8,6 +12,10 @@ class SignInController extends GetxController {
 
   final isPasswordHidden = true.obs;
   final isLoading = false.obs;
+
+  final SignInService _signInService = SignInService();
+
+  LoginResponseModel? loginResponse;
 
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
@@ -34,14 +42,35 @@ class SignInController extends GetxController {
   }
 
   Future<void> login() async {
-    isLoading.value = true;
-
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      Get.offAllNamed('/medicalDisclaimerScreen');
-      EasyLoading.showSuccess('Logged in successfully');
+      isLoading.value = true;
+
+      final response = await _signInService.loginUser(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      loginResponse = response;
+
+      if (response.success) {
+        final accessToken = response.data?.tokens?.accessToken ?? '';
+        final refreshToken = response.data?.tokens?.refreshToken ?? '';
+
+        await SharedPreferencesHelper.saveAccessToken(accessToken);
+        await SharedPreferencesHelper.saveRefreshToken(refreshToken);
+        await SharedPreferencesHelper.setLoginStatus(true);
+
+        debugPrint('Access Token: $accessToken');
+        debugPrint('Refresh Token: $refreshToken');
+
+        EasyLoading.showSuccess(response.message);
+        Get.offAllNamed('/medicalDisclaimerScreen');
+      } else {
+        EasyLoading.showError(response.message);
+      }
     } catch (e) {
-      EasyLoading.showError('Login failed: ${e.toString()}');
+      EasyLoading.showError('Login failed. Please try again.');
+      debugPrint('Login error: $e');
     } finally {
       isLoading.value = false;
     }
