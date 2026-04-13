@@ -4,7 +4,6 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:get/utils.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
