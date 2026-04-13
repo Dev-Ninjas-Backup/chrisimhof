@@ -1,7 +1,6 @@
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
-import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
