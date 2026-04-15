@@ -1,14 +1,54 @@
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
 import 'package:chrisimhof/features/settings/main/service/logout_service.dart';
+import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
   final isLoading = false.obs;
+  final isProfileLoading = false.obs;
 
   final LogoutService _logoutService = LogoutService();
+  final ProfileService _profileService = ProfileService();
+
+  final userName = ''.obs;
+  final email = ''.obs;
+  final avatarUrl = ''.obs;
+
+  Future<void> getProfile() async {
+    try {
+      isProfileLoading.value = true;
+
+      final String? accessToken =
+          await SharedPreferencesHelper.getAccessToken();
+
+      debugPrint('Profile access token: $accessToken');
+
+      if (accessToken == null || accessToken.trim().isEmpty) {
+        userName.value = '';
+        email.value = '';
+        avatarUrl.value = '';
+        return;
+      }
+
+      final ProfileResponseModel response = await _profileService.getProfile(
+        accessToken: accessToken,
+      );
+
+      if (response.success && response.data != null) {
+        userName.value = response.data!.userName;
+        email.value = response.data!.email;
+        avatarUrl.value = response.data!.avatarUrl ?? '';
+      }
+    } catch (e) {
+      debugPrint('Profile error: $e');
+    } finally {
+      isProfileLoading.value = false;
+    }
+  }
 
   Future<void> logout() async {
     try {
@@ -63,5 +103,11 @@ class SettingsController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    getProfile();
   }
 }
