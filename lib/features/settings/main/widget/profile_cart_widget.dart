@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class ProfileCartWidget extends StatelessWidget {
   ProfileCartWidget({super.key});
 
-  final SettingsController controller = Get.find<SettingsController>();
+  final SettingsController controller = Get.put(SettingsController());
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +77,15 @@ class ProfileCartWidget extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                Get.to(EditProfileScreen(name: name, email: userEmail));
+                Get.to(
+                  () => EditProfileScreen(name: name, email: userEmail),
+                  arguments: {
+                    'name': name,
+                    'email': userEmail,
+                    'bio': '',
+                    'avatarUrl': imageUrl,
+                  },
+                );
               },
               icon: Icon(Icons.edit, color: AppColors.primaryButtonColor),
             ),

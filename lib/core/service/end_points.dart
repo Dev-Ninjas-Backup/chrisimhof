@@ -5,4 +5,5 @@ class Urls {
   static const String login = '$baseUrl/auth/login';
   static const String logout = '$baseUrl/auth/logout';
   static const String profile = '$baseUrl/profile';
+  static const String updateProfile = '$baseUrl/profile';
 }

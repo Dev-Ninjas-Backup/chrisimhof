@@ -22,7 +22,7 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.only(top: 78, left: 16, right: 16),
           child: Column(
             children: [
-              const CustomAppBar(title: 'Settings', showBackButton: false),
+              CustomAppBar(title: 'Settings', showBackButton: false),
               ProfileCartWidget(),
               SettingsOptionWidget(),
               LogoutButton(),
