@@ -1,21 +1,11 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/features/calculator/screens/calculator_screen.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CustomNavBar extends StatelessWidget {
   const CustomNavBar({super.key});
-
-  void _onFabPressed(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.primaryTextColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => const _AddSheet(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +75,9 @@ class CustomNavBar extends StatelessWidget {
 
             Positioned(
               child: GestureDetector(
-                onTap: () => _onFabPressed(context),
+                onTap: () {
+                  Get.to(() => CalculatorScreen());
+                },
                 child: Container(
                   width: 56,
                   height: 56,
@@ -168,63 +160,6 @@ class _NavItem extends StatelessWidget {
           color: isActive ? AppColors.primaryButtonColor : Colors.white,
         ),
       ),
-    );
-  }
-}
-
-class _AddSheet extends StatelessWidget {
-  const _AddSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Add New',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
-          _SheetOption(icon: Icons.note_add_rounded, label: 'New Note'),
-          _SheetOption(icon: Icons.add_task_rounded, label: 'New Task'),
-          _SheetOption(icon: Icons.camera_alt_rounded, label: 'Add Photo'),
-          _SheetOption(icon: Icons.link_rounded, label: 'Add Link'),
-        ],
-      ),
-    );
-  }
-}
-
-class _SheetOption extends StatelessWidget {
-  const _SheetOption({required this.icon, required this.label});
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: const Color(0xFF3DCA8A), size: 22),
-      ),
-      title: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
-      ),
-      onTap: () => Get.back(),
     );
   }
 }

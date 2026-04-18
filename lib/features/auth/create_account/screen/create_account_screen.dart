@@ -15,13 +15,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreateAccountScreen extends StatelessWidget {
-  const CreateAccountScreen({super.key});
+  CreateAccountScreen({super.key});
+
+  final CreateAccountController controller = Get.put(CreateAccountController());
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateAccountController());
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -49,27 +49,18 @@ class CreateAccountScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 15),
-                RichText(
-                  text: TextSpan(
-                    text:
-                        'Start optimizing your lifestyle and unlock your peak performance with ',
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Your intelligent system for better performance.',
                     style: getTextStyle(
                       fontSize: 16,
-                      color: AppColors.secondaryTextColor,
                       fontWeight: FontWeight.w400,
+                      color: AppColors.secondaryTextColor,
                     ),
-                    children: [
-                      TextSpan(
-                        text: 'RYVENZA',
-                        style: getTextStyle(
-                          fontSize: 16,
-                          color: AppColors.primaryButtonColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
+
                 SizedBox(height: 56),
                 CustomTextFormField(
                   label: 'Full Name',

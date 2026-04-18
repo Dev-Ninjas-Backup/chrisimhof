@@ -1,4 +1,6 @@
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
+import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -9,6 +11,10 @@ class SignInController extends GetxController {
 
   final isPasswordHidden = true.obs;
   final isLoading = false.obs;
+
+  final SignInService _signInService = SignInService();
+
+  LoginResponseModel? loginResponse;
 
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
@@ -35,14 +41,35 @@ class SignInController extends GetxController {
   }
 
   Future<void> login() async {
-    isLoading.value = true;
-
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      Get.offAll(NavbarScreen());
-      EasyLoading.showSuccess('Logged in successfully');
+      isLoading.value = true;
+
+      final response = await _signInService.loginUser(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      loginResponse = response;
+
+      if (response.success) {
+        final accessToken = response.data?.tokens?.accessToken ?? '';
+        final refreshToken = response.data?.tokens?.refreshToken ?? '';
+
+        await SharedPreferencesHelper.saveAccessToken(accessToken);
+        await SharedPreferencesHelper.saveRefreshToken(refreshToken);
+        await SharedPreferencesHelper.setLoginStatus(true);
+
+        debugPrint('Access Token: $accessToken');
+        debugPrint('Refresh Token: $refreshToken');
+
+        EasyLoading.showSuccess(response.message);
+        Get.offAllNamed('/medicalDisclaimerScreen');
+      } else {
+        EasyLoading.showError(response.message);
+      }
     } catch (e) {
-      EasyLoading.showError('Login failed: ${e.toString()}');
+      EasyLoading.showError('Login failed. Please try again.');
+      debugPrint('Login error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -54,12 +81,12 @@ class SignInController extends GetxController {
 
       EasyLoading.showSuccess(
         'Google Sign-In Clicked',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } catch (e) {
       EasyLoading.showError(
         'Google Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } finally {
       isLoading.value = false;
@@ -71,12 +98,12 @@ class SignInController extends GetxController {
       isLoading.value = true;
       EasyLoading.showSuccess(
         'Apple Sign-In Clicked',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } catch (e) {
       EasyLoading.showError(
         'Apple Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } finally {
       isLoading.value = false;
@@ -88,22 +115,15 @@ class SignInController extends GetxController {
       isLoading.value = true;
       EasyLoading.showSuccess(
         'Microsoft Sign-In Clicked',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } catch (e) {
       EasyLoading.showError(
         'Microsoft Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
       );
     } finally {
       isLoading.value = false;
     }
-  }
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.onClose();
   }
 }
