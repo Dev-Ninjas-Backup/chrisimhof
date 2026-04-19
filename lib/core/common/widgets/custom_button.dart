@@ -13,7 +13,7 @@ class CustomButton extends StatelessWidget {
     required this.text,
     required this.onTap,
     this.width,
-    this.backgroundColor = AppColors.primaryButtonColor,
+    this.backgroundColor,
   });
 
   @override
@@ -24,7 +24,7 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
+          backgroundColor: backgroundColor ?? AppColors.primaryButtonColor,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
