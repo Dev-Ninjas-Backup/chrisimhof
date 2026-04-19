@@ -41,7 +41,7 @@ class SignInScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
 
                   child: Text(
-                    'Welcome Back',
+                    'Welcome Back'.tr,
                     style: getTextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -53,7 +53,7 @@ class SignInScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Your intelligent system for better performance.',
+                    'Your intelligent system for better performance.'.tr,
                     style: getTextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -63,8 +63,8 @@ class SignInScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 56),
                 CustomTextFormField(
-                  label: 'Email',
-                  hintText: 'Enter your email',
+                  label: 'Email'.tr,
+                  hintText: 'Enter your email'.tr,
                   isRequired: true,
                   controller: controller.emailController,
                   validator: (value) => controller.validateEmail(value),
@@ -72,9 +72,9 @@ class SignInScreen extends StatelessWidget {
                 SizedBox(height: 16),
                 Obx(
                   () => CustomTextFormField(
-                    label: 'Password',
+                    label: 'Password'.tr,
                     isRequired: true,
-                    hintText: 'Enter your password',
+                    hintText: 'Enter your password'.tr,
                     controller: controller.passwordController,
                     suffixIcon: IconButton(
                       onPressed: controller.togglePasswordVisibility,
@@ -98,7 +98,7 @@ class SignInScreen extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      'Forget Password?',
+                      'Forget Password?'.tr,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.primaryButtonColor,
@@ -112,7 +112,7 @@ class SignInScreen extends StatelessWidget {
                 SizedBox(height: 40),
                 Obx(
                   () => CustomButton(
-                    text: 'Sign In',
+                    text: 'Sign In'.tr,
                     onTap: controller.isLoading.value
                         ? null
                         : () {
@@ -149,7 +149,7 @@ class SignInScreen extends StatelessWidget {
                 SizedBox(height: 32),
                 RichText(
                   text: TextSpan(
-                    text: 'Don\'t have an account? ',
+                    text: '${'Don\'t have an account?'.tr} ',
                     style: getTextStyle(
                       fontSize: 14,
                       color: AppColors.secondaryTextColor,
@@ -161,7 +161,7 @@ class SignInScreen extends StatelessWidget {
                           ..onTap = () {
                             Get.toNamed(AppRoutes.createAccountScreen);
                           },
-                        text: 'Create Account',
+                        text: 'Create Account'.tr,
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.primaryButtonColor,

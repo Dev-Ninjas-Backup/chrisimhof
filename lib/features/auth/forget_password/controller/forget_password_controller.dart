@@ -31,10 +31,10 @@ class ForgetPasswordController extends GetxController {
 
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+      return 'Email is required'.tr;
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim())) {
-      return 'Please enter a valid email';
+      return 'Please enter a valid email'.tr;
     }
     return null;
   }
@@ -45,9 +45,9 @@ class ForgetPasswordController extends GetxController {
     try {
       await Future.delayed(const Duration(seconds: 1));
       Get.to(VerifyCodeScreen());
-      EasyLoading.showSuccess('Code sent successfully');
+      EasyLoading.showSuccess('Code sent successfully'.tr);
     } catch (e) {
-      EasyLoading.showError('Failed to send code: ${e.toString()}');
+      EasyLoading.showError('${'Failed to send code'.tr}: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
@@ -71,7 +71,7 @@ class ForgetPasswordController extends GetxController {
 
   Future<void> verifyCode() async {
     if (otpCode.length != 4) {
-      EasyLoading.showError('Please enter the 4-digit code');
+      EasyLoading.showError('Please enter the 4-digit code'.tr);
       return;
     }
 
@@ -80,9 +80,9 @@ class ForgetPasswordController extends GetxController {
     try {
       await Future.delayed(const Duration(seconds: 1));
       Get.to(ForgetPasswordScreen());
-      EasyLoading.showSuccess('Code verified successfully');
+      EasyLoading.showSuccess('Code verified successfully'.tr);
     } catch (e) {
-      EasyLoading.showError('Verification failed: ${e.toString()}');
+      EasyLoading.showError('${'Verification failed'.tr}: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
@@ -90,20 +90,20 @@ class ForgetPasswordController extends GetxController {
 
   String? validateNewPassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'New password is required';
+      return 'New password is required'.tr;
     }
     if (value.trim().length < 6) {
-      return 'New password must be at least 6 characters';
+      return 'New password must be at least 6 characters'.tr;
     }
     return null;
   }
 
   String? validateConfirmPassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Confirm password is required';
+      return 'Confirm password is required'.tr;
     }
     if (value.trim() != newPasswordController.text.trim()) {
-      return 'Passwords do not match';
+      return 'Passwords do not match'.tr;
     }
     return null;
   }
@@ -114,9 +114,9 @@ class ForgetPasswordController extends GetxController {
     try {
       await Future.delayed(const Duration(seconds: 1));
       Get.to(SuccessScreen());
-      EasyLoading.showSuccess('Update password successfully');
+      EasyLoading.showSuccess('Update password successfully'.tr);
     } catch (e) {
-      EasyLoading.showError('Update password failed: ${e.toString()}');
+      EasyLoading.showError('${'Update password failed'.tr}: ${e.toString()}');
     } finally {}
   }
 

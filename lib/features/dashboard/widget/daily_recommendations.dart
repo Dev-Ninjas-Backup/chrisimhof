@@ -22,7 +22,7 @@ class DailyRecommendations extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Daily Recommendations',
+            'Daily Recommendations'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -32,21 +32,24 @@ class DailyRecommendations extends StatelessWidget {
           SizedBox(height: 24),
           DailyRecommendationsWidget(
             imagePath: IconPath.iron,
-            recommendationText: 'Recommendations of the day',
+            recommendationText: 'Recommendations of the day'.tr,
             subText:
-                'A small nighttime meal: light, easy to digest, not too fatty, with easily digestible protein and simple/moderate carbohydrates. Not a large fast-food meal at 3 a.m.',
+                'A small nighttime meal: light, easy to digest, not too fatty, with easily digestible protein and simple/moderate carbohydrates.'
+                    .tr,
           ),
           DailyRecommendationsWidget(
             imagePath: IconPath.vector,
-            recommendationText: 'Caffeine',
+            recommendationText: 'Caffeine'.tr,
             subText:
-                'Moderate caffeine intake. Try to stop around 7:32 PM to protect your sleep.',
+                'Moderate caffeine intake. Try to stop around 7:32 PM to protect your sleep.'
+                    .tr,
           ),
           DailyRecommendationsWidget(
             imagePath: IconPath.sports,
-            recommendationText: 'Sport',
+            recommendationText: 'Sport'.tr,
             subText:
-                'Moderate caffeine intake. Try to stop around 7:32 PM to protect your sleep.',
+                'Regular physical activity improves sleep quality and overall health.'
+                    .tr,
           ),
         ],
       ),

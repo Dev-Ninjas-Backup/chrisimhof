@@ -27,4 +27,14 @@ class TimeController extends GetxController {
 
   String get formattedHour => hour.value.toString().padLeft(2, '0');
   String get formattedMinute => minute.value.toString().padLeft(2, '0');
+  String get formattedTime =>
+      '$formattedHour:$formattedMinute ${period.value.tr}';
+
+  String get to24HourFormat {
+    int h = hour.value;
+    if (period.value == 'PM' && h != 12) h += 12;
+    if (period.value == 'AM' && h == 12) h = 0;
+
+    return '${h.toString().padLeft(2, '0')}:$formattedMinute';
+  }
 }

@@ -21,7 +21,7 @@ class SettingsOptionWidget extends StatelessWidget {
       child: Column(
         children: [
           OptionItem(
-            title: 'Subscriptions',
+            title: 'Subscriptions.'.tr,
             icon: Icons.attach_money_outlined,
             onTap: () {
               Get.to(SubscriptionsScreen());
@@ -29,7 +29,7 @@ class SettingsOptionWidget extends StatelessWidget {
             showPremiumBadge: true,
           ),
           OptionItem(
-            title: 'Change Password',
+            title: 'Change Password'.tr,
             icon: Icons.notifications_outlined,
             onTap: () {
               Get.toNamed('/changePasswordScreen');
@@ -37,7 +37,7 @@ class SettingsOptionWidget extends StatelessWidget {
             showPremiumBadge: false,
           ),
           OptionItem(
-            title: 'Choose Language',
+            title: 'Choose Language'.tr,
             icon: Icons.language_outlined,
             onTap: () {
               Get.to(LanguageScreen());
@@ -45,7 +45,7 @@ class SettingsOptionWidget extends StatelessWidget {
             showPremiumBadge: false,
           ),
           OptionItem(
-            title: 'Privacy Policy',
+            title: 'Privacy Policy'.tr,
             icon: Icons.lock,
             onTap: () {
               Get.to(PrivacyPolicyScreen());
@@ -53,7 +53,7 @@ class SettingsOptionWidget extends StatelessWidget {
             showPremiumBadge: false,
           ),
           OptionItem(
-            title: 'Terms of Use',
+            title: 'Terms of Use'.tr,
             icon: Icons.file_copy,
             onTap: () {
               Get.to(TermsOfUseScreen());

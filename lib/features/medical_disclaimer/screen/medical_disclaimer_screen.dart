@@ -22,7 +22,7 @@ class MedicalDisclaimerScreen extends StatelessWidget {
             Image.asset(ImagePath.disclaimer, height: 106, width: 106),
             SizedBox(height: 40),
             Text(
-              'Medical Disclaimer',
+              'Medical Disclaimer'.tr,
               style: getTextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w600,
@@ -31,7 +31,8 @@ class MedicalDisclaimerScreen extends StatelessWidget {
             ),
             SizedBox(height: 32),
             Text(
-              'RYVENZA provides lifestyle and performance recommendations based on user inputs.  It is not a medical device and does not provide medical advice, diagnosis, or treatment.  The information provided by the application is for informational and educational  purposes only.  Users should always consult a qualified healthcare professional for medical concerns.  Use of the application is at your own risk.',
+              'RYVENZA provides lifestyle and performance recommendations based on user inputs.  It is not a medical device and does not provide medical advice, diagnosis, or treatment.  The information provided by the application is for informational and educational  purposes only.  Users should always consult a qualified healthcare professional for medical concerns.  Use of the application is at your own risk.'
+                  .tr,
               style: getTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
@@ -41,7 +42,7 @@ class MedicalDisclaimerScreen extends StatelessWidget {
             ),
             Spacer(),
             CustomButton(
-              text: 'Continue',
+              text: 'Continue'.tr,
               onTap: () {
                 Get.offAll(NavbarScreen());
               },

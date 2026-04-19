@@ -23,7 +23,7 @@ class LogoutButton extends StatelessWidget {
             border: Border.all(width: 1, color: AppColors.logoutBorderColor),
           ),
           child: Text(
-            controller.isLoading.value ? 'Logging out...' : 'Logout',
+            controller.isLoading.value ? 'Logging out...'.tr : 'Logout'.tr,
             textAlign: TextAlign.center,
             style: getTextStyle(
               color: AppColors.logoutBorderColor,
