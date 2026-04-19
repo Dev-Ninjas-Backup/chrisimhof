@@ -24,7 +24,7 @@ class WellnessScoreCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Wellness Score',
+            'Wellness Score'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -33,7 +33,7 @@ class WellnessScoreCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Weekly balance overview',
+            'Weekly balance overview'.tr,
             style: getTextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -87,13 +87,13 @@ class WellnessScoreCard extends StatelessWidget {
                     ),
                   ],
                   getTitle: (index, angle) {
-                    const titles = [
-                      'Sleep',
-                      'Hydration',
-                      'Caffein',
-                      'Exercise',
-                      'Recovery',
-                      'Nutrition',
+                    final titles = [
+                      'Sleep'.tr,
+                      'Hydration'.tr,
+                      'Caffeine'.tr,
+                      'Exercise'.tr,
+                      'Recovery'.tr,
+                      'Nutrition'.tr,
                     ];
 
                     return RadarChartTitle(text: titles[index], angle: angle);
@@ -123,7 +123,7 @@ class WellnessScoreCard extends StatelessWidget {
     return [
       safeValue(0), // Sleep
       safeValue(1), // Hydration
-      safeValue(2), // Caffein
+      safeValue(2), // Caffeine
       safeValue(3), // Exercise
       safeValue(4), // Recovery
       safeValue(5), // Nutrition

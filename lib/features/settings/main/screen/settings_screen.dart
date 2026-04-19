@@ -22,14 +22,14 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.only(top: 78, left: 16, right: 16),
           child: Column(
             children: [
-              CustomAppBar(title: 'Settings', showBackButton: false),
+              CustomAppBar(title: 'Settings'.tr, showBackButton: false),
               ProfileCartWidget(),
               SettingsOptionWidget(),
               LogoutButton(),
               GestureDetector(
                 onTap: () => Get.offAllNamed('/signInScreen'),
                 child: Text(
-                  'Delete Account',
+                  'Delete Account'.tr,
                   style: getTextStyle(
                     color: AppColors.secondaryTextColor,
                     fontSize: 18,

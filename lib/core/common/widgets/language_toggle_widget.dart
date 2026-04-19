@@ -10,9 +10,7 @@ class LanguageToggleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LanguageController controller = Get.isRegistered<LanguageController>()
-        ? Get.find<LanguageController>()
-        : Get.put(LanguageController(), permanent: true);
+    final LanguageController controller = Get.find<LanguageController>();
 
     return SizedBox(
       width: 140,
@@ -22,6 +20,7 @@ class LanguageToggleWidget extends StatelessWidget {
           children: [
             Expanded(
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => controller.changeLanguage('en'),
                 child: Container(
                   padding: const EdgeInsets.all(4),
@@ -45,7 +44,9 @@ class LanguageToggleWidget extends StatelessWidget {
                         style: getTextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTextColor,
+                          color: controller.isSelected('en')
+                              ? Colors.white
+                              : AppColors.primaryTextColor,
                         ),
                       ),
                     ],
@@ -55,6 +56,7 @@ class LanguageToggleWidget extends StatelessWidget {
             ),
             Expanded(
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => controller.changeLanguage('fr'),
                 child: Container(
                   padding: const EdgeInsets.all(4),
@@ -78,7 +80,9 @@ class LanguageToggleWidget extends StatelessWidget {
                         style: getTextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTextColor,
+                          color: controller.isSelected('fr')
+                              ? Colors.white
+                              : AppColors.primaryTextColor,
                         ),
                       ),
                     ],

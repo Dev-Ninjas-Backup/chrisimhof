@@ -48,7 +48,7 @@ class OptionItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'Premium',
+                'Premium'.tr,
                 style: getTextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,

@@ -31,7 +31,7 @@ class TheDailyVitalityScore extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'The Daily Vitality\nScore',
+                    'The Daily Vitality\nScore'.tr,
                     style: getTextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -90,9 +90,7 @@ class TheDailyVitalityScore extends StatelessWidget {
                         color: AppColors.secondaryTextColor,
                       ),
                       children: [
-                        const TextSpan(
-                          text: 'Your lifestyle efficiency is up ',
-                        ),
+                        TextSpan(text: 'Your lifestyle efficiency is up '.tr),
                         TextSpan(
                           text: '${controller.improvementPercent.value}%',
                           style: const TextStyle(
@@ -100,7 +98,7 @@ class TheDailyVitalityScore extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const TextSpan(text: ' from yesterday.'),
+                        TextSpan(text: ' from yesterday.'.tr),
                       ],
                     ),
                   ),

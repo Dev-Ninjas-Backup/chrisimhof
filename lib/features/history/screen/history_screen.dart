@@ -24,7 +24,7 @@ class HistoryScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            CustomAppBar(title: 'History', showBackButton: false),
+            CustomAppBar(title: 'History'.tr, showBackButton: false),
             const SizedBox(height: 24),
             Obx(
               () => Row(
@@ -32,7 +32,7 @@ class HistoryScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TabButton(
-                      text: 'Recent',
+                      text: 'Recent'.tr,
                       isSelected: controller.selectedTab.value == 0,
                       onTap: () => controller.selectTab(0),
                     ),
@@ -40,7 +40,7 @@ class HistoryScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   Expanded(
                     child: TabButton(
-                      text: 'Past',
+                      text: 'Past'.tr,
                       isSelected: controller.selectedTab.value == 1,
                       onTap: () => controller.selectTab(1),
                     ),

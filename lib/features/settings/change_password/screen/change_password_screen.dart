@@ -20,13 +20,13 @@ class ChangePasswordScreen extends StatelessWidget {
           padding: EdgeInsets.only(left: 16, right: 16, top: 78),
           child: Column(
             children: [
-              CustomAppBar(title: 'Change Password', showBackButton: true),
+              CustomAppBar(title: 'Change Password'.tr, showBackButton: true),
               SizedBox(height: 28),
               Obx(
                 () => CustomTextFormField(
-                  label: 'New Password',
+                  label: 'New Password'.tr,
                   isRequired: true,
-                  hintText: 'Enter your new password',
+                  hintText: 'Enter your new password'.tr,
                   controller: controller.newPasswordController,
                   suffixIcon: IconButton(
                     onPressed: controller.toggleNewPasswordVisibility,
@@ -45,9 +45,9 @@ class ChangePasswordScreen extends StatelessWidget {
               SizedBox(height: 16),
               Obx(
                 () => CustomTextFormField(
-                  label: 'Confirm Password',
+                  label: 'Confirm Password'.tr,
                   isRequired: true,
-                  hintText: 'Enter your confirm password',
+                  hintText: 'Enter your confirm password'.tr,
                   controller: controller.confirmPasswordController,
                   suffixIcon: IconButton(
                     onPressed: controller.toggleConfirmPasswordVisibility,
@@ -66,7 +66,7 @@ class ChangePasswordScreen extends StatelessWidget {
               ),
               Spacer(),
               CustomButton(
-                text: 'Update Password',
+                text: 'Update Password'.tr,
                 onTap: controller.updatePassword, // 👈 call updatePassword
               ),
               SizedBox(height: 32),

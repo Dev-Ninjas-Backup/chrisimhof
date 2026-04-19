@@ -15,11 +15,11 @@ class ProfileCartWidget extends StatelessWidget {
     return Obx(() {
       final String name = controller.userName.value.isNotEmpty
           ? controller.userName.value
-          : 'User Name';
+          : 'User Name'.tr;
 
       final String userEmail = controller.email.value.isNotEmpty
           ? controller.email.value
-          : 'Email Address';
+          : 'Email Address'.tr;
 
       final String imageUrl = controller.avatarUrl.value;
 
