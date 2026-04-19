@@ -21,6 +21,12 @@ class CalculatorSleepWidget extends StatelessWidget {
         CustomRangeSlider(headerText: 'Sleep Last Night (h) ', currentValue: 8, onChanged: (double p1) {  }),
          SizedBox(height: 16),
         CustomRangeSlider(headerText: 'Sleep Goal (h) ', currentValue: 5, onChanged: (double p1) {  }),
+         SizedBox(height: 100),
+         TimeWidget(topTitle: 'Desired Sleep Start', controller: wakeUpController),
+        SizedBox(height: 16),
+        TimeWidget(topTitle: 'Desired Sleep Start', controller: wakeUpController),
+        SizedBox(height: 16),
+
       ],
     );
   }

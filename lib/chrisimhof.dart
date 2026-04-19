@@ -10,7 +10,7 @@ class Chrisimhof extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.getMedicalDisclaimerScreen(),
+      initialRoute: AppRoutes.getSplashScreen(),
       getPages: AppRoutes.routes,
       builder: EasyLoading.init(),
       themeMode: ThemeMode.light,
