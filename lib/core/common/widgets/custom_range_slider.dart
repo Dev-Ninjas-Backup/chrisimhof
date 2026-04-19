@@ -1,21 +1,17 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomRangeSlider extends StatelessWidget {
   final String headerText;
-  final double currentValue;
-  final double min;
-  final double max;
-  final Function(double) onChanged;
+  final RangeSliderController controller;
 
   const CustomRangeSlider({
     super.key,
     required this.headerText,
-    required this.currentValue,
-    required this.onChanged,
-    this.min = 1,
-    this.max = 10,
+    required this.controller,
   });
 
   @override
@@ -68,12 +64,14 @@ class CustomRangeSlider extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Slider(
-                  value: currentValue,
-                  min: min,
-                  max: max,
-                  divisions: (max - min).toInt(),
-                  onChanged: onChanged,
+                Obx(
+                  () => Slider(
+                    value: controller.value.value,
+                    min: controller.min,
+                    max: controller.max,
+                    divisions: (controller.max - controller.min).toInt(),
+                    onChanged: controller.updateValue,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Padding(
@@ -81,19 +79,23 @@ class CustomRangeSlider extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(
-                      (max - min + 1).toInt(),
+                      (controller.max - controller.min + 1).toInt(),
                       (index) {
-                        double val = min + index;
-                        bool isSelected = val == currentValue;
-                        return Text(
-                          val.toInt().toString(),
-                          style: getTextStyle(
-                            fontSize: 14,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected 
-                                ? AppColors.primaryButtonColor 
-                                : const Color(0xFF414651),
-                          ),
+                        double val = controller.min + index;
+                        return Obx(
+                          () {
+                            bool isSelected = val == controller.value.value;
+                            return Text(
+                              val.toInt().toString(),
+                              style: getTextStyle(
+                                fontSize: 14,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected 
+                                    ? AppColors.primaryButtonColor 
+                                    : const Color(0xFF414651),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
