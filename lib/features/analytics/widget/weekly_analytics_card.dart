@@ -10,7 +10,7 @@ class WeeklyAnalyticsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AnalyticsController());
+    final controller = Get.find<AnalyticsController>();
 
     return Container(
       width: Get.width,
@@ -88,7 +88,9 @@ class WeeklyAnalyticsCard extends StatelessWidget {
 
   Widget _buildChart(AnalyticsController controller) {
     return Obx(() {
-      final spots = controller.currentSpots;
+      final spots = controller.weeklyScoreSpots;
+      final labels = controller.weeklyLabels;
+      final latestSpot = spots.isNotEmpty ? spots.last : const FlSpot(0, 0);
 
       return LineChart(
         LineChartData(
@@ -111,13 +113,13 @@ class WeeklyAnalyticsCard extends StatelessWidget {
                 reservedSize: 28,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
-                  if (index < 0 || index >= controller.days.length) {
+                  if (index < 0 || index >= labels.length) {
                     return const SizedBox.shrink();
                   }
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      controller.days[index],
+                      labels[index],
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -145,7 +147,7 @@ class WeeklyAnalyticsCard extends StatelessWidget {
               getTooltipItems: (touchedSpots) {
                 return touchedSpots.map((spot) {
                   return LineTooltipItem(
-                    'Highest: ${spot.y.toInt()}%',
+                    'Score: ${spot.y.toInt()}%',
                     const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -184,19 +186,21 @@ class WeeklyAnalyticsCard extends StatelessWidget {
               belowBarData: BarAreaData(show: false),
             ),
           ],
-          showingTooltipIndicators: [
-            ShowingTooltipIndicators([
-              LineBarSpot(
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: true,
-                  color: const Color(0xFF1DB97B),
-                ),
-                0,
-                spots.last,
-              ),
-            ]),
-          ],
+          showingTooltipIndicators: spots.isEmpty
+              ? const []
+              : [
+                  ShowingTooltipIndicators([
+                    LineBarSpot(
+                      LineChartBarData(
+                        spots: spots,
+                        isCurved: true,
+                        color: const Color(0xFF1DB97B),
+                      ),
+                      0,
+                      latestSpot,
+                    ),
+                  ]),
+                ],
         ),
       );
     });

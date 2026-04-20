@@ -1,16 +1,22 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/features/analytics/controller/analytics_controller.dart';
 import 'package:chrisimhof/features/analytics/widget/daily_activity_split_card.dart';
 import 'package:chrisimhof/features/analytics/widget/sleep_trend_card.dart';
 import 'package:chrisimhof/features/analytics/widget/weekly_analytics_card.dart';
 import 'package:chrisimhof/features/analytics/widget/wellness_score_card.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<AnalyticsController>()) {
+      Get.put(AnalyticsController());
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(

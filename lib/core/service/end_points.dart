@@ -12,4 +12,7 @@ class Urls {
   static const String changePassword = '$baseUrl/profile/password';
   static const String checkout = '$baseUrl/billing/checkout';
   static const String userMe = '$baseUrl/auth/me';
+
+  // Analytics
+  static String analytics(String days) => '$baseUrl/analytics?period=$days';
 }
