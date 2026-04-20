@@ -83,13 +83,28 @@ class CalculatorNutritionTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 130),
-          CustomButton(
-            text: "Next",
-            onTap: () {
-              // TODO: Implement nutrition submission
-              // controller.submitNutritionData();
-            },
+          Obx(
+            () => CustomButton(
+              text: controller.isNutritionSubmitting.value
+                  ? 'Submitting...'
+                  : 'Next',
+              onTap: controller.isNutritionSubmitting.value
+                  ? null
+                  : () {
+                      controller.submitNutritionData();
+                    },
+              width: double.infinity,
+            ),
           ),
+          if (controller.nutritionSubmitError.value.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 16),
+              child: Text(
+                controller.nutritionSubmitError.value,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+            ),
         ],
       ),
     );

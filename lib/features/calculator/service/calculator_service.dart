@@ -4,6 +4,7 @@ import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
 import 'package:http/http.dart' as http;
 
 class CalculatorService {
@@ -146,6 +147,45 @@ class CalculatorService {
     } catch (e) {
       print('Skip work error: $e');
       throw Exception('Error skipping work: $e');
+    }
+  }
+
+  Future<NutritionCalculatorResponse> submitNutritionData(
+    String sessionId,
+    NutritionCalculatorRequest request,
+  ) async {
+    final uri = Uri.parse(Urls.nutritionCalculator(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode(request.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      print('=== Nutrition Calculator Response ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response: $jsonData');
+      print('=====================================');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return NutritionCalculatorResponse.fromJson(jsonData);
+      } else {
+        throw Exception(
+          jsonData['message'] ?? 'Failed to submit nutrition data',
+        );
+      }
+    } catch (e) {
+      print('Nutrition calculator error: $e');
+      throw Exception('Error submitting nutrition data: $e');
     }
   }
 }

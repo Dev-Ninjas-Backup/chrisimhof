@@ -19,4 +19,6 @@ class Urls {
       '$baseUrl/calculator/session/$sessionId/work';
   static String skipWork(String sessionId) =>
       '$baseUrl/calculator/session/$sessionId/work/skip';
+  static String nutritionCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/nutrition';
 }
