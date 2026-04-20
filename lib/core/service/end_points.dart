@@ -15,4 +15,15 @@ class Urls {
 
   // Analytics
   static String analytics(String days) => '$baseUrl/analytics?period=$days';
+  static const String createCalculatorSession = '$baseUrl/calculator/session';
+  static String sleepCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/sleep';
+  static String workCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/work';
+  static String skipWork(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/work/skip';
+  static String nutritionCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/nutrition';
+  static String hydrationCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/hydration';
 }

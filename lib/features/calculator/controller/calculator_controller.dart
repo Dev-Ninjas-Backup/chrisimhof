@@ -1,5 +1,11 @@
 import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
+import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/hydration_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 
@@ -7,6 +13,28 @@ class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
 
   final selectedTabIndex = 0.obs;
+
+  // Session Management
+  final CalculatorService _calculatorService = CalculatorService();
+  final Rx<CalculatorSession?> calculatorSession = Rx(null);
+  final RxBool isSessionLoading = true.obs;
+  final RxString sessionError = ''.obs;
+
+  // Sleep submission
+  final RxBool isSleepSubmitting = false.obs;
+  final RxString sleepSubmitError = ''.obs;
+
+  // Work submission
+  final RxBool isWorkSubmitting = false.obs;
+  final RxString workSubmitError = ''.obs;
+
+  // Nutrition submission
+  final RxBool isNutritionSubmitting = false.obs;
+  final RxString nutritionSubmitError = ''.obs;
+
+  // Hydration submission
+  final RxBool isHydrationSubmitting = false.obs;
+  final RxString hydrationSubmitError = ''.obs;
 
   // Sleep Tab Controllers
   late TimeController wakeUpController;
@@ -17,7 +45,7 @@ class CalculatorController extends GetxController {
   late RangeSliderController sleepLastNightController;
   late RangeSliderController sleepGoalController;
   final RxString fatigueLevel = 'Low'.obs;
-  
+
   // Nap management
   final RxList<Map<String, dynamic>> naps = <Map<String, dynamic>>[].obs;
   late TextEditingController currentNapDurationController;
@@ -32,7 +60,7 @@ class CalculatorController extends GetxController {
   late RangeSliderController hydrationConsumedController;
   late RangeSliderController hydrationDailyGoalController;
 
-// Nutrition Tab Controllers
+  // Nutrition Tab Controllers
   late RangeSliderController desiredNumberOfMealsController;
   late TimeController firstMealTimeController;
   late TimeController lastMealTimeController;
@@ -48,17 +76,46 @@ class CalculatorController extends GetxController {
   final RxDouble caffeinMaxValue = 400.0.obs;
   final RxDouble caffeineLastEightHoursValue = 110.0.obs;
   late TimeController caffeineIntakeTimeController;
-  final RxList<Map<String, String>> caffeineHistory = <Map<String, String>>[].obs;
+  final RxList<Map<String, String>> caffeineHistory =
+      <Map<String, String>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
+    _fetchCalculatorSession();
     _initializeSleepControllers();
     _initializeWorkControllers();
     _initializeNutritionControllers();
     _initializeSportControllers();
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
+  }
+
+  Future<void> _fetchCalculatorSession() async {
+    try {
+      print('\n📋 _fetchCalculatorSession() CALLED');
+      isSessionLoading.value = true;
+      sessionError.value = '';
+
+      final response = await _calculatorService.getCalculatorSession();
+      print('✓ Response received: ${response.data}');
+      print('  Session ID: ${response.data.sessionId}');
+      print('  Completed Steps: ${response.data.completedSteps}');
+      print('  Next Step: ${response.data.nextStep}');
+
+      calculatorSession.value = response.data;
+      print('✓ calculatorSession assigned: ${calculatorSession.value}');
+      print(
+        '✓ calculatorSession.value.sessionId: ${calculatorSession.value!.sessionId}',
+      );
+    } catch (e) {
+      sessionError.value = e.toString();
+      print('✗ Session error: $e');
+      print('Stack trace: ${StackTrace.current}');
+    } finally {
+      isSessionLoading.value = false;
+      print('✓ Session loading complete. IsLoading: ${isSessionLoading.value}');
+    }
   }
 
   void _initializeSleepControllers() {
@@ -99,15 +156,10 @@ class CalculatorController extends GetxController {
     ]);
   }
 
-  void _loadCaffeineHistory() {
-  }
+  void _loadCaffeineHistory() {}
 
   void addCaffeineIntake(String name, int mgAmount, String time) {
-    caffeineHistory.add({
-      'name': name,
-      'dose': '${mgAmount}mg',
-      'time': time,
-    });
+    caffeineHistory.add({'name': name, 'dose': '${mgAmount}mg', 'time': time});
     caffeine24hValue.value += mgAmount;
     caffeineLastEightHoursValue.value += mgAmount;
   }
@@ -134,6 +186,444 @@ class CalculatorController extends GetxController {
 
   void changeTab(int index) {
     selectedTabIndex.value = index;
+  }
+
+  Future<void> submitSleepData() async {
+    print('\n🔵 submitSleepData() CALLED');
+    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+    print('DEBUG: isSessionLoading.value = ${isSessionLoading.value}');
+
+    try {
+      if (calculatorSession.value == null) {
+        print('✗ calculatorSession.value is NULL');
+        sleepSubmitError.value = 'Session not initialized (value is null)';
+        return;
+      }
+
+      if (calculatorSession.value!.sessionId == null) {
+        print('✗ calculatorSession.value.sessionId is NULL');
+        sleepSubmitError.value = 'Session ID is null';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isSleepSubmitting.value = true;
+      sleepSubmitError.value = '';
+
+      // Build nap list
+      List<NapData> napList = [];
+      for (int i = 0; i < naps.length; i++) {
+        final nap = naps[i];
+        napList.add(
+          NapData(
+            startTime: nap['preferredTime'] ?? '00:00',
+            durationMin: int.tryParse(nap['duration'] ?? '0') ?? 0,
+            order: i + 1,
+          ),
+        );
+      }
+
+      print('✓ Built nap list with ${napList.length} naps');
+
+      // Build request
+      final request = SleepCalculatorRequest(
+        wakeUpTime: wakeUpController.to24HourFormat,
+        sleepHours: sleepLastNightController.value.value,
+        desiredSleepHours: sleepGoalController.value.value,
+        fatigueLevel: fatigueLevel.value.toUpperCase(),
+        desiredSleepStart: desiredSleepStartController.to24HourFormat,
+        desiredWakeTime: desiredSleepEndController.to24HourFormat,
+        naps: napList,
+      );
+
+      print('=== Sleep Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('==========================');
+
+      final response = await _calculatorService.submitSleepData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Sleep Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('==================================');
+
+      if (response.success && response.data != null) {
+        print('✓ Sleep submission successful');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+        print('Completed steps: ${response.data!.completedSteps}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Work tab (index: 1)...');
+
+        // Navigate to next tab (work tab)
+        changeTab(1);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Sleep submission failed');
+        print('Error message: ${response.message}');
+        sleepSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Sleep submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      sleepSubmitError.value = e.toString();
+    } finally {
+      isSleepSubmitting.value = false;
+      print(
+        'Sleep submission state: complete (loading=${isSleepSubmitting.value})',
+      );
+    }
+  }
+
+  Future<void> submitWorkData() async {
+    print('\n🔵 submitWorkData() CALLED');
+    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null) {
+        print('✗ calculatorSession.value is NULL');
+        workSubmitError.value = 'Session not initialized (value is null)';
+        return;
+      }
+
+      if (calculatorSession.value!.sessionId == null) {
+        print('✗ calculatorSession.value.sessionId is NULL');
+        workSubmitError.value = 'Session ID is null';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isWorkSubmitting.value = true;
+      workSubmitError.value = '';
+
+      final request = WorkCalculatorRequest(
+        shiftStart: workBeginsController.to24HourFormat,
+        shiftEnd: workCompleteController.to24HourFormat,
+        daysWorked: int.tryParse(daysWorkedController.text) ?? 1,
+        shiftType: selectedShiftType.value.toUpperCase(),
+      );
+
+      print('=== Work Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('========================');
+
+      final response = await _calculatorService.submitWorkData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Work Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('=================================');
+
+      if (response.success && response.data != null) {
+        print('✓ Work submission successful');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+        print('Completed steps: ${response.data!.completedSteps}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Nutrition tab (index: 2)...');
+
+        // Navigate to next tab (nutrition tab)
+        changeTab(2);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Work submission failed');
+        print('Error message: ${response.message}');
+        workSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Work submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      workSubmitError.value = e.toString();
+    } finally {
+      isWorkSubmitting.value = false;
+      print(
+        'Work submission state: complete (loading=${isWorkSubmitting.value})',
+      );
+    }
+  }
+
+  Future<void> skipWorkData() async {
+    print('\n⏭️ skipWorkData() CALLED');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        print('✗ Session not initialized');
+        workSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isWorkSubmitting.value = true;
+      workSubmitError.value = '';
+
+      final response = await _calculatorService.skipWorkData(
+        calculatorSession.value!.sessionId!,
+      );
+
+      print('=== Skip Work Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('==========================');
+
+      if (response.success && response.data != null) {
+        print('✓ Work skipped successfully');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Nutrition tab (index: 2)...');
+
+        // Navigate to next tab (nutrition tab)
+        changeTab(2);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Skip work failed');
+        print('Error message: ${response.message}');
+        workSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Skip work error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      workSubmitError.value = e.toString();
+    } finally {
+      isWorkSubmitting.value = false;
+      print('Skip work state: complete (loading=${isWorkSubmitting.value})');
+    }
+  }
+
+  Future<void> submitNutritionData() async {
+    print('\n🔵 submitNutritionData() CALLED');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        print('✗ Session not initialized');
+        nutritionSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isNutritionSubmitting.value = true;
+      nutritionSubmitError.value = '';
+
+      // Convert Yes/No to boolean
+      final hadMealToday = hasMealTodaySelection.value == 'Yes';
+
+      final request = NutritionCalculatorRequest(
+        mealsPerDay: desiredNumberOfMealsController.value.value.toInt(),
+        hadMealToday: hadMealToday,
+        desiredMealCount: desiredNumberOfMealsController.value.value.toInt(),
+        firstMealTime: firstMealTimeController.to24HourFormat,
+        lastMealTime: lastMealTimeController.to24HourFormat,
+      );
+
+      print('=== Nutrition Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('==============================');
+
+      final response = await _calculatorService.submitNutritionData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Nutrition Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('======================================');
+
+      if (response.success && response.data != null) {
+        print('✓ Nutrition submission successful');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+        print('Completed steps: ${response.data!.completedSteps}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Hydration tab (index: 3)...');
+
+        // Navigate to next tab (hydration tab)
+        changeTab(3);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Nutrition submission failed');
+        print('Error message: ${response.message}');
+        nutritionSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Nutrition submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      nutritionSubmitError.value = e.toString();
+    } finally {
+      isNutritionSubmitting.value = false;
+      print(
+        'Nutrition submission state: complete (loading=${isNutritionSubmitting.value})',
+      );
+    }
+  }
+
+  Future<void> submitHydrationData() async {
+    print('\n🔵 submitHydrationData() CALLED');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        print('✗ Session not initialized');
+        hydrationSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isHydrationSubmitting.value = true;
+      hydrationSubmitError.value = '';
+
+      final request = HydrationCalculatorRequest(
+        waterConsumedL: hydrationConsumedController.value.value,
+        waterGoalL: hydrationDailyGoalController.value.value,
+      );
+
+      print('=== Hydration Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('==============================');
+
+      final response = await _calculatorService.submitHydrationData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Hydration Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('====================================');
+
+      if (response.success) {
+        print('✓ Hydration submission successful');
+
+        final currentSession = calculatorSession.value!;
+        final completedSteps = response.data?.completedSteps.isNotEmpty == true
+            ? response.data!.completedSteps
+            : [
+                ...currentSession.completedSteps,
+                if (!currentSession.completedSteps.contains('hydration'))
+                  'hydration',
+              ];
+        final nextStep = response.data?.nextStep.isNotEmpty == true
+            ? response.data!.nextStep
+            : 'caffeine';
+        final sessionId = response.data?.sessionId.isNotEmpty == true
+            ? response.data!.sessionId
+            : currentSession.sessionId!;
+
+        print('Next step: $nextStep');
+        print('Session ID: $sessionId');
+        print('Completed steps: $completedSteps');
+
+        calculatorSession.value = CalculatorSession(
+          sessionId: sessionId,
+          completedSteps: completedSteps,
+          nextStep: nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data?.isReadyToCalculate ?? false,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Caffeine tab (index: 4)...');
+
+        changeTab(4);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Hydration submission failed');
+        print('Error message: ${response.message}');
+        hydrationSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Hydration submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      hydrationSubmitError.value = e.toString();
+    } finally {
+      isHydrationSubmitting.value = false;
+      print(
+        'Hydration submission state: complete (loading=${isHydrationSubmitting.value})',
+      );
+    }
   }
 
   void selectActivityType(String activityType) {
