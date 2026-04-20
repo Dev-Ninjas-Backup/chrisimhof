@@ -37,4 +37,10 @@ class TimeController extends GetxController {
 
     return '${h.toString().padLeft(2, '0')}:$formattedMinute';
   }
+
+  void reset() {
+    hour.value = 6;
+    minute.value = 11;
+    period.value = 'PM';
+  }
 }

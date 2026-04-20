@@ -16,6 +16,11 @@ class CalculatorController extends GetxController {
   late TextEditingController durationController;
   late RangeSliderController sleepLastNightController;
   late RangeSliderController sleepGoalController;
+  final RxString fatigueLevel = 'Low'.obs;
+  
+  // Nap management
+  final RxList<Map<String, dynamic>> naps = <Map<String, dynamic>>[].obs;
+  late TextEditingController currentNapDurationController;
 
   // Work Tab Controllers
   late TimeController workBeginsController;
@@ -62,6 +67,7 @@ class CalculatorController extends GetxController {
     desiredSleepEndController = TimeController();
     preferredTimeController = TimeController();
     durationController = TextEditingController();
+    currentNapDurationController = TextEditingController();
     sleepLastNightController = RangeSliderController(initialValue: 8);
     sleepGoalController = RangeSliderController(initialValue: 8);
   }
@@ -138,9 +144,35 @@ class CalculatorController extends GetxController {
     sportIntensity.value = intensity;
   }
 
+  // Nap management methods
+  void addNap(String duration, String preferredTime) {
+    if (duration.isNotEmpty && preferredTime.isNotEmpty) {
+      naps.add({
+        'duration': duration,
+        'preferredTime': preferredTime,
+        'napNumber': naps.length + 1,
+      });
+      // Clear inputs after adding
+      currentNapDurationController.clear();
+      preferredTimeController.reset();
+    }
+  }
+
+  void removeNap(int index) {
+    if (index >= 0 && index < naps.length) {
+      naps.removeAt(index);
+    }
+  }
+
+  void clearAllNaps() {
+    naps.clear();
+    currentNapDurationController.clear();
+  }
+
   @override
   void onClose() {
     durationController.dispose();
+    currentNapDurationController.dispose();
     daysWorkedController.dispose();
     sportDurationController.dispose();
     caffeineIntakeTimeController.dispose();
