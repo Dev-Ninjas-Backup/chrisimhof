@@ -1,5 +1,8 @@
 import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
+import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 
@@ -7,6 +10,16 @@ class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
 
   final selectedTabIndex = 0.obs;
+
+  // Session Management
+  final CalculatorService _calculatorService = CalculatorService();
+  final Rx<CalculatorSession?> calculatorSession = Rx(null);
+  final RxBool isSessionLoading = true.obs;
+  final RxString sessionError = ''.obs;
+
+  // Sleep submission
+  final RxBool isSleepSubmitting = false.obs;
+  final RxString sleepSubmitError = ''.obs;
 
   // Sleep Tab Controllers
   late TimeController wakeUpController;
@@ -17,7 +30,7 @@ class CalculatorController extends GetxController {
   late RangeSliderController sleepLastNightController;
   late RangeSliderController sleepGoalController;
   final RxString fatigueLevel = 'Low'.obs;
-  
+
   // Nap management
   final RxList<Map<String, dynamic>> naps = <Map<String, dynamic>>[].obs;
   late TextEditingController currentNapDurationController;
@@ -32,7 +45,7 @@ class CalculatorController extends GetxController {
   late RangeSliderController hydrationConsumedController;
   late RangeSliderController hydrationDailyGoalController;
 
-// Nutrition Tab Controllers
+  // Nutrition Tab Controllers
   late RangeSliderController desiredNumberOfMealsController;
   late TimeController firstMealTimeController;
   late TimeController lastMealTimeController;
@@ -48,17 +61,46 @@ class CalculatorController extends GetxController {
   final RxDouble caffeinMaxValue = 400.0.obs;
   final RxDouble caffeineLastEightHoursValue = 110.0.obs;
   late TimeController caffeineIntakeTimeController;
-  final RxList<Map<String, String>> caffeineHistory = <Map<String, String>>[].obs;
+  final RxList<Map<String, String>> caffeineHistory =
+      <Map<String, String>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
+    _fetchCalculatorSession();
     _initializeSleepControllers();
     _initializeWorkControllers();
     _initializeNutritionControllers();
     _initializeSportControllers();
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
+  }
+
+  Future<void> _fetchCalculatorSession() async {
+    try {
+      print('\n📋 _fetchCalculatorSession() CALLED');
+      isSessionLoading.value = true;
+      sessionError.value = '';
+
+      final response = await _calculatorService.getCalculatorSession();
+      print('✓ Response received: ${response.data}');
+      print('  Session ID: ${response.data.sessionId}');
+      print('  Completed Steps: ${response.data.completedSteps}');
+      print('  Next Step: ${response.data.nextStep}');
+
+      calculatorSession.value = response.data;
+      print('✓ calculatorSession assigned: ${calculatorSession.value}');
+      print(
+        '✓ calculatorSession.value.sessionId: ${calculatorSession.value!.sessionId}',
+      );
+    } catch (e) {
+      sessionError.value = e.toString();
+      print('✗ Session error: $e');
+      print('Stack trace: ${StackTrace.current}');
+    } finally {
+      isSessionLoading.value = false;
+      print('✓ Session loading complete. IsLoading: ${isSessionLoading.value}');
+    }
   }
 
   void _initializeSleepControllers() {
@@ -99,15 +141,10 @@ class CalculatorController extends GetxController {
     ]);
   }
 
-  void _loadCaffeineHistory() {
-  }
+  void _loadCaffeineHistory() {}
 
   void addCaffeineIntake(String name, int mgAmount, String time) {
-    caffeineHistory.add({
-      'name': name,
-      'dose': '${mgAmount}mg',
-      'time': time,
-    });
+    caffeineHistory.add({'name': name, 'dose': '${mgAmount}mg', 'time': time});
     caffeine24hValue.value += mgAmount;
     caffeineLastEightHoursValue.value += mgAmount;
   }
@@ -134,6 +171,113 @@ class CalculatorController extends GetxController {
 
   void changeTab(int index) {
     selectedTabIndex.value = index;
+  }
+
+  Future<void> submitSleepData() async {
+    print('\n🔵 submitSleepData() CALLED');
+    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+    print('DEBUG: isSessionLoading.value = ${isSessionLoading.value}');
+
+    try {
+      if (calculatorSession.value == null) {
+        print('✗ calculatorSession.value is NULL');
+        sleepSubmitError.value = 'Session not initialized (value is null)';
+        return;
+      }
+
+      if (calculatorSession.value!.sessionId == null) {
+        print('✗ calculatorSession.value.sessionId is NULL');
+        sleepSubmitError.value = 'Session ID is null';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isSleepSubmitting.value = true;
+      sleepSubmitError.value = '';
+
+      // Build nap list
+      List<NapData> napList = [];
+      for (int i = 0; i < naps.length; i++) {
+        final nap = naps[i];
+        napList.add(
+          NapData(
+            startTime: nap['preferredTime'] ?? '00:00',
+            durationMin: int.tryParse(nap['duration'] ?? '0') ?? 0,
+            order: i + 1,
+          ),
+        );
+      }
+
+      print('✓ Built nap list with ${napList.length} naps');
+
+      // Build request
+      final request = SleepCalculatorRequest(
+        wakeUpTime: wakeUpController.to24HourFormat,
+        sleepHours: sleepLastNightController.value.value,
+        desiredSleepHours: sleepGoalController.value.value,
+        fatigueLevel: fatigueLevel.value.toUpperCase(),
+        desiredSleepStart: desiredSleepStartController.to24HourFormat,
+        desiredWakeTime: desiredSleepEndController.to24HourFormat,
+        naps: napList,
+      );
+
+      print('=== Sleep Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('==========================');
+
+      final response = await _calculatorService.submitSleepData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Sleep Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('==================================');
+
+      if (response.success && response.data != null) {
+        print('✓ Sleep submission successful');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+        print('Completed steps: ${response.data!.completedSteps}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Work tab (index: 1)...');
+
+        // Navigate to next tab (work tab)
+        changeTab(1);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Sleep submission failed');
+        print('Error message: ${response.message}');
+        sleepSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Sleep submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      sleepSubmitError.value = e.toString();
+    } finally {
+      isSleepSubmitting.value = false;
+      print(
+        'Sleep submission state: complete (loading=${isSleepSubmitting.value})',
+      );
+    }
   }
 
   void selectActivityType(String activityType) {

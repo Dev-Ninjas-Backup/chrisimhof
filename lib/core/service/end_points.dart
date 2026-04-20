@@ -12,4 +12,7 @@ class Urls {
   static const String changePassword = '$baseUrl/profile/password';
   static const String checkout = '$baseUrl/billing/checkout';
   static const String userMe = '$baseUrl/auth/me';
+  static const String createCalculatorSession = '$baseUrl/calculator/session';
+  static String sleepCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/sleep';
 }
