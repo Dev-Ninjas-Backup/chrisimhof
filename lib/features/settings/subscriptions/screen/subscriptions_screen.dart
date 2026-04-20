@@ -65,6 +65,8 @@ class SubscriptionsScreen extends StatelessWidget {
                     controller.subscriptionPlans.value.length,
                     (index) {
                       final plan = controller.subscriptionPlans.value[index];
+                      // Check if this is the active plan
+                      final isActive = plan.id == controller.activePlanId.value;
                       // Highlight the most popular plan (Monthly)
                       final isPremium =
                           plan.name.toLowerCase() == 'weekly' ||
@@ -76,16 +78,16 @@ class SubscriptionsScreen extends StatelessWidget {
                         child: SubscriptionPlanWidget(
                           planName: plan.name.tr,
                           planPrice: plan.formattedPrice,
-                          buttonText: plan.price == 0
-                              ? 'Current'.tr
-                              : 'Subscribe'.tr,
-                          buttonColor: plan.price == 0
+                          buttonText: isActive ? 'Current'.tr : 'Subscribe'.tr,
+                          buttonColor: isActive
                               ? const Color(0xFFE9EAEB)
                               : Colors.white,
                           features: plan.features,
-                          onTap: () {
-                            controller.handleSubscription(plan);
-                          },
+                          onTap: isActive
+                              ? null
+                              : () {
+                                  controller.handleSubscription(plan);
+                                },
                           widgetColor: isPremium
                               ? AppColors.primaryButtonColor
                               : Colors.white,

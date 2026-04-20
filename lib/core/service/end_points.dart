@@ -10,4 +10,6 @@ class Urls {
   static const String showSubscriptionPlans =
       '$baseUrl/subscription-plans/public/active';
   static const String changePassword = '$baseUrl/profile/password';
+  static const String checkout = '$baseUrl/billing/checkout';
+  static const String userMe = '$baseUrl/auth/me';
 }

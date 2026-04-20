@@ -88,7 +88,14 @@ class SubscriptionPlan {
       trialDays: json['trialDays'] ?? 0,
       isActive: json['isActive'] ?? false,
       features: json['features'] != null
-          ? List<String>.from(json['features'] as List)
+          ? (json['features'] as List)
+                .map(
+                  (feature) => feature is Map
+                      ? (feature['title'] as String?)
+                      : (feature as String?),
+                )
+                .whereType<String>()
+                .toList()
           : [],
       deletedAt: json['deletedAt'] != null
           ? DateTime.parse(json['deletedAt'])
@@ -100,5 +107,97 @@ class SubscriptionPlan {
           ? DateTime.parse(json['updatedAt'])
           : DateTime.now(),
     );
+  }
+}
+
+class UserResponse {
+  final bool success;
+  final String message;
+  final UserData data;
+
+  UserResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory UserResponse.fromJson(Map<String, dynamic> json) {
+    return UserResponse(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      data: UserData.fromJson(json['data'] ?? {}),
+    );
+  }
+}
+
+class UserData {
+  final String id;
+  final String email;
+  final bool isSubscribed;
+  final String? plan;
+  final UserSubscriptions? subscriptions;
+
+  UserData({
+    required this.id,
+    required this.email,
+    required this.isSubscribed,
+    this.plan,
+    this.subscriptions,
+  });
+
+  factory UserData.fromJson(Map<String, dynamic> json) {
+    return UserData(
+      id: json['id'] ?? '',
+      email: json['email'] ?? '',
+      isSubscribed: json['isSubscribed'] ?? false,
+      plan: json['plan'],
+      subscriptions: json['subscriptions'] != null
+          ? UserSubscriptions.fromJson(json['subscriptions'])
+          : null,
+    );
+  }
+}
+
+class UserSubscriptions {
+  final SubscriptionPlan? plan;
+
+  UserSubscriptions({this.plan});
+
+  factory UserSubscriptions.fromJson(Map<String, dynamic> json) {
+    return UserSubscriptions(
+      plan: json['plan'] != null
+          ? SubscriptionPlan.fromJson(json['plan'])
+          : null,
+    );
+  }
+}
+
+class CheckoutResponse {
+  final bool success;
+  final String message;
+  final CheckoutData data;
+
+  CheckoutResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory CheckoutResponse.fromJson(Map<String, dynamic> json) {
+    return CheckoutResponse(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      data: CheckoutData.fromJson(json['data'] ?? {}),
+    );
+  }
+}
+
+class CheckoutData {
+  final String url;
+
+  CheckoutData({required this.url});
+
+  factory CheckoutData.fromJson(Map<String, dynamic> json) {
+    return CheckoutData(url: json['url'] ?? '');
   }
 }
