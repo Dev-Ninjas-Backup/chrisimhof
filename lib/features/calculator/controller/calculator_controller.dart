@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
@@ -20,6 +21,10 @@ class CalculatorController extends GetxController {
   // Sleep submission
   final RxBool isSleepSubmitting = false.obs;
   final RxString sleepSubmitError = ''.obs;
+
+  // Work submission
+  final RxBool isWorkSubmitting = false.obs;
+  final RxString workSubmitError = ''.obs;
 
   // Sleep Tab Controllers
   late TimeController wakeUpController;
@@ -277,6 +282,159 @@ class CalculatorController extends GetxController {
       print(
         'Sleep submission state: complete (loading=${isSleepSubmitting.value})',
       );
+    }
+  }
+
+  Future<void> submitWorkData() async {
+    print('\n🔵 submitWorkData() CALLED');
+    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null) {
+        print('✗ calculatorSession.value is NULL');
+        workSubmitError.value = 'Session not initialized (value is null)';
+        return;
+      }
+
+      if (calculatorSession.value!.sessionId == null) {
+        print('✗ calculatorSession.value.sessionId is NULL');
+        workSubmitError.value = 'Session ID is null';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isWorkSubmitting.value = true;
+      workSubmitError.value = '';
+
+      final request = WorkCalculatorRequest(
+        shiftStart: workBeginsController.to24HourFormat,
+        shiftEnd: workCompleteController.to24HourFormat,
+        daysWorked: int.tryParse(daysWorkedController.text) ?? 1,
+        shiftType: selectedShiftType.value.toUpperCase(),
+      );
+
+      print('=== Work Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('========================');
+
+      final response = await _calculatorService.submitWorkData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Work Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('=================================');
+
+      if (response.success && response.data != null) {
+        print('✓ Work submission successful');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+        print('Completed steps: ${response.data!.completedSteps}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Nutrition tab (index: 2)...');
+
+        // Navigate to next tab (nutrition tab)
+        changeTab(2);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Work submission failed');
+        print('Error message: ${response.message}');
+        workSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Work submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      workSubmitError.value = e.toString();
+    } finally {
+      isWorkSubmitting.value = false;
+      print(
+        'Work submission state: complete (loading=${isWorkSubmitting.value})',
+      );
+    }
+  }
+
+  Future<void> skipWorkData() async {
+    print('\n⏭️ skipWorkData() CALLED');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        print('✗ Session not initialized');
+        workSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isWorkSubmitting.value = true;
+      workSubmitError.value = '';
+
+      final response = await _calculatorService.skipWorkData(
+        calculatorSession.value!.sessionId!,
+      );
+
+      print('=== Skip Work Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('==========================');
+
+      if (response.success && response.data != null) {
+        print('✓ Work skipped successfully');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Nutrition tab (index: 2)...');
+
+        // Navigate to next tab (nutrition tab)
+        changeTab(2);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Skip work failed');
+        print('Error message: ${response.message}');
+        workSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Skip work error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      workSubmitError.value = e.toString();
+    } finally {
+      isWorkSubmitting.value = false;
+      print('Skip work state: complete (loading=${isWorkSubmitting.value})');
     }
   }
 

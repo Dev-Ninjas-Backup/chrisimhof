@@ -75,13 +75,39 @@ class CalculatorWorkTab extends StatelessWidget {
         const SizedBox(height: 150),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
-          child: CustomButton(text: 'Next', onTap: () {}),
+          child: Obx(
+            () => CustomButton(
+              text: controller.isWorkSubmitting.value
+                  ? 'Submitting...'
+                  : 'Next',
+              onTap: controller.isWorkSubmitting.value
+                  ? null
+                  : () {
+                      controller.submitWorkData();
+                    },
+              width: double.infinity,
+            ),
+          ),
         ),
+        if (controller.workSubmitError.value.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              controller.workSubmitError.value,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+          ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
-              child: TabButton(text: 'Skip', onTap: () {}),
+              child: TabButton(
+                text: 'Skip',
+                onTap: () {
+                  controller.skipWorkData();
+                },
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -123,5 +149,3 @@ class TabButton extends StatelessWidget {
     );
   }
 }
-
-
