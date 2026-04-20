@@ -10,7 +10,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
   final String buttonText;
   final Color buttonColor;
   final List<String> features;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color widgetColor;
 
   const SubscriptionPlanWidget({
@@ -20,7 +20,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
     required this.buttonText,
     required this.buttonColor,
     required this.features,
-    required this.onTap,
+    this.onTap,
     required this.widgetColor,
   });
 
