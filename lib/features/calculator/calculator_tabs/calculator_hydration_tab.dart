@@ -15,6 +15,7 @@ class CalculatorHydrationTab extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10),
@@ -63,18 +64,38 @@ class CalculatorHydrationTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 130),
-          CustomButton(
-            text: "Next",
-            onTap: () {
-              // TODO: Implement hydration submission
-              // controller.submitHydrationData();
-            },
+          Obx(
+            () => CustomButton(
+              text: controller.isHydrationSubmitting.value
+                  ? 'Submitting...'
+                  : 'Next',
+              onTap: controller.isHydrationSubmitting.value
+                  ? null
+                  : () {
+                      controller.submitHydrationData();
+                    },
+              width: double.infinity,
+            ),
           ),
           const SizedBox(height: 16),
+          Obx(
+            () => controller.hydrationSubmitError.value.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    child: Text(
+                      controller.hydrationSubmitError.value,
+                      style: const TextStyle(color: Colors.red, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
           CustomButton(
             text: "Reset",
             onTap: () {
-              // TODO: Implement hydration reset
+              controller.hydrationConsumedController.updateValue(1.0);
+              controller.hydrationDailyGoalController.updateValue(2.5);
+              controller.hydrationSubmitError.value = '';
             },
             backgroundColor: Colors.grey[300],
           ),
