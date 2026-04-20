@@ -43,7 +43,7 @@ class DailyActivitySplitCard extends StatelessWidget {
           const SizedBox(height: 30),
           Expanded(
             child: Obx(() {
-              final items = _buildActivityItems(controller);
+              final items = controller.activityItems;
               return Row(
                 children: [
                   Expanded(
@@ -98,51 +98,6 @@ class DailyActivitySplitCard extends StatelessWidget {
       ),
     );
   }
-
-  List<_ActivityItem> _buildActivityItems(AnalyticsController controller) {
-    final spots = controller.currentSpots;
-
-    double safeY(int index) {
-      if (index >= spots.length) return 10;
-      return spots[index].y <= 0 ? 10 : spots[index].y;
-    }
-
-    final rawValues = [safeY(0), safeY(1), safeY(2), safeY(3), safeY(4)];
-
-    final total = rawValues.fold<double>(0, (sum, value) => sum + value);
-
-    final percentages = rawValues
-        .map((value) => total == 0 ? 0.0 : (value / total) * 100)
-        .toList();
-
-    return [
-      _ActivityItem(
-        title: 'Sleep',
-        color: const Color(0xFF006E4A),
-        percent: percentages[0],
-      ),
-      _ActivityItem(
-        title: 'Work',
-        color: const Color(0xFF111827),
-        percent: percentages[1],
-      ),
-      _ActivityItem(
-        title: 'Exercise',
-        color: const Color(0xFF34D399),
-        percent: percentages[2],
-      ),
-      _ActivityItem(
-        title: 'Meals',
-        color: const Color(0xFFD5D7DA),
-        percent: percentages[3],
-      ),
-      _ActivityItem(
-        title: 'Free Time',
-        color: const Color(0xFF535862),
-        percent: percentages[4],
-      ),
-    ];
-  }
 }
 
 class _LegendItem extends StatelessWidget {
@@ -191,18 +146,4 @@ class _LegendItem extends StatelessWidget {
       ],
     );
   }
-}
-
-class _ActivityItem {
-  final String title;
-  final Color color;
-  final double percent;
-
-  const _ActivityItem({
-    required this.title,
-    required this.color,
-    required this.percent,
-  });
-
-  String get percentLabel => '${percent.round()}%';
 }
