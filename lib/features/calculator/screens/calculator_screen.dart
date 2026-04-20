@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_caffeine_tab.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_nutrition_tab.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_sport_tab.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
@@ -67,7 +68,7 @@ class CalculatorScreen extends StatelessWidget {
                     return const CalculatorHydrationTab();
 
                   case 4:
-                    return const _SimpleTabWidget(title: "Caffeine Widget");
+                    return const CalculatorCaffeineTab();
 
                   case 5:
                     return const CalculatorSportTab();
@@ -84,26 +85,26 @@ class CalculatorScreen extends StatelessWidget {
   }
 }
 
-class _SimpleTabWidget extends StatelessWidget {
-  final String title;
+// class _SimpleTabWidget extends StatelessWidget {
+//   final String title;
 
-  const _SimpleTabWidget({required this.title});
+//   const _SimpleTabWidget({required this.title});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: Get.width,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Center(
-        child: Text(
-          title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: Get.width,
+//       padding: const EdgeInsets.all(24),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(24),
+//       ),
+//       child: Center(
+//         child: Text(
+//           title,
+//           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+//         ),
+//       ),
+//     );
+//   }
+// }

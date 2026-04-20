@@ -38,6 +38,13 @@ class CalculatorController extends GetxController {
   final RxString selectedActivityType = ''.obs;
   final RxDouble sportIntensity = 0.0.obs;
 
+  // Caffeine Tab Controllers
+  final RxDouble caffeine24hValue = 180.0.obs;
+  final RxDouble caffeinMaxValue = 400.0.obs;
+  final RxDouble caffeineLastEightHoursValue = 110.0.obs;
+  late TimeController caffeineIntakeTimeController;
+  final RxList<Map<String, String>> caffeineHistory = <Map<String, String>>[].obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -45,6 +52,8 @@ class CalculatorController extends GetxController {
     _initializeWorkControllers();
     _initializeNutritionControllers();
     _initializeSportControllers();
+    _initializeCaffeineControllers();
+    _loadCaffeineHistory();
   }
 
   void _initializeSleepControllers() {
@@ -75,6 +84,44 @@ class CalculatorController extends GetxController {
     sportDurationController = TextEditingController();
   }
 
+  void _initializeCaffeineControllers() {
+    caffeineIntakeTimeController = TimeController();
+    // Initialize with sample caffeine history
+    caffeineHistory.assignAll([
+      {'name': 'Coffee', 'dose': '100mg', 'time': '06:11 PM'},
+      {'name': 'Espresso', 'dose': '75mg', 'time': '02:45 PM'},
+    ]);
+  }
+
+  void _loadCaffeineHistory() {
+  }
+
+  void addCaffeineIntake(String name, int mgAmount, String time) {
+    caffeineHistory.add({
+      'name': name,
+      'dose': '${mgAmount}mg',
+      'time': time,
+    });
+    caffeine24hValue.value += mgAmount;
+    caffeineLastEightHoursValue.value += mgAmount;
+  }
+
+  void clearCaffeineHistory() {
+    caffeineHistory.clear();
+    caffeine24hValue.value = 0;
+    caffeineLastEightHoursValue.value = 0;
+  }
+
+  void resetCaffeineTracking() {
+    caffeineLastEightHoursValue.value = 0;
+  }
+
+  void removeCaffeineEntry(int index) {
+    if (index >= 0 && index < caffeineHistory.length) {
+      caffeineHistory.removeAt(index);
+    }
+  }
+
   void selectShiftType(String shiftType) {
     selectedShiftType.value = shiftType;
   }
@@ -96,6 +143,7 @@ class CalculatorController extends GetxController {
     durationController.dispose();
     daysWorkedController.dispose();
     sportDurationController.dispose();
+    caffeineIntakeTimeController.dispose();
     super.onClose();
   }
 }
