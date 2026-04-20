@@ -1,0 +1,37 @@
+import 'dart:convert';
+import 'package:chrisimhof/core/service/end_points.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/settings/subscriptions/model/subscription_plan_model.dart';
+import 'package:http/http.dart' as http;
+
+class SubscriptionsService {
+  Future<SubscriptionPlansResponse> getSubscriptionPlans() async {
+    final uri = Uri.parse(Urls.showSubscriptionPlans);
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return SubscriptionPlansResponse.fromJson(jsonData);
+      } else {
+        throw Exception(
+          jsonData['message'] ?? 'Failed to fetch subscription plans',
+        );
+      }
+    } catch (e) {
+      throw Exception('Error fetching subscription plans: $e');
+    }
+  }
+}
