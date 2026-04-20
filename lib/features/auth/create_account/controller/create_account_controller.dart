@@ -1,6 +1,7 @@
 import 'package:chrisimhof/features/auth/create_account/model/register_response_model.dart';
 import 'package:chrisimhof/features/auth/create_account/service/create_account_service.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_screen.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -89,12 +90,13 @@ class CreateAccountController extends GetxController {
         EasyLoading.showSuccess("Registration Successful");
 
         // Navigate to OTP verification with email
-        Get.to(
-          VerifyCodeScreen(
-            email: emailController.text.trim(),
-            purpose: 'register',
-          ),
-        );
+        // Get.to(
+        //   VerifyCodeScreen(
+        //     email: emailController.text.trim(),
+        //     purpose: 'register',
+        //   ),
+        // );
+        Get.off(AppRoutes.signInScreen);
       } else {
         EasyLoading.dismiss();
         EasyLoading.showError(response.message);
