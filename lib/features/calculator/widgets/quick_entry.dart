@@ -38,7 +38,6 @@ class QuickEntrySelector extends StatelessWidget {
                 onTap: () => onEntrySelected(entry['name'], entry['amount']),
                 child: Container(
                   width: 140,
-                  margin: const EdgeInsets.only(right: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -51,7 +50,7 @@ class QuickEntrySelector extends StatelessWidget {
                         entry['name'],
                         style: getTextStyle(
                           color: AppColors.primaryTextColor,
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -60,7 +59,7 @@ class QuickEntrySelector extends StatelessWidget {
                         "${entry['amount']} mg",
                         style: getTextStyle(
                           color: const Color(0xFF6B7280),
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

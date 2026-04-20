@@ -85,26 +85,26 @@ class CalculatorScreen extends StatelessWidget {
   }
 }
 
-class _SimpleTabWidget extends StatelessWidget {
-  final String title;
+// class _SimpleTabWidget extends StatelessWidget {
+//   final String title;
 
-  const _SimpleTabWidget({required this.title});
+//   const _SimpleTabWidget({required this.title});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: Get.width,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Center(
-        child: Text(
-          title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: Get.width,
+//       padding: const EdgeInsets.all(24),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(24),
+//       ),
+//       child: Center(
+//         child: Text(
+//           title,
+//           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+//         ),
+//       ),
+//     );
+//   }
+// }

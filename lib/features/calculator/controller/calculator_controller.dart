@@ -94,34 +94,28 @@ class CalculatorController extends GetxController {
   }
 
   void _loadCaffeineHistory() {
-    // Load from SharedPreferences or API in the future
   }
 
-  /// Add caffeine intake
   void addCaffeineIntake(String name, int mgAmount, String time) {
     caffeineHistory.add({
       'name': name,
       'dose': '${mgAmount}mg',
       'time': time,
     });
-    // Update the 24h and last 8h values
     caffeine24hValue.value += mgAmount;
     caffeineLastEightHoursValue.value += mgAmount;
   }
 
-  /// Clear all caffeine history
   void clearCaffeineHistory() {
     caffeineHistory.clear();
     caffeine24hValue.value = 0;
     caffeineLastEightHoursValue.value = 0;
   }
 
-  /// Reset caffeine for current tracking period
   void resetCaffeineTracking() {
     caffeineLastEightHoursValue.value = 0;
   }
 
-  /// Remove specific caffeine entry
   void removeCaffeineEntry(int index) {
     if (index >= 0 && index < caffeineHistory.length) {
       caffeineHistory.removeAt(index);

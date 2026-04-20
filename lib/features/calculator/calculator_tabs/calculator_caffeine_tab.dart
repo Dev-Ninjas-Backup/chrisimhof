@@ -1,5 +1,4 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/common/widgets/custom_range_slider.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
 import 'package:chrisimhof/features/calculator/widgets/caffeine_history_list.dart';
@@ -23,7 +22,6 @@ class CalculatorCaffeineTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Text
           Text(
             "Caffeine (last 8 hours)",
             style: getTextStyle(
@@ -37,10 +35,10 @@ class CalculatorCaffeineTab extends StatelessWidget {
           Obx(
             () => Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
                 color: AppColors.primaryButtonColor,
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 "Active caffeine in your body now: ${controller.caffeineLastEightHoursValue.value.toInt()} mg",
@@ -66,11 +64,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
           QuickEntrySelector(
             onEntrySelected: (name, amount) {
               controller.addCaffeineIntake(name, amount, 'Now');
-              Get.snackbar(
-                'Caffeine Added',
-                '$name ($amount mg) added to your intake',
-                snackPosition: SnackPosition.BOTTOM,
-              );
+              
             },
           ),
           SizedBox(height: 32),
@@ -78,17 +72,13 @@ class CalculatorCaffeineTab extends StatelessWidget {
             topTitle: 'Time of Intake',
             controller: controller.caffeineIntakeTimeController,
           ),
-          const SizedBox(height: 150),
+          const SizedBox(height: 130),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: CustomButton(
               text: 'Next',
               onTap: () {
-                Get.snackbar(
-                  'Caffeine Saved',
-                  'Your caffeine intake has been recorded',
-                  snackPosition: SnackPosition.BOTTOM,
-                );
+                
               },
             ),
           ),
@@ -99,11 +89,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
                 child: TabButton(
                   text: 'Skip',
                   onTap: () {
-                    Get.snackbar(
-                      'Skipped',
-                      'Caffeine tracking skipped for this cycle',
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
+                    
                   },
                 ),
               ),
@@ -113,11 +99,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
                   text: 'Reset',
                   onTap: () {
                     controller.resetCaffeineTracking();
-                    Get.snackbar(
-                      'Reset',
-                      'Caffeine tracking has been reset',
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
+                   
                   },
                 ),
               ),

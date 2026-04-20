@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
+import 'package:get/get.dart';
 
 class CaffeineTrackerCard extends StatelessWidget {
   final double current24hValue;
@@ -9,11 +11,13 @@ class CaffeineTrackerCard extends StatelessWidget {
   const CaffeineTrackerCard({
     super.key,
     required this.current24hValue,
-    this.maxValue = 400.0,
+    this.maxValue = 600.0,
   });
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<CalculatorController>();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -31,7 +35,7 @@ class CaffeineTrackerCard extends StatelessWidget {
                 "Caffeine (last 8 hours)",
                 style: getTextStyle(
                   color: AppColors.primaryTextColor,
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -39,7 +43,7 @@ class CaffeineTrackerCard extends StatelessWidget {
                 "180mg",
                 style: getTextStyle(
                   color: AppColors.primaryTextColor,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -48,16 +52,15 @@ class CaffeineTrackerCard extends StatelessWidget {
           const SizedBox(height: 12),
           const Divider(color: Color(0xFFE5E7EB), thickness: 1),
           const SizedBox(height: 20),
-          Row(
+          Obx(() => Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Use Expanded for the title to prevent it from pushing the value off-screen
               Expanded(
                 child: Text(
                   "Caffeine (last 24 hours)",
                   style: getTextStyle(
                     color: AppColors.primaryTextColor,
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -66,7 +69,7 @@ class CaffeineTrackerCard extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: "${current24hValue.toInt()}",
+                      text: "${controller.caffeine24hValue.toInt()}",
                       style: getTextStyle(
                         color: AppColors.primaryTextColor,
                         fontSize: 20,
@@ -85,9 +88,9 @@ class CaffeineTrackerCard extends StatelessWidget {
                 ),
               ),
             ],
-          ),
+          )),
           const SizedBox(height: 20),
-          SliderTheme(
+          Obx(() => SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 24.0,
               activeTrackColor: AppColors.primaryButtonColor,
@@ -101,14 +104,15 @@ class CaffeineTrackerCard extends StatelessWidget {
               trackShape: const RoundedRectSliderTrackShape(),
             ),
             child: Slider(
-              value: current24hValue,
+              value: controller.caffeine24hValue.value,
               min: 0,
               max: maxValue,
-              onChanged: (val) {},
+              onChanged: (val) {
+                controller.caffeine24hValue.value = val;
+              },
             ),
-          ),
+          )),
           const SizedBox(height: 12),
-          // Added Padding to the label row to prevent the 1.3px overflow
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Row(
@@ -116,8 +120,8 @@ class CaffeineTrackerCard extends StatelessWidget {
               children: [
                 _buildLabel("0 mg"),
                 _buildLabel("200 mg"),
+                _buildLabel("400 mg"),
                 _buildLabel("${maxValue.toInt()} mg"),
-                // Removed the duplicate 400mg label if it causes crowding
               ],
             ),
           ),
@@ -130,8 +134,8 @@ class CaffeineTrackerCard extends StatelessWidget {
     return Text(
       text,
       style: getTextStyle(
-        color: const Color(0xFF6B7280),
-        fontSize: 12, // Slightly smaller font helps with tight spaces
+        color: const Color(0xFF414651),
+        fontSize: 12, 
         fontWeight: FontWeight.w400,
       ),
     );
