@@ -11,7 +11,7 @@ class CalculatorHydrationTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CalculatorController>();
-    
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -32,7 +32,6 @@ class CalculatorHydrationTab extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-          
           ),
           const SizedBox(height: 24),
           CustomRangeSlider(
@@ -67,16 +66,18 @@ class CalculatorHydrationTab extends StatelessWidget {
           CustomButton(
             text: "Next",
             onTap: () {
-
+              // TODO: Implement hydration submission
+              // controller.submitHydrationData();
             },
           ),
           const SizedBox(height: 16),
           CustomButton(
             text: "Reset",
             onTap: () {
-
+              // TODO: Implement hydration reset
             },
-            backgroundColor: Colors.grey[300],),  
+            backgroundColor: Colors.grey[300],
+          ),
         ],
       ),
     );

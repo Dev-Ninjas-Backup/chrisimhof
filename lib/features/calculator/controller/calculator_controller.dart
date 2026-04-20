@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/common/controller/time_controller.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
@@ -25,6 +26,10 @@ class CalculatorController extends GetxController {
   // Work submission
   final RxBool isWorkSubmitting = false.obs;
   final RxString workSubmitError = ''.obs;
+
+  // Nutrition submission
+  final RxBool isNutritionSubmitting = false.obs;
+  final RxString nutritionSubmitError = ''.obs;
 
   // Sleep Tab Controllers
   late TimeController wakeUpController;
@@ -435,6 +440,91 @@ class CalculatorController extends GetxController {
     } finally {
       isWorkSubmitting.value = false;
       print('Skip work state: complete (loading=${isWorkSubmitting.value})');
+    }
+  }
+
+  Future<void> submitNutritionData() async {
+    print('\n🔵 submitNutritionData() CALLED');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        print('✗ Session not initialized');
+        nutritionSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isNutritionSubmitting.value = true;
+      nutritionSubmitError.value = '';
+
+      // Convert Yes/No to boolean
+      final hadMealToday = hasMealTodaySelection.value == 'Yes';
+
+      final request = NutritionCalculatorRequest(
+        mealsPerDay: desiredNumberOfMealsController.value.value.toInt(),
+        hadMealToday: hadMealToday,
+        desiredMealCount: desiredNumberOfMealsController.value.value.toInt(),
+        firstMealTime: firstMealTimeController.to24HourFormat,
+        lastMealTime: lastMealTimeController.to24HourFormat,
+      );
+
+      print('=== Nutrition Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('==============================');
+
+      final response = await _calculatorService.submitNutritionData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Nutrition Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('======================================');
+
+      if (response.success && response.data != null) {
+        print('✓ Nutrition submission successful');
+        print('Next step: ${response.data!.nextStep}');
+        print('Session ID: ${response.data!.sessionId}');
+        print('Completed steps: ${response.data!.completedSteps}');
+
+        // Update session with response data
+        calculatorSession.value = CalculatorSession(
+          sessionId: response.data!.sessionId,
+          completedSteps: response.data!.completedSteps,
+          nextStep: response.data!.nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data!.isReadyToCalculate,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Hydration tab (index: 3)...');
+
+        // Navigate to next tab (hydration tab)
+        changeTab(3);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Nutrition submission failed');
+        print('Error message: ${response.message}');
+        nutritionSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Nutrition submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      nutritionSubmitError.value = e.toString();
+    } finally {
+      isNutritionSubmitting.value = false;
+      print(
+        'Nutrition submission state: complete (loading=${isNutritionSubmitting.value})',
+      );
     }
   }
 
