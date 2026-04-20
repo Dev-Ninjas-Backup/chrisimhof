@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/hydration_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
@@ -30,6 +31,10 @@ class CalculatorController extends GetxController {
   // Nutrition submission
   final RxBool isNutritionSubmitting = false.obs;
   final RxString nutritionSubmitError = ''.obs;
+
+  // Hydration submission
+  final RxBool isHydrationSubmitting = false.obs;
+  final RxString hydrationSubmitError = ''.obs;
 
   // Sleep Tab Controllers
   late TimeController wakeUpController;
@@ -524,6 +529,99 @@ class CalculatorController extends GetxController {
       isNutritionSubmitting.value = false;
       print(
         'Nutrition submission state: complete (loading=${isNutritionSubmitting.value})',
+      );
+    }
+  }
+
+  Future<void> submitHydrationData() async {
+    print('\n🔵 submitHydrationData() CALLED');
+    print(
+      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
+    );
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        print('✗ Session not initialized');
+        hydrationSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
+      isHydrationSubmitting.value = true;
+      hydrationSubmitError.value = '';
+
+      final request = HydrationCalculatorRequest(
+        waterConsumedL: hydrationConsumedController.value.value,
+        waterGoalL: hydrationDailyGoalController.value.value,
+      );
+
+      print('=== Hydration Data Request ===');
+      print('Request: ${request.toJson()}');
+      print('==============================');
+
+      final response = await _calculatorService.submitHydrationData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('=== Hydration Submission Response ===');
+      print('Full Response: $response');
+      print('Success: ${response.success}');
+      print('Message: ${response.message}');
+      print('Data: ${response.data}');
+      print('====================================');
+
+      if (response.success) {
+        print('✓ Hydration submission successful');
+
+        final currentSession = calculatorSession.value!;
+        final completedSteps = response.data?.completedSteps.isNotEmpty == true
+            ? response.data!.completedSteps
+            : [
+                ...currentSession.completedSteps,
+                if (!currentSession.completedSteps.contains('hydration'))
+                  'hydration',
+              ];
+        final nextStep = response.data?.nextStep.isNotEmpty == true
+            ? response.data!.nextStep
+            : 'caffeine';
+        final sessionId = response.data?.sessionId.isNotEmpty == true
+            ? response.data!.sessionId
+            : currentSession.sessionId!;
+
+        print('Next step: $nextStep');
+        print('Session ID: $sessionId');
+        print('Completed steps: $completedSteps');
+
+        calculatorSession.value = CalculatorSession(
+          sessionId: sessionId,
+          completedSteps: completedSteps,
+          nextStep: nextStep,
+          isFinalized: false,
+          isReadyToCalculate: response.data?.isReadyToCalculate ?? false,
+          prefilled: false,
+        );
+
+        print('✓ Session updated');
+        print('Navigating to Caffeine tab (index: 4)...');
+
+        changeTab(4);
+
+        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
+      } else {
+        print('✗ Hydration submission failed');
+        print('Error message: ${response.message}');
+        hydrationSubmitError.value = response.message;
+      }
+    } catch (e) {
+      print('✗ Hydration submission error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      hydrationSubmitError.value = e.toString();
+    } finally {
+      isHydrationSubmitting.value = false;
+      print(
+        'Hydration submission state: complete (loading=${isHydrationSubmitting.value})',
       );
     }
   }

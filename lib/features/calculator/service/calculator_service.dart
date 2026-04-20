@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/hydration_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
@@ -186,6 +187,86 @@ class CalculatorService {
     } catch (e) {
       print('Nutrition calculator error: $e');
       throw Exception('Error submitting nutrition data: $e');
+    }
+  }
+
+  Future<HydrationCalculatorResponse> submitHydrationData(
+    String sessionId,
+    HydrationCalculatorRequest request,
+  ) async {
+    final uri = Uri.parse(Urls.hydrationCalculator(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    try {
+      print('=== Hydration Calculator Request ===');
+      print('URL: $uri');
+      print('Headers: $headers');
+      print('Request: ${request.toJson()}');
+      print('====================================');
+
+      final response = await http
+          .post(uri, headers: headers, body: jsonEncode(request.toJson()))
+          .timeout(const Duration(seconds: 10));
+
+      print('=== Hydration Calculator Response ===');
+      print('Status Code: ${response.statusCode}');
+      print(
+        'Response Body: ${response.body.isEmpty ? '<empty>' : response.body}',
+      );
+      print('=====================================');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final body = response.body.trim();
+
+        if (body.isEmpty) {
+          return HydrationCalculatorResponse(
+            success: true,
+            message: 'Hydration step saved.',
+            data: null,
+          );
+        }
+
+        try {
+          final decodedBody = jsonDecode(body);
+          if (decodedBody is Map<String, dynamic>) {
+            return HydrationCalculatorResponse.fromJson(decodedBody);
+          }
+
+          throw const FormatException(
+            'Hydration response was not a JSON object',
+          );
+        } on FormatException catch (e) {
+          print('Hydration response parsing error: $e');
+          return HydrationCalculatorResponse(
+            success: true,
+            message: 'Hydration step saved.',
+            data: null,
+          );
+        }
+      } else {
+        if (response.body.isNotEmpty) {
+          try {
+            final decodedBody = jsonDecode(response.body);
+            if (decodedBody is Map<String, dynamic>) {
+              throw Exception(
+                decodedBody['message'] ?? 'Failed to submit hydration data',
+              );
+            }
+          } catch (_) {
+            // Fall through to the generic error below.
+          }
+        }
+
+        throw Exception('Failed to submit hydration data');
+      }
+    } catch (e) {
+      print('Hydration calculator error: $e');
+      throw Exception('Error submitting hydration data: $e');
     }
   }
 }
