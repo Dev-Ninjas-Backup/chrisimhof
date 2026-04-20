@@ -76,6 +76,9 @@ class CalculatorController extends GetxController {
   final RxDouble caffeinMaxValue = 400.0.obs;
   final RxDouble caffeineLastEightHoursValue = 110.0.obs;
   late TimeController caffeineIntakeTimeController;
+  late TextEditingController caffeineDrinkNameController;
+  late TextEditingController caffeineDrinkTypeController;
+  late TextEditingController caffeineAmountController;
   final RxList<Map<String, String>> caffeineHistory =
       <Map<String, String>>[].obs;
 
@@ -149,6 +152,9 @@ class CalculatorController extends GetxController {
 
   void _initializeCaffeineControllers() {
     caffeineIntakeTimeController = TimeController();
+    caffeineDrinkNameController = TextEditingController();
+    caffeineDrinkTypeController = TextEditingController();
+    caffeineAmountController = TextEditingController();
     // Initialize with sample caffeine history
     caffeineHistory.assignAll([
       {'name': 'Coffee', 'dose': '100mg', 'time': '06:11 PM'},
@@ -162,6 +168,34 @@ class CalculatorController extends GetxController {
     caffeineHistory.add({'name': name, 'dose': '${mgAmount}mg', 'time': time});
     caffeine24hValue.value += mgAmount;
     caffeineLastEightHoursValue.value += mgAmount;
+  }
+
+  void resetAddCaffeineForm() {
+    caffeineDrinkNameController.clear();
+    caffeineDrinkTypeController.clear();
+    caffeineAmountController.clear();
+    caffeineIntakeTimeController.reset();
+  }
+
+  bool submitAddCaffeineForm() {
+    final String drinkName = caffeineDrinkNameController.text.trim();
+    final String drinkType = caffeineDrinkTypeController.text.trim();
+    final int? amount = int.tryParse(caffeineAmountController.text.trim());
+
+    if (drinkName.isEmpty ||
+        drinkType.isEmpty ||
+        amount == null ||
+        amount <= 0) {
+      return false;
+    }
+
+    addCaffeineIntake(
+      '$drinkName (${drinkType})',
+      amount,
+      caffeineIntakeTimeController.formattedTime,
+    );
+    resetAddCaffeineForm();
+    return true;
   }
 
   void clearCaffeineHistory() {
@@ -665,6 +699,9 @@ class CalculatorController extends GetxController {
     currentNapDurationController.dispose();
     daysWorkedController.dispose();
     sportDurationController.dispose();
+    caffeineDrinkNameController.dispose();
+    caffeineDrinkTypeController.dispose();
+    caffeineAmountController.dispose();
     caffeineIntakeTimeController.dispose();
     super.onClose();
   }
