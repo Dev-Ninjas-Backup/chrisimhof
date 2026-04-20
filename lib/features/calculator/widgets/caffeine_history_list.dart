@@ -1,7 +1,6 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:get/get.dart';
 
