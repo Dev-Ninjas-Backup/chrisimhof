@@ -14,7 +14,7 @@ class CalculatorNutritionTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CalculatorController>();
-    
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -25,7 +25,7 @@ class CalculatorNutritionTab extends StatelessWidget {
             controller: controller.desiredNumberOfMealsController,
           ),
           const SizedBox(height: 24),
-            CustomRangeSlider(
+          CustomRangeSlider(
             required: false,
             headerText: "Meals Per Day",
             controller: controller.desiredNumberOfMealsController,
@@ -59,8 +59,10 @@ class CalculatorNutritionTab extends StatelessWidget {
                     child: Obx(
                       () => SelectableTabButton(
                         text: 'Yes',
-                        isSelected: controller.hasMealTodaySelection.value == 'Yes',
-                        onTap: () => controller.hasMealTodaySelection.value = 'Yes',
+                        isSelected:
+                            controller.hasMealTodaySelection.value == 'Yes',
+                        onTap: () =>
+                            controller.hasMealTodaySelection.value = 'Yes',
                       ),
                     ),
                   ),
@@ -69,8 +71,10 @@ class CalculatorNutritionTab extends StatelessWidget {
                     child: Obx(
                       () => SelectableTabButton(
                         text: 'No',
-                        isSelected: controller.hasMealTodaySelection.value == 'No',
-                        onTap: () => controller.hasMealTodaySelection.value = 'No',
+                        isSelected:
+                            controller.hasMealTodaySelection.value == 'No',
+                        onTap: () =>
+                            controller.hasMealTodaySelection.value = 'No',
                       ),
                     ),
                   ),
@@ -81,8 +85,11 @@ class CalculatorNutritionTab extends StatelessWidget {
           const SizedBox(height: 130),
           CustomButton(
             text: "Next",
-            onTap: () {},
-          ),  
+            onTap: () {
+              // TODO: Implement nutrition submission
+              // controller.submitNutritionData();
+            },
+          ),
         ],
       ),
     );
