@@ -5,6 +5,7 @@ import 'package:chrisimhof/features/calculator/models/hydration_calculator_model
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculator_results_model.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
@@ -666,6 +667,182 @@ class CalculatorController extends GetxController {
 
   void setSportIntensity(double intensity) {
     sportIntensity.value = intensity;
+  }
+
+  CalculatorResultsData buildResultsData() {
+    final int sleepScore = _calculateSleepScore();
+    final int hydrationScore = _calculateHydrationScore();
+    final int caffeineScore = _calculateCaffeineScore();
+    final int nutritionScore = _calculateNutritionScore();
+    final int sportScore = _calculateSportScore();
+
+    final List<int> scores = [
+      sleepScore,
+      hydrationScore,
+      caffeineScore,
+      nutritionScore,
+      sportScore,
+    ];
+
+    final int overallScore =
+        scores.reduce((total, score) => total + score) ~/ scores.length;
+
+    return CalculatorResultsData(
+      overallScore: overallScore,
+      overallLabel: _overallLabelFor(overallScore),
+      metrics: [
+        CalculatorResultMetric(
+          title: 'Sleep',
+          score: sleepScore,
+          detail: _sleepDetailText(),
+          iconKey: 'sleep',
+        ),
+        CalculatorResultMetric(
+          title: 'Hydration',
+          score: hydrationScore,
+          detail: _hydrationDetailText(),
+          iconKey: 'hydration',
+        ),
+        CalculatorResultMetric(
+          title: 'Caffeine',
+          score: caffeineScore,
+          detail: '${caffeine24hValue.value.toInt()}mg today',
+          iconKey: 'caffeine',
+        ),
+        CalculatorResultMetric(
+          title: 'Nutrition',
+          score: nutritionScore,
+          detail: _nutritionDetailText(),
+          iconKey: 'nutrition',
+        ),
+      ],
+      recommendations: [
+        CalculatorRecommendation(
+          title: 'Recommendations of the day',
+          headline: 'Nutrition',
+          description: _nutritionRecommendationText(),
+          iconKey: 'nutrition',
+        ),
+        CalculatorRecommendation(
+          title: 'Caffeine',
+          headline: 'Caffeine',
+          description: _caffeineRecommendationText(),
+          iconKey: 'caffeine',
+        ),
+        CalculatorRecommendation(
+          title: 'Sport',
+          headline: 'Sport',
+          description: _sportRecommendationText(sportScore),
+          iconKey: 'sport',
+        ),
+      ],
+    );
+  }
+
+  int _calculateSleepScore() {
+    final double sleptHours = sleepLastNightController.value.value;
+    final double goalHours = sleepGoalController.value.value;
+    if (goalHours <= 0) {
+      return 0;
+    }
+
+    return ((sleptHours / goalHours) * 100).round().clamp(0, 100);
+  }
+
+  int _calculateHydrationScore() {
+    final double consumed = hydrationConsumedController.value.value;
+    final double goal = hydrationDailyGoalController.value.value;
+    if (goal <= 0) {
+      return 0;
+    }
+
+    return ((consumed / goal) * 100).round().clamp(0, 100);
+  }
+
+  int _calculateCaffeineScore() {
+    final double max = caffeinMaxValue.value;
+    if (max <= 0) {
+      return 0;
+    }
+
+    final double ratio = 1 - (caffeine24hValue.value / max);
+    return (ratio * 100).round().clamp(0, 100);
+  }
+
+  int _calculateNutritionScore() {
+    final int desiredMeals = desiredNumberOfMealsController.value.value
+        .toInt()
+        .clamp(1, 10);
+    final int baseScore = hasMealTodaySelection.value == 'Yes' ? 70 : 45;
+    final int mealBonus = (desiredMeals * 7).clamp(0, 30);
+    return (baseScore + mealBonus).clamp(0, 100);
+  }
+
+  int _calculateSportScore() {
+    final int duration = int.tryParse(sportDurationController.text.trim()) ?? 0;
+    final int durationScore = (duration * 2).clamp(0, 70);
+    final int intensityScore = (sportIntensity.value * 30).round().clamp(0, 30);
+    return (durationScore + intensityScore).clamp(0, 100);
+  }
+
+  String _overallLabelFor(int score) {
+    if (score >= 85) {
+      return 'Excellent level';
+    }
+    if (score >= 70) {
+      return 'Good level';
+    }
+    if (score >= 50) {
+      return 'Fair level';
+    }
+    return 'Needs support';
+  }
+
+  String _sleepDetailText() {
+    final double slept = sleepLastNightController.value.value;
+    final double goal = sleepGoalController.value.value;
+    final double debt = (goal - slept).clamp(0, goal);
+    return '${slept.toStringAsFixed(0)}h slept / ${debt.toStringAsFixed(0)}h debt';
+  }
+
+  String _hydrationDetailText() {
+    return '${hydrationConsumedController.value.value.toStringAsFixed(1)}L / ${hydrationDailyGoalController.value.value.toStringAsFixed(1)}L';
+  }
+
+  String _nutritionDetailText() {
+    final String mealState = hasMealTodaySelection.value == 'Yes'
+        ? 'Meal logged'
+        : 'No meal yet';
+    return '$mealState • ${desiredNumberOfMealsController.value.value.toInt()} meals';
+  }
+
+  String _nutritionRecommendationText() {
+    if (hasMealTodaySelection.value == 'Yes') {
+      return 'Keep your meals light and balanced tonight, and spread protein and carbs evenly across ${desiredNumberOfMealsController.value.value.toInt()} meals.';
+    }
+
+    return 'Plan a simple meal soon with protein, easy carbs, and enough fiber so your energy stays stable through the day.';
+  }
+
+  String _caffeineRecommendationText() {
+    if (caffeine24hValue.value >= caffeinMaxValue.value) {
+      return 'Your caffeine is already at the daily limit, so avoid more intake and shift to water for the rest of the day.';
+    }
+
+    return 'Moderate caffeine intake looks manageable. Try to stop around ${caffeineIntakeTimeController.formattedTime} to better protect your sleep.';
+  }
+
+  String _sportRecommendationText(int sportScore) {
+    final int duration = int.tryParse(sportDurationController.text.trim()) ?? 0;
+    final String activity = selectedActivityType.value.isEmpty
+        ? 'movement'
+        : selectedActivityType.value.toLowerCase();
+
+    if (sportScore >= 75) {
+      return 'Your $activity plan looks strong. Keep the ${sportIntensity.value.toStringAsFixed(1)} intensity and allow time to recover after ${duration} minutes.';
+    }
+
+    return 'Add a little more $activity today or increase intensity slightly so you build toward a stronger activity score.';
   }
 
   // Nap management methods
