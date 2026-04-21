@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
+import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_sport_tab.dart';
 import 'package:chrisimhof/features/calculator/widgets/caffeine_history_list.dart';
 import 'package:chrisimhof/features/calculator/widgets/quick_entry.dart';
 import 'package:chrisimhof/features/calculator/widgets/value_slider_card.dart';
@@ -64,7 +65,6 @@ class CalculatorCaffeineTab extends StatelessWidget {
           QuickEntrySelector(
             onEntrySelected: (name, amount) {
               controller.addCaffeineIntake(name, amount, 'Now');
-              
             },
           ),
           SizedBox(height: 32),
@@ -75,22 +75,34 @@ class CalculatorCaffeineTab extends StatelessWidget {
           const SizedBox(height: 130),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
-            child: CustomButton(
-              text: 'Next',
-              onTap: () {
-                
-              },
+            child: Obx(
+              () => CustomButton(
+                text: controller.isCaffeineSubmitting.value
+                    ? 'Submitting...'
+                    : 'Next',
+                onTap: () {
+                  if (!controller.isCaffeineSubmitting.value) {
+                    _handleSubmitCaffeine(controller);
+                  }
+                },
+              ),
             ),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
-                child: TabButton(
-                  text: 'Skip',
-                  onTap: () {
-                    
-                  },
+                child: Obx(
+                  () => TabButton(
+                    text: controller.isCaffeineSubmitting.value
+                        ? 'Skipping...'
+                        : 'Skip',
+                    onTap: () {
+                      if (!controller.isCaffeineSubmitting.value) {
+                        _handleSkipCaffeine(controller);
+                      }
+                    },
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -99,7 +111,6 @@ class CalculatorCaffeineTab extends StatelessWidget {
                   text: 'Reset',
                   onTap: () {
                     controller.resetCaffeineTracking();
-                   
                   },
                 ),
               ),
@@ -108,5 +119,31 @@ class CalculatorCaffeineTab extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleSubmitCaffeine(CalculatorController controller) async {
+    try {
+      await controller.submitCaffeineIntake();
+      Get.to(() => const CalculatorSportTab());
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        controller.caffeineSubmitError.value,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  void _handleSkipCaffeine(CalculatorController controller) async {
+    try {
+      await controller.skipCaffeineIntake();
+      Get.to(() => const CalculatorSportTab());
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        controller.caffeineSubmitError.value,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

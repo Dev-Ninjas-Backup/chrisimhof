@@ -1,6 +1,8 @@
 import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_preset_model.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_intake_model.dart';
 import 'package:chrisimhof/features/calculator/models/hydration_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
@@ -74,15 +76,24 @@ class CalculatorController extends GetxController {
   final RxDouble sportIntensity = 0.0.obs;
 
   // Caffeine Tab Controllers
-  final RxDouble caffeine24hValue = 180.0.obs;
+  final RxDouble caffeine24hValue = 0.0.obs;
   final RxDouble caffeinMaxValue = 400.0.obs;
-  final RxDouble caffeineLastEightHoursValue = 110.0.obs;
+  final RxDouble caffeineLastEightHoursValue = 0.0.obs;
   late TimeController caffeineIntakeTimeController;
   late TextEditingController caffeineDrinkNameController;
   late TextEditingController caffeineDrinkTypeController;
   late TextEditingController caffeineAmountController;
   final RxList<Map<String, String>> caffeineHistory =
       <Map<String, String>>[].obs;
+
+  // Caffeine Presets
+  final RxList<CaffeinePreset> caffeinePresets = <CaffeinePreset>[].obs;
+  final RxBool isCaffeinePresetsLoading = true.obs;
+  final RxString caffeinePresetsError = ''.obs;
+
+  // Caffeine Intake Submission
+  final RxBool isCaffeineSubmitting = false.obs;
+  final RxString caffeineSubmitError = ''.obs;
 
   @override
   void onInit() {
@@ -94,6 +105,7 @@ class CalculatorController extends GetxController {
     _initializeSportControllers();
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
+    _fetchCaffeinePresets();
   }
 
   Future<void> _fetchCalculatorSession() async {
@@ -158,13 +170,30 @@ class CalculatorController extends GetxController {
     caffeineDrinkTypeController = TextEditingController();
     caffeineAmountController = TextEditingController();
     // Initialize with sample caffeine history
-    caffeineHistory.assignAll([
-      {'name': 'Coffee', 'dose': '100mg', 'time': '06:11 PM'},
-      {'name': 'Espresso', 'dose': '75mg', 'time': '02:45 PM'},
-    ]);
+    caffeineHistory.assignAll([]);
   }
 
   void _loadCaffeineHistory() {}
+
+  Future<void> _fetchCaffeinePresets() async {
+    try {
+      print('\n☕ _fetchCaffeinePresets() CALLED');
+      isCaffeinePresetsLoading.value = true;
+      caffeinePresetsError.value = '';
+
+      final presets = await _calculatorService.getCaffeinePresets();
+      print('✓ Caffeine presets received: ${presets.length} items');
+
+      caffeinePresets.assignAll(presets);
+      print('✓ caffeinePresets assigned');
+    } catch (e) {
+      caffeinePresetsError.value = e.toString();
+      print('✗ Caffeine presets error: $e');
+    } finally {
+      isCaffeinePresetsLoading.value = false;
+      print('✓ Caffeine presets loading complete');
+    }
+  }
 
   void addCaffeineIntake(String name, int mgAmount, String time) {
     caffeineHistory.add({'name': name, 'dose': '${mgAmount}mg', 'time': time});
@@ -194,7 +223,7 @@ class CalculatorController extends GetxController {
     addCaffeineIntake(
       '$drinkName (${drinkType})',
       amount,
-      caffeineIntakeTimeController.formattedTime,
+      caffeineIntakeTimeController.to24HourFormat,
     );
     resetAddCaffeineForm();
     return true;
@@ -213,6 +242,92 @@ class CalculatorController extends GetxController {
   void removeCaffeineEntry(int index) {
     if (index >= 0 && index < caffeineHistory.length) {
       caffeineHistory.removeAt(index);
+    }
+  }
+
+  Future<void> submitCaffeineIntake() async {
+    try {
+      print('\n☕ submitCaffeineIntake() CALLED');
+      isCaffeineSubmitting.value = true;
+      caffeineSubmitError.value = '';
+
+      if (calculatorSession.value?.sessionId == null) {
+        throw Exception('Session ID not found');
+      }
+
+      // Convert caffeineHistory to CaffeineIntake objects
+      final List<CaffeineIntake> intakes = [];
+      for (final entry in caffeineHistory) {
+        final name = entry['name'] ?? '';
+        final dose = entry['dose'] ?? '';
+        var time = entry['time'] ?? '';
+
+        // Parse dose (e.g., "75mg" -> 75)
+        final amountMg = int.tryParse(dose.replaceAll('mg', '').trim()) ?? 0;
+
+        // If time is "Now" or a 12-hour format, use TimeWidget time or format properly
+        if (time == 'Now' || time.contains(RegExp(r'(AM|PM)'))) {
+          time = caffeineIntakeTimeController.to24HourFormat;
+        }
+
+        // Try to find the drink type from presets
+        String drinkType = 'COFFEE'; // default
+        for (final preset in caffeinePresets) {
+          if (preset.label.toLowerCase() == name.toLowerCase()) {
+            drinkType = preset.drinkType;
+            break;
+          }
+        }
+
+        intakes.add(
+          CaffeineIntake(
+            amountMg: amountMg,
+            consumedAt: time,
+            drinkType: drinkType,
+            drinkName: name,
+          ),
+        );
+      }
+
+      final request = CaffeineIntakeRequest(caffeineIntakes: intakes);
+      final response = await _calculatorService.submitCaffeineIntake(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+      print('✓ Caffeine intake submitted successfully');
+      print('  Next Step: ${response.nextStep}');
+    } catch (e) {
+      caffeineSubmitError.value = e.toString();
+      print('✗ Caffeine intake submission error: $e');
+      rethrow;
+    } finally {
+      isCaffeineSubmitting.value = false;
+    }
+  }
+
+  Future<void> skipCaffeineIntake() async {
+    try {
+      print('\n☕ skipCaffeineIntake() CALLED');
+      isCaffeineSubmitting.value = true;
+      caffeineSubmitError.value = '';
+
+      if (calculatorSession.value?.sessionId == null) {
+        throw Exception('Session ID not found');
+      }
+
+      final response = await _calculatorService.skipCaffeineIntake(
+        calculatorSession.value!.sessionId!,
+      );
+
+      print('✓ Caffeine intake skipped successfully');
+      print('  Next Step: ${response.nextStep}');
+    } catch (e) {
+      caffeineSubmitError.value = e.toString();
+      print('✗ Skip caffeine intake error: $e');
+      rethrow;
+    } finally {
+      isCaffeineSubmitting.value = false;
     }
   }
 

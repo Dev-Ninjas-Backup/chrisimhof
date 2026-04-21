@@ -29,4 +29,10 @@ class Urls {
       '$baseUrl/calculator/session/$sessionId/nutrition';
   static String hydrationCalculator(String sessionId) =>
       '$baseUrl/calculator/session/$sessionId/hydration';
+  static const String caffeineQuickEntry =
+      '$baseUrl/calculator/caffeine-presets';
+  static String addCaffeineIntake(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/caffeine';
+  static String skipCaffeineIntake(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/caffeine/skip';
 }
