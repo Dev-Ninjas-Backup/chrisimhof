@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../model/user_model.dart';
 
@@ -20,7 +21,7 @@ class GoogleAuthService {
 
     } catch (e) {
 
-      print("Google Sign-In Error: $e");
+      debugPrint("Google Sign-In Error: $e");
       return null;
 
     }
