@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "852460494016",
+    "project_id": "ryvenza-1d3f0",
+    "storage_bucket": "ryvenza-1d3f0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852460494016:android:dc902c42d7b433d879e125",
+        "android_client_info": {
+          "package_name": "com.ryvenza.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "852460494016-v4hlpvc52v2io67vqba2a06j6jlvkjl9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ryvenza.app",
+            "certificate_hash": "ad637f7f1302ffefd658b15e4a303fc10ef859aa"
+          }
+        },
+        {
+          "client_id": "852460494016-bvd7g3a37npfijipmd3o7vhj561tfd0g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc-avuCw_kekv9X9sKLvkBKubvGj-R1qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "852460494016-bvd7g3a37npfijipmd3o7vhj561tfd0g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "852460494016-kfl5i0nnbvk2c1o066hgvqbkl57sjt05.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ryvenza.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
