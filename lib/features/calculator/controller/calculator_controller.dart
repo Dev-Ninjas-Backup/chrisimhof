@@ -14,6 +14,7 @@ class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
 
   final selectedTabIndex = 0.obs;
+  
 
   // Session Management
   final CalculatorService _calculatorService = CalculatorService();
