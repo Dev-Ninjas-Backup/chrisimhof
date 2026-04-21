@@ -12,7 +12,7 @@ class Urls {
   static const String changePassword = '$baseUrl/profile/password';
   static const String checkout = '$baseUrl/billing/checkout';
 
-  static const String userMe = '$baseUrl/auth/me';  
+  static const String userMe = '$baseUrl/auth/me';
   static const String history = '$baseUrl/history';
   static const String dashboard = '$baseUrl/dashboard';
 
@@ -28,5 +28,5 @@ class Urls {
   static String nutritionCalculator(String sessionId) =>
       '$baseUrl/calculator/session/$sessionId/nutrition';
   static String hydrationCalculator(String sessionId) =>
-
+      '$baseUrl/calculator/session/$sessionId/hydration';
 }
