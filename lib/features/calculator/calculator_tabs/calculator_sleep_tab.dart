@@ -16,7 +16,10 @@ class CalculatorSleepTab extends StatelessWidget {
 
     return Column(
       children: [
-        TimeWidget(topTitle: 'Wake-up-Time', controller: controller.wakeUpController),
+        TimeWidget(
+          topTitle: 'Wake-up-Time',
+          controller: controller.wakeUpController,
+        ),
         const SizedBox(height: 16),
         CustomRangeSlider(
           headerText: 'Sleep Last Night (h)',
@@ -65,7 +68,8 @@ class CalculatorSleepTab extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Nap ${nap['napNumber']}#",
@@ -143,7 +147,7 @@ class CalculatorSleepTab extends StatelessWidget {
                 onTap: () {
                   controller.addNap(
                     controller.currentNapDurationController.text,
-                    controller.preferredTimeController.formattedTime,
+                    controller.preferredTimeController.to24HourFormat,
                   );
                 },
                 width: double.infinity,
@@ -152,15 +156,38 @@ class CalculatorSleepTab extends StatelessWidget {
           );
         }),
         const SizedBox(height: 32),
-        CustomButton(
-          text: "Next",
-          onTap: () {},
-          width: double.infinity,
+        Obx(
+          () => CustomButton(
+            text: controller.isSleepSubmitting.value ? "Submitting..." : "Next",
+            onTap: controller.isSleepSubmitting.value
+                ? null
+                : () {
+                    controller.submitSleepData();
+                  },
+            width: double.infinity,
+          ),
         ),
         const SizedBox(height: 16),
+        if (controller.sleepSubmitError.value.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              controller.sleepSubmitError.value,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+          ),
         CustomButton(
           text: "Reset",
-          onTap: () {},
+          onTap: () {
+            controller.clearAllNaps();
+            controller.wakeUpController.reset();
+            controller.sleepLastNightController.updateValue(8);
+            controller.sleepGoalController.updateValue(8);
+            controller.fatigueLevel.value = 'Low';
+            controller.desiredSleepStartController.reset();
+            controller.desiredSleepEndController.reset();
+          },
           width: double.infinity,
           backgroundColor: const Color(0xFFF3F4F6),
         ),

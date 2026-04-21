@@ -43,7 +43,8 @@ class SleepTrendCard extends StatelessWidget {
           const SizedBox(height: 16),
           Expanded(
             child: Obx(() {
-              final spots = controller.currentSpots;
+              final values = controller.sleepTrendValues;
+              final labels = controller.sleepLabels;
               return BarChart(
                 BarChartData(
                   minY: 0,
@@ -63,9 +64,9 @@ class SleepTrendCard extends StatelessWidget {
                       ),
                       tooltipMargin: 8,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final day = controller.days[group.x.toInt()];
+                        final day = labels[group.x.toInt()];
                         return BarTooltipItem(
-                          '$day-Sleep(h): ${rod.toY.toInt()}',
+                          '$day-Sleep(h): ${rod.toY.toStringAsFixed(1)}',
                           getTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -91,14 +92,14 @@ class SleepTrendCard extends StatelessWidget {
                         reservedSize: 34,
                         getTitlesWidget: (value, meta) {
                           final index = value.toInt();
-                          if (index < 0 || index >= controller.days.length) {
+                          if (index < 0 || index >= labels.length) {
                             return const SizedBox.shrink();
                           }
 
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              controller.days[index],
+                              labels[index],
                               style: getTextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
@@ -110,15 +111,13 @@ class SleepTrendCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  barGroups: List.generate(spots.length, (index) {
-                    final spot = spots[index];
-
+                  barGroups: List.generate(values.length, (index) {
                     return BarChartGroupData(
                       x: index,
                       barsSpace: 0,
                       barRods: [
                         BarChartRodData(
-                          toY: spot.y / 10,
+                          toY: values[index],
                           width: 28,
                           color: const Color(0xFF1DB97B),
                           borderRadius: BorderRadius.circular(24),

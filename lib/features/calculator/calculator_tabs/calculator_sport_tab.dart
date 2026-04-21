@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
+import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
 import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,11 @@ class CalculatorSportTab extends StatelessWidget {
               CustomButton(
                 text: "Calculate",
                 onTap: () {
-                  // Add calculation logic here
+                  Get.to(
+                    () => CalculatorResultsScreen(
+                      initialData: controller.buildResultsData(),
+                    ),
+                  );
                 },
                 backgroundColor: AppColors.primaryButtonColor,
               ),

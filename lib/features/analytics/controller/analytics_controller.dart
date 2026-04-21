@@ -1,61 +1,160 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AnalyticsController extends GetxController {
-  final selectedPeriod = 'Last 7 Days'.obs;
+import 'package:chrisimhof/features/analytics/model/analytics_response_model.dart';
+import 'package:chrisimhof/features/analytics/service/analytics_service.dart';
 
-  final periods = const [
-    'Last 7 Days',
-    'Last 14 Days',
-    'Last 30 Days',
-    'Last 90 Days',
+class AnalyticsController extends GetxController {
+  final AnalyticsService _service = AnalyticsService();
+  static const List<String> _weekDayLabels = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
   ];
 
-  final days = const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  final selectedPeriod = 'Last 7 Days'.obs;
+  final isLoading = false.obs;
+  final errorMessage = ''.obs;
+  final analyticsData = Rxn<AnalyticsResponseModel>();
 
-  final Map<String, List<FlSpot>> periodSpots = {
-    'Last 7 Days': const [
-      FlSpot(0, 5),
-      FlSpot(1, 10),
-      FlSpot(2, 25),
-      FlSpot(3, 42),
-      FlSpot(4, 30),
-      FlSpot(5, 55),
-      FlSpot(6, 94),
-    ],
-    'Last 14 Days': const [
-      FlSpot(0, 12),
-      FlSpot(1, 20),
-      FlSpot(2, 18),
-      FlSpot(3, 35),
-      FlSpot(4, 50),
-      FlSpot(5, 46),
-      FlSpot(6, 70),
-    ],
-    'Last 30 Days': const [
-      FlSpot(0, 8),
-      FlSpot(1, 16),
-      FlSpot(2, 28),
-      FlSpot(3, 22),
-      FlSpot(4, 40),
-      FlSpot(5, 60),
-      FlSpot(6, 78),
-    ],
-    'Last 90 Days': const [
-      FlSpot(0, 15),
-      FlSpot(1, 30),
-      FlSpot(2, 20),
-      FlSpot(3, 45),
-      FlSpot(4, 38),
-      FlSpot(5, 72),
-      FlSpot(6, 88),
-    ],
+  final periods = const ['Last 7 Days', 'Last 30 Days', 'Last 90 Days'];
+
+  static const Map<String, String> _periodQueryMap = {
+    'Last 7 Days': '7d',
+    'Last 30 Days': '30d',
+    'Last 90 Days': '90d',
   };
 
-  List<FlSpot> get currentSpots =>
-      periodSpots[selectedPeriod.value] ?? periodSpots['Last 7 Days']!;
-
-  void changePeriod(String value) {
-    selectedPeriod.value = value;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchAnalytics();
   }
+
+  Future<void> fetchAnalytics() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      analyticsData.value = await _service.getAnalytics(currentPeriodQuery);
+    } catch (e) {
+      errorMessage.value = e.toString();
+      debugPrint('Analytics error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> changePeriod(String value) async {
+    if (selectedPeriod.value == value) return;
+    selectedPeriod.value = value;
+    await fetchAnalytics();
+  }
+
+  String get currentPeriodQuery =>
+      _periodQueryMap[selectedPeriod.value] ?? '7d';
+
+  List<FlSpot> get weeklyScoreSpots {
+    final scores = analyticsData.value?.weeklyScores ?? const [];
+    if (scores.isEmpty) return const [];
+
+    final groupedScores = <int, List<double>>{};
+
+    for (final item in scores) {
+      final index = _weekdayIndex(item.date);
+      groupedScores.putIfAbsent(index, () => []).add(item.overallScore);
+    }
+
+    return groupedScores.entries.map((entry) {
+      final values = entry.value;
+      final average =
+          values.fold<double>(0, (sum, value) => sum + value) / values.length;
+      return FlSpot(entry.key.toDouble(), average);
+    }).toList()..sort((a, b) => a.x.compareTo(b.x));
+  }
+
+  List<double> get sleepTrendValues {
+    final items = analyticsData.value?.sleepTrend ?? const [];
+    if (items.isEmpty) return List.filled(_weekDayLabels.length, 0);
+
+    final groupedSleep = <int, List<double>>{};
+
+    for (final item in items) {
+      final index = _weekdayIndex(item.date);
+      groupedSleep.putIfAbsent(index, () => []).add(item.sleepHours);
+    }
+
+    return List.generate(_weekDayLabels.length, (index) {
+      final values = groupedSleep[index];
+      if (values == null || values.isEmpty) return 0;
+      return values.fold<double>(0, (sum, value) => sum + value) /
+          values.length;
+    });
+  }
+
+  List<String> get weeklyLabels => List.unmodifiable(_weekDayLabels);
+
+  List<String> get sleepLabels => List.unmodifiable(_weekDayLabels);
+
+  List<double> get wellnessValues {
+    final radar = analyticsData.value?.wellnessRadar;
+    if (radar == null) return const [1.5, 1.5, 1.5, 1.5, 1.5, 1.5];
+
+    final maxValue = radar.maxValue <= 0 ? 100.0 : radar.maxValue;
+
+    double normalize(double value) => (value / maxValue * 5).clamp(1.5, 5.0);
+
+    return [
+      normalize(radar.sleep),
+      normalize(radar.hydration),
+      normalize(radar.caffeine),
+      normalize(radar.activity),
+      normalize(radar.recovery),
+      normalize(radar.nutrition),
+    ];
+  }
+
+  List<AnalyticsActivityItem> get activityItems {
+    final items = analyticsData.value?.activitySplit.items ?? const [];
+    if (items.isEmpty) return const [];
+
+    return items.map((item) {
+      return AnalyticsActivityItem(
+        title: item.label,
+        color: _parseColor(item.color),
+        percent: item.percent,
+      );
+    }).toList();
+  }
+
+  int _weekdayIndex(DateTime? date) {
+    if (date == null) return 0;
+    return date.weekday % 7;
+  }
+
+  Color _parseColor(String hex) {
+    final sanitized = hex.replaceFirst('#', '').trim();
+    if (sanitized.length != 6) return const Color(0xFF1DB97B);
+    final parsedColor = int.tryParse('FF$sanitized', radix: 16);
+    if (parsedColor == null) return const Color(0xFF1DB97B);
+    return Color(parsedColor);
+  }
+}
+
+class AnalyticsActivityItem {
+  final String title;
+  final Color color;
+  final double percent;
+
+  const AnalyticsActivityItem({
+    required this.title,
+    required this.color,
+    required this.percent,
+  });
+
+  String get percentLabel => '${percent.round()}%';
 }

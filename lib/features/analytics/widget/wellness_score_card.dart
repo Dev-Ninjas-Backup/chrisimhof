@@ -43,7 +43,7 @@ class WellnessScoreCard extends StatelessWidget {
           const SizedBox(height: 16),
           Expanded(
             child: Obx(() {
-              final values = _buildWellnessValues(controller);
+              final values = controller.wellnessValues;
 
               return RadarChart(
                 RadarChartData(
@@ -109,24 +109,5 @@ class WellnessScoreCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<double> _buildWellnessValues(AnalyticsController controller) {
-    final spots = controller.currentSpots;
-
-    double safeValue(int index) {
-      if (index >= spots.length) return 3.0;
-      final value = spots[index].y / 10;
-      return value.clamp(1.5, 5.0);
-    }
-
-    return [
-      safeValue(0), // Sleep
-      safeValue(1), // Hydration
-      safeValue(2), // Caffeine
-      safeValue(3), // Exercise
-      safeValue(4), // Recovery
-      safeValue(5), // Nutrition
-    ];
   }
 }
