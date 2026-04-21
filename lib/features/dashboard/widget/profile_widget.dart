@@ -1,6 +1,5 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +29,7 @@ class ProfileWidget extends StatelessWidget {
             backgroundColor: Colors.grey.shade200,
             backgroundImage: displayImage.isNotEmpty
                 ? NetworkImage(displayImage)
-                : AssetImage(ImagePath.profile) as ImageProvider,
+                : null,
             child: displayImage.isEmpty
                 ? const Icon(Icons.person, size: 20, color: Colors.grey)
                 : null,
