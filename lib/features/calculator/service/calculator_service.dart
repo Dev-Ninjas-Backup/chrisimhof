@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_preset_model.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_intake_model.dart';
 import 'package:chrisimhof/features/calculator/models/hydration_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
@@ -267,6 +269,126 @@ class CalculatorService {
     } catch (e) {
       print('Hydration calculator error: $e');
       throw Exception('Error submitting hydration data: $e');
+    }
+  }
+
+  Future<List<CaffeinePreset>> getCaffeinePresets() async {
+    final uri = Uri.parse(Urls.caffeineQuickEntry);
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      print('=== Caffeine Presets Response ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response: ${response.body}');
+      print('=================================');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = jsonDecode(response.body);
+        return jsonData
+            .map(
+              (item) => CaffeinePreset.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      } else {
+        throw Exception('Failed to fetch caffeine presets');
+      }
+    } catch (e) {
+      print('Caffeine presets error: $e');
+      throw Exception('Error fetching caffeine presets: $e');
+    }
+  }
+
+  Future<CaffeineIntakeResponse> submitCaffeineIntake(
+    String sessionId,
+    CaffeineIntakeRequest request,
+  ) async {
+    final uri = Uri.parse(Urls.addCaffeineIntake(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      print('=== Caffeine Intake Request ===');
+      print('URL: $uri');
+      print('Request Body: ${jsonEncode(request.toJson())}');
+      print('================================');
+
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': '*/*',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode(request.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      print('=== Caffeine Intake Response ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: $jsonData');
+      print('================================');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return CaffeineIntakeResponse.fromJson(jsonData);
+      } else {
+        throw Exception(
+          jsonData['message'] ?? 'Failed to submit caffeine intake',
+        );
+      }
+    } catch (e) {
+      print('Caffeine intake error: $e');
+      throw Exception('Error submitting caffeine intake: $e');
+    }
+  }
+
+  Future<CaffeineIntakeResponse> skipCaffeineIntake(String sessionId) async {
+    final uri = Uri.parse(Urls.skipCaffeineIntake(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      print('=== Skip Caffeine Intake Request ===');
+      print('URL: $uri');
+      print('=====================================');
+
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': '*/*',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      print('=== Skip Caffeine Intake Response ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: $jsonData');
+      print('======================================');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return CaffeineIntakeResponse.fromJson(jsonData);
+      } else {
+        throw Exception(
+          jsonData['message'] ?? 'Failed to skip caffeine intake',
+        );
+      }
+    } catch (e) {
+      print('Skip caffeine intake error: $e');
+      throw Exception('Error skipping caffeine intake: $e');
     }
   }
 }
