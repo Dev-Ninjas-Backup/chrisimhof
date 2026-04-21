@@ -19,7 +19,7 @@ class TabButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 70),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryButtonColor : Colors.white,
@@ -27,6 +27,8 @@ class TabButton extends StatelessWidget {
         ),
         child: Text(
           text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: getTextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,

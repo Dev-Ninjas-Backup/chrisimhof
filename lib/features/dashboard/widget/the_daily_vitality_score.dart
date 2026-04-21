@@ -41,65 +41,58 @@ class TheDailyVitalityScore extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Center(
-                    child: SizedBox(
-                      width: 140,
-                      height: 140,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          CustomPaint(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 140,
+                          height: 140,
+                          child: CustomPaint(
                             size: const Size(140, 140),
                             painter: VitalityProgressPainter(
                               progress: controller.vitalityScore.value / 100,
+                              percentage: controller.vitalityScore.value.toInt(),
                             ),
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                controller.formattedScore,
-                                style: getTextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryTextColor,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                controller.levelText.value,
-                                style: getTextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.secondaryTextColor,
-                                ),
-                              ),
-                            ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          controller.levelText.value,
+                          style: getTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.secondaryTextColor,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  SizedBox(height: 16),
+                  SizedBox(height: 8),
 
-                  RichText(
-                    text: TextSpan(
-                      style: getTextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.secondaryTextColor,
-                      ),
-                      children: [
-                        TextSpan(text: 'Your lifestyle efficiency is up '.tr),
-                        TextSpan(
-                          text: '${controller.improvementPercent.value}%',
-                          style: const TextStyle(
-                            color: Color(0xFF10B981),
-                            fontWeight: FontWeight.w500,
+                  Flexible(
+                    child: SizedBox(
+                      width: 164,
+                      child: RichText(
+                        text: TextSpan(
+                          style: getTextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.secondaryTextColor,
                           ),
+                          children: [
+                            TextSpan(text: 'Your lifestyle efficiency is up '.tr),
+                            TextSpan(
+                              text: '${controller.improvementPercent.value}%',
+                              style: getTextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF10B981),
+                              ),
+                            ),
+                            TextSpan(text: ' from yesterday.'.tr),
+                          ],
                         ),
-                        TextSpan(text: ' from yesterday.'.tr),
-                      ],
+                      ),
                     ),
                   ),
                 ],

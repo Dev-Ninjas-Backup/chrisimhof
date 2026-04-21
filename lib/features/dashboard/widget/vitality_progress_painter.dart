@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class VitalityProgressPainter extends CustomPainter {
   final double progress;
+  final int percentage;
 
-  VitalityProgressPainter({required this.progress});
+  VitalityProgressPainter({required this.progress, required this.percentage});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -40,10 +41,30 @@ class VitalityProgressPainter extends CustomPainter {
     final sweepAngle = maxSweepAngle * progress;
 
     canvas.drawArc(rect, startAngle, sweepAngle, false, progressPaint);
+
+    // Draw percentage text dynamically inside the circle
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: '$percentage%',
+        style: const TextStyle(
+          color: AppColors.primaryTextColor,
+          fontSize: 32,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout();
+    final offset = Offset(
+      size.width / 2 - textPainter.width / 2,
+      size.height / 2 - textPainter.height / 2,
+    );
+    textPainter.paint(canvas, offset);
   }
 
   @override
   bool shouldRepaint(covariant VitalityProgressPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress || oldDelegate.percentage != percentage;
   }
 }

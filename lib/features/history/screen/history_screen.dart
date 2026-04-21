@@ -28,11 +28,11 @@ class HistoryScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Obx(
               () => Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
                     child: TabButton(
-                      text: 'Recent'.tr,
+                      text: 'Recent',
                       isSelected: controller.selectedTab.value == 0,
                       onTap: () => controller.selectTab(0),
                     ),
@@ -40,7 +40,7 @@ class HistoryScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   Expanded(
                     child: TabButton(
-                      text: 'Past'.tr,
+                      text: 'Past',
                       isSelected: controller.selectedTab.value == 1,
                       onTap: () => controller.selectTab(1),
                     ),
@@ -51,20 +51,66 @@ class HistoryScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Expanded(
               child: Obx(
-                () => ListView.separated(
-                  padding: EdgeInsets.zero,
-                  itemCount: controller.currentList.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = controller.currentList[index];
-                    return HistoryWidget(
-                      dateTime: item.dateTime,
-                      details: item.details,
-                      score: item.score,
-                      scoreDetails: item.scoreDetails,
+                () {
+                  if (controller.isLoading.value && controller.currentList.isEmpty) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryButtonColor,
+                      ),
                     );
-                  },
-                ),
+                  }
+
+                  if (controller.errorMessage.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Error loading history'.tr,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: controller.refreshHistory,
+                            child: Text('Retry'.tr),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (controller.currentList.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No history found'.tr,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      controller.refreshHistory();
+                    },
+                    child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemCount: controller.currentList.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final item = controller.currentList[index];
+                        return HistoryWidget(historyItem: item);
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           ],

@@ -1,20 +1,46 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/history/model/history_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HistoryWidget extends StatelessWidget {
-  final String dateTime;
-  final String details;
-  final String score;
-  final String scoreDetails;
+  final HistoryModel historyItem;
+
   const HistoryWidget({
     super.key,
-    required this.dateTime,
-    required this.details,
-    required this.score,
-    required this.scoreDetails,
+    required this.historyItem,
   });
+
+  String _formatDate(String dateTimeString) {
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      final formattedDate =
+          'MMM d, yyyy · h:mm a'.tr; // Will be handled by locale
+      // Simple formatting: Apr 20, 2026 · 9:09 PM
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
+      final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
+      final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+      final minute = dateTime.minute.toString().padLeft(2, '0');
+
+      return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year} · $hour:$minute $period';
+    } catch (e) {
+      return dateTimeString;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +60,7 @@ class HistoryWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  dateTime,
+                  _formatDate(historyItem.createdAt),
                   style: getTextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -43,7 +69,7 @@ class HistoryWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  details,
+                  historyItem.summary,
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
@@ -53,14 +79,14 @@ class HistoryWidget extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 16), // ← gap between the two columns
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  score,
+                  '${historyItem.overallScore}%',
                   style: getTextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -69,12 +95,13 @@ class HistoryWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  scoreDetails,
+                  '${historyItem.sleepScore}% sleep • ${historyItem.activityScore}% activity',
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: AppColors.secondaryTextColor,
                   ),
+                  textAlign: TextAlign.end,
                 ),
               ],
             ),

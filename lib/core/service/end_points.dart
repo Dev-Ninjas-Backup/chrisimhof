@@ -11,5 +11,7 @@ class Urls {
       '$baseUrl/subscription-plans/public/active';
   static const String changePassword = '$baseUrl/profile/password';
   static const String checkout = '$baseUrl/billing/checkout';
-  static const String userMe = '$baseUrl/auth/me';
+  static const String userMe = '$baseUrl/auth/me';  
+  static const String history = '$baseUrl/history';
+  static const String dashboard = '$baseUrl/dashboard';
 }

@@ -17,42 +17,85 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsetsGeometry.only(top: 78, left: 16, bottom: 20),
-          child: Column(
-            children: [
-              ProfileWidget(),
-              TheDailyVitalityScore(),
-              OptionButtonWidget(),
-              Obx(
-                () => GridView.builder(
-                  padding: EdgeInsets.only(right: 16),
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: controller.dashboardItems.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.15,
+      body: Obx(
+        () {
+          if (controller.isLoading.value && controller.dashboardItems.isEmpty) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primaryButtonColor,
+              ),
+            );
+          }
+
+          if (controller.errorMessage.isNotEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    controller.errorMessage.value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red,
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    final item = controller.dashboardItems[index];
-                    return ListWidget(
-                      title: item.title,
-                      image: item.image,
-                      percent: item.percent,
-                      description: item.description,
-                    );
-                  },
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => controller.refreshDashboard(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              await controller.refreshDashboard();
+            },
+            color: AppColors.primaryButtonColor,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 78, left: 16, bottom: 20),
+                child: Column(
+                  children: [
+                    ProfileWidget(),
+                    TheDailyVitalityScore(),
+                    OptionButtonWidget(),
+                    Obx(
+                      () => GridView.builder(
+                        padding: const EdgeInsets.only(right: 16),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: controller.dashboardItems.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.15,
+                        ),
+                        itemBuilder: (context, index) {
+                          final item = controller.dashboardItems[index];
+                          return ListWidget(
+                            title: item.title,
+                            image: item.image,
+                            percent: item.percent,
+                            description: item.description,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DailyRecommendations(),
+                  ],
                 ),
               ),
-              SizedBox(height: 16),
-              DailyRecommendations(),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
