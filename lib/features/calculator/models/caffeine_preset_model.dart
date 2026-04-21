@@ -10,10 +10,22 @@ class CaffeinePreset {
   });
 
   factory CaffeinePreset.fromJson(Map<String, dynamic> json) {
+    // Handle amountMg as both int and string from API
+    int parsedAmountMg = 0;
+    final amountMgValue = json['amountMg'];
+    if (amountMgValue != null) {
+      if (amountMgValue is int) {
+        parsedAmountMg = amountMgValue;
+      } else if (amountMgValue is String) {
+        parsedAmountMg = int.tryParse(amountMgValue) ?? 0;
+      }
+    }
+
+    // API uses 'drinkName' but we store it as 'label' for UI consistency
     return CaffeinePreset(
       drinkType: json['drinkType'] ?? '',
-      label: json['label'] ?? '',
-      defaultMg: json['defaultMg'] ?? 0,
+      label: json['drinkName'] ?? '', // Map drinkName -> label
+      defaultMg: parsedAmountMg, // Map amountMg -> defaultMg
     );
   }
 
