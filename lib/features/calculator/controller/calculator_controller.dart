@@ -1,11 +1,14 @@
 import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_preset_model.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_intake_model.dart';
 import 'package:chrisimhof/features/calculator/models/hydration_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculator_results_model.dart';
+import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
@@ -14,7 +17,6 @@ class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
 
   final selectedTabIndex = 0.obs;
-  
 
   // Session Management
   final CalculatorService _calculatorService = CalculatorService();
@@ -37,6 +39,10 @@ class CalculatorController extends GetxController {
   // Hydration submission
   final RxBool isHydrationSubmitting = false.obs;
   final RxString hydrationSubmitError = ''.obs;
+
+  // Sport submission
+  final RxBool isSportSubmitting = false.obs;
+  final RxString sportSubmitError = ''.obs;
 
   // Sleep Tab Controllers
   late TimeController wakeUpController;
@@ -74,15 +80,24 @@ class CalculatorController extends GetxController {
   final RxDouble sportIntensity = 0.0.obs;
 
   // Caffeine Tab Controllers
-  final RxDouble caffeine24hValue = 180.0.obs;
+  final RxDouble caffeine24hValue = 0.0.obs;
   final RxDouble caffeinMaxValue = 400.0.obs;
-  final RxDouble caffeineLastEightHoursValue = 110.0.obs;
+  final RxDouble caffeineLastEightHoursValue = 0.0.obs;
   late TimeController caffeineIntakeTimeController;
   late TextEditingController caffeineDrinkNameController;
   late TextEditingController caffeineDrinkTypeController;
   late TextEditingController caffeineAmountController;
   final RxList<Map<String, String>> caffeineHistory =
       <Map<String, String>>[].obs;
+
+  // Caffeine Presets
+  final RxList<CaffeinePreset> caffeinePresets = <CaffeinePreset>[].obs;
+  final RxBool isCaffeinePresetsLoading = true.obs;
+  final RxString caffeinePresetsError = ''.obs;
+
+  // Caffeine Intake Submission
+  final RxBool isCaffeineSubmitting = false.obs;
+  final RxString caffeineSubmitError = ''.obs;
 
   @override
   void onInit() {
@@ -94,32 +109,21 @@ class CalculatorController extends GetxController {
     _initializeSportControllers();
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
+    _fetchCaffeinePresets();
   }
 
   Future<void> _fetchCalculatorSession() async {
     try {
-      print('\n📋 _fetchCalculatorSession() CALLED');
       isSessionLoading.value = true;
       sessionError.value = '';
 
       final response = await _calculatorService.getCalculatorSession();
-      print('✓ Response received: ${response.data}');
-      print('  Session ID: ${response.data.sessionId}');
-      print('  Completed Steps: ${response.data.completedSteps}');
-      print('  Next Step: ${response.data.nextStep}');
 
       calculatorSession.value = response.data;
-      print('✓ calculatorSession assigned: ${calculatorSession.value}');
-      print(
-        '✓ calculatorSession.value.sessionId: ${calculatorSession.value!.sessionId}',
-      );
     } catch (e) {
       sessionError.value = e.toString();
-      print('✗ Session error: $e');
-      print('Stack trace: ${StackTrace.current}');
     } finally {
       isSessionLoading.value = false;
-      print('✓ Session loading complete. IsLoading: ${isSessionLoading.value}');
     }
   }
 
@@ -158,13 +162,27 @@ class CalculatorController extends GetxController {
     caffeineDrinkTypeController = TextEditingController();
     caffeineAmountController = TextEditingController();
     // Initialize with sample caffeine history
-    caffeineHistory.assignAll([
-      {'name': 'Coffee', 'dose': '100mg', 'time': '06:11 PM'},
-      {'name': 'Espresso', 'dose': '75mg', 'time': '02:45 PM'},
-    ]);
+    caffeineHistory.assignAll([]);
   }
 
   void _loadCaffeineHistory() {}
+
+  Future<void> _fetchCaffeinePresets() async {
+    try {
+      isCaffeinePresetsLoading.value = true;
+      caffeinePresetsError.value = '';
+
+      final presets = await _calculatorService.getCaffeinePresets();
+      for (int i = 0; i < presets.length; i++) {
+      }
+
+      caffeinePresets.assignAll(presets);
+    } catch (e) {
+      caffeinePresetsError.value = e.toString();
+    } finally {
+      isCaffeinePresetsLoading.value = false;
+    }
+  }
 
   void addCaffeineIntake(String name, int mgAmount, String time) {
     caffeineHistory.add({'name': name, 'dose': '${mgAmount}mg', 'time': time});
@@ -192,9 +210,9 @@ class CalculatorController extends GetxController {
     }
 
     addCaffeineIntake(
-      '$drinkName (${drinkType})',
+      '$drinkName ($drinkType)',
       amount,
-      caffeineIntakeTimeController.formattedTime,
+      caffeineIntakeTimeController.to24HourFormat,
     );
     resetAddCaffeineForm();
     return true;
@@ -216,6 +234,120 @@ class CalculatorController extends GetxController {
     }
   }
 
+  Future<void> submitCaffeineIntake() async {
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        caffeineSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      isCaffeineSubmitting.value = true;
+      caffeineSubmitError.value = '';
+
+      // Convert caffeineHistory to CaffeineIntake objects
+      final List<CaffeineIntake> intakes = [];
+      for (final entry in caffeineHistory) {
+        final name = entry['name'] ?? '';
+        final dose = entry['dose'] ?? '';
+        var time = entry['time'] ?? '';
+
+        // Parse dose (e.g., "75mg" -> 75)
+        final amountMg = int.tryParse(dose.replaceAll('mg', '').trim()) ?? 0;
+
+        // If time is "Now" or a 12-hour format, use TimeWidget time or format properly
+        if (time == 'Now' || time.contains(RegExp(r'(AM|PM)'))) {
+          time = caffeineIntakeTimeController.to24HourFormat;
+        }
+
+        // Try to find the drink type from presets
+        String drinkType = 'COFFEE'; // default
+        for (final preset in caffeinePresets) {
+          if (preset.label.toLowerCase() == name.toLowerCase()) {
+            drinkType = preset.drinkType;
+            break;
+          }
+        }
+
+        intakes.add(
+          CaffeineIntake(
+            amountMg: amountMg,
+            consumedAt: time,
+            drinkType: drinkType,
+            drinkName: name,
+          ),
+        );
+      }
+
+      final request = CaffeineIntakeRequest(caffeineIntakes: intakes);
+
+
+      final response = await _calculatorService.submitCaffeineIntake(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+
+
+      // Update session with response data
+      calculatorSession.value = CalculatorSession(
+        sessionId: response.sessionId,
+        completedSteps: response.completedSteps,
+        nextStep: response.nextStep,
+        isFinalized: false,
+        isReadyToCalculate: response.isReadyToCalculate,
+        prefilled: false,
+      );
+
+
+      changeTab(5);
+
+    } catch (e) {
+      caffeineSubmitError.value = e.toString();
+    } finally {
+      isCaffeineSubmitting.value = false;
+    }
+  }
+
+  Future<void> skipCaffeineIntake() async {
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        caffeineSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      isCaffeineSubmitting.value = true;
+      caffeineSubmitError.value = '';
+
+      final response = await _calculatorService.skipCaffeineIntake(
+        calculatorSession.value!.sessionId!,
+      );
+
+
+
+      // Update session with response data
+      calculatorSession.value = CalculatorSession(
+        sessionId: response.sessionId,
+        completedSteps: response.completedSteps,
+        nextStep: response.nextStep,
+        isFinalized: false,
+        isReadyToCalculate: response.isReadyToCalculate,
+        prefilled: false,
+      );
+
+
+      changeTab(5);
+
+    } catch (e) {
+      caffeineSubmitError.value = e.toString();
+    } finally {
+      isCaffeineSubmitting.value = false;
+    }
+  }
+
   void selectShiftType(String shiftType) {
     selectedShiftType.value = shiftType;
   }
@@ -225,27 +357,18 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitSleepData() async {
-    print('\n🔵 submitSleepData() CALLED');
-    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
-    print('DEBUG: isSessionLoading.value = ${isSessionLoading.value}');
 
     try {
       if (calculatorSession.value == null) {
-        print('✗ calculatorSession.value is NULL');
         sleepSubmitError.value = 'Session not initialized (value is null)';
         return;
       }
 
       if (calculatorSession.value!.sessionId == null) {
-        print('✗ calculatorSession.value.sessionId is NULL');
         sleepSubmitError.value = 'Session ID is null';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isSleepSubmitting.value = true;
       sleepSubmitError.value = '';
 
@@ -262,7 +385,6 @@ class CalculatorController extends GetxController {
         );
       }
 
-      print('✓ Built nap list with ${napList.length} naps');
 
       // Build request
       final request = SleepCalculatorRequest(
@@ -275,27 +397,14 @@ class CalculatorController extends GetxController {
         naps: napList,
       );
 
-      print('=== Sleep Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('==========================');
 
       final response = await _calculatorService.submitSleepData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Sleep Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('==================================');
 
       if (response.success && response.data != null) {
-        print('✓ Sleep submission successful');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
-        print('Completed steps: ${response.data!.completedSteps}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -307,51 +416,33 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Work tab (index: 1)...');
 
         // Navigate to next tab (work tab)
         changeTab(1);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Sleep submission failed');
-        print('Error message: ${response.message}');
         sleepSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Sleep submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       sleepSubmitError.value = e.toString();
     } finally {
       isSleepSubmitting.value = false;
-      print(
-        'Sleep submission state: complete (loading=${isSleepSubmitting.value})',
-      );
     }
   }
 
   Future<void> submitWorkData() async {
-    print('\n🔵 submitWorkData() CALLED');
-    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null) {
-        print('✗ calculatorSession.value is NULL');
         workSubmitError.value = 'Session not initialized (value is null)';
         return;
       }
 
       if (calculatorSession.value!.sessionId == null) {
-        print('✗ calculatorSession.value.sessionId is NULL');
         workSubmitError.value = 'Session ID is null';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isWorkSubmitting.value = true;
       workSubmitError.value = '';
 
@@ -362,27 +453,14 @@ class CalculatorController extends GetxController {
         shiftType: selectedShiftType.value.toUpperCase(),
       );
 
-      print('=== Work Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('========================');
 
       final response = await _calculatorService.submitWorkData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Work Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('=================================');
 
       if (response.success && response.data != null) {
-        print('✓ Work submission successful');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
-        print('Completed steps: ${response.data!.completedSteps}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -394,45 +472,29 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Nutrition tab (index: 2)...');
 
         // Navigate to next tab (nutrition tab)
         changeTab(2);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Work submission failed');
-        print('Error message: ${response.message}');
         workSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Work submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       workSubmitError.value = e.toString();
     } finally {
       isWorkSubmitting.value = false;
-      print(
-        'Work submission state: complete (loading=${isWorkSubmitting.value})',
-      );
     }
   }
 
   Future<void> skipWorkData() async {
-    print('\n⏭️ skipWorkData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         workSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isWorkSubmitting.value = true;
       workSubmitError.value = '';
 
@@ -440,17 +502,8 @@ class CalculatorController extends GetxController {
         calculatorSession.value!.sessionId!,
       );
 
-      print('=== Skip Work Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('==========================');
 
       if (response.success && response.data != null) {
-        print('✓ Work skipped successfully');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -462,43 +515,29 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Nutrition tab (index: 2)...');
 
         // Navigate to next tab (nutrition tab)
         changeTab(2);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Skip work failed');
-        print('Error message: ${response.message}');
         workSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Skip work error: $e');
-      print('Stack trace: ${StackTrace.current}');
       workSubmitError.value = e.toString();
     } finally {
       isWorkSubmitting.value = false;
-      print('Skip work state: complete (loading=${isWorkSubmitting.value})');
     }
   }
 
   Future<void> submitNutritionData() async {
-    print('\n🔵 submitNutritionData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         nutritionSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isNutritionSubmitting.value = true;
       nutritionSubmitError.value = '';
 
@@ -513,27 +552,14 @@ class CalculatorController extends GetxController {
         lastMealTime: lastMealTimeController.to24HourFormat,
       );
 
-      print('=== Nutrition Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('==============================');
 
       final response = await _calculatorService.submitNutritionData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Nutrition Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('======================================');
 
       if (response.success && response.data != null) {
-        print('✓ Nutrition submission successful');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
-        print('Completed steps: ${response.data!.completedSteps}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -545,45 +571,29 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Hydration tab (index: 3)...');
 
         // Navigate to next tab (hydration tab)
         changeTab(3);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Nutrition submission failed');
-        print('Error message: ${response.message}');
         nutritionSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Nutrition submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       nutritionSubmitError.value = e.toString();
     } finally {
       isNutritionSubmitting.value = false;
-      print(
-        'Nutrition submission state: complete (loading=${isNutritionSubmitting.value})',
-      );
     }
   }
 
   Future<void> submitHydrationData() async {
-    print('\n🔵 submitHydrationData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         hydrationSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isHydrationSubmitting.value = true;
       hydrationSubmitError.value = '';
 
@@ -592,24 +602,14 @@ class CalculatorController extends GetxController {
         waterGoalL: hydrationDailyGoalController.value.value,
       );
 
-      print('=== Hydration Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('==============================');
 
       final response = await _calculatorService.submitHydrationData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Hydration Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('====================================');
 
       if (response.success) {
-        print('✓ Hydration submission successful');
 
         final currentSession = calculatorSession.value!;
         final completedSteps = response.data?.completedSteps.isNotEmpty == true
@@ -626,9 +626,6 @@ class CalculatorController extends GetxController {
             ? response.data!.sessionId
             : currentSession.sessionId!;
 
-        print('Next step: $nextStep');
-        print('Session ID: $sessionId');
-        print('Completed steps: $completedSteps');
 
         calculatorSession.value = CalculatorSession(
           sessionId: sessionId,
@@ -639,26 +636,16 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Caffeine tab (index: 4)...');
 
         changeTab(4);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Hydration submission failed');
-        print('Error message: ${response.message}');
         hydrationSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Hydration submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       hydrationSubmitError.value = e.toString();
     } finally {
       isHydrationSubmitting.value = false;
-      print(
-        'Hydration submission state: complete (loading=${isHydrationSubmitting.value})',
-      );
     }
   }
 
@@ -668,182 +655,6 @@ class CalculatorController extends GetxController {
 
   void setSportIntensity(double intensity) {
     sportIntensity.value = intensity;
-  }
-
-  CalculatorResultsData buildResultsData() {
-    final int sleepScore = _calculateSleepScore();
-    final int hydrationScore = _calculateHydrationScore();
-    final int caffeineScore = _calculateCaffeineScore();
-    final int nutritionScore = _calculateNutritionScore();
-    final int sportScore = _calculateSportScore();
-
-    final List<int> scores = [
-      sleepScore,
-      hydrationScore,
-      caffeineScore,
-      nutritionScore,
-      sportScore,
-    ];
-
-    final int overallScore =
-        scores.reduce((total, score) => total + score) ~/ scores.length;
-
-    return CalculatorResultsData(
-      overallScore: overallScore,
-      overallLabel: _overallLabelFor(overallScore),
-      metrics: [
-        CalculatorResultMetric(
-          title: 'Sleep',
-          score: sleepScore,
-          detail: _sleepDetailText(),
-          iconKey: 'sleep',
-        ),
-        CalculatorResultMetric(
-          title: 'Hydration',
-          score: hydrationScore,
-          detail: _hydrationDetailText(),
-          iconKey: 'hydration',
-        ),
-        CalculatorResultMetric(
-          title: 'Caffeine',
-          score: caffeineScore,
-          detail: '${caffeine24hValue.value.toInt()}mg today',
-          iconKey: 'caffeine',
-        ),
-        CalculatorResultMetric(
-          title: 'Nutrition',
-          score: nutritionScore,
-          detail: _nutritionDetailText(),
-          iconKey: 'nutrition',
-        ),
-      ],
-      recommendations: [
-        CalculatorRecommendation(
-          title: 'Recommendations of the day',
-          headline: 'Nutrition',
-          description: _nutritionRecommendationText(),
-          iconKey: 'nutrition',
-        ),
-        CalculatorRecommendation(
-          title: 'Caffeine',
-          headline: 'Caffeine',
-          description: _caffeineRecommendationText(),
-          iconKey: 'caffeine',
-        ),
-        CalculatorRecommendation(
-          title: 'Sport',
-          headline: 'Sport',
-          description: _sportRecommendationText(sportScore),
-          iconKey: 'sport',
-        ),
-      ],
-    );
-  }
-
-  int _calculateSleepScore() {
-    final double sleptHours = sleepLastNightController.value.value;
-    final double goalHours = sleepGoalController.value.value;
-    if (goalHours <= 0) {
-      return 0;
-    }
-
-    return ((sleptHours / goalHours) * 100).round().clamp(0, 100);
-  }
-
-  int _calculateHydrationScore() {
-    final double consumed = hydrationConsumedController.value.value;
-    final double goal = hydrationDailyGoalController.value.value;
-    if (goal <= 0) {
-      return 0;
-    }
-
-    return ((consumed / goal) * 100).round().clamp(0, 100);
-  }
-
-  int _calculateCaffeineScore() {
-    final double max = caffeinMaxValue.value;
-    if (max <= 0) {
-      return 0;
-    }
-
-    final double ratio = 1 - (caffeine24hValue.value / max);
-    return (ratio * 100).round().clamp(0, 100);
-  }
-
-  int _calculateNutritionScore() {
-    final int desiredMeals = desiredNumberOfMealsController.value.value
-        .toInt()
-        .clamp(1, 10);
-    final int baseScore = hasMealTodaySelection.value == 'Yes' ? 70 : 45;
-    final int mealBonus = (desiredMeals * 7).clamp(0, 30);
-    return (baseScore + mealBonus).clamp(0, 100);
-  }
-
-  int _calculateSportScore() {
-    final int duration = int.tryParse(sportDurationController.text.trim()) ?? 0;
-    final int durationScore = (duration * 2).clamp(0, 70);
-    final int intensityScore = (sportIntensity.value * 30).round().clamp(0, 30);
-    return (durationScore + intensityScore).clamp(0, 100);
-  }
-
-  String _overallLabelFor(int score) {
-    if (score >= 85) {
-      return 'Excellent level';
-    }
-    if (score >= 70) {
-      return 'Good level';
-    }
-    if (score >= 50) {
-      return 'Fair level';
-    }
-    return 'Needs support';
-  }
-
-  String _sleepDetailText() {
-    final double slept = sleepLastNightController.value.value;
-    final double goal = sleepGoalController.value.value;
-    final double debt = (goal - slept).clamp(0, goal);
-    return '${slept.toStringAsFixed(0)}h slept / ${debt.toStringAsFixed(0)}h debt';
-  }
-
-  String _hydrationDetailText() {
-    return '${hydrationConsumedController.value.value.toStringAsFixed(1)}L / ${hydrationDailyGoalController.value.value.toStringAsFixed(1)}L';
-  }
-
-  String _nutritionDetailText() {
-    final String mealState = hasMealTodaySelection.value == 'Yes'
-        ? 'Meal logged'
-        : 'No meal yet';
-    return '$mealState • ${desiredNumberOfMealsController.value.value.toInt()} meals';
-  }
-
-  String _nutritionRecommendationText() {
-    if (hasMealTodaySelection.value == 'Yes') {
-      return 'Keep your meals light and balanced tonight, and spread protein and carbs evenly across ${desiredNumberOfMealsController.value.value.toInt()} meals.';
-    }
-
-    return 'Plan a simple meal soon with protein, easy carbs, and enough fiber so your energy stays stable through the day.';
-  }
-
-  String _caffeineRecommendationText() {
-    if (caffeine24hValue.value >= caffeinMaxValue.value) {
-      return 'Your caffeine is already at the daily limit, so avoid more intake and shift to water for the rest of the day.';
-    }
-
-    return 'Moderate caffeine intake looks manageable. Try to stop around ${caffeineIntakeTimeController.formattedTime} to better protect your sleep.';
-  }
-
-  String _sportRecommendationText(int sportScore) {
-    final int duration = int.tryParse(sportDurationController.text.trim()) ?? 0;
-    final String activity = selectedActivityType.value.isEmpty
-        ? 'movement'
-        : selectedActivityType.value.toLowerCase();
-
-    if (sportScore >= 75) {
-      return 'Your $activity plan looks strong. Keep the ${sportIntensity.value.toStringAsFixed(1)} intensity and allow time to recover after ${duration} minutes.';
-    }
-
-    return 'Add a little more $activity today or increase intensity slightly so you build toward a stronger activity score.';
   }
 
   // Nap management methods
@@ -869,6 +680,87 @@ class CalculatorController extends GetxController {
   void clearAllNaps() {
     naps.clear();
     currentNapDurationController.clear();
+  }
+
+  Future<void> submitSportData() async {
+
+    try {
+      if (calculatorSession.value == null ||
+          calculatorSession.value!.sessionId == null) {
+        sportSubmitError.value = 'Session not initialized';
+        return;
+      }
+
+      // Validate inputs
+      if (sportDurationController.text.isEmpty) {
+        sportSubmitError.value = 'Please enter activity duration';
+        return;
+      }
+
+      if (selectedActivityType.value.isEmpty) {
+        sportSubmitError.value = 'Please select an activity type';
+        return;
+      }
+
+      isSportSubmitting.value = true;
+      sportSubmitError.value = '';
+
+      // Parse activity duration
+      final int activityDuration =
+          int.tryParse(sportDurationController.text) ?? 0;
+      if (activityDuration <= 0) {
+        throw Exception('Invalid activity duration');
+      }
+
+      // Map activity type to API format using enum
+      final ActivityType selectedActivityEnum = ActivityType.fromDisplayName(
+        selectedActivityType.value,
+      );
+      final String activityTypeApi = selectedActivityEnum.apiValue;
+
+      // Map intensity to API format (0=LIGHT, 1=MODERATE, 2=HARD)
+      String activityIntensity = 'LIGHT';
+      if (sportIntensity.value == 1.0) {
+        activityIntensity = 'MODERATE';
+      } else if (sportIntensity.value == 2.0) {
+        activityIntensity = 'HARD';
+      }
+
+      // Get current time in HH:MM format
+      final now = DateTime.now();
+      final activityTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+      final request = SportRequest(
+        activityDuration: activityDuration,
+        activityType: activityTypeApi,
+        activityIntensity: activityIntensity,
+        activityTime: activityTime,
+      );
+
+
+      final response = await _calculatorService.submitSportData(
+        calculatorSession.value!.sessionId!,
+        request,
+      );
+
+
+
+      // Update session with response data
+      calculatorSession.value = CalculatorSession(
+        sessionId: response.sessionId,
+        completedSteps: response.completedSteps,
+        nextStep: response.nextStep,
+        isFinalized: false,
+        isReadyToCalculate: response.isReadyToCalculate,
+        prefilled: false,
+      );
+
+    } catch (e) {
+      sportSubmitError.value = e.toString();
+    } finally {
+      isSportSubmitting.value = false;
+    }
   }
 
   @override

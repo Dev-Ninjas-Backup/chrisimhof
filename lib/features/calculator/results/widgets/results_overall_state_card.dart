@@ -51,6 +51,7 @@ class ResultsOverallStateCard extends StatelessWidget {
                         size: const Size(180, 180),
                         painter: _OverallStateRingPainter(
                           progress: animatedProgress,
+                          score: score,
                         ),
                       ),
                       Column(
@@ -91,8 +92,9 @@ class ResultsOverallStateCard extends StatelessWidget {
 
 class _OverallStateRingPainter extends CustomPainter {
   final double progress;
+  final int score;
 
-  const _OverallStateRingPainter({required this.progress});
+  const _OverallStateRingPainter({required this.progress, required this.score});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -113,8 +115,11 @@ class _OverallStateRingPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, trackPaint);
 
-    final double sweepAngle = (math.pi * 0.65) * progress.clamp(0.0, 1.0);
-    const double startAngle = 0.55;
+    const double startAngle = -math.pi / 2; // Start from top
+    final double maxSweepAngle = math.pi * 2; // Full circle
+    final double sweepAngle = maxSweepAngle * progress.clamp(0.0, 1.0);
+
+
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
@@ -126,6 +131,6 @@ class _OverallStateRingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _OverallStateRingPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress || oldDelegate.score != score;
   }
 }

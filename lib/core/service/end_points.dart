@@ -1,35 +1,46 @@
 class Urls {
- // static const String baseUrl = 'http://83.228.246.134/api/v1';
- static const String baseUrl = 'https://api.ryvenza.app/api/v1';
+  static const String baseUrl = 'https://api.ryvenza.app';
 
-  static const String register = '$baseUrl/auth/register';
-  static const String verifyOtp = '$baseUrl/auth/verify';
-  static const String login = '$baseUrl/auth/login';
-  static const String logout = '$baseUrl/auth/logout';
-static const String googleSignin = '$baseUrl/auth/google';
+  static const String register = '$baseUrl/api/v1/auth/register';
+  static const String verifyOtp = '$baseUrl/api/v1/auth/verify';
+  static const String login = '$baseUrl/api/v1/auth/login';
+  static const String logout = '$baseUrl/api/v1/auth/logout';
+  static const String googleSignin = '$baseUrl/api/v1/auth/google';
 
-  static const String profile = '$baseUrl/profile';
-  static const String updateProfile = '$baseUrl/profile';
+  static const String profile = '$baseUrl/api/v1/profile';
+  static const String updateProfile = '$baseUrl/api/v1/profile';
   static const String showSubscriptionPlans =
-      '$baseUrl/subscription-plans/public/active';
-  static const String changePassword = '$baseUrl/profile/password';
-  static const String checkout = '$baseUrl/billing/checkout';
+      '$baseUrl/api/v1/subscription-plans/public/active';
+  static const String changePassword = '$baseUrl/api/v1/profile/password';
+  static const String checkout = '$baseUrl/api/v1/billing/checkout';
 
-  static const String userMe = '$baseUrl/auth/me';
-  static const String history = '$baseUrl/history';
-  static const String dashboard = '$baseUrl/dashboard';
+  static const String userMe = '$baseUrl/api/v1/auth/me';
+  static const String history = '$baseUrl/api/v1/history';
+  static const String dashboard = '$baseUrl/api/v1/dashboard';
 
   // Analytics
-  static String analytics(String days) => '$baseUrl/analytics?period=$days';
-  static const String createCalculatorSession = '$baseUrl/calculator/session';
+  static String analytics(String days) =>
+      '$baseUrl/api/v1/analytics?period=$days';
+  static const String createCalculatorSession =
+      '$baseUrl/api/v1/calculator/session';
   static String sleepCalculator(String sessionId) =>
-      '$baseUrl/calculator/session/$sessionId/sleep';
+      '$baseUrl/api/v1/calculator/session/$sessionId/sleep';
   static String workCalculator(String sessionId) =>
-      '$baseUrl/calculator/session/$sessionId/work';
+      '$baseUrl/api/v1/calculator/session/$sessionId/work';
   static String skipWork(String sessionId) =>
-      '$baseUrl/calculator/session/$sessionId/work/skip';
+      '$baseUrl/api/v1/calculator/session/$sessionId/work/skip';
   static String nutritionCalculator(String sessionId) =>
-      '$baseUrl/calculator/session/$sessionId/nutrition';
+      '$baseUrl/api/v1/calculator/session/$sessionId/nutrition';
   static String hydrationCalculator(String sessionId) =>
-      '$baseUrl/calculator/session/$sessionId/hydration';
+      '$baseUrl/api/v1/calculator/session/$sessionId/hydration';
+  static const String caffeineQuickEntry =
+      '$baseUrl/api/v1/calculator/caffeine-presets';
+  static String addCaffeineIntake(String sessionId) =>
+      '$baseUrl/api/v1/calculator/session/$sessionId/caffeine';
+  static String skipCaffeineIntake(String sessionId) =>
+      '$baseUrl/api/v1/calculator/session/$sessionId/caffeine/skip';
+  static String sportsCalculator(String sessionId) =>
+      '$baseUrl/api/v1/calculator/session/$sessionId/sport';
+  static String calculateResult(String sessionId) =>
+      '$baseUrl/api/v1/calculator/session/$sessionId/calculate';
 }

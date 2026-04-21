@@ -1,11 +1,11 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculator_results_model.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_icon_badge.dart';
 import 'package:flutter/material.dart';
 
 class ResultsMetricCard extends StatelessWidget {
-  final CalculatorResultMetric metric;
+  final ApiMetric metric;
 
   const ResultsMetricCard({super.key, required this.metric});
 
@@ -47,7 +47,7 @@ class ResultsMetricCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            metric.detail,
+            '${metric.score}% score',
             style: getTextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,

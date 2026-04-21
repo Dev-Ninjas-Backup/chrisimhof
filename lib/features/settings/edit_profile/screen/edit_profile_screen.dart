@@ -2,7 +2,6 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/settings/edit_profile/controller/edit_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,8 +37,16 @@ class EditProfileScreen extends StatelessWidget {
                                 ? NetworkImage(
                                     controller.currentAvatarUrl.value,
                                   )
-                                : const AssetImage(ImagePath.profile)
-                                      as ImageProvider),
+                                : null),
+                      child:
+                          controller.selectedImage.value == null &&
+                              controller.currentAvatarUrl.value.isEmpty
+                          ? const Icon(
+                              Icons.person,
+                              size: 28,
+                              color: Colors.grey,
+                            )
+                          : null,
                     ),
                   ),
                   Positioned(

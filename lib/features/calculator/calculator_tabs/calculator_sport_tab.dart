@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
 import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
@@ -47,12 +48,42 @@ class CalculatorSportTab extends StatelessWidget {
               const SizedBox(height: 180),
               CustomButton(
                 text: "Calculate",
-                onTap: () {
-                  Get.to(
-                    () => CalculatorResultsScreen(
-                      initialData: controller.buildResultsData(),
-                    ),
-                  );
+                onTap: () async {
+                  try {
+                    await controller.submitSportData();
+                    if (controller.sportSubmitError.value.isEmpty) {
+                      Get.to(
+                        () => CalculatorResultsScreen(
+                          initialData: CalculateResultResponse(
+                            id: '',
+                            overallScore: 0,
+                            scoreBreakdown: ScoreBreakdown(
+                              sleep: 0,
+                              nutrition: 0,
+                              hydration: 0,
+                              caffeine: 0,
+                            ),
+                            recommendations: [],
+                            createdAt: '',
+                          ),
+                          sessionId:
+                              controller.calculatorSession.value?.sessionId,
+                        ),
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        controller.sportSubmitError.value,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
+                  } catch (e) {
+                    Get.snackbar(
+                      'Error',
+                      'Failed to submit sport activity: $e',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  }
                 },
                 backgroundColor: AppColors.primaryButtonColor,
               ),

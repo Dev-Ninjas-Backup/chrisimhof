@@ -20,7 +20,7 @@ class HistoryService {
       if (kDebugMode) {
         print('🔗 Fetching history from: $url');
         print(
-            '🔑 Token: ${token?.isNotEmpty == true ? token!.substring(0, 20) + '...' : 'No token found'}');
+            '🔑 Token: ${token?.isNotEmpty == true ? '${token!.substring(0, 20)}...' : 'No token found'}');
       }
 
       final response = await http.get(
