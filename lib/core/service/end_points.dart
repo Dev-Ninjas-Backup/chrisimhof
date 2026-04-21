@@ -43,4 +43,5 @@ class Urls {
       '$baseUrl/api/v1/calculator/session/$sessionId/sport';
   static String calculateResult(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/calculate';
+  static const String selectlanguage = '$baseUrl/api/v1/profile/language';
 }
