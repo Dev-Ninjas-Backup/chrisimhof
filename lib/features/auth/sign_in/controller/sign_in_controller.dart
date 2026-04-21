@@ -1,4 +1,7 @@
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/auth/google_signin/model/user_model.dart';
+import 'package:chrisimhof/features/auth/google_signin/service/api_service.dart';
+import 'package:chrisimhof/features/auth/google_signin/service/google_auth_service.dart';
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:flutter/material.dart';
@@ -75,19 +78,44 @@ class SignInController extends GetxController {
     }
   }
 
+  final GoogleAuthService _googleService = GoogleAuthService();
+  final ApiService _apiService = ApiService();
+
   Future<void> signInWithGoogle() async {
     try {
       isLoading.value = true;
+      EasyLoading.show(status: 'Signing in...');
 
-      EasyLoading.showSuccess(
-        'Google Sign-In Clicked',
-        duration: Duration(seconds: 1),
-      );
+      UserModel? user = await _googleService.signIn();
+
+      if (user != null) {
+        final apiResponse = await _apiService.sendUser(user);
+
+        if (apiResponse.success && apiResponse.accessToken != null) {
+          // Save tokens
+          await SharedPreferencesHelper.saveAccessToken(apiResponse.accessToken!);
+          if (apiResponse.refreshToken != null) {
+            await SharedPreferencesHelper.saveRefreshToken(apiResponse.refreshToken!);
+          }
+          await SharedPreferencesHelper.setLoginStatus(true);
+          
+          EasyLoading.dismiss();
+          EasyLoading.showSuccess('Login successful');
+          Get.offAllNamed('/medicalDisclaimerScreen');
+        } else {
+          EasyLoading.dismiss();
+          EasyLoading.showError(apiResponse.message ?? 'API login failed');
+          debugPrint('API login failed: ${apiResponse.message}');
+        }
+      } else {
+        EasyLoading.dismiss();
+        EasyLoading.showInfo('Google sign-in cancelled');
+        debugPrint('Google sign-in cancelled by user');
+      }
     } catch (e) {
-      EasyLoading.showError(
-        'Google Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 1),
-      );
+      EasyLoading.dismiss();
+      EasyLoading.showError('Sign-in error: ${e.toString()}');
+      debugPrint('Google Sign-In Controller Error: $e');
     } finally {
       isLoading.value = false;
     }
