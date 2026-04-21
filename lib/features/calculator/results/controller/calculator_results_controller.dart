@@ -47,15 +47,8 @@ class CalculatorResultsController extends GetxController {
     try {
       final response = await _calculatorService.calculateResult(sessionId!);
 
-      print('\n✓ Result calculated');
-      print('Overall Score: ${response.overallScore}');
-      print('Recommendations: ${response.recommendations.length}');
-
       resultData.value = response;
-
-      print('✓ Results loaded');
     } catch (e) {
-      print('✗ Error calculating results: $e');
       error.value = e.toString();
     } finally {
       isLoading.value = false;

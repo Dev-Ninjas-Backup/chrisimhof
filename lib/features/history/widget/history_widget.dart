@@ -7,16 +7,12 @@ import 'package:get/get.dart';
 class HistoryWidget extends StatelessWidget {
   final HistoryModel historyItem;
 
-  const HistoryWidget({
-    super.key,
-    required this.historyItem,
-  });
+  const HistoryWidget({super.key, required this.historyItem});
 
   String _formatDate(String dateTimeString) {
     try {
       final dateTime = DateTime.parse(dateTimeString);
-      final formattedDate =
-          'MMM d, yyyy · h:mm a'.tr; // Will be handled by locale
+      // Will be handled by locale
       // Simple formatting: Apr 20, 2026 · 9:09 PM
       final months = [
         'Jan',
@@ -30,7 +26,7 @@ class HistoryWidget extends StatelessWidget {
         'Sep',
         'Oct',
         'Nov',
-        'Dec'
+        'Dec',
       ];
       final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
       final period = dateTime.hour >= 12 ? 'PM' : 'AM';

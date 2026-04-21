@@ -41,9 +41,6 @@ class ResultsOverallStateCard extends StatelessWidget {
               duration: const Duration(milliseconds: 900),
               curve: Curves.easeOutCubic,
               builder: (context, animatedProgress, child) {
-                print(
-                  '🎯 ResultsOverallStateCard - score=$score, animatedProgress=$animatedProgress',
-                );
                 return SizedBox(
                   width: 180,
                   height: 180,
@@ -122,11 +119,6 @@ class _OverallStateRingPainter extends CustomPainter {
     final double maxSweepAngle = math.pi * 2; // Full circle
     final double sweepAngle = maxSweepAngle * progress.clamp(0.0, 1.0);
 
-    print('🎨 Painter - score=$score, progress=$progress');
-    print('   startAngle=$startAngle (radians)');
-    print('   maxSweepAngle=$maxSweepAngle (radians)');
-    print('   sweepAngle=$sweepAngle (radians)');
-    print('   Expected fill: ${(progress * 100).toStringAsFixed(1)}%');
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),

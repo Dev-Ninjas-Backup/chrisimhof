@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/dashboard/model/dashboard_item_model.dart';
 import 'package:chrisimhof/features/dashboard/model/dashboard_model.dart';

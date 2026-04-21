@@ -114,28 +114,16 @@ class CalculatorController extends GetxController {
 
   Future<void> _fetchCalculatorSession() async {
     try {
-      print('\n📋 _fetchCalculatorSession() CALLED');
       isSessionLoading.value = true;
       sessionError.value = '';
 
       final response = await _calculatorService.getCalculatorSession();
-      print('✓ Response received: ${response.data}');
-      print('  Session ID: ${response.data.sessionId}');
-      print('  Completed Steps: ${response.data.completedSteps}');
-      print('  Next Step: ${response.data.nextStep}');
 
       calculatorSession.value = response.data;
-      print('✓ calculatorSession assigned: ${calculatorSession.value}');
-      print(
-        '✓ calculatorSession.value.sessionId: ${calculatorSession.value!.sessionId}',
-      );
     } catch (e) {
       sessionError.value = e.toString();
-      print('✗ Session error: $e');
-      print('Stack trace: ${StackTrace.current}');
     } finally {
       isSessionLoading.value = false;
-      print('✓ Session loading complete. IsLoading: ${isSessionLoading.value}');
     }
   }
 
@@ -181,28 +169,18 @@ class CalculatorController extends GetxController {
 
   Future<void> _fetchCaffeinePresets() async {
     try {
-      print('\n☕ _fetchCaffeinePresets() CALLED');
       isCaffeinePresetsLoading.value = true;
       caffeinePresetsError.value = '';
 
       final presets = await _calculatorService.getCaffeinePresets();
-      print('✓ Caffeine presets received: ${presets.length} items');
       for (int i = 0; i < presets.length; i++) {
-        print(
-          '  Preset $i: label=${presets[i].label}, defaultMg=${presets[i].defaultMg}, drinkType=${presets[i].drinkType}',
-        );
       }
 
       caffeinePresets.assignAll(presets);
-      print(
-        '✓ caffeinePresets assigned: ${caffeinePresets.length} items in list',
-      );
     } catch (e) {
       caffeinePresetsError.value = e.toString();
-      print('✗ Caffeine presets error: $e');
     } finally {
       isCaffeinePresetsLoading.value = false;
-      print('✓ Caffeine presets loading complete');
     }
   }
 
@@ -232,7 +210,7 @@ class CalculatorController extends GetxController {
     }
 
     addCaffeineIntake(
-      '$drinkName (${drinkType})',
+      '$drinkName ($drinkType)',
       amount,
       caffeineIntakeTimeController.to24HourFormat,
     );
@@ -257,20 +235,14 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitCaffeineIntake() async {
-    print('\n☕ submitCaffeineIntake() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         caffeineSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isCaffeineSubmitting.value = true;
       caffeineSubmitError.value = '';
 
@@ -310,27 +282,13 @@ class CalculatorController extends GetxController {
 
       final request = CaffeineIntakeRequest(caffeineIntakes: intakes);
 
-      print('=== Caffeine Intake Request ===');
-      print('Request: ${request.toJson()}');
-      print('===============================');
 
       final response = await _calculatorService.submitCaffeineIntake(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Caffeine Intake Response ===');
-      print('Full Response: $response');
-      print('Session ID: ${response.sessionId}');
-      print('Message: ${response.message}');
-      print('Next Step: ${response.nextStep}');
-      print('Completed steps: ${response.completedSteps}');
-      print('================================');
 
-      print('✓ Caffeine intake submitted successfully');
-      print('Next step: ${response.nextStep}');
-      print('Session ID: ${response.sessionId}');
-      print('Completed steps: ${response.completedSteps}');
 
       // Update session with response data
       calculatorSession.value = CalculatorSession(
@@ -342,39 +300,25 @@ class CalculatorController extends GetxController {
         prefilled: false,
       );
 
-      print('✓ Session updated');
-      print('Navigating to Sport tab (index: 5)...');
 
       changeTab(5);
 
-      print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
     } catch (e) {
-      print('✗ Caffeine intake submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       caffeineSubmitError.value = e.toString();
     } finally {
       isCaffeineSubmitting.value = false;
-      print(
-        'Caffeine submission state: complete (loading=${isCaffeineSubmitting.value})',
-      );
     }
   }
 
   Future<void> skipCaffeineIntake() async {
-    print('\n☕ skipCaffeineIntake() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         caffeineSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isCaffeineSubmitting.value = true;
       caffeineSubmitError.value = '';
 
@@ -382,18 +326,7 @@ class CalculatorController extends GetxController {
         calculatorSession.value!.sessionId!,
       );
 
-      print('=== Skip Caffeine Intake Response ===');
-      print('Full Response: $response');
-      print('Session ID: ${response.sessionId}');
-      print('Message: ${response.message}');
-      print('Next Step: ${response.nextStep}');
-      print('Completed steps: ${response.completedSteps}');
-      print('======================================');
 
-      print('✓ Caffeine intake skipped successfully');
-      print('Next step: ${response.nextStep}');
-      print('Session ID: ${response.sessionId}');
-      print('Completed steps: ${response.completedSteps}');
 
       // Update session with response data
       calculatorSession.value = CalculatorSession(
@@ -405,21 +338,13 @@ class CalculatorController extends GetxController {
         prefilled: false,
       );
 
-      print('✓ Session updated');
-      print('Navigating to Sport tab (index: 5)...');
 
       changeTab(5);
 
-      print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
     } catch (e) {
-      print('✗ Skip caffeine intake error: $e');
-      print('Stack trace: ${StackTrace.current}');
       caffeineSubmitError.value = e.toString();
     } finally {
       isCaffeineSubmitting.value = false;
-      print(
-        'Skip caffeine state: complete (loading=${isCaffeineSubmitting.value})',
-      );
     }
   }
 
@@ -432,27 +357,18 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitSleepData() async {
-    print('\n🔵 submitSleepData() CALLED');
-    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
-    print('DEBUG: isSessionLoading.value = ${isSessionLoading.value}');
 
     try {
       if (calculatorSession.value == null) {
-        print('✗ calculatorSession.value is NULL');
         sleepSubmitError.value = 'Session not initialized (value is null)';
         return;
       }
 
       if (calculatorSession.value!.sessionId == null) {
-        print('✗ calculatorSession.value.sessionId is NULL');
         sleepSubmitError.value = 'Session ID is null';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isSleepSubmitting.value = true;
       sleepSubmitError.value = '';
 
@@ -469,7 +385,6 @@ class CalculatorController extends GetxController {
         );
       }
 
-      print('✓ Built nap list with ${napList.length} naps');
 
       // Build request
       final request = SleepCalculatorRequest(
@@ -482,27 +397,14 @@ class CalculatorController extends GetxController {
         naps: napList,
       );
 
-      print('=== Sleep Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('==========================');
 
       final response = await _calculatorService.submitSleepData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Sleep Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('==================================');
 
       if (response.success && response.data != null) {
-        print('✓ Sleep submission successful');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
-        print('Completed steps: ${response.data!.completedSteps}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -514,51 +416,33 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Work tab (index: 1)...');
 
         // Navigate to next tab (work tab)
         changeTab(1);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Sleep submission failed');
-        print('Error message: ${response.message}');
         sleepSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Sleep submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       sleepSubmitError.value = e.toString();
     } finally {
       isSleepSubmitting.value = false;
-      print(
-        'Sleep submission state: complete (loading=${isSleepSubmitting.value})',
-      );
     }
   }
 
   Future<void> submitWorkData() async {
-    print('\n🔵 submitWorkData() CALLED');
-    print('DEBUG: calculatorSession.value = ${calculatorSession.value}');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null) {
-        print('✗ calculatorSession.value is NULL');
         workSubmitError.value = 'Session not initialized (value is null)';
         return;
       }
 
       if (calculatorSession.value!.sessionId == null) {
-        print('✗ calculatorSession.value.sessionId is NULL');
         workSubmitError.value = 'Session ID is null';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isWorkSubmitting.value = true;
       workSubmitError.value = '';
 
@@ -569,27 +453,14 @@ class CalculatorController extends GetxController {
         shiftType: selectedShiftType.value.toUpperCase(),
       );
 
-      print('=== Work Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('========================');
 
       final response = await _calculatorService.submitWorkData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Work Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('=================================');
 
       if (response.success && response.data != null) {
-        print('✓ Work submission successful');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
-        print('Completed steps: ${response.data!.completedSteps}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -601,45 +472,29 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Nutrition tab (index: 2)...');
 
         // Navigate to next tab (nutrition tab)
         changeTab(2);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Work submission failed');
-        print('Error message: ${response.message}');
         workSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Work submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       workSubmitError.value = e.toString();
     } finally {
       isWorkSubmitting.value = false;
-      print(
-        'Work submission state: complete (loading=${isWorkSubmitting.value})',
-      );
     }
   }
 
   Future<void> skipWorkData() async {
-    print('\n⏭️ skipWorkData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         workSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isWorkSubmitting.value = true;
       workSubmitError.value = '';
 
@@ -647,17 +502,8 @@ class CalculatorController extends GetxController {
         calculatorSession.value!.sessionId!,
       );
 
-      print('=== Skip Work Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('==========================');
 
       if (response.success && response.data != null) {
-        print('✓ Work skipped successfully');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -669,43 +515,29 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Nutrition tab (index: 2)...');
 
         // Navigate to next tab (nutrition tab)
         changeTab(2);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Skip work failed');
-        print('Error message: ${response.message}');
         workSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Skip work error: $e');
-      print('Stack trace: ${StackTrace.current}');
       workSubmitError.value = e.toString();
     } finally {
       isWorkSubmitting.value = false;
-      print('Skip work state: complete (loading=${isWorkSubmitting.value})');
     }
   }
 
   Future<void> submitNutritionData() async {
-    print('\n🔵 submitNutritionData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         nutritionSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isNutritionSubmitting.value = true;
       nutritionSubmitError.value = '';
 
@@ -720,27 +552,14 @@ class CalculatorController extends GetxController {
         lastMealTime: lastMealTimeController.to24HourFormat,
       );
 
-      print('=== Nutrition Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('==============================');
 
       final response = await _calculatorService.submitNutritionData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Nutrition Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('======================================');
 
       if (response.success && response.data != null) {
-        print('✓ Nutrition submission successful');
-        print('Next step: ${response.data!.nextStep}');
-        print('Session ID: ${response.data!.sessionId}');
-        print('Completed steps: ${response.data!.completedSteps}');
 
         // Update session with response data
         calculatorSession.value = CalculatorSession(
@@ -752,45 +571,29 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Hydration tab (index: 3)...');
 
         // Navigate to next tab (hydration tab)
         changeTab(3);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Nutrition submission failed');
-        print('Error message: ${response.message}');
         nutritionSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Nutrition submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       nutritionSubmitError.value = e.toString();
     } finally {
       isNutritionSubmitting.value = false;
-      print(
-        'Nutrition submission state: complete (loading=${isNutritionSubmitting.value})',
-      );
     }
   }
 
   Future<void> submitHydrationData() async {
-    print('\n🔵 submitHydrationData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         hydrationSubmitError.value = 'Session not initialized';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isHydrationSubmitting.value = true;
       hydrationSubmitError.value = '';
 
@@ -799,24 +602,14 @@ class CalculatorController extends GetxController {
         waterGoalL: hydrationDailyGoalController.value.value,
       );
 
-      print('=== Hydration Data Request ===');
-      print('Request: ${request.toJson()}');
-      print('==============================');
 
       final response = await _calculatorService.submitHydrationData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Hydration Submission Response ===');
-      print('Full Response: $response');
-      print('Success: ${response.success}');
-      print('Message: ${response.message}');
-      print('Data: ${response.data}');
-      print('====================================');
 
       if (response.success) {
-        print('✓ Hydration submission successful');
 
         final currentSession = calculatorSession.value!;
         final completedSteps = response.data?.completedSteps.isNotEmpty == true
@@ -833,9 +626,6 @@ class CalculatorController extends GetxController {
             ? response.data!.sessionId
             : currentSession.sessionId!;
 
-        print('Next step: $nextStep');
-        print('Session ID: $sessionId');
-        print('Completed steps: $completedSteps');
 
         calculatorSession.value = CalculatorSession(
           sessionId: sessionId,
@@ -846,26 +636,16 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        print('✓ Session updated');
-        print('Navigating to Caffeine tab (index: 4)...');
 
         changeTab(4);
 
-        print('✓ Navigation complete. Current tab: ${selectedTabIndex.value}');
       } else {
-        print('✗ Hydration submission failed');
-        print('Error message: ${response.message}');
         hydrationSubmitError.value = response.message;
       }
     } catch (e) {
-      print('✗ Hydration submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       hydrationSubmitError.value = e.toString();
     } finally {
       isHydrationSubmitting.value = false;
-      print(
-        'Hydration submission state: complete (loading=${isHydrationSubmitting.value})',
-      );
     }
   }
 
@@ -903,33 +683,25 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitSportData() async {
-    print('\n⚽ submitSportData() CALLED');
-    print(
-      'DEBUG: calculatorSession.value?.sessionId = ${calculatorSession.value?.sessionId}',
-    );
 
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
-        print('✗ Session not initialized');
         sportSubmitError.value = 'Session not initialized';
         return;
       }
 
       // Validate inputs
       if (sportDurationController.text.isEmpty) {
-        print('✗ Activity duration not provided');
         sportSubmitError.value = 'Please enter activity duration';
         return;
       }
 
       if (selectedActivityType.value.isEmpty) {
-        print('✗ Activity type not selected');
         sportSubmitError.value = 'Please select an activity type';
         return;
       }
 
-      print('✓ Session initialized: ${calculatorSession.value!.sessionId}');
       isSportSubmitting.value = true;
       sportSubmitError.value = '';
 
@@ -966,28 +738,13 @@ class CalculatorController extends GetxController {
         activityTime: activityTime,
       );
 
-      print('=== Sport Activity Request ===');
-      print('Request: ${request.toJson()}');
-      print('================================');
 
       final response = await _calculatorService.submitSportData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-      print('=== Sport Activity Response ===');
-      print('Full Response: $response');
-      print('Session ID: ${response.sessionId}');
-      print('Message: ${response.message}');
-      print('Next Step: ${response.nextStep}');
-      print('Completed steps: ${response.completedSteps}');
-      print('Is Ready To Calculate: ${response.isReadyToCalculate}');
-      print('================================');
 
-      print('✓ Sport activity submitted successfully');
-      print('Next step: ${response.nextStep}');
-      print('Session ID: ${response.sessionId}');
-      print('Ready to calculate: ${response.isReadyToCalculate}');
 
       // Update session with response data
       calculatorSession.value = CalculatorSession(
@@ -999,16 +756,10 @@ class CalculatorController extends GetxController {
         prefilled: false,
       );
 
-      print('✓ Session updated');
     } catch (e) {
-      print('✗ Sport activity submission error: $e');
-      print('Stack trace: ${StackTrace.current}');
       sportSubmitError.value = e.toString();
     } finally {
       isSportSubmitting.value = false;
-      print(
-        'Sport submission state: complete (loading=${isSportSubmitting.value})',
-      );
     }
   }
 

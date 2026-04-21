@@ -81,8 +81,6 @@ class SubscriptionsService {
           .timeout(const Duration(seconds: 10));
 
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
-      print('Checkout response status: ${response.statusCode}');
-      print('Checkout response body: $jsonData');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return CheckoutResponse.fromJson(jsonData);
@@ -90,7 +88,6 @@ class SubscriptionsService {
         throw Exception(jsonData['message'] ?? 'Failed to initiate checkout');
       }
     } catch (e) {
-      print('Checkout error: $e');
       throw Exception('Error initiating checkout: $e');
     }
   }
