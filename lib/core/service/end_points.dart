@@ -35,4 +35,8 @@ class Urls {
       '$baseUrl/calculator/session/$sessionId/caffeine';
   static String skipCaffeineIntake(String sessionId) =>
       '$baseUrl/calculator/session/$sessionId/caffeine/skip';
+  static String sportsCalculator(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/sport';
+  static String calculateResult(String sessionId) =>
+      '$baseUrl/calculator/session/$sessionId/calculate';
 }

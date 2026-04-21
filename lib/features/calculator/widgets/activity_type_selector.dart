@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:flutter/material.dart';
 
 class ActivityTypeSelector extends StatelessWidget {
@@ -14,7 +15,14 @@ class ActivityTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> activities = ["Walking", "Running", "Cycle"];
+    final List<ActivityType> activities = [
+      ActivityType.walk,
+      ActivityType.run,
+      ActivityType.cycle,
+      ActivityType.gym,
+      ActivityType.rest,
+      ActivityType.sport,
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,11 +41,11 @@ class ActivityTypeSelector extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: activities.map((activity) {
-              final bool isSelected = activity == selectedActivity;
+              final bool isSelected = activity.displayName == selectedActivity;
               return Padding(
                 padding: const EdgeInsets.only(right: 12.0),
                 child: GestureDetector(
-                  onTap: () => onSelect(activity),
+                  onTap: () => onSelect(activity.displayName),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: 12.0,
@@ -50,11 +58,13 @@ class ActivityTypeSelector extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10000.0),
                     ),
                     child: Text(
-                      activity,
+                      activity.displayName,
                       style: getTextStyle(
                         color: AppColors.primaryTextColor,
                         fontSize: 16,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w900,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w900,
                       ),
                     ),
                   ),

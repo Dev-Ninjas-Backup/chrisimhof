@@ -1,11 +1,11 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculator_results_model.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_icon_badge.dart';
 import 'package:flutter/material.dart';
 
 class ResultsRecommendationsCard extends StatelessWidget {
-  final List<CalculatorRecommendation> recommendations;
+  final List<ApiRecommendation> recommendations;
 
   const ResultsRecommendationsCard({super.key, required this.recommendations});
 
@@ -35,7 +35,10 @@ class ResultsRecommendationsCard extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ResultsIconBadge(iconKey: recommendation.iconKey, size: 24),
+                ResultsIconBadge(
+                  iconKey: _mapCategoryToIconKey(recommendation.category),
+                  size: 24,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   recommendation.title,
@@ -47,7 +50,7 @@ class ResultsRecommendationsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  recommendation.description,
+                  recommendation.body,
                   style: getTextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
@@ -65,5 +68,23 @@ class ResultsRecommendationsCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _mapCategoryToIconKey(String category) {
+    switch (category.toLowerCase()) {
+      case 'sleep':
+        return 'sleep';
+      case 'hydration':
+        return 'hydration';
+      case 'caffeine':
+        return 'caffeine';
+      case 'nutrition':
+        return 'nutrition';
+      case 'activity':
+      case 'sport':
+        return 'sport';
+      default:
+        return 'circle';
+    }
   }
 }

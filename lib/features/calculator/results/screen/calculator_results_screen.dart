@@ -2,7 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/calculator/results/controller/calculator_results_controller.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculator_results_model.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_metric_card.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_overall_state_card.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_recommendations_card.dart';
@@ -11,9 +11,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CalculatorResultsScreen extends StatefulWidget {
-  final CalculatorResultsData initialData;
+  final CalculateResultResponse initialData;
+  final String? sessionId;
 
-  const CalculatorResultsScreen({super.key, required this.initialData});
+  const CalculatorResultsScreen({
+    super.key,
+    required this.initialData,
+    this.sessionId,
+  });
 
   @override
   State<CalculatorResultsScreen> createState() =>
@@ -29,9 +34,16 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
     super.initState();
     _tag = DateTime.now().microsecondsSinceEpoch.toString();
     _controller = Get.put(
-      CalculatorResultsController(initialData: widget.initialData),
+      CalculatorResultsController(
+        initialData: widget.initialData,
+        sessionId: widget.sessionId,
+      ),
       tag: _tag,
     );
+
+    if (widget.sessionId != null) {
+      _controller.calculateResultsFromAPI();
+    }
   }
 
   @override
@@ -67,13 +79,13 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
                 const SizedBox(height: 24),
                 ResultsOverallStateCard(
                   score: resultData.overallScore,
-                  label: resultData.overallLabel,
+                  label: _controller.getLabelForScore(resultData.overallScore),
                 ),
                 const SizedBox(height: 16),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: resultData.metrics.length,
+                  itemCount: 4,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
@@ -81,7 +93,29 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
                     childAspectRatio: 0.98,
                   ),
                   itemBuilder: (context, index) {
-                    return ResultsMetricCard(metric: resultData.metrics[index]);
+                    final metrics = [
+                      _buildMetric(
+                        'Sleep',
+                        resultData.scoreBreakdown.sleep,
+                        'sleep',
+                      ),
+                      _buildMetric(
+                        'Hydration',
+                        resultData.scoreBreakdown.hydration,
+                        'hydration',
+                      ),
+                      _buildMetric(
+                        'Caffeine',
+                        resultData.scoreBreakdown.caffeine,
+                        'caffeine',
+                      ),
+                      _buildMetric(
+                        'Nutrition',
+                        resultData.scoreBreakdown.nutrition,
+                        'nutrition',
+                      ),
+                    ];
+                    return ResultsMetricCard(metric: metrics[index]);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -102,5 +136,9 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
         }),
       ),
     );
+  }
+
+  ApiMetric _buildMetric(String title, int score, String category) {
+    return ApiMetric(title: title, score: score, category: category);
   }
 }

@@ -8,6 +8,8 @@ import 'package:chrisimhof/features/calculator/models/hydration_calculator_model
 import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:http/http.dart' as http;
 
 class CalculatorService {
@@ -290,16 +292,30 @@ class CalculatorService {
 
       print('=== Caffeine Presets Response ===');
       print('Status Code: ${response.statusCode}');
-      print('Response: ${response.body}');
+      print('Raw Response Body: ${response.body}');
       print('=================================');
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
-        return jsonData
-            .map(
-              (item) => CaffeinePreset.fromJson(item as Map<String, dynamic>),
-            )
-            .toList();
+        print('Parsed as List with ${jsonData.length} items');
+
+        final presets = <CaffeinePreset>[];
+        for (int i = 0; i < jsonData.length; i++) {
+          final item = jsonData[i] as Map<String, dynamic>;
+          print('Item $i raw JSON: $item');
+          print('  Keys in item: ${item.keys.toList()}');
+          print('  drinkType: ${item['drinkType']}');
+          print('  label: ${item['label']}');
+          print('  defaultMg: ${item['defaultMg']}');
+
+          final preset = CaffeinePreset.fromJson(item);
+          print(
+            '  Parsed to: label="${preset.label}", defaultMg=${preset.defaultMg}',
+          );
+          presets.add(preset);
+        }
+
+        return presets;
       } else {
         throw Exception('Failed to fetch caffeine presets');
       }
@@ -389,6 +405,87 @@ class CalculatorService {
     } catch (e) {
       print('Skip caffeine intake error: $e');
       throw Exception('Error skipping caffeine intake: $e');
+    }
+  }
+
+  Future<SportResponse> submitSportData(
+    String sessionId,
+    SportRequest request,
+  ) async {
+    final uri = Uri.parse(Urls.sportsCalculator(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      print('=== Sport Activity Request ===');
+      print('URL: $uri');
+      print('Request Body: ${jsonEncode(request.toJson())}');
+      print('================================');
+
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': '*/*',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode(request.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      print('=== Sport Activity Response ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: $jsonData');
+      print('================================');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return SportResponse.fromJson(jsonData);
+      } else {
+        throw Exception(
+          jsonData['message'] ?? 'Failed to submit sport activity',
+        );
+      }
+    } catch (e) {
+      print('Sport activity error: $e');
+      throw Exception('Error submitting sport activity: $e');
+    }
+  }
+
+  Future<CalculateResultResponse> calculateResult(String sessionId) async {
+    final uri = Uri.parse(Urls.calculateResult(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      print('\n📊 calculateResult() CALLED');
+      print('URL: $uri');
+      print('============================');
+
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': '*/*',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      print('=== Calculate Result Response ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: $jsonData');
+      print('==================================');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return CalculateResultResponse.fromJson(jsonData);
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to calculate result');
+      }
+    } catch (e) {
+      print('Calculate result error: $e');
+      throw Exception('Error calculating result: $e');
     }
   }
 }

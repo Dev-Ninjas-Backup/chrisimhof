@@ -1,7 +1,6 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
-import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_sport_tab.dart';
 import 'package:chrisimhof/features/calculator/widgets/caffeine_history_list.dart';
 import 'package:chrisimhof/features/calculator/widgets/quick_entry.dart';
 import 'package:chrisimhof/features/calculator/widgets/value_slider_card.dart';
@@ -124,7 +123,6 @@ class CalculatorCaffeineTab extends StatelessWidget {
   void _handleSubmitCaffeine(CalculatorController controller) async {
     try {
       await controller.submitCaffeineIntake();
-      Get.to(() => const CalculatorSportTab());
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -137,7 +135,6 @@ class CalculatorCaffeineTab extends StatelessWidget {
   void _handleSkipCaffeine(CalculatorController controller) async {
     try {
       await controller.skipCaffeineIntake();
-      Get.to(() => const CalculatorSportTab());
     } catch (e) {
       Get.snackbar(
         'Error',
