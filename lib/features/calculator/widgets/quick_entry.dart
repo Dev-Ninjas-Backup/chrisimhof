@@ -34,9 +34,6 @@ class QuickEntrySelector extends StatelessWidget {
           }
 
           if (controller.caffeinePresetsError.value.isNotEmpty) {
-            print(
-              'QuickEntrySelector - Error: ${controller.caffeinePresetsError.value}',
-            );
             return SizedBox(
               height: 140,
               child: Center(
@@ -51,12 +48,7 @@ class QuickEntrySelector extends StatelessWidget {
             );
           }
 
-          print(
-            'QuickEntrySelector - Presets count: ${controller.caffeinePresets.length}',
-          );
           for (int i = 0; i < controller.caffeinePresets.length; i++) {
-            final p = controller.caffeinePresets[i];
-            print('  Preset $i: ${p.label} = ${p.defaultMg}mg');
           }
 
           if (controller.caffeinePresets.isEmpty) {
