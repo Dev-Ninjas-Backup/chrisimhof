@@ -1,0 +1,112 @@
+class DashboardModel {
+  final int currentScore;
+  final StateIndicators stateIndicators;
+  final List<WeeklyTrendItem> weeklyTrend;
+  final int streak;
+  final String sleepAdaptationNote;
+  final List<DailyRecommendation> dailyRecommendations;
+
+  DashboardModel({
+    required this.currentScore,
+    required this.stateIndicators,
+    required this.weeklyTrend,
+    required this.streak,
+    required this.sleepAdaptationNote,
+    required this.dailyRecommendations,
+  });
+
+  factory DashboardModel.fromJson(Map<String, dynamic> json) {
+    return DashboardModel(
+      currentScore: json['currentScore'] ?? 0,
+      stateIndicators: StateIndicators.fromJson(json['stateIndicators'] ?? {}),
+      weeklyTrend: (json['weeklyTrend'] as List?)
+              ?.map((item) => WeeklyTrendItem.fromJson(item))
+              .toList() ??
+          [],
+      streak: json['streak'] ?? 0,
+      sleepAdaptationNote: json['sleepAdaptationNote'] ?? '',
+      dailyRecommendations: (json['dailyRecommendations'] as List?)
+              ?.map((item) => DailyRecommendation.fromJson(item))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class StateIndicators {
+  final String sleep;
+  final String hydration;
+  final String caffeine;
+  final String nutrition;
+  final String activity;
+  final String recovery;
+
+  StateIndicators({
+    required this.sleep,
+    required this.hydration,
+    required this.caffeine,
+    required this.nutrition,
+    required this.activity,
+    required this.recovery,
+  });
+
+  factory StateIndicators.fromJson(Map<String, dynamic> json) {
+    return StateIndicators(
+      sleep: json['sleep'] ?? 'Unknown',
+      hydration: json['hydration'] ?? 'Unknown',
+      caffeine: json['caffeine'] ?? 'Unknown',
+      nutrition: json['nutrition'] ?? 'Unknown',
+      activity: json['activity'] ?? 'Unknown',
+      recovery: json['recovery'] ?? 'Unknown',
+    );
+  }
+}
+
+class WeeklyTrendItem {
+  final DateTime date;
+  final int overallScore;
+  final Map<String, int> scores;
+
+  WeeklyTrendItem({
+    required this.date,
+    required this.overallScore,
+    required this.scores,
+  });
+
+  factory WeeklyTrendItem.fromJson(Map<String, dynamic> json) {
+    return WeeklyTrendItem(
+      date: DateTime.tryParse(json['date'] ?? '') ?? DateTime.now(),
+      overallScore: json['overallScore'] ?? 0,
+      scores: Map<String, int>.from(json['scores'] ?? {}),
+    );
+  }
+}
+
+class DailyRecommendation {
+  final String id;
+  final String category;
+  final int priority;
+  final bool isPremium;
+  final String title;
+  final String body;
+
+  DailyRecommendation({
+    required this.id,
+    required this.category,
+    required this.priority,
+    required this.isPremium,
+    required this.title,
+    required this.body,
+  });
+
+  factory DailyRecommendation.fromJson(Map<String, dynamic> json) {
+    return DailyRecommendation(
+      id: json['id'] ?? '',
+      category: json['category'] ?? '',
+      priority: json['priority'] ?? 0,
+      isPremium: json['isPremium'] ?? false,
+      title: json['title'] ?? '',
+      body: json['body'] ?? '',
+    );
+  }
+}

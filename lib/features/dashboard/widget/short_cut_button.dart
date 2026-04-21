@@ -10,7 +10,6 @@ class ShortCutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-
       child: Container(
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(

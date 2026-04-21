@@ -1,3 +1,4 @@
+import 'package:chrisimhof/features/calculator/screens/calculator_screen.dart';
 import 'package:chrisimhof/features/dashboard/widget/short_cut_button.dart';
 import 'package:chrisimhof/features/history/screen/history_screen.dart';
 import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
@@ -20,7 +21,12 @@ class OptionButtonWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          ShortCutButton(icon: Icons.add, onTap: () {}),
+          ShortCutButton(
+            icon: Icons.add,
+            onTap: () {
+              Get.to(CalculatorScreen());
+            },
+          ),
           ShortCutButton(
             icon: Icons.history,
             onTap: () {

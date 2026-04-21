@@ -1,59 +1,108 @@
 import 'package:chrisimhof/features/history/model/history_model.dart';
+import 'package:chrisimhof/features/history/service/history_service.dart';
 import 'package:get/get.dart';
 
 class HistoryController extends GetxController {
   final selectedTab = 0.obs;
+  final isLoading = false.obs;
+  final errorMessage = ''.obs;
 
-  final recentList = <HistoryModel>[
-    HistoryModel(
-      dateTime: 'Apr 8, 2025 · 10:30 AM',
-      details: 'Night shift • 7 hours of sleep • Low fatigue',
-      score: '92%',
-      scoreDetails: 'Excellent performance',
-    ),
-    HistoryModel(
-      dateTime: 'Apr 7, 2025 · 09:15 AM',
-      details: 'Cardio Session',
-      score: '85%',
-      scoreDetails: 'Night shift • 7 hours of sleep • Low fatigue',
-    ),
-    HistoryModel(
-      dateTime: 'Apr 6, 2025 · 08:00 AM',
-      details: 'Strength Training',
-      score: '78%',
-      scoreDetails: 'Good progress',
-    ),
-  ];
+  final recentList = <HistoryModel>[].obs;
+  final pastList = <HistoryModel>[].obs;
 
-  final pastList = <HistoryModel>[
-    HistoryModel(
-      dateTime: 'Mar 15, 2025 · 07:45 AM',
-      details: 'Yoga Session',
-      score: '88%',
-      scoreDetails: 'Very relaxing',
-    ),
-    HistoryModel(
-      dateTime: 'Mar 10, 2025 · 06:30 AM',
-      details: 'HIIT Workout',
-      score: '95%',
-      scoreDetails: 'Night shift • 7 hours of sleep • Low fatigue',
-    ),
-    HistoryModel(
-      dateTime: 'Mar 5, 2025 · 11:00 AM',
-      details: 'Swimming',
-      score: '80%',
-      scoreDetails: 'Solid session',
-    ),
-    HistoryModel(
-      dateTime: 'Feb 28, 2025 · 08:00 AM',
-      details: 'Cycling',
-      score: '74%',
-      scoreDetails: 'Keep going',
-    ),
-  ];
+  // Pagination
+  final currentPage = 1.obs;
+  final pageSize = 10.obs;
+  final hasMoreData = true.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchRecentHistory();
+  }
+
+  Future<void> fetchRecentHistory() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final data = await HistoryService.fetchHistory(
+        page: currentPage.value,
+        limit: pageSize.value,
+        filter: 'recent',
+      );
+
+      recentList.assignAll(data);
+      isLoading.value = false;
+    } catch (e) {
+      errorMessage.value = e.toString();
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchPastHistory() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final data = await HistoryService.fetchHistory(
+        page: 1,
+        limit: pageSize.value,
+        filter: 'past',
+      );
+
+      pastList.assignAll(data);
+      isLoading.value = false;
+    } catch (e) {
+      errorMessage.value = e.toString();
+      isLoading.value = false;
+    }
+  }
 
   List<HistoryModel> get currentList =>
       selectedTab.value == 0 ? recentList : pastList;
 
-  void selectTab(int index) => selectedTab.value = index;
+  void selectTab(int index) {
+    selectedTab.value = index;
+    if (index == 0 && recentList.isEmpty) {
+      fetchRecentHistory();
+    } else if (index == 1 && pastList.isEmpty) {
+      fetchPastHistory();
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (!hasMoreData.value || isLoading.value) return;
+
+    currentPage.value++;
+    try {
+      final filter = selectedTab.value == 0 ? 'recent' : 'past';
+      final data = await HistoryService.fetchHistory(
+        page: currentPage.value,
+        limit: pageSize.value,
+        filter: filter,
+      );
+
+      if (data.isEmpty) {
+        hasMoreData.value = false;
+      } else {
+        if (selectedTab.value == 0) {
+          recentList.addAll(data);
+        } else {
+          pastList.addAll(data);
+        }
+      }
+    } catch (e) {
+      errorMessage.value = e.toString();
+    }
+  }
+
+  void refreshHistory() {
+    currentPage.value = 1;
+    hasMoreData.value = true;
+    recentList.clear();
+    pastList.clear();
+    errorMessage.value = '';
+    fetchRecentHistory();
+  }
 }
