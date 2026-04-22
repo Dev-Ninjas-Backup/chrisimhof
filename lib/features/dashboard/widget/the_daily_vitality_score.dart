@@ -44,12 +44,12 @@ class TheDailyVitalityScore extends StatelessWidget {
                     child: Column(
                       children: [
                         SizedBox(
-                          width: 140,
-                          height: 140,
+                          width: 125,
+                          height: 125,
                           child: CustomPaint(
-                            size: const Size(140, 140),
+                            size: const Size(125, 125),
                             painter: VitalityProgressPainter(
-                              progress: controller.vitalityScore.value / 100,
+                              progress: controller.vitalityScore.value/100,
                               percentage: controller.vitalityScore.value.toInt(),
                             ),
                           ),
@@ -72,27 +72,37 @@ class TheDailyVitalityScore extends StatelessWidget {
                   Flexible(
                     child: SizedBox(
                       width: 164,
-                      child: RichText(
-                        text: TextSpan(
-                          style: getTextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.secondaryTextColor,
-                          ),
-                          children: [
-                            TextSpan(text: 'Your lifestyle efficiency is up '.tr),
-                            TextSpan(
-                              text: '${controller.improvementPercent.value}%',
-                              style: getTextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF10B981),
-                              ),
-                            ),
-                            TextSpan(text: ' from yesterday.'.tr),
-                          ],
+                      child: Text(
+                        controller.improvementPercentLabel.value,
+                        style: getTextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.secondaryTextColor,
                         ),
                       ),
+                      // child: RichText(
+                      //   text: TextSpan(
+                      //     style: getTextStyle(
+                      //       fontSize: 13,
+                      //       fontWeight: FontWeight.w400,
+                      //       color: AppColors.secondaryTextColor,
+                      //     ),
+                      //     children: [
+
+                      //     Text(controller.improvementPercentLabel.value.toString())
+                      //       // TextSpan(text: 'Your lifestyle efficiency is up '.tr),
+                      //       // TextSpan(
+                      //       //   text: '${controller.improvementPercent.value}%',
+                      //       //   style: getTextStyle(
+                      //       //     fontSize: 13,
+                      //       //     fontWeight: FontWeight.w500,
+                      //       //     color: const Color(0xFF10B981),
+                      //       //   ),
+                      //       // ),
+                      //       // TextSpan(text: ' from yesterday.'.tr),
+                      //     ],
+                      //   ),
+                      // ),
                     ),
                   ),
                 ],
