@@ -23,7 +23,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Caffeine (last 8 hours)",
+            "Caffeine (last 8 hours)".tr,
             style: getTextStyle(
               color: AppColors.primaryTextColor,
               fontSize: 18,
@@ -41,7 +41,11 @@ class CalculatorCaffeineTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Active caffeine in your body now: ${controller.caffeineLastEightHoursValue.value.toInt()} mg",
+                "Active caffeine in your body now: @value mg".trParams({
+                  'value': controller.caffeineLastEightHoursValue.value
+                      .toInt()
+                      .toString(),
+                }),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
@@ -68,7 +72,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
           ),
           SizedBox(height: 32),
           TimeWidget(
-            topTitle: 'Time of Intake',
+            topTitle: 'Time of Intake'.tr,
             controller: controller.caffeineIntakeTimeController,
           ),
           const SizedBox(height: 130),
@@ -77,8 +81,8 @@ class CalculatorCaffeineTab extends StatelessWidget {
             child: Obx(
               () => CustomButton(
                 text: controller.isCaffeineSubmitting.value
-                    ? 'Submitting...'
-                    : 'Next',
+                    ? 'Submitting...'.tr
+                    : 'Next'.tr,
                 onTap: () {
                   if (!controller.isCaffeineSubmitting.value) {
                     _handleSubmitCaffeine(controller);
@@ -94,8 +98,8 @@ class CalculatorCaffeineTab extends StatelessWidget {
                 child: Obx(
                   () => TabButton(
                     text: controller.isCaffeineSubmitting.value
-                        ? 'Skipping...'
-                        : 'Skip',
+                        ? 'Skipping...'.tr
+                        : 'Skip'.tr,
                     onTap: () {
                       if (!controller.isCaffeineSubmitting.value) {
                         _handleSkipCaffeine(controller);
@@ -107,7 +111,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: TabButton(
-                  text: 'Reset',
+                  text: 'Reset'.tr,
                   onTap: () {
                     controller.resetCaffeineTracking();
                   },
@@ -125,8 +129,8 @@ class CalculatorCaffeineTab extends StatelessWidget {
       await controller.submitCaffeineIntake();
     } catch (e) {
       Get.snackbar(
-        'Error',
-        controller.caffeineSubmitError.value,
+        'Error'.tr,
+        controller.caffeineSubmitError.value.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     }
@@ -137,8 +141,8 @@ class CalculatorCaffeineTab extends StatelessWidget {
       await controller.skipCaffeineIntake();
     } catch (e) {
       Get.snackbar(
-        'Error',
-        controller.caffeineSubmitError.value,
+        'Error'.tr,
+        controller.caffeineSubmitError.value.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     }
