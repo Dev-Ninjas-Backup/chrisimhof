@@ -34,11 +34,8 @@ class VitalityProgressPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     canvas.drawArc(rect, 0, math.pi * 2, false, backgroundPaint);
-
-    // Start from lower-right side like the design
-    const startAngle = math.pi / 12; // 15 degrees
-    const maxSweepAngle = math.pi * 1.05; // controlled short arc
-    final sweepAngle = maxSweepAngle * progress;
+    final startAngle = -math.pi / 2;
+    final sweepAngle = math.pi * 2 * progress;
 
     canvas.drawArc(rect, startAngle, sweepAngle, false, progressPaint);
 

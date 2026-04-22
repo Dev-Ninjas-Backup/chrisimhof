@@ -82,7 +82,7 @@ class DashboardScreen extends StatelessWidget {
                           return ListWidget(
                             title: item.title,
                             image: item.image,
-                            percent: item.percent,
+                            percent: controller.dashboardItems[index].percent,
                             description: item.description,
                           );
                         },
