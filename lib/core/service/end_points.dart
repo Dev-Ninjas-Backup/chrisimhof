@@ -44,4 +44,6 @@ class Urls {
   static String calculateResult(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/calculate';
   static const String selectlanguage = '$baseUrl/api/v1/profile/language';
+  static String deleteAccount(String userId) =>
+      '$baseUrl/api/v1/users/$userId/permanent';
 }

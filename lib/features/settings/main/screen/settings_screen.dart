@@ -1,7 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart'; // CHANGE: add this import
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:chrisimhof/features/settings/main/widget/logout_button.dart';
 import 'package:chrisimhof/features/settings/main/widget/profile_cart_widget.dart';
 import 'package:chrisimhof/features/settings/main/widget/settings_option_widget.dart';
@@ -26,14 +26,20 @@ class SettingsScreen extends StatelessWidget {
               ProfileCartWidget(),
               SettingsOptionWidget(),
               LogoutButton(),
-              GestureDetector(
-                onTap: () => Get.offAllNamed('/signInScreen'),
-                child: Text(
-                  'Delete Account'.tr,
-                  style: getTextStyle(
-                    color: AppColors.secondaryTextColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+              Obx(
+                () => GestureDetector(
+                  onTap: controller.isDeleteLoading.value
+                      ? null
+                      : controller.deleteAccount,
+                  child: Text(
+                    controller.isDeleteLoading.value
+                        ? 'Deleting account...'.tr
+                        : 'Delete Account'.tr,
+                    style: getTextStyle(
+                      color: AppColors.secondaryTextColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

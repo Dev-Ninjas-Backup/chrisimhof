@@ -21,6 +21,7 @@ class ProfileResponseModel {
 class ProfileData {
   final String id;
   final String userId;
+  final String? fcmToken;
   final String? firstName;
   final String? avatarUrl;
   final String? bio;
@@ -36,6 +37,7 @@ class ProfileData {
   ProfileData({
     required this.id,
     required this.userId,
+    required this.fcmToken,
     required this.firstName,
     required this.avatarUrl,
     required this.bio,
@@ -50,20 +52,26 @@ class ProfileData {
   });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> profile =
+        (json['profile'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    final Map<String, dynamic> role =
+        (json['role'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+
     return ProfileData(
-      id: json['id'] ?? '',
-      userId: json['userId'] ?? '',
-      firstName: json['firstName'],
-      avatarUrl: json['avatarUrl'],
-      bio: json['bio'],
-      createdAt: json['createdAt'] ?? '',
-      updatedAt: json['updatedAt'] ?? '',
+      id: json['id'] ?? profile['id'] ?? '',
+      userId: profile['userId'] ?? json['id'] ?? '',
+      fcmToken: json['fcmToken'],
+      firstName: profile['firstName'] ?? json['firstName'],
+      avatarUrl: profile['avatarUrl'],
+      bio: profile['bio'],
+      createdAt: profile['createdAt'] ?? json['createdAt'] ?? '',
+      updatedAt: profile['updatedAt'] ?? json['updatedAt'] ?? '',
       email: json['email'] ?? '',
-      fullName: json['fullName'] ?? '',
+      fullName: profile['fullName'] ?? json['fullName'] ?? '',
       isSubscribed: json['isSubscribed'] ?? false,
       signInBy: json['signInBy'] ?? '',
       accountStatus: json['accountStatus'] ?? '',
-      role: json['role'] ?? '',
+      role: role['name'] ?? json['role'] ?? '',
     );
   }
 }

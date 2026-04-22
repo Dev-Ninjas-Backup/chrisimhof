@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class ProfileService {
   Future<ProfileResponseModel> getProfile({required String accessToken}) async {
-    final uri = Uri.parse(Urls.profile);
+    final uri = Uri.parse(Urls.userMe);
 
     final response = await http.get(
       uri,
