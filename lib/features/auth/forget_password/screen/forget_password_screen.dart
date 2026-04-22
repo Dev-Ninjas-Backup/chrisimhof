@@ -25,13 +25,13 @@ class ForgetPasswordScreen extends StatelessWidget {
           key: controller.formKey,
           child: Column(
             children: [
-              CustomAppBar(title: 'Forget Password', showBackButton: true),
+              CustomAppBar(title: 'Forget Password'.tr, showBackButton: true),
               SizedBox(height: 44),
               Obx(
                 () => CustomTextFormField(
-                  label: 'New Password',
+                  label: 'New Password'.tr,
                   isRequired: true,
-                  hintText: 'Enter your new password',
+                  hintText: 'Enter your new password'.tr,
                   controller: controller.newPasswordController,
                   suffixIcon: IconButton(
                     onPressed: controller.toggleNewPasswordVisibility,
@@ -50,9 +50,9 @@ class ForgetPasswordScreen extends StatelessWidget {
               SizedBox(height: 36),
               Obx(
                 () => CustomTextFormField(
-                  label: 'Confirm Password',
+                  label: 'Confirm Password'.tr,
                   isRequired: true,
-                  hintText: 'Enter your confirm password',
+                  hintText: 'Enter your confirm password'.tr,
                   controller: controller.confirmPasswordController,
                   suffixIcon: IconButton(
                     onPressed: controller.toggleConfirmPasswordVisibility,
@@ -71,7 +71,7 @@ class ForgetPasswordScreen extends StatelessWidget {
               ),
               Spacer(),
               CustomButton(
-                text: 'Save Password',
+                text: 'Save Password'.tr,
                 onTap: controller.savePassword,
               ),
             ],

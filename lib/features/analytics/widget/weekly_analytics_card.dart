@@ -35,7 +35,7 @@ class WeeklyAnalyticsCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Weekly Analytics',
+          'Weekly Analytics'.tr,
           style: getTextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -72,7 +72,7 @@ class WeeklyAnalyticsCard extends StatelessWidget {
             items: controller.periods.map((period) {
               return DropdownMenuItem<String>(
                 value: period,
-                child: Text(period),
+                child: Text(period.tr),
               );
             }).toList(),
             onChanged: (value) {
@@ -119,7 +119,7 @@ class WeeklyAnalyticsCard extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      labels[index],
+                      labels[index].tr,
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -147,7 +147,9 @@ class WeeklyAnalyticsCard extends StatelessWidget {
               getTooltipItems: (touchedSpots) {
                 return touchedSpots.map((spot) {
                   return LineTooltipItem(
-                    'Score: ${spot.y.toInt()}%',
+                    'Score: @value%'.trParams({
+                      'value': spot.y.toInt().toString(),
+                    }),
                     const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

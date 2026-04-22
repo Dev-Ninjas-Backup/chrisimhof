@@ -40,7 +40,7 @@ class CreateAccountScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Create Your Account',
+                    'Create Your Account'.tr,
                     style: getTextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -52,7 +52,7 @@ class CreateAccountScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Your intelligent system for better performance.',
+                    'Your intelligent system for better performance.'.tr,
                     style: getTextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -63,16 +63,16 @@ class CreateAccountScreen extends StatelessWidget {
 
                 SizedBox(height: 56),
                 CustomTextFormField(
-                  label: 'Full Name',
-                  hintText: 'Enter your full name',
+                  label: 'Full Name'.tr,
+                  hintText: 'Enter your full name'.tr,
                   isRequired: true,
                   controller: controller.fullNameController,
                   validator: (value) => controller.validateFullName(value),
                 ),
                 SizedBox(height: 16),
                 CustomTextFormField(
-                  label: 'Email',
-                  hintText: 'Enter your email',
+                  label: 'Email'.tr,
+                  hintText: 'Enter your email'.tr,
                   isRequired: true,
                   controller: controller.emailController,
                   validator: (value) => controller.validateEmail(value),
@@ -80,9 +80,9 @@ class CreateAccountScreen extends StatelessWidget {
                 SizedBox(height: 16),
                 Obx(
                   () => CustomTextFormField(
-                    label: 'Password',
+                    label: 'Password'.tr,
                     isRequired: true,
-                    hintText: 'Enter your password',
+                    hintText: 'Enter your password'.tr,
                     controller: controller.passwordController,
                     suffixIcon: IconButton(
                       onPressed: controller.togglePasswordVisibility,
@@ -101,7 +101,7 @@ class CreateAccountScreen extends StatelessWidget {
                 SizedBox(height: 40),
                 Obx(
                   () => CustomButton(
-                    text: 'Create Account',
+                    text: 'Create Account'.tr,
                     onTap: controller.isLoading.value
                         ? null
                         : () {
@@ -138,7 +138,7 @@ class CreateAccountScreen extends StatelessWidget {
                 SizedBox(height: 32),
                 RichText(
                   text: TextSpan(
-                    text: 'Do you have an account? ',
+                    text: '${'Do you have an account?'.tr} ',
                     style: getTextStyle(
                       fontSize: 14,
                       color: AppColors.secondaryTextColor,
@@ -150,7 +150,7 @@ class CreateAccountScreen extends StatelessWidget {
                           ..onTap = () {
                             Get.toNamed(AppRoutes.signInScreen);
                           },
-                        text: 'Sign In',
+                        text: 'Sign In'.tr,
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.primaryButtonColor,

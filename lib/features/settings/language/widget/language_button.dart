@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class LanguageButton extends StatelessWidget {
   final String languageCode;
@@ -33,7 +34,7 @@ class LanguageButton extends StatelessWidget {
           children: [
             Image.asset(iconPath, height: 24, width: 24),
             SizedBox(width: 16),
-            Text(label),
+            Text(label.tr),
             Spacer(),
             Container(
               width: 16,

@@ -28,7 +28,7 @@ class TimeWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            topTitle,
+            topTitle.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -89,7 +89,7 @@ class TimeWidget extends StatelessWidget {
                   onDownTap: controller.togglePeriod,
                   child: Obx(
                     () => Text(
-                      controller.period.value,
+                      controller.period.value.tr,
                       textAlign: TextAlign.center,
                       style: getTextStyle(
                         fontSize: 32,

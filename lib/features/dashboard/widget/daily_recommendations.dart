@@ -53,30 +53,30 @@ class DailyRecommendations extends StatelessWidget {
             ),
           ),
           SizedBox(height: 24),
-          Obx(
-            () {
-              if (controller.dailyRecommendations.isEmpty) {
-                return Text(
-                  'No recommendations available',
-                  style: getTextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.secondaryTextColor,
-                  ),
-                );
-              }
-
-              return Column(
-                children: controller.dailyRecommendations
-                    .map((rec) => DailyRecommendationsWidget(
-                          imagePath: _getCategoryIcon(rec.category),
-                          recommendationText: rec.title,
-                          subText: rec.body,
-                        ))
-                    .toList(),
+          Obx(() {
+            if (controller.dailyRecommendations.isEmpty) {
+              return Text(
+                'No recommendations available'.tr,
+                style: getTextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.secondaryTextColor,
+                ),
               );
-            },
-          ),
+            }
+
+            return Column(
+              children: controller.dailyRecommendations
+                  .map(
+                    (rec) => DailyRecommendationsWidget(
+                      imagePath: _getCategoryIcon(rec.category),
+                      recommendationText: rec.title.tr,
+                      subText: rec.body.tr,
+                    ),
+                  )
+                  .toList(),
+            );
+          }),
         ],
       ),
     );

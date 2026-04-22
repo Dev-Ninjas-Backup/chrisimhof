@@ -17,34 +17,34 @@ class CalculatorSleepTab extends StatelessWidget {
     return Column(
       children: [
         TimeWidget(
-          topTitle: 'Wake-up-Time',
+          topTitle: 'Wake-up-Time'.tr,
           controller: controller.wakeUpController,
         ),
         const SizedBox(height: 16),
         CustomRangeSlider(
-          headerText: 'Sleep Last Night (h)',
+          headerText: 'Sleep Last Night (h)'.tr,
           controller: controller.sleepLastNightController,
         ),
         const SizedBox(height: 16),
         CustomRangeSlider(
-          headerText: 'Sleep Goal (h)',
+          headerText: 'Sleep Goal (h)'.tr,
           controller: controller.sleepGoalController,
         ),
         const SizedBox(height: 16),
         FatigueLevel(
-          headerText: 'Fatigue Level',
+          headerText: 'Fatigue Level'.tr,
           selectedOption: controller.fatigueLevel,
-          options: ['Low', 'Medium', 'High'],
+          options: ['Low'.tr, 'Medium'.tr, 'High'.tr],
           onSelect: (option) => controller.fatigueLevel.value = option,
         ),
         const SizedBox(height: 24),
         TimeWidget(
-          topTitle: 'Desired Sleep Start',
+          topTitle: 'Desired Sleep Start'.tr,
           controller: controller.desiredSleepStartController,
         ),
         const SizedBox(height: 16),
         TimeWidget(
-          topTitle: 'Desired  Wake Time',
+          topTitle: 'Desired Wake Time'.tr,
           controller: controller.desiredSleepEndController,
         ),
         const SizedBox(height: 24),
@@ -72,7 +72,9 @@ class CalculatorSleepTab extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Nap ${nap['napNumber']}#",
+                                    "Nap @number#".trParams({
+                                      'number': nap['napNumber'].toString(),
+                                    }),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -91,7 +93,9 @@ class CalculatorSleepTab extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                "Duration: ${nap['duration']} min",
+                                "Duration: @value min".trParams({
+                                  'value': nap['duration'].toString(),
+                                }),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -100,7 +104,9 @@ class CalculatorSleepTab extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                "Time: ${nap['preferredTime']}",
+                                "Time: @value".trParams({
+                                  'value': nap['preferredTime'].toString(),
+                                }),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -119,7 +125,9 @@ class CalculatorSleepTab extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    "Nap ${controller.naps.length + 1}#",
+                    "Nap @number#".trParams({
+                      'number': (controller.naps.length + 1).toString(),
+                    }),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -130,20 +138,20 @@ class CalculatorSleepTab extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               CustomTextFormField(
-                label: "Desired Nap Duration (min)",
-                hintText: "Enter Duration",
+                label: "Desired Nap Duration (min)".tr,
+                hintText: "Enter Duration".tr,
                 isRequired: true,
                 controller: controller.currentNapDurationController,
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 24),
               TimeWidget(
-                topTitle: 'Preferred Time',
+                topTitle: 'Preferred Time'.tr,
                 controller: controller.preferredTimeController,
               ),
               const SizedBox(height: 32),
               CustomButton(
-                text: "+Add Nap",
+                text: "+Add Nap".tr,
                 onTap: () {
                   controller.addNap(
                     controller.currentNapDurationController.text,
@@ -158,7 +166,9 @@ class CalculatorSleepTab extends StatelessWidget {
         const SizedBox(height: 32),
         Obx(
           () => CustomButton(
-            text: controller.isSleepSubmitting.value ? "Submitting..." : "Next",
+            text: controller.isSleepSubmitting.value
+                ? "Submitting...".tr
+                : "Next".tr,
             onTap: controller.isSleepSubmitting.value
                 ? null
                 : () {
@@ -172,13 +182,13 @@ class CalculatorSleepTab extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
-              controller.sleepSubmitError.value,
+              controller.sleepSubmitError.value.tr,
               style: const TextStyle(color: Colors.red, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ),
         CustomButton(
-          text: "Reset",
+          text: "Reset".tr,
           onTap: () {
             controller.clearAllNaps();
             controller.wakeUpController.reset();

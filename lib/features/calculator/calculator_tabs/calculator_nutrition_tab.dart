@@ -21,23 +21,23 @@ class CalculatorNutritionTab extends StatelessWidget {
         children: [
           CustomRangeSlider(
             required: false,
-            headerText: "Desired Number of Meals",
+            headerText: "Desired Number of Meals".tr,
             controller: controller.desiredNumberOfMealsController,
           ),
           const SizedBox(height: 24),
           CustomRangeSlider(
             required: false,
-            headerText: "Meals Per Day",
+            headerText: "Meals Per Day".tr,
             controller: controller.desiredNumberOfMealsController,
           ),
           const SizedBox(height: 24),
           TimeWidget(
-            topTitle: 'First Meal Time',
+            topTitle: 'First Meal Time'.tr,
             controller: controller.firstMealTimeController,
           ),
           const SizedBox(height: 24),
           TimeWidget(
-            topTitle: 'Last Meal Time',
+            topTitle: 'Last Meal Time'.tr,
             controller: controller.lastMealTimeController,
           ),
           const SizedBox(height: 24),
@@ -45,7 +45,7 @@ class CalculatorNutritionTab extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Already had a meal today?",
+                "Already had a meal today?".tr,
                 style: getTextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -58,7 +58,7 @@ class CalculatorNutritionTab extends StatelessWidget {
                   Expanded(
                     child: Obx(
                       () => SelectableTabButton(
-                        text: 'Yes',
+                        text: 'Yes'.tr,
                         isSelected:
                             controller.hasMealTodaySelection.value == 'Yes',
                         onTap: () =>
@@ -70,7 +70,7 @@ class CalculatorNutritionTab extends StatelessWidget {
                   Expanded(
                     child: Obx(
                       () => SelectableTabButton(
-                        text: 'No',
+                        text: 'No'.tr,
                         isSelected:
                             controller.hasMealTodaySelection.value == 'No',
                         onTap: () =>
@@ -86,8 +86,8 @@ class CalculatorNutritionTab extends StatelessWidget {
           Obx(
             () => CustomButton(
               text: controller.isNutritionSubmitting.value
-                  ? 'Submitting...'
-                  : 'Next',
+                  ? 'Submitting...'.tr
+                  : 'Next'.tr,
               onTap: controller.isNutritionSubmitting.value
                   ? null
                   : () {
@@ -100,7 +100,7 @@ class CalculatorNutritionTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 16, bottom: 16),
               child: Text(
-                controller.nutritionSubmitError.value,
+                controller.nutritionSubmitError.value.tr,
                 style: const TextStyle(color: Colors.red, fontSize: 14),
                 textAlign: TextAlign.center,
               ),

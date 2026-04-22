@@ -24,7 +24,7 @@ class SleepTrendCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Sleep Trend',
+            'Sleep Trend'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -33,7 +33,7 @@ class SleepTrendCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Hours per night vs goal',
+            'Hours per night vs goal'.tr,
             style: getTextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -66,7 +66,10 @@ class SleepTrendCard extends StatelessWidget {
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final day = labels[group.x.toInt()];
                         return BarTooltipItem(
-                          '$day-Sleep(h): ${rod.toY.toStringAsFixed(1)}',
+                          '@day-Sleep(h): @value'.trParams({
+                            'day': day.tr,
+                            'value': rod.toY.toStringAsFixed(1),
+                          }),
                           getTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -99,7 +102,7 @@ class SleepTrendCard extends StatelessWidget {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              labels[index],
+                              labels[index].tr,
                               style: getTextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
