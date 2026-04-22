@@ -5,6 +5,7 @@ import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:chrisimhof/features/calculator/widgets/fatigue_level.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class CalculatorSleepTab extends StatelessWidget {
@@ -178,15 +179,22 @@ class CalculatorSleepTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        if (controller.sleepSubmitError.value.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Text(
-              controller.sleepSubmitError.value.tr,
-              style: const TextStyle(color: Colors.red, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ),
+        Obx(() {
+          final errorMessage = controller.sleepSubmitError.value;
+
+          if (errorMessage.isEmpty) {
+            return const SizedBox.shrink();
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            EasyLoading.showError(errorMessage);
+            if (controller.sleepSubmitError.value == errorMessage) {
+              controller.sleepSubmitError.value = '';
+            }
+          });
+
+          return const SizedBox.shrink();
+        }),
         CustomButton(
           text: "Reset".tr,
           onTap: () {

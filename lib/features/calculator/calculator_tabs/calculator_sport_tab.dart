@@ -7,6 +7,7 @@ import 'package:chrisimhof/features/calculator/results/screen/calculator_results
 import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class CalculatorSportTab extends StatelessWidget {
@@ -71,20 +72,12 @@ class CalculatorSportTab extends StatelessWidget {
                         ),
                       );
                     } else {
-                      Get.snackbar(
-                        'Error'.tr,
+                      EasyLoading.showError(
                         controller.sportSubmitError.value.tr,
-                        snackPosition: SnackPosition.BOTTOM,
                       );
                     }
                   } catch (e) {
-                    Get.snackbar(
-                      'Error'.tr,
-                      'Failed to submit sport activity: @error'.trParams({
-                        'error': e.toString(),
-                      }),
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
+                    EasyLoading.showError(e.toString());
                   }
                 },
                 backgroundColor: AppColors.primaryButtonColor,
