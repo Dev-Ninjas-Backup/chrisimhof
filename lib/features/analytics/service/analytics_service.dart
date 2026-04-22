@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/analytics/model/analytics_response_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class AnalyticsService {
@@ -23,6 +24,7 @@ class AnalyticsService {
           .timeout(const Duration(seconds: 10));
 
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      debugPrint("Analytic: "+jsonData.toString());
 
       if (response.statusCode == 200) {
         return AnalyticsResponseModel.fromJson(jsonData);
