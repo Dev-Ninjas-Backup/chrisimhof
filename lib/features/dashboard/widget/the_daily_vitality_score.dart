@@ -49,8 +49,9 @@ class TheDailyVitalityScore extends StatelessWidget {
                           child: CustomPaint(
                             size: const Size(125, 125),
                             painter: VitalityProgressPainter(
-                              progress: controller.vitalityScore.value/100,
-                              percentage: controller.vitalityScore.value.toInt(),
+                              progress: controller.vitalityScore.value / 100,
+                              percentage: controller.vitalityScore.value
+                                  .toInt(),
                             ),
                           ),
                         ),
@@ -80,29 +81,6 @@ class TheDailyVitalityScore extends StatelessWidget {
                           color: AppColors.secondaryTextColor,
                         ),
                       ),
-                      // child: RichText(
-                      //   text: TextSpan(
-                      //     style: getTextStyle(
-                      //       fontSize: 13,
-                      //       fontWeight: FontWeight.w400,
-                      //       color: AppColors.secondaryTextColor,
-                      //     ),
-                      //     children: [
-
-                      //     Text(controller.improvementPercentLabel.value.toString())
-                      //       // TextSpan(text: 'Your lifestyle efficiency is up '.tr),
-                      //       // TextSpan(
-                      //       //   text: '${controller.improvementPercent.value}%',
-                      //       //   style: getTextStyle(
-                      //       //     fontSize: 13,
-                      //       //     fontWeight: FontWeight.w500,
-                      //       //     color: const Color(0xFF10B981),
-                      //       //   ),
-                      //       // ),
-                      //       // TextSpan(text: ' from yesterday.'.tr),
-                      //     ],
-                      //   ),
-                      // ),
                     ),
                   ),
                 ],

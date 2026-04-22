@@ -2,6 +2,11 @@ import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/google_signin/model/user_model.dart';
 import 'package:chrisimhof/features/auth/google_signin/service/api_service.dart';
 import 'package:chrisimhof/features/auth/google_signin/service/google_auth_service.dart';
+import 'package:chrisimhof/features/auth/microsoft_signin/model/user_model.dart'
+    as microsoft_user;
+import 'package:chrisimhof/features/auth/microsoft_signin/service/api_service.dart'
+    as microsoft_api;
+import 'package:chrisimhof/features/auth/microsoft_signin/service/microsoft_auth_service.dart';
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:flutter/material.dart';
@@ -81,6 +86,10 @@ class SignInController extends GetxController {
   final GoogleAuthService _googleService = GoogleAuthService();
   final ApiService _apiService = ApiService();
 
+  final MicrosoftAuthService _microsoftService = MicrosoftAuthService();
+  final microsoft_api.MicrosoftApiService _microsoftApiService =
+      microsoft_api.MicrosoftApiService();
+
   Future<void> signInWithGoogle() async {
     try {
       isLoading.value = true;
@@ -141,15 +150,41 @@ class SignInController extends GetxController {
   Future<void> signInWithMicrosoft() async {
     try {
       isLoading.value = true;
-      EasyLoading.showSuccess(
-        'Microsoft Sign-In Clicked',
-        duration: Duration(seconds: 1),
-      );
+      EasyLoading.show(status: 'Signing in with Microsoft...');
+
+      microsoft_user.UserModel? user = await _microsoftService.signIn();
+
+      if (user != null) {
+        final apiResponse = await _microsoftApiService.sendUser(user);
+
+        if (apiResponse.success && apiResponse.accessToken != null) {
+          // Save tokens
+          await SharedPreferencesHelper.saveAccessToken(
+              apiResponse.accessToken!);
+          if (apiResponse.refreshToken != null) {
+            await SharedPreferencesHelper.saveRefreshToken(
+                apiResponse.refreshToken!);
+          }
+          await SharedPreferencesHelper.setLoginStatus(true);
+
+          EasyLoading.dismiss();
+          EasyLoading.showSuccess('Login successful');
+          Get.offAllNamed('/medicalDisclaimerScreen');
+        } else {
+          EasyLoading.dismiss();
+          EasyLoading.showError(
+              apiResponse.message ?? 'Microsoft login failed');
+          debugPrint('Microsoft login failed: ${apiResponse.message}');
+        }
+      } else {
+        EasyLoading.dismiss();
+        EasyLoading.showInfo('Microsoft sign-in cancelled');
+        debugPrint('Microsoft sign-in cancelled by user');
+      }
     } catch (e) {
-      EasyLoading.showError(
-        'Microsoft Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 1),
-      );
+      EasyLoading.dismiss();
+      EasyLoading.showError('Microsoft sign-in error: ${e.toString()}');
+      debugPrint('Microsoft Sign-In Controller Error: $e');
     } finally {
       isLoading.value = false;
     }

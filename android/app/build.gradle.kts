@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-daddadadad    // START: FlutterFire Configuration
+    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
     id("kotlin-android")
@@ -31,6 +31,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+manifestPlaceholders += mapOf(
+    "appAuthRedirectScheme" to "com.ryvenza.app"
+)
     }
 
     buildTypes {
