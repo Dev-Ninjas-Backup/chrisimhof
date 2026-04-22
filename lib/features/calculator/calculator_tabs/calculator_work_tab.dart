@@ -6,6 +6,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class CalculatorWorkTab extends StatelessWidget {
@@ -47,28 +48,54 @@ class CalculatorWorkTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Obx(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Obx(
                     () => SelectableTabButton(
                       text: 'Night'.tr,
                       isSelected: controller.selectedShiftType.value == 'Night',
                       onTap: () => controller.selectShiftType('Night'),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Obx(
+                  const SizedBox(width: 16),
+                  Obx(
                     () => SelectableTabButton(
-                      text: 'Day'.tr,
-                      isSelected: controller.selectedShiftType.value == 'Day',
-                      onTap: () => controller.selectShiftType('Day'),
+                      text: 'Rotating'.tr,
+                      isSelected:
+                          controller.selectedShiftType.value == 'Rotating',
+                      onTap: () => controller.selectShiftType('Rotating'),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 16),
+                  Obx(
+                    () => SelectableTabButton(
+                      text: 'Early Morning'.tr,
+                      isSelected:
+                          controller.selectedShiftType.value == 'Early_Morning',
+                      onTap: () => controller.selectShiftType('Early_Morning'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Obx(
+                    () => SelectableTabButton(
+                      text: 'Split'.tr,
+                      isSelected: controller.selectedShiftType.value == 'Split',
+                      onTap: () => controller.selectShiftType('Split'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Obx(
+                    () => SelectableTabButton(
+                      text: 'Standard'.tr,
+                      isSelected:
+                          controller.selectedShiftType.value == 'Standard',
+                      onTap: () => controller.selectShiftType('Standard'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -89,15 +116,22 @@ class CalculatorWorkTab extends StatelessWidget {
             ),
           ),
         ),
-        if (controller.workSubmitError.value.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Text(
-              controller.workSubmitError.value.tr,
-              style: const TextStyle(color: Colors.red, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ),
+        Obx(() {
+          final errorMessage = controller.workSubmitError.value;
+
+          if (errorMessage.isEmpty) {
+            return const SizedBox.shrink();
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            EasyLoading.showError(errorMessage);
+            if (controller.workSubmitError.value == errorMessage) {
+              controller.workSubmitError.value = '';
+            }
+          });
+
+          return const SizedBox.shrink();
+        }),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [

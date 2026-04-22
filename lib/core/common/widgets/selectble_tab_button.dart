@@ -2,7 +2,6 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
 
-
 class SelectableTabButton extends StatelessWidget {
   final String text;
   final bool isSelected;
@@ -20,10 +19,12 @@ class SelectableTabButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.all(16),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryButtonColor : const Color(0xFFF3F4F6),
+          color: isSelected
+              ? AppColors.primaryButtonColor
+              : const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(10000),
         ),
         child: Text(

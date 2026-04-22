@@ -173,8 +173,7 @@ class CalculatorController extends GetxController {
       caffeinePresetsError.value = '';
 
       final presets = await _calculatorService.getCaffeinePresets();
-      for (int i = 0; i < presets.length; i++) {
-      }
+      for (int i = 0; i < presets.length; i++) {}
 
       caffeinePresets.assignAll(presets);
     } catch (e) {
@@ -235,7 +234,6 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitCaffeineIntake() async {
-
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
@@ -282,13 +280,10 @@ class CalculatorController extends GetxController {
 
       final request = CaffeineIntakeRequest(caffeineIntakes: intakes);
 
-
       final response = await _calculatorService.submitCaffeineIntake(
         calculatorSession.value!.sessionId!,
         request,
       );
-
-
 
       // Update session with response data
       calculatorSession.value = CalculatorSession(
@@ -300,9 +295,7 @@ class CalculatorController extends GetxController {
         prefilled: false,
       );
 
-
       changeTab(5);
-
     } catch (e) {
       caffeineSubmitError.value = e.toString();
     } finally {
@@ -311,7 +304,6 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> skipCaffeineIntake() async {
-
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
@@ -326,8 +318,6 @@ class CalculatorController extends GetxController {
         calculatorSession.value!.sessionId!,
       );
 
-
-
       // Update session with response data
       calculatorSession.value = CalculatorSession(
         sessionId: response.sessionId,
@@ -338,9 +328,7 @@ class CalculatorController extends GetxController {
         prefilled: false,
       );
 
-
       changeTab(5);
-
     } catch (e) {
       caffeineSubmitError.value = e.toString();
     } finally {
@@ -356,8 +344,17 @@ class CalculatorController extends GetxController {
     selectedTabIndex.value = index;
   }
 
-  Future<void> submitSleepData() async {
+  String _formatErrorMessage(Object error, {String? servicePrefix}) {
+    var message = error.toString().replaceFirst('Exception: ', '');
 
+    if (servicePrefix != null && message.startsWith(servicePrefix)) {
+      message = message.substring(servicePrefix.length).trim();
+    }
+
+    return message;
+  }
+
+  Future<void> submitSleepData() async {
     try {
       if (calculatorSession.value == null) {
         sleepSubmitError.value = 'Session not initialized (value is null)';
@@ -385,7 +382,6 @@ class CalculatorController extends GetxController {
         );
       }
 
-
       // Build request
       final request = SleepCalculatorRequest(
         wakeUpTime: wakeUpController.to24HourFormat,
@@ -397,15 +393,12 @@ class CalculatorController extends GetxController {
         naps: napList,
       );
 
-
       final response = await _calculatorService.submitSleepData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-
       if (response.success && response.data != null) {
-
         // Update session with response data
         calculatorSession.value = CalculatorSession(
           sessionId: response.data!.sessionId,
@@ -416,22 +409,22 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-
         // Navigate to next tab (work tab)
         changeTab(1);
-
       } else {
         sleepSubmitError.value = response.message;
       }
     } catch (e) {
-      sleepSubmitError.value = e.toString();
+      sleepSubmitError.value = _formatErrorMessage(
+        e,
+        servicePrefix: 'Error submitting sleep data:',
+      );
     } finally {
       isSleepSubmitting.value = false;
     }
   }
 
   Future<void> submitWorkData() async {
-
     try {
       if (calculatorSession.value == null) {
         workSubmitError.value = 'Session not initialized (value is null)';
@@ -453,15 +446,12 @@ class CalculatorController extends GetxController {
         shiftType: selectedShiftType.value.toUpperCase(),
       );
 
-
       final response = await _calculatorService.submitWorkData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-
       if (response.success && response.data != null) {
-
         // Update session with response data
         calculatorSession.value = CalculatorSession(
           sessionId: response.data!.sessionId,
@@ -472,22 +462,22 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-
         // Navigate to next tab (nutrition tab)
         changeTab(2);
-
       } else {
         workSubmitError.value = response.message;
       }
     } catch (e) {
-      workSubmitError.value = e.toString();
+      workSubmitError.value = _formatErrorMessage(
+        e,
+        servicePrefix: 'Error submitting work data:',
+      );
     } finally {
       isWorkSubmitting.value = false;
     }
   }
 
   Future<void> skipWorkData() async {
-
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
@@ -502,9 +492,7 @@ class CalculatorController extends GetxController {
         calculatorSession.value!.sessionId!,
       );
 
-
       if (response.success && response.data != null) {
-
         // Update session with response data
         calculatorSession.value = CalculatorSession(
           sessionId: response.data!.sessionId,
@@ -515,22 +503,22 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-
         // Navigate to next tab (nutrition tab)
         changeTab(2);
-
       } else {
         workSubmitError.value = response.message;
       }
     } catch (e) {
-      workSubmitError.value = e.toString();
+      workSubmitError.value = _formatErrorMessage(
+        e,
+        servicePrefix: 'Error skipping work:',
+      );
     } finally {
       isWorkSubmitting.value = false;
     }
   }
 
   Future<void> submitNutritionData() async {
-
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
@@ -552,15 +540,12 @@ class CalculatorController extends GetxController {
         lastMealTime: lastMealTimeController.to24HourFormat,
       );
 
-
       final response = await _calculatorService.submitNutritionData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-
       if (response.success && response.data != null) {
-
         // Update session with response data
         calculatorSession.value = CalculatorSession(
           sessionId: response.data!.sessionId,
@@ -571,10 +556,8 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-
         // Navigate to next tab (hydration tab)
         changeTab(3);
-
       } else {
         nutritionSubmitError.value = response.message;
       }
@@ -586,7 +569,6 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitHydrationData() async {
-
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
@@ -602,15 +584,12 @@ class CalculatorController extends GetxController {
         waterGoalL: hydrationDailyGoalController.value.value,
       );
 
-
       final response = await _calculatorService.submitHydrationData(
         calculatorSession.value!.sessionId!,
         request,
       );
 
-
       if (response.success) {
-
         final currentSession = calculatorSession.value!;
         final completedSteps = response.data?.completedSteps.isNotEmpty == true
             ? response.data!.completedSteps
@@ -626,7 +605,6 @@ class CalculatorController extends GetxController {
             ? response.data!.sessionId
             : currentSession.sessionId!;
 
-
         calculatorSession.value = CalculatorSession(
           sessionId: sessionId,
           completedSteps: completedSteps,
@@ -636,9 +614,7 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-
         changeTab(4);
-
       } else {
         hydrationSubmitError.value = response.message;
       }
@@ -683,7 +659,6 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitSportData() async {
-
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
@@ -738,13 +713,10 @@ class CalculatorController extends GetxController {
         activityTime: activityTime,
       );
 
-
       final response = await _calculatorService.submitSportData(
         calculatorSession.value!.sessionId!,
         request,
       );
-
-
 
       // Update session with response data
       calculatorSession.value = CalculatorSession(
@@ -755,7 +727,6 @@ class CalculatorController extends GetxController {
         isReadyToCalculate: response.isReadyToCalculate,
         prefilled: false,
       );
-
     } catch (e) {
       sportSubmitError.value = e.toString();
     } finally {

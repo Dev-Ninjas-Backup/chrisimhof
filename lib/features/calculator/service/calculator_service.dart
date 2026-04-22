@@ -13,6 +13,26 @@ import 'package:chrisimhof/features/calculator/results/model/calculate_result_mo
 import 'package:http/http.dart' as http;
 
 class CalculatorService {
+  String _extractErrorMessage(dynamic message, String fallback) {
+    if (message is String && message.trim().isNotEmpty) {
+      return message;
+    }
+
+    if (message is List) {
+      final messages = message
+          .whereType<String>()
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .toList();
+
+      if (messages.isNotEmpty) {
+        return messages.join('\n');
+      }
+    }
+
+    return fallback;
+  }
+
   Future<CalculatorSessionResponse> getCalculatorSession() async {
     final uri = Uri.parse(Urls.createCalculatorSession);
     final accessToken = await SharedPreferencesHelper.getAccessToken();
@@ -68,8 +88,15 @@ class CalculatorService {
       if (response.statusCode == 201 || response.statusCode == 200) {
         return SleepCalculatorResponse.fromJson(jsonData);
       } else {
-        throw Exception(jsonData['message'] ?? 'Failed to submit sleep data');
+        throw Exception(
+          _extractErrorMessage(
+            jsonData['message'],
+            'Failed to submit sleep data',
+          ),
+        );
       }
+    } on Exception {
+      rethrow;
     } catch (e) {
       throw Exception('Error submitting sleep data: $e');
     }
@@ -100,8 +127,15 @@ class CalculatorService {
       if (response.statusCode == 201 || response.statusCode == 200) {
         return WorkCalculatorResponse.fromJson(jsonData);
       } else {
-        throw Exception(jsonData['message'] ?? 'Failed to submit work data');
+        throw Exception(
+          _extractErrorMessage(
+            jsonData['message'],
+            'Failed to submit work data',
+          ),
+        );
       }
+    } on Exception {
+      rethrow;
     } catch (e) {
       throw Exception('Error submitting work data: $e');
     }
@@ -128,8 +162,12 @@ class CalculatorService {
       if (response.statusCode == 201 || response.statusCode == 200) {
         return WorkCalculatorResponse.fromJson(jsonData);
       } else {
-        throw Exception(jsonData['message'] ?? 'Failed to skip work');
+        throw Exception(
+          _extractErrorMessage(jsonData['message'], 'Failed to skip work'),
+        );
       }
+    } on Exception {
+      rethrow;
     } catch (e) {
       throw Exception('Error skipping work: $e');
     }
@@ -182,11 +220,9 @@ class CalculatorService {
     };
 
     try {
-
       final response = await http
           .post(uri, headers: headers, body: jsonEncode(request.toJson()))
           .timeout(const Duration(seconds: 10));
-
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final body = response.body.trim();
@@ -252,7 +288,6 @@ class CalculatorService {
           )
           .timeout(const Duration(seconds: 10));
 
-
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
 
@@ -281,7 +316,6 @@ class CalculatorService {
     final accessToken = await SharedPreferencesHelper.getAccessToken();
 
     try {
-
       final response = await http
           .post(
             uri,
@@ -313,7 +347,6 @@ class CalculatorService {
     final accessToken = await SharedPreferencesHelper.getAccessToken();
 
     try {
-
       final response = await http
           .post(
             uri,
@@ -347,7 +380,6 @@ class CalculatorService {
     final accessToken = await SharedPreferencesHelper.getAccessToken();
 
     try {
-
       final response = await http
           .post(
             uri,
@@ -379,7 +411,6 @@ class CalculatorService {
     final accessToken = await SharedPreferencesHelper.getAccessToken();
 
     try {
-
       final response = await http
           .post(
             uri,
