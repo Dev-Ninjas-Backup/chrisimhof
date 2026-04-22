@@ -18,18 +18,18 @@ class CalculatorWorkTab extends StatelessWidget {
     return Column(
       children: [
         TimeWidget(
-          topTitle: 'Work Begins',
+          topTitle: 'Work Begins'.tr,
           controller: controller.workBeginsController,
         ),
         const SizedBox(height: 16),
         TimeWidget(
-          topTitle: 'Work Complete',
+          topTitle: 'Work Complete'.tr,
           controller: controller.workCompleteController,
         ),
         const SizedBox(height: 16),
         CustomTextFormField(
-          label: "Days Worked",
-          hintText: "Enter Duration",
+          label: "Days Worked".tr,
+          hintText: "Enter Duration".tr,
           isRequired: true,
           controller: controller.daysWorkedController,
           keyboardType: TextInputType.number,
@@ -39,7 +39,7 @@ class CalculatorWorkTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Shift Type",
+              "Shift Type".tr,
               style: getTextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -52,7 +52,7 @@ class CalculatorWorkTab extends StatelessWidget {
                 Expanded(
                   child: Obx(
                     () => SelectableTabButton(
-                      text: 'Night',
+                      text: 'Night'.tr,
                       isSelected: controller.selectedShiftType.value == 'Night',
                       onTap: () => controller.selectShiftType('Night'),
                     ),
@@ -62,7 +62,7 @@ class CalculatorWorkTab extends StatelessWidget {
                 Expanded(
                   child: Obx(
                     () => SelectableTabButton(
-                      text: 'Day',
+                      text: 'Day'.tr,
                       isSelected: controller.selectedShiftType.value == 'Day',
                       onTap: () => controller.selectShiftType('Day'),
                     ),
@@ -78,8 +78,8 @@ class CalculatorWorkTab extends StatelessWidget {
           child: Obx(
             () => CustomButton(
               text: controller.isWorkSubmitting.value
-                  ? 'Submitting...'
-                  : 'Next',
+                  ? 'Submitting...'.tr
+                  : 'Next'.tr,
               onTap: controller.isWorkSubmitting.value
                   ? null
                   : () {
@@ -93,7 +93,7 @@ class CalculatorWorkTab extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
-              controller.workSubmitError.value,
+              controller.workSubmitError.value.tr,
               style: const TextStyle(color: Colors.red, fontSize: 14),
               textAlign: TextAlign.center,
             ),
@@ -103,7 +103,7 @@ class CalculatorWorkTab extends StatelessWidget {
           children: [
             Expanded(
               child: TabButton(
-                text: 'Skip',
+                text: 'Skip'.tr,
                 onTap: () {
                   controller.skipWorkData();
                 },
@@ -111,7 +111,7 @@ class CalculatorWorkTab extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: TabButton(text: 'Reset', onTap: () {}),
+              child: TabButton(text: 'Reset'.tr, onTap: () {}),
             ),
           ],
         ),
@@ -138,7 +138,7 @@ class TabButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10000),
         ),
         child: Text(
-          text,
+          text.tr,
           style: getTextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,

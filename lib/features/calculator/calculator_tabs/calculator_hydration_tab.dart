@@ -25,7 +25,7 @@ class CalculatorHydrationTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              "Recommended hydration 2.5L perday",
+              "Recommended hydration 2.5L per day".tr,
               textAlign: TextAlign.center,
               style: getTextStyle(
                 color: Colors.black,
@@ -37,13 +37,13 @@ class CalculatorHydrationTab extends StatelessWidget {
           const SizedBox(height: 24),
           CustomRangeSlider(
             required: false,
-            headerText: "Already Consumed (L)",
+            headerText: "Already Consumed (L)".tr,
             controller: controller.hydrationConsumedController,
           ),
           const SizedBox(height: 26),
           CustomRangeSlider(
             required: false,
-            headerText: "Daily Goal (L)",
+            headerText: "Daily Goal (L)".tr,
             controller: controller.hydrationDailyGoalController,
           ),
           const SizedBox(height: 24),
@@ -55,7 +55,8 @@ class CalculatorHydrationTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              "Hydration recomendation may adjust automatically based on sport activity",
+              "Hydration recommendation may adjust automatically based on sport activity"
+                  .tr,
               style: getTextStyle(
                 color: Colors.black,
                 fontSize: 12,
@@ -67,8 +68,8 @@ class CalculatorHydrationTab extends StatelessWidget {
           Obx(
             () => CustomButton(
               text: controller.isHydrationSubmitting.value
-                  ? 'Submitting...'
-                  : 'Next',
+                  ? 'Submitting...'.tr
+                  : 'Next'.tr,
               onTap: controller.isHydrationSubmitting.value
                   ? null
                   : () {
@@ -83,7 +84,7 @@ class CalculatorHydrationTab extends StatelessWidget {
                 ? Padding(
                     padding: const EdgeInsets.only(top: 16, bottom: 16),
                     child: Text(
-                      controller.hydrationSubmitError.value,
+                      controller.hydrationSubmitError.value.tr,
                       style: const TextStyle(color: Colors.red, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
@@ -91,7 +92,7 @@ class CalculatorHydrationTab extends StatelessWidget {
                 : const SizedBox.shrink(),
           ),
           CustomButton(
-            text: "Reset",
+            text: "Reset".tr,
             onTap: () {
               controller.hydrationConsumedController.updateValue(1.0);
               controller.hydrationDailyGoalController.updateValue(2.5);

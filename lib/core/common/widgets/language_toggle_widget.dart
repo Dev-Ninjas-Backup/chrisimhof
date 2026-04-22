@@ -76,7 +76,7 @@ class LanguageToggleWidget extends StatelessWidget {
                       Image.asset(IconPath.freLogo, height: 24, width: 24),
                       const SizedBox(width: 4),
                       Text(
-                        'Fre',
+                        'Fre'.tr,
                         style: getTextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,

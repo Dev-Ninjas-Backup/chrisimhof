@@ -24,7 +24,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Forget Password',
+                'Forget Password'.tr,
                 style: getTextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
@@ -33,7 +33,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
               ),
               SizedBox(height: 12),
               Text(
-                'Don’t warry it happens. Please enter the e-mail address.',
+                'Don’t worry it happens. Please enter the e-mail address.'.tr,
                 style: getTextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -43,8 +43,8 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
               ),
               SizedBox(height: 48),
               CustomTextFormField(
-                label: 'Email',
-                hintText: 'Enter your email',
+                label: 'Email'.tr,
+                hintText: 'Enter your email'.tr,
                 isRequired: true,
                 controller: controller.emailController,
                 validator: (value) => controller.validateEmail(value),
@@ -52,7 +52,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
               SizedBox(height: 60),
               Obx(
                 () => CustomButton(
-                  text: 'Sign In',
+                  text: 'Sign In'.tr,
                   onTap: controller.isLoading.value
                       ? null
                       : () {

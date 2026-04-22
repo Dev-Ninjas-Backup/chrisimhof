@@ -24,7 +24,7 @@ class DailyActivitySplitCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Daily Activity Split',
+            'Daily Activity Split'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -33,7 +33,7 @@ class DailyActivitySplitCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Average time allocation',
+            'Average time allocation'.tr,
             style: getTextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -85,7 +85,7 @@ class DailyActivitySplitCard extends StatelessWidget {
                         return _LegendItem(
                           color: item.color,
                           percent: item.percentLabel,
-                          title: item.title,
+                          title: item.title.tr,
                         );
                       }).toList(),
                     ),

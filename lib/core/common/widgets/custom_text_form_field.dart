@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final String label;
@@ -42,7 +43,7 @@ class CustomTextFormField extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: label,
+                text: label.tr,
                 style: getTextStyle(
                   color: AppColors.primaryTextColor,
                   fontSize: 18,
@@ -80,7 +81,7 @@ class CustomTextFormField extends StatelessWidget {
             ),
 
             decoration: InputDecoration(
-              hintText: hintText,
+              hintText: hintText?.tr,
               hintStyle: TextStyle(
                 color: AppColors.secondaryTextColor,
                 fontSize: 14,

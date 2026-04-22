@@ -23,7 +23,7 @@ class LanguageScreen extends StatelessWidget {
               SizedBox(height: 24),
               LanguageButton(
                 languageCode: 'EN',
-                label: 'English'.tr,
+                label: 'English',
                 iconPath: IconPath.ukLogo,
                 isSelected: controller.isSelected('EN'),
                 onTap: () => controller.changeLanguage('EN'),

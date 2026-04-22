@@ -21,8 +21,8 @@ class CalculatorSportTab extends StatelessWidget {
           child: Column(
             children: [
               CustomTextFormField(
-                label: "Desired Duration (min)",
-                hintText: "Enter Duration",
+                label: "Desired Duration (min)".tr,
+                hintText: "Enter Duration".tr,
                 isRequired: false,
                 controller: controller.sportDurationController,
                 keyboardType: TextInputType.number,
@@ -47,7 +47,7 @@ class CalculatorSportTab extends StatelessWidget {
               ),
               const SizedBox(height: 180),
               CustomButton(
-                text: "Calculate",
+                text: "Calculate".tr,
                 onTap: () async {
                   try {
                     await controller.submitSportData();
@@ -72,15 +72,17 @@ class CalculatorSportTab extends StatelessWidget {
                       );
                     } else {
                       Get.snackbar(
-                        'Error',
-                        controller.sportSubmitError.value,
+                        'Error'.tr,
+                        controller.sportSubmitError.value.tr,
                         snackPosition: SnackPosition.BOTTOM,
                       );
                     }
                   } catch (e) {
                     Get.snackbar(
-                      'Error',
-                      'Failed to submit sport activity: $e',
+                      'Error'.tr,
+                      'Failed to submit sport activity: @error'.trParams({
+                        'error': e.toString(),
+                      }),
                       snackPosition: SnackPosition.BOTTOM,
                     );
                   }
@@ -89,7 +91,7 @@ class CalculatorSportTab extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               CustomButton(
-                text: "Reset",
+                text: "Reset".tr,
                 onTap: () {
                   controller.sportDurationController.clear();
                   controller.selectActivityType('');

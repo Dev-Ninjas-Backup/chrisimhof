@@ -75,7 +75,7 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomAppBar(title: 'Results', showBackButton: true),
+                CustomAppBar(title: 'Results'.tr, showBackButton: true),
                 const SizedBox(height: 24),
                 ResultsOverallStateCard(
                   score: resultData.overallScore,
@@ -95,22 +95,22 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
                   itemBuilder: (context, index) {
                     final metrics = [
                       _buildMetric(
-                        'Sleep',
+                        'Sleep'.tr,
                         resultData.scoreBreakdown.sleep,
                         'sleep',
                       ),
                       _buildMetric(
-                        'Hydration',
+                        'Hydration'.tr,
                         resultData.scoreBreakdown.hydration,
                         'hydration',
                       ),
                       _buildMetric(
-                        'Caffeine',
+                        'Caffeine'.tr,
                         resultData.scoreBreakdown.caffeine,
                         'caffeine',
                       ),
                       _buildMetric(
-                        'Nutrition',
+                        'Nutrition'.tr,
                         resultData.scoreBreakdown.nutrition,
                         'nutrition',
                       ),
@@ -123,10 +123,10 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
                   recommendations: resultData.recommendations,
                 ),
                 const SizedBox(height: 24),
-                CustomButton(text: 'Recalculate', onTap: Get.back),
+                CustomButton(text: 'Recalculate'.tr, onTap: Get.back),
                 const SizedBox(height: 16),
                 CustomButton(
-                  text: 'Go To Dashboard',
+                  text: 'Go To Dashboard'.tr,
                   onTap: () => Get.offAll(() => const NavbarScreen()),
                   backgroundColor: const Color(0xFFF4F4F8),
                 ),

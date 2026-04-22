@@ -31,7 +31,7 @@ class CalculatorScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CustomAppBar(title: 'Calculator', showBackButton: true),
+              CustomAppBar(title: 'Calculator'.tr, showBackButton: true),
               const SizedBox(height: 24),
 
               /// ✅ Tabs
@@ -42,7 +42,7 @@ class CalculatorScreen extends StatelessWidget {
                     children: List.generate(
                       controller.tabs.length,
                       (index) => CalculatorTabButton(
-                        title: controller.tabs[index],
+                        title: controller.tabs[index].tr,
                         isActive: controller.selectedTabIndex.value == index,
                         onTap: () => controller.changeTab(index),
                       ),

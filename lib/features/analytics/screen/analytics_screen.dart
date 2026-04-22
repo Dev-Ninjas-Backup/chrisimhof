@@ -29,7 +29,7 @@ class AnalyticsScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              CustomAppBar(title: 'Analytics', showBackButton: false),
+              CustomAppBar(title: 'Analytics'.tr, showBackButton: false),
               SizedBox(height: 24),
               WeeklyAnalyticsCard(),
               SizedBox(height: 16),

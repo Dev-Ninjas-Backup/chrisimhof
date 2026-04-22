@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class ListWidget extends StatelessWidget {
   final String title;
@@ -30,7 +31,7 @@ class ListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                title,
+                title.tr,
                 style: getTextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -50,7 +51,7 @@ class ListWidget extends StatelessWidget {
             ),
           ),
           Text(
-            description,
+            description.tr,
             style: getTextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
