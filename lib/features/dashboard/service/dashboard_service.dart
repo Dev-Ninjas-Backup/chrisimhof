@@ -19,8 +19,8 @@ class DashboardService {
       );
 
       if (kDebugMode) {
-        print('Response Status: ${response.statusCode}');
-        print('Response Body: ${response.body}');
+        debugPrint('Response Statusdashboard: ${response.statusCode}');
+        debugPrint('Response Bodydashboard: ${response.body}');
       }
 
       if (response.statusCode == 200) {

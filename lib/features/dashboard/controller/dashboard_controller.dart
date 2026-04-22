@@ -11,36 +11,11 @@ class DashboardController extends GetxController {
 
   final vitalityScore = 0.0.obs;
   final levelText = 'Loading...'.obs;
-  final improvementPercent = 0.obs;
+  final improvementPercentLabel = "".obs;
   final isLoading = true.obs;
   final errorMessage = ''.obs;
 
-  final dashboardItems = <DashboardItemModel>[
-    DashboardItemModel(
-      title: 'Sleep',
-      image: IconPath.moon,
-      percent: '90%',
-      description: '7h slept / 0h debt',
-    ),
-    DashboardItemModel(
-      title: 'Hydration',
-      image: IconPath.waterDrops,
-      percent: '72%',
-      description: '1.5L / 2.5L',
-    ),
-    DashboardItemModel(
-      title: 'Caffeine',
-      image: IconPath.vector,
-      percent: '82%',
-      description: '123 mg today',
-    ),
-    DashboardItemModel(
-      title: 'Nutrition',
-      image: IconPath.iron,
-      percent: '86%',
-      description: 'Small night meal • 3 meals',
-    ),
-  ].obs;
+  final dashboardItems = <DashboardItemModel>[].obs;
   final sleepAdaptationNote = ''.obs;
   final dailyRecommendations = <DashboardRecommendation>[].obs;
   final weeklyTrendData = <WeeklyTrendItem>[].obs;
@@ -61,9 +36,73 @@ class DashboardController extends GetxController {
 
       // Update vitality score
       vitalityScore.value = dashboard.currentScore.toDouble();
-      levelText.value = _getLevelText(dashboard.currentScore);
+      levelText.value = dashboard.scoreLevel;
       streak.value = dashboard.streak;
       sleepAdaptationNote.value = dashboard.sleepAdaptationNote;
+      
+      // Update improvement percentage from scoreChange
+      if (dashboard.scoreChange != null) {
+        improvementPercentLabel.value = dashboard.scoreChange!.label;
+      }
+
+      // Build dashboard items from cards
+      final items = <DashboardItemModel>[];
+      
+      if (dashboard.cards.sleep != null) {
+        items.add(DashboardItemModel(
+          title: 'Sleep',
+          image: IconPath.moon,
+          percent: '${dashboard.cards.sleep!.score}%',
+          description: dashboard.cards.sleep!.subtitle,
+        ));
+      }
+      
+      if (dashboard.cards.hydration != null) {
+        items.add(DashboardItemModel(
+          title: 'Hydration',
+          image: IconPath.waterDrops,
+          percent: '${dashboard.cards.hydration!.score}%',
+          description: dashboard.cards.hydration!.subtitle,
+        ));
+      }
+      
+      if (dashboard.cards.caffeine != null) {
+        items.add(DashboardItemModel(
+          title: 'Caffeine',
+          image: IconPath.vector,
+          percent: '${dashboard.cards.caffeine!.score}%',
+          description: dashboard.cards.caffeine!.subtitle,
+        ));
+      }
+      
+      if (dashboard.cards.nutrition != null) {
+        items.add(DashboardItemModel(
+          title: 'Nutrition',
+          image: IconPath.iron,
+          percent: '${dashboard.cards.nutrition!.score}%',
+          description: dashboard.cards.nutrition!.subtitle,
+        ));
+      }
+      
+      if (dashboard.cards.activity != null) {
+        items.add(DashboardItemModel(
+          title: 'Activity',
+          image: IconPath.waterDrops,
+          percent: '${dashboard.cards.activity!.score}%',
+          description: dashboard.cards.activity!.subtitle,
+        ));
+      }
+      
+      if (dashboard.cards.recovery != null) {
+        items.add(DashboardItemModel(
+          title: 'Recovery',
+          image: IconPath.iron,
+          percent: '${dashboard.cards.recovery!.score}%',
+          description: dashboard.cards.recovery!.subtitle,
+        ));
+      }
+      
+      dashboardItems.value = items;
 
       // Update daily recommendations
       dailyRecommendations.value = dashboard.dailyRecommendations
@@ -93,13 +132,6 @@ class DashboardController extends GetxController {
   }
 
   String get formattedScore => '${vitalityScore.value.toInt()}%';
-
-  String _getLevelText(int score) {
-    if (score >= 80) return 'Excellent level';
-    if (score >= 60) return 'Good level';
-    if (score >= 40) return 'Moderate level';
-    return 'Poor level';
-  }
 }
 
 class DashboardRecommendation {

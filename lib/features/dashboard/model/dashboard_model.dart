@@ -1,6 +1,28 @@
+class ScoreChange {
+  final String direction;
+  final int percent;
+  final String label;
+
+  ScoreChange({
+    required this.direction,
+    required this.percent,
+    required this.label,
+  });
+
+  factory ScoreChange.fromJson(Map<String, dynamic> json) {
+    return ScoreChange(
+      direction: json['direction'] ?? 'up',
+      percent: json['percent'] ?? 0,
+      label: json['label'] ?? '',
+    );
+  }
+}
+
 class DashboardModel {
   final int currentScore;
-  final StateIndicators stateIndicators;
+  final String scoreLevel;
+  final ScoreChange? scoreChange;
+  final DashboardCards cards;
   final List<WeeklyTrendItem> weeklyTrend;
   final int streak;
   final String sleepAdaptationNote;
@@ -8,7 +30,9 @@ class DashboardModel {
 
   DashboardModel({
     required this.currentScore,
-    required this.stateIndicators,
+    required this.scoreLevel,
+    this.scoreChange,
+    required this.cards,
     required this.weeklyTrend,
     required this.streak,
     required this.sleepAdaptationNote,
@@ -18,7 +42,11 @@ class DashboardModel {
   factory DashboardModel.fromJson(Map<String, dynamic> json) {
     return DashboardModel(
       currentScore: json['currentScore'] ?? 0,
-      stateIndicators: StateIndicators.fromJson(json['stateIndicators'] ?? {}),
+      scoreLevel: json['scoreLevel'] ?? '',
+      scoreChange: json['scoreChange'] != null 
+        ? ScoreChange.fromJson(json['scoreChange']) 
+        : null,
+      cards: DashboardCards.fromJson(json['cards'] ?? {}),
       weeklyTrend: (json['weeklyTrend'] as List?)
               ?.map((item) => WeeklyTrendItem.fromJson(item))
               .toList() ??
@@ -29,6 +57,61 @@ class DashboardModel {
               ?.map((item) => DailyRecommendation.fromJson(item))
               .toList() ??
           [],
+    );
+  }
+}
+
+class DashboardCards {
+  final CardDetail? sleep;
+  final CardDetail? hydration;
+  final CardDetail? caffeine;
+  final CardDetail? nutrition;
+  final CardDetail? activity;
+  final CardDetail? recovery;
+
+  DashboardCards({
+    this.sleep,
+    this.hydration,
+    this.caffeine,
+    this.nutrition,
+    this.activity,
+    this.recovery,
+  });
+
+  factory DashboardCards.fromJson(Map<String, dynamic> json) {
+    return DashboardCards(
+      sleep: json['sleep'] != null ? CardDetail.fromJson(json['sleep']) : null,
+      hydration: json['hydration'] != null ? CardDetail.fromJson(json['hydration']) : null,
+      caffeine: json['caffeine'] != null ? CardDetail.fromJson(json['caffeine']) : null,
+      nutrition: json['nutrition'] != null ? CardDetail.fromJson(json['nutrition']) : null,
+      activity: json['activity'] != null ? CardDetail.fromJson(json['activity']) : null,
+      recovery: json['recovery'] != null ? CardDetail.fromJson(json['recovery']) : null,
+    );
+  }
+}
+
+class CardDetail {
+  final int score;
+  final String label;
+  final String subtitle;
+  final Map<String, dynamic> additionalData;
+
+  CardDetail({
+    required this.score,
+    required this.label,
+    required this.subtitle,
+    this.additionalData = const {},
+  });
+
+  factory CardDetail.fromJson(Map<String, dynamic> json) {
+    final additionalData = Map<String, dynamic>.from(json);
+    additionalData.removeWhere((key, value) => ['score', 'label', 'subtitle'].contains(key));
+
+    return CardDetail(
+      score: json['score'] ?? 0,
+      label: json['label'] ?? '',
+      subtitle: json['subtitle'] ?? '',
+      additionalData: additionalData,
     );
   }
 }
