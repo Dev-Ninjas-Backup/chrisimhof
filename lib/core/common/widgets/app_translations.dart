@@ -54,6 +54,11 @@ class AppTranslations extends Translations {
       // Settings
       'Settings': 'Settings',
       'Delete Account': 'Delete Account',
+      'Deleting account...': 'Deleting account...',
+      'Account deleted successfully': 'Account deleted successfully',
+      'Delete account failed. Please try again.':
+          'Delete account failed. Please try again.',
+      'Unable to find user account.': 'Unable to find user account.',
       'Subscriptions.': 'Subscriptions.',
       'User Name': 'User Name',
       'Email Address': 'Email Address',
@@ -219,7 +224,8 @@ class AppTranslations extends Translations {
       'Desired Duration (min)': 'Desired Duration (min)',
       'Calculate': 'Calculate',
       'Error': 'Error',
-      'Failed to submit sport activity: @error': 'Failed to submit sport activity: @error',
+      'Failed to submit sport activity: @error':
+          'Failed to submit sport activity: @error',
       'Wake-up-Time': 'Wake-up-Time',
       'Sleep Last Night (h)': 'Sleep Last Night (h)',
       'Sleep Goal (h)': 'Sleep Goal (h)',
@@ -242,7 +248,8 @@ class AppTranslations extends Translations {
       'Already had a meal today?': 'Already had a meal today?',
       'Yes': 'Yes',
       'No': 'No',
-      'Recommended hydration 2.5L per day': 'Recommended hydration 2.5L per day',
+      'Recommended hydration 2.5L per day':
+          'Recommended hydration 2.5L per day',
       'Already Consumed (L)': 'Already Consumed (L)',
       'Daily Goal (L)': 'Daily Goal (L)',
       'Hydration recommendation may adjust automatically based on sport activity':
@@ -300,6 +307,12 @@ class AppTranslations extends Translations {
       // Settings
       'Settings': 'Paramètres',
       'Delete Account': 'Supprimer le compte',
+      'Deleting account...': 'Suppression du compte...',
+      'Account deleted successfully': 'Compte supprimé avec succès',
+      'Delete account failed. Please try again.':
+          'La suppression du compte a échoué. Veuillez réessayer.',
+      'Unable to find user account.':
+          'Impossible de trouver le compte utilisateur.',
       'Subscriptions.': 'Abonnements',
       'User Name': 'Nom d\'utilisateur',
       'Email Address': 'Adresse e-mail',
@@ -467,7 +480,8 @@ class AppTranslations extends Translations {
       'Desired Duration (min)': 'Durée souhaitée (min)',
       'Calculate': 'Calculer',
       'Error': 'Erreur',
-      'Failed to submit sport activity: @error': 'Échec de l\'envoi de l\'activité sportive : @error',
+      'Failed to submit sport activity: @error':
+          'Échec de l\'envoi de l\'activité sportive : @error',
       'Wake-up-Time': 'Heure de réveil',
       'Sleep Last Night (h)': 'Sommeil la nuit dernière (h)',
       'Sleep Goal (h)': 'Objectif de sommeil (h)',
@@ -490,7 +504,8 @@ class AppTranslations extends Translations {
       'Already had a meal today?': 'Avez-vous déjà mangé aujourd\'hui ?',
       'Yes': 'Oui',
       'No': 'Non',
-      'Recommended hydration 2.5L per day': 'Hydratation recommandée 2,5 L par jour',
+      'Recommended hydration 2.5L per day':
+          'Hydratation recommandée 2,5 L par jour',
       'Already Consumed (L)': 'Déjà consommé (L)',
       'Daily Goal (L)': 'Objectif quotidien (L)',
       'Hydration recommendation may adjust automatically based on sport activity':
