@@ -1,12 +1,12 @@
 class NutritionCalculatorRequest {
-  final int mealsPerDay;
+  // final int mealsPerDay;
   final bool hadMealToday;
   final int desiredMealCount;
   final String firstMealTime;
   final String lastMealTime;
 
   NutritionCalculatorRequest({
-    required this.mealsPerDay,
+    // required this.mealsPerDay,
     required this.hadMealToday,
     required this.desiredMealCount,
     required this.firstMealTime,
@@ -15,7 +15,7 @@ class NutritionCalculatorRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'mealsPerDay': mealsPerDay,
+      // 'mealsPerDay': mealsPerDay,
       'hadMealToday': hadMealToday,
       'desiredMealCount': desiredMealCount,
       'firstMealTime': firstMealTime,

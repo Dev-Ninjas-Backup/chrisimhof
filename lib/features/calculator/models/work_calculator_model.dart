@@ -1,22 +1,22 @@
 class WorkCalculatorRequest {
   final String shiftStart;
   final String shiftEnd;
-  final int daysWorked;
-  final String shiftType;
+  // final int daysWorked;
+  // final String shiftType;
 
   WorkCalculatorRequest({
     required this.shiftStart,
     required this.shiftEnd,
-    required this.daysWorked,
-    required this.shiftType,
+    // required this.daysWorked,
+    // required this.shiftType,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'shiftStart': shiftStart,
       'shiftEnd': shiftEnd,
-      'daysWorked': daysWorked,
-      'shiftType': shiftType,
+      // 'daysWorked': daysWorked,
+      // 'shiftType': shiftType,
     };
   }
 }

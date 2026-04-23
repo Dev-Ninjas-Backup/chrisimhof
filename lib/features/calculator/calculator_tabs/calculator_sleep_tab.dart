@@ -35,7 +35,7 @@ class CalculatorSleepTab extends StatelessWidget {
         FatigueLevel(
           headerText: 'Fatigue Level'.tr,
           selectedOption: controller.fatigueLevel,
-          options: ['Low'.tr, 'Medium'.tr, 'High'.tr],
+          options: ['Low'.tr, 'Average'.tr, 'High'.tr],
           onSelect: (option) => controller.fatigueLevel.value = option,
         ),
         const SizedBox(height: 24),
@@ -52,115 +52,125 @@ class CalculatorSleepTab extends StatelessWidget {
         Obx(() {
           return Column(
             children: [
-              // Display all added naps
-              if (controller.naps.isNotEmpty)
-                Column(
-                  children: List.generate(controller.naps.length, (index) {
-                    final nap = controller.naps[index];
-                    return Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF9FAFB),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Nap @number#".trParams({
-                                      'number': nap['napNumber'].toString(),
-                                    }),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text('I want to take a nap'.tr),
+                value: controller.wantsNap.value,
+                onChanged: (val) => controller.setWantsNap(val ?? false),
+              ),
+
+              if (controller.wantsNap.value) ...[
+                // Display all added naps
+                if (controller.naps.isNotEmpty)
+                  Column(
+                    children: List.generate(controller.naps.length, (index) {
+                      final nap = controller.naps[index];
+                      return Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF9FAFB),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Nap @number#".trParams({
+                                        'number': nap['napNumber'].toString(),
+                                      }),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => controller.removeNap(index),
-                                    child: const Icon(
-                                      Icons.close,
-                                      color: Colors.red,
-                                      size: 20,
+                                    GestureDetector(
+                                      onTap: () => controller.removeNap(index),
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: Colors.red,
+                                        size: 20,
+                                      ),
                                     ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  "Duration: @value min".trParams({
+                                    'value': nap['duration'].toString(),
+                                  }),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF6B7280),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                "Duration: @value min".trParams({
-                                  'value': nap['duration'].toString(),
-                                }),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF6B7280),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Time: @value".trParams({
-                                  'value': nap['preferredTime'].toString(),
-                                }),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF6B7280),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Time: @value".trParams({
+                                    'value': nap['preferredTime'].toString(),
+                                  }),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF6B7280),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    );
-                  }),
-                ),
-              // Current nap input section
-              Row(
-                children: [
-                  Text(
-                    "Nap @number#".trParams({
-                      'number': (controller.naps.length + 1).toString(),
+                          const SizedBox(height: 24),
+                        ],
+                      );
                     }),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              CustomTextFormField(
-                label: "Desired Nap Duration (min)".tr,
-                hintText: "Enter Duration".tr,
-                isRequired: true,
-                controller: controller.currentNapDurationController,
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 24),
-              TimeWidget(
-                topTitle: 'Preferred Time'.tr,
-                controller: controller.preferredTimeController,
-              ),
-              const SizedBox(height: 32),
-              CustomButton(
-                text: "+Add Nap".tr,
-                onTap: () {
-                  controller.addNap(
-                    controller.currentNapDurationController.text,
-                    controller.preferredTimeController.to24HourFormat,
-                  );
-                },
-                width: double.infinity,
-              ),
+
+                // Current nap input section
+                Row(
+                  children: [
+                    Text(
+                      "Nap @number#".trParams({
+                        'number': (controller.naps.length + 1).toString(),
+                      }),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                CustomTextFormField(
+                  label: "Desired Nap Duration (min)".tr,
+                  hintText: "Enter Duration".tr,
+                  isRequired: true,
+                  controller: controller.currentNapDurationController,
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 24),
+                TimeWidget(
+                  topTitle: 'Preferred Time'.tr,
+                  controller: controller.preferredTimeController,
+                ),
+                const SizedBox(height: 32),
+                CustomButton(
+                  text: "+Add Nap".tr,
+                  onTap: () {
+                    controller.addNap(
+                      controller.currentNapDurationController.text,
+                      controller.preferredTimeController.to24HourFormat,
+                    );
+                  },
+                  width: double.infinity,
+                ),
+              ],
             ],
           );
         }),
@@ -199,6 +209,7 @@ class CalculatorSleepTab extends StatelessWidget {
           text: "Reset".tr,
           onTap: () {
             controller.clearAllNaps();
+            controller.setWantsNap(false);
             controller.wakeUpController.reset();
             controller.sleepLastNightController.updateValue(8);
             controller.sleepGoalController.updateValue(8);

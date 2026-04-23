@@ -25,12 +25,12 @@ class CalculatorNutritionTab extends StatelessWidget {
             controller: controller.desiredNumberOfMealsController,
           ),
           const SizedBox(height: 24),
-          CustomRangeSlider(
-            required: false,
-            headerText: "Meals Per Day".tr,
-            controller: controller.desiredNumberOfMealsController,
-          ),
-          const SizedBox(height: 24),
+          // CustomRangeSlider(
+          //   required: false,
+          //   headerText: "Meals Per Day".tr,
+          //   controller: controller.desiredNumberOfMealsController,
+          // ),
+          // const SizedBox(height: 24),
           TimeWidget(
             topTitle: 'First Meal Time'.tr,
             controller: controller.firstMealTimeController,

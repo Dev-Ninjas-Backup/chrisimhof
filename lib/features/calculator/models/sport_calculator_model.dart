@@ -1,21 +1,18 @@
 class SportRequest {
+  final String trainingIntent; // NO_TRAINING | WILL_TRAIN | ALREADY_TRAINED
   final int activityDuration;
-  final String activityType;
   final String activityIntensity;
-  final String activityTime;
 
   SportRequest({
+    required this.trainingIntent,
     required this.activityDuration,
-    required this.activityType,
     required this.activityIntensity,
-    required this.activityTime,
   });
 
   Map<String, dynamic> toJson() => {
+    'trainingIntent': trainingIntent,
     'activityDuration': activityDuration,
-    'activityType': activityType,
     'activityIntensity': activityIntensity,
-    'activityTime': activityTime,
   };
 }
 

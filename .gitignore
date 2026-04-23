@@ -47,3 +47,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /android/local.properties
+ios/build
+/ios/Pods
