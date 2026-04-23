@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,6 +10,9 @@ import '../model/user_model.dart';
 
 class MicrosoftAuthService {
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
+  static const Duration _authorizationTimeout = Duration(seconds: 45);
+  static const Duration _tokenExchangeTimeout = Duration(seconds: 20);
+  static const Duration _graphRequestTimeout = Duration(seconds: 15);
 
   // Microsoft Azure AD Configuration
   static const String _clientId =
@@ -16,7 +20,7 @@ class MicrosoftAuthService {
   static const String _androidRedirectUrl =
       'msauth://com.ryvenza.app/eCjfdTT0ePbJMhw4XEgNcp01Wsg=';
   static const String _iosRedirectUrl =
-      'com.ryvenza.app://auth'; // Must also be registered in the Microsoft app
+      'msauth.com.ryvenza.app://auth'; // Must match the iOS redirect URI in Microsoft Entra
   static const AuthorizationServiceConfiguration _serviceConfiguration =
       AuthorizationServiceConfiguration(
         authorizationEndpoint:
@@ -28,13 +32,16 @@ class MicrosoftAuthService {
   static const String _graphMeEndpoint = 'https://graph.microsoft.com/v1.0/me';
 
   Future<UserModel> _fetchUserProfile(String accessToken) async {
-    final response = await http.get(
-      Uri.parse(_graphMeEndpoint),
-      headers: {
-        HttpHeaders.authorizationHeader: 'Bearer $accessToken',
-        HttpHeaders.acceptHeader: 'application/json',
-      },
-    );
+    debugPrint('Fetching Microsoft Graph profile...');
+    final response = await http
+        .get(
+          Uri.parse(_graphMeEndpoint),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer $accessToken',
+            HttpHeaders.acceptHeader: 'application/json',
+          },
+        )
+        .timeout(_graphRequestTimeout);
 
     if (response.statusCode != 200) {
       throw Exception(
@@ -91,30 +98,59 @@ class MicrosoftAuthService {
       final redirectUrl = Platform.isAndroid
           ? _androidRedirectUrl
           : _iosRedirectUrl;
+      final externalUserAgent = Platform.isIOS
+          ? ExternalUserAgent.sfSafariViewController
+          : ExternalUserAgent.asWebAuthenticationSession;
 
-      final AuthorizationTokenResponse result = await _appAuth
-          .authorizeAndExchangeCode(
-            AuthorizationTokenRequest(
+      debugPrint('Requesting Microsoft authorization code...');
+      final AuthorizationResponse authorizationResponse = await _appAuth
+          .authorize(
+            AuthorizationRequest(
               _clientId,
               redirectUrl,
               serviceConfiguration: _serviceConfiguration,
               scopes: _scopes,
               promptValues: ['login'],
+              externalUserAgent: externalUserAgent,
             ),
-          );
+          )
+          .timeout(_authorizationTimeout);
 
-      debugPrint('Microsoft Sign-In successful');
-      debugPrint('Access Token: ${result.accessToken}');
-      if (result.idToken != null) {
-        debugPrint('ID Token payload: ${_decodeToken(result.idToken!)}');
+      final authorizationCode = authorizationResponse.authorizationCode;
+      if (authorizationCode == null || authorizationCode.isEmpty) {
+        throw Exception('Microsoft authorization code missing from response');
       }
 
-      final accessToken = result.accessToken;
+      debugPrint('Authorization code received. Exchanging for tokens...');
+      final TokenResponse tokenResponse = await _appAuth
+          .token(
+            TokenRequest(
+              _clientId,
+              redirectUrl,
+              authorizationCode: authorizationCode,
+              codeVerifier: authorizationResponse.codeVerifier,
+              nonce: authorizationResponse.nonce,
+              serviceConfiguration: _serviceConfiguration,
+              scopes: _scopes,
+            ),
+          )
+          .timeout(_tokenExchangeTimeout);
+
+      debugPrint('Microsoft token exchange successful');
+      debugPrint('Access Token: ${tokenResponse.accessToken}');
+      if (tokenResponse.idToken != null) {
+        debugPrint('ID Token payload: ${_decodeToken(tokenResponse.idToken!)}');
+      }
+
+      final accessToken = tokenResponse.accessToken;
       if (accessToken == null || accessToken.isEmpty) {
         throw Exception('Microsoft access token missing from token response');
       }
 
       return _fetchUserProfile(accessToken);
+    } on TimeoutException catch (e) {
+      debugPrint('Microsoft Sign-In timeout: $e');
+      rethrow;
     } on FlutterAppAuthUserCancelledException catch (e) {
       debugPrint('Microsoft Sign-In cancelled: $e');
       return null;
