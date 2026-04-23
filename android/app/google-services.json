@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "852460494016-gheesi295ilc50vnqfqv6mm01bscd550.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ryvenza.app",
+            "certificate_hash": "7828df7534f478f6c9321c385c480d729d355ac8"
+          }
+        },
+        {
           "client_id": "852460494016-v4hlpvc52v2io67vqba2a06j6jlvkjl9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
