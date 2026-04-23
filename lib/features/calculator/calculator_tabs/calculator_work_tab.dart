@@ -1,6 +1,4 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
-import 'package:chrisimhof/core/common/widgets/selectble_tab_button.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -27,79 +25,7 @@ class CalculatorWorkTab extends StatelessWidget {
           topTitle: 'Work Complete'.tr,
           controller: controller.workCompleteController,
         ),
-        const SizedBox(height: 16),
-        CustomTextFormField(
-          label: "Days Worked".tr,
-          hintText: "Enter Duration".tr,
-          isRequired: true,
-          controller: controller.daysWorkedController,
-          keyboardType: TextInputType.number,
-        ),
         const SizedBox(height: 24),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Shift Type".tr,
-              style: getTextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryTextColor,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Obx(
-                    () => SelectableTabButton(
-                      text: 'Night'.tr,
-                      isSelected: controller.selectedShiftType.value == 'Night',
-                      onTap: () => controller.selectShiftType('Night'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Obx(
-                    () => SelectableTabButton(
-                      text: 'Rotating'.tr,
-                      isSelected:
-                          controller.selectedShiftType.value == 'Rotating',
-                      onTap: () => controller.selectShiftType('Rotating'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Obx(
-                    () => SelectableTabButton(
-                      text: 'Early Morning'.tr,
-                      isSelected:
-                          controller.selectedShiftType.value == 'Early_Morning',
-                      onTap: () => controller.selectShiftType('Early_Morning'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Obx(
-                    () => SelectableTabButton(
-                      text: 'Split'.tr,
-                      isSelected: controller.selectedShiftType.value == 'Split',
-                      onTap: () => controller.selectShiftType('Split'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Obx(
-                    () => SelectableTabButton(
-                      text: 'Standard'.tr,
-                      isSelected:
-                          controller.selectedShiftType.value == 'Standard',
-                      onTap: () => controller.selectShiftType('Standard'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 150),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Obx(
@@ -145,7 +71,15 @@ class CalculatorWorkTab extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: TabButton(text: 'Reset'.tr, onTap: () {}),
+              child: TabButton(
+                text: 'Reset'.tr,
+                onTap: () {
+                  controller.workBeginsController.reset();
+                  controller.workCompleteController.reset();
+                  controller.daysWorkedController.clear();
+                  controller.selectShiftType('STANDARD');
+                },
+              ),
             ),
           ],
         ),

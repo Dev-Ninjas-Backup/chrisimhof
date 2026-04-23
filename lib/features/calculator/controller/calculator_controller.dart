@@ -8,9 +8,9 @@ import 'package:chrisimhof/features/calculator/models/sleep_calculator_model.dar
 import 'package:chrisimhof/features/calculator/models/work_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
-import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 
 class CalculatorController extends GetxController {
@@ -57,12 +57,14 @@ class CalculatorController extends GetxController {
   // Nap management
   final RxList<Map<String, dynamic>> naps = <Map<String, dynamic>>[].obs;
   late TextEditingController currentNapDurationController;
+  // whether user wants to take naps
+  final RxBool wantsNap = false.obs;
 
   // Work Tab Controllers
   late TimeController workBeginsController;
   late TimeController workCompleteController;
   late TextEditingController daysWorkedController;
-  final RxString selectedShiftType = 'Day'.obs;
+  final RxString selectedShiftType = 'STANDARD'.obs;
 
   // Hydration Tab Controllers
   late RangeSliderController hydrationConsumedController;
@@ -77,6 +79,8 @@ class CalculatorController extends GetxController {
   // Sport Tab Controllers
   late TextEditingController sportDurationController;
   final RxString selectedActivityType = ''.obs;
+  // training intent for sport: NO_TRAINING, WILL_TRAIN, ALREADY_TRAINED
+  final RxString trainingIntent = 'NO_TRAINING'.obs;
   final RxDouble sportIntensity = 0.0.obs;
 
   // Caffeine Tab Controllers
@@ -382,12 +386,22 @@ class CalculatorController extends GetxController {
         );
       }
 
+      // Normalize fatigue level to API values (always use English values)
+      String normalizedFatigue;
+      if (fatigueLevel.value == 'Low'.tr) {
+        normalizedFatigue = 'Low';
+      } else if (fatigueLevel.value == 'Average'.tr) {
+        normalizedFatigue = 'Average';
+      } else {
+        normalizedFatigue = 'High';
+      }
+
       // Build request
       final request = SleepCalculatorRequest(
         wakeUpTime: wakeUpController.to24HourFormat,
         sleepHours: sleepLastNightController.value.value,
         desiredSleepHours: sleepGoalController.value.value,
-        fatigueLevel: fatigueLevel.value.toUpperCase(),
+        fatigueLevel: normalizedFatigue.toUpperCase(),
         desiredSleepStart: desiredSleepStartController.to24HourFormat,
         desiredWakeTime: desiredSleepEndController.to24HourFormat,
         naps: napList,
@@ -442,8 +456,8 @@ class CalculatorController extends GetxController {
       final request = WorkCalculatorRequest(
         shiftStart: workBeginsController.to24HourFormat,
         shiftEnd: workCompleteController.to24HourFormat,
-        daysWorked: int.tryParse(daysWorkedController.text) ?? 1,
-        shiftType: selectedShiftType.value.toUpperCase(),
+        // daysWorked: int.tryParse(daysWorkedController.text) ?? 1,
+        // shiftType: selectedShiftType.value.toUpperCase(),
       );
 
       final response = await _calculatorService.submitWorkData(
@@ -533,7 +547,7 @@ class CalculatorController extends GetxController {
       final hadMealToday = hasMealTodaySelection.value == 'Yes';
 
       final request = NutritionCalculatorRequest(
-        mealsPerDay: desiredNumberOfMealsController.value.value.toInt(),
+        // mealsPerDay: desiredNumberOfMealsController.value.value.toInt(),
         hadMealToday: hadMealToday,
         desiredMealCount: desiredNumberOfMealsController.value.value.toInt(),
         firstMealTime: firstMealTimeController.to24HourFormat,
@@ -629,6 +643,15 @@ class CalculatorController extends GetxController {
     selectedActivityType.value = activityType;
   }
 
+  void setTrainingIntent(String intent) {
+    trainingIntent.value = intent;
+    // if user chooses no training, clear duration and intensity
+    if (intent == 'NO_TRAINING') {
+      sportDurationController.clear();
+      setSportIntensity(0);
+    }
+  }
+
   void setSportIntensity(double intensity) {
     sportIntensity.value = intensity;
   }
@@ -658,6 +681,13 @@ class CalculatorController extends GetxController {
     currentNapDurationController.clear();
   }
 
+  void setWantsNap(bool value) {
+    wantsNap.value = value;
+    if (!value) {
+      clearAllNaps();
+    }
+  }
+
   Future<void> submitSportData() async {
     try {
       if (calculatorSession.value == null ||
@@ -665,52 +695,42 @@ class CalculatorController extends GetxController {
         sportSubmitError.value = 'Session not initialized';
         return;
       }
-
-      // Validate inputs
-      if (sportDurationController.text.isEmpty) {
-        sportSubmitError.value = 'Please enter activity duration';
-        return;
-      }
-
-      if (selectedActivityType.value.isEmpty) {
-        sportSubmitError.value = 'Please select an activity type';
-        return;
-      }
-
+      // Validate/prepare based on training intent
       isSportSubmitting.value = true;
       sportSubmitError.value = '';
 
-      // Parse activity duration
-      final int activityDuration =
-          int.tryParse(sportDurationController.text) ?? 0;
-      if (activityDuration <= 0) {
-        throw Exception('Invalid activity duration');
-      }
+      final intent = trainingIntent.value;
 
-      // Map activity type to API format using enum
-      final ActivityType selectedActivityEnum = ActivityType.fromDisplayName(
-        selectedActivityType.value,
-      );
-      final String activityTypeApi = selectedActivityEnum.apiValue;
-
-      // Map intensity to API format (0=LIGHT, 1=MODERATE, 2=HARD)
+      int activityDuration = 0;
       String activityIntensity = 'LIGHT';
-      if (sportIntensity.value == 1.0) {
-        activityIntensity = 'MODERATE';
-      } else if (sportIntensity.value == 2.0) {
-        activityIntensity = 'HARD';
-      }
 
-      // Get current time in HH:MM format
-      final now = DateTime.now();
-      final activityTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      if (intent == 'WILL_TRAIN' || intent == 'ALREADY_TRAINED') {
+        if (sportDurationController.text.isEmpty) {
+          sportSubmitError.value = 'Please enter activity duration';
+          isSportSubmitting.value = false;
+          return;
+        }
+
+        activityDuration = int.tryParse(sportDurationController.text) ?? 0;
+        if (activityDuration <= 0) {
+          sportSubmitError.value = 'Invalid activity duration';
+          isSportSubmitting.value = false;
+          return;
+        }
+
+        if (sportIntensity.value == 1.0) {
+          activityIntensity = 'MODERATE';
+        } else if (sportIntensity.value == 2.0) {
+          activityIntensity = 'HARD';
+        } else {
+          activityIntensity = 'LIGHT';
+        }
+      }
 
       final request = SportRequest(
+        trainingIntent: intent,
         activityDuration: activityDuration,
-        activityType: activityTypeApi,
         activityIntensity: activityIntensity,
-        activityTime: activityTime,
       );
 
       final response = await _calculatorService.submitSportData(

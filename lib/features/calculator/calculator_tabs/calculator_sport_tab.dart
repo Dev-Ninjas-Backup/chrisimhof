@@ -4,7 +4,6 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
-import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -21,32 +20,61 @@ class CalculatorSportTab extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              CustomTextFormField(
-                label: "Desired Duration (min)".tr,
-                hintText: "Enter Duration".tr,
-                isRequired: false,
-                controller: controller.sportDurationController,
-                keyboardType: TextInputType.number,
+              // Training intent options
+              Column(
+                children: [
+                  Obx(
+                    () => RadioListTile<String>(
+                      value: 'NO_TRAINING',
+                      groupValue: controller.trainingIntent.value,
+                      title: Text("I don't want to train today".tr),
+                      onChanged: (v) =>
+                          controller.setTrainingIntent(v ?? 'NO_TRAINING'),
+                    ),
+                  ),
+                  Obx(
+                    () => RadioListTile<String>(
+                      value: 'WILL_TRAIN',
+                      groupValue: controller.trainingIntent.value,
+                      title: Text('I want to train today'.tr),
+                      onChanged: (v) =>
+                          controller.setTrainingIntent(v ?? 'WILL_TRAIN'),
+                    ),
+                  ),
+                  Obx(
+                    () => RadioListTile<String>(
+                      value: 'ALREADY_TRAINED',
+                      groupValue: controller.trainingIntent.value,
+                      title: Text('I already trained'.tr),
+                      onChanged: (v) =>
+                          controller.setTrainingIntent(v ?? 'ALREADY_TRAINED'),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 30),
-              Obx(
-                () => ActivityTypeSelector(
-                  selectedActivity: controller.selectedActivityType.value,
-                  onSelect: (activity) {
-                    controller.selectActivityType(activity);
-                  },
-                ),
+
+              // Show duration + intensity only when training or already trained
+              Column(
+                children: [
+                  CustomTextFormField(
+                    label: "Duration (min)".tr,
+                    hintText: "Enter Duration".tr,
+                    isRequired: false,
+                    controller: controller.sportDurationController,
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 24),
+                  IntensitySlider(
+                    value: controller.sportIntensity.value,
+                    onChanged: (value) {
+                      controller.setSportIntensity(value);
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
-              const SizedBox(height: 24),
-              Obx(
-                () => IntensitySlider(
-                  value: controller.sportIntensity.value,
-                  onChanged: (value) {
-                    controller.setSportIntensity(value);
-                  },
-                ),
-              ),
-              const SizedBox(height: 180),
+              const SizedBox(height: 120),
+
               CustomButton(
                 text: "Calculate".tr,
                 onTap: () async {
@@ -87,7 +115,7 @@ class CalculatorSportTab extends StatelessWidget {
                 text: "Reset".tr,
                 onTap: () {
                   controller.sportDurationController.clear();
-                  controller.selectActivityType('');
+                  controller.setTrainingIntent('NO_TRAINING');
                   controller.setSportIntensity(0);
                 },
                 backgroundColor: Colors.grey[300],

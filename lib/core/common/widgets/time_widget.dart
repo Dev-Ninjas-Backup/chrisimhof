@@ -42,9 +42,13 @@ class TimeWidget extends StatelessWidget {
                 child: _TimePartColumn(
                   onUpTap: controller.increaseHour,
                   onDownTap: controller.decreaseHour,
+                  onVerticalDragUpdate: (details) =>
+                      controller.handleHourDrag(details.delta.dy),
+                  onVerticalDragEnd: (_) => controller.handleHourDragEnd(),
                   child: Obx(
                     () => Text(
-                      controller.formattedHour,
+                      // show 24-hour format using controller's 24h conversion
+                      controller.to24HourFormat.split(':').first,
                       textAlign: TextAlign.center,
                       style: getTextStyle(
                         fontSize: 32,
@@ -70,26 +74,12 @@ class TimeWidget extends StatelessWidget {
                 child: _TimePartColumn(
                   onUpTap: controller.increaseMinute,
                   onDownTap: controller.decreaseMinute,
+                  onVerticalDragUpdate: (details) =>
+                      controller.handleMinuteDrag(details.delta.dy),
+                  onVerticalDragEnd: (_) => controller.handleMinuteDragEnd(),
                   child: Obx(
                     () => Text(
                       controller.formattedMinute,
-                      textAlign: TextAlign.center,
-                      style: getTextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: _TimePartColumn(
-                  onUpTap: controller.togglePeriod,
-                  onDownTap: controller.togglePeriod,
-                  child: Obx(
-                    () => Text(
-                      controller.period.value.tr,
                       textAlign: TextAlign.center,
                       style: getTextStyle(
                         fontSize: 32,
@@ -112,23 +102,34 @@ class _TimePartColumn extends StatelessWidget {
   final VoidCallback onUpTap;
   final VoidCallback onDownTap;
   final Widget child;
+  final GestureDragUpdateCallback? onVerticalDragUpdate;
+  final GestureDragEndCallback? onVerticalDragEnd;
 
   const _TimePartColumn({
     required this.onUpTap,
     required this.onDownTap,
     required this.child,
+    this.onVerticalDragUpdate,
+    this.onVerticalDragEnd,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _ArrowButton(icon: Icons.keyboard_arrow_up_rounded, onTap: onUpTap),
-        const SizedBox(height: 10),
-        child,
-        const SizedBox(height: 10),
-        _ArrowButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onDownTap),
-      ],
+    return GestureDetector(
+      onVerticalDragUpdate: onVerticalDragUpdate,
+      onVerticalDragEnd: onVerticalDragEnd,
+      child: Column(
+        children: [
+          _ArrowButton(icon: Icons.keyboard_arrow_up_rounded, onTap: onUpTap),
+          const SizedBox(height: 10),
+          child,
+          const SizedBox(height: 10),
+          _ArrowButton(
+            icon: Icons.keyboard_arrow_down_rounded,
+            onTap: onDownTap,
+          ),
+        ],
+      ),
     );
   }
 }
