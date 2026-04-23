@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:http/http.dart' as http;
+
 import '../model/user_model.dart';
 
 class MicrosoftAuthService {
@@ -15,10 +17,48 @@ class MicrosoftAuthService {
       'msauth://com.ryvenza.app/eCjfdTT0ePbJMhw4XEgNcp01Wsg=';
   static const String _iosRedirectUrl =
       'com.ryvenza.app://auth'; // Must also be registered in the Microsoft app
-  static const String _issuer =
-      'https://login.microsoftonline.com/19458893-1d91-4953-ab51-55f25565d1d5/v2.0';
+  static const AuthorizationServiceConfiguration _serviceConfiguration =
+      AuthorizationServiceConfiguration(
+        authorizationEndpoint:
+            'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+        tokenEndpoint:
+            'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+      );
+  static const List<String> _scopes = ['offline_access', 'User.Read'];
+  static const String _graphMeEndpoint = 'https://graph.microsoft.com/v1.0/me';
 
-  /// Decodes the JWT ID token to extract user information
+  Future<UserModel> _fetchUserProfile(String accessToken) async {
+    final response = await http.get(
+      Uri.parse(_graphMeEndpoint),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $accessToken',
+        HttpHeaders.acceptHeader: 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Graph profile request failed: ${response.statusCode} ${response.body}',
+      );
+    }
+
+    final Map<String, dynamic> data =
+        jsonDecode(response.body) as Map<String, dynamic>;
+    final email = (data['mail'] as String?)?.trim();
+    final principalName = (data['userPrincipalName'] as String?)?.trim();
+    final fullName = (data['displayName'] as String?)?.trim();
+
+    return UserModel(
+      email: (email?.isNotEmpty ?? false)
+          ? email!
+          : (principalName?.isNotEmpty ?? false)
+          ? principalName!
+          : '',
+      fullName: (fullName?.isNotEmpty ?? false) ? fullName! : '',
+    );
+  }
+
+  /// Kept for optional debug logging when an ID token is returned.
   Map<String, dynamic> _decodeToken(String token) {
     try {
       final parts = token.split('.');
@@ -57,24 +97,24 @@ class MicrosoftAuthService {
             AuthorizationTokenRequest(
               _clientId,
               redirectUrl,
-              issuer: _issuer,
-              scopes: ['openid', 'profile', 'email'],
+              serviceConfiguration: _serviceConfiguration,
+              scopes: _scopes,
               promptValues: ['login'],
             ),
           );
 
       debugPrint('Microsoft Sign-In successful');
       debugPrint('Access Token: ${result.accessToken}');
+      if (result.idToken != null) {
+        debugPrint('ID Token payload: ${_decodeToken(result.idToken!)}');
+      }
 
-      // Decode the ID token to extract user information
-      final tokenData = result.idToken != null
-          ? _decodeToken(result.idToken!)
-          : {};
+      final accessToken = result.accessToken;
+      if (accessToken == null || accessToken.isEmpty) {
+        throw Exception('Microsoft access token missing from token response');
+      }
 
-      return UserModel(
-        email: tokenData['email'] as String? ?? '',
-        fullName: tokenData['name'] as String? ?? '',
-      );
+      return _fetchUserProfile(accessToken);
     } on FlutterAppAuthUserCancelledException catch (e) {
       debugPrint('Microsoft Sign-In cancelled: $e');
       return null;
