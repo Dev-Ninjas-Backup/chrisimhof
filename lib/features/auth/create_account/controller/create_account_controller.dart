@@ -108,57 +108,57 @@ class CreateAccountController extends GetxController {
     }
   }
 
-  Future<void> signInWithGoogle() async {
-    try {
-      isLoading.value = true;
+  // Future<void> signInWithGoogle() async {
+  //   try {
+  //     isLoading.value = true;
 
-      EasyLoading.showSuccess(
-        'Google Sign-In Clicked',
-        duration: Duration(seconds: 2),
-      );
-    } catch (e) {
-      EasyLoading.showError(
-        'Google Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  //     EasyLoading.showSuccess(
+  //       'Google Sign-In Clicked',
+  //       duration: Duration(seconds: 2),
+  //     );
+  //   } catch (e) {
+  //     EasyLoading.showError(
+  //       'Google Sign-In Error: ${e.toString()}',
+  //       duration: Duration(seconds: 2),
+  //     );
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
-  Future<void> signInWithApple() async {
-    try {
-      isLoading.value = true;
-      EasyLoading.showSuccess(
-        'Apple Sign-In Clicked',
-        duration: Duration(seconds: 2),
-      );
-    } catch (e) {
-      EasyLoading.showError(
-        'Apple Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  // Future<void> signInWithApple() async {
+  //   try {
+  //     isLoading.value = true;
+  //     EasyLoading.showSuccess(
+  //       'Apple Sign-In Clicked',
+  //       duration: Duration(seconds: 2),
+  //     );
+  //   } catch (e) {
+  //     EasyLoading.showError(
+  //       'Apple Sign-In Error: ${e.toString()}',
+  //       duration: Duration(seconds: 2),
+  //     );
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
-  Future<void> signInWithMicrosoft() async {
-    try {
-      isLoading.value = true;
-      EasyLoading.showSuccess(
-        'Microsoft Sign-In Clicked',
-        duration: Duration(seconds: 2),
-      );
-    } catch (e) {
-      EasyLoading.showError(
-        'Microsoft Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 2),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  // Future<void> signInWithMicrosoft() async {
+  //   try {
+  //     isLoading.value = true;
+  //     EasyLoading.showSuccess(
+  //       'Microsoft Sign-In Clicked',
+  //       duration: Duration(seconds: 2),
+  //     );
+  //   } catch (e) {
+  //     EasyLoading.showError(
+  //       'Microsoft Sign-In Error: ${e.toString()}',
+  //       duration: Duration(seconds: 2),
+  //     );
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
   @override
   void onClose() {

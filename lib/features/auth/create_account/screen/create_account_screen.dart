@@ -14,10 +14,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../sign_in/controller/sign_in_controller.dart';
+
 class CreateAccountScreen extends StatelessWidget {
   CreateAccountScreen({super.key});
 
   final CreateAccountController controller = Get.put(CreateAccountController());
+  final SignInController signInController = Get.find<SignInController>();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
@@ -120,18 +123,18 @@ class CreateAccountScreen extends StatelessWidget {
                   children: [
                     SocialButton(
                       imagePath: IconPath.google,
-                      onTap: controller.signInWithGoogle,
+                      onTap: signInController.signInWithGoogle,
                     ),
                     SizedBox(width: 16),
                     SocialButton(
                       imagePath: IconPath.apple,
                       backgroundColor: Colors.black,
-                      onTap: controller.signInWithApple,
+                      onTap: signInController.signInWithApple,
                     ),
                     SizedBox(width: 16),
                     SocialButton(
                       imagePath: IconPath.microsoft,
-                      onTap: controller.signInWithMicrosoft,
+                      onTap: signInController.signInWithMicrosoft,
                     ),
                   ],
                 ),
