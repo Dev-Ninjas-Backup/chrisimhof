@@ -13,7 +13,7 @@ class CustomNavBar extends StatelessWidget {
 
     return Container(
       color: Colors.transparent,
-      padding: EdgeInsets.only(left: 56, right: 56, bottom: 32, top: 12),
+      padding: EdgeInsets.only(left: 56, right: 56, bottom: 50, top: 12),
       child: SizedBox(
         height: 56,
         child: Stack(
