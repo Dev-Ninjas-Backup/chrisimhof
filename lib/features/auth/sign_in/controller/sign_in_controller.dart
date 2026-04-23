@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/google_signin/model/user_model.dart';
 import 'package:chrisimhof/features/auth/google_signin/service/api_service.dart';
@@ -102,12 +104,16 @@ class SignInController extends GetxController {
 
         if (apiResponse.success && apiResponse.accessToken != null) {
           // Save tokens
-          await SharedPreferencesHelper.saveAccessToken(apiResponse.accessToken!);
+          await SharedPreferencesHelper.saveAccessToken(
+            apiResponse.accessToken!,
+          );
           if (apiResponse.refreshToken != null) {
-            await SharedPreferencesHelper.saveRefreshToken(apiResponse.refreshToken!);
+            await SharedPreferencesHelper.saveRefreshToken(
+              apiResponse.refreshToken!,
+            );
           }
           await SharedPreferencesHelper.setLoginStatus(true);
-          
+
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
           Get.offAllNamed('/medicalDisclaimerScreen');
@@ -160,10 +166,12 @@ class SignInController extends GetxController {
         if (apiResponse.success && apiResponse.accessToken != null) {
           // Save tokens
           await SharedPreferencesHelper.saveAccessToken(
-              apiResponse.accessToken!);
+            apiResponse.accessToken!,
+          );
           if (apiResponse.refreshToken != null) {
             await SharedPreferencesHelper.saveRefreshToken(
-                apiResponse.refreshToken!);
+              apiResponse.refreshToken!,
+            );
           }
           await SharedPreferencesHelper.setLoginStatus(true);
 
@@ -173,7 +181,8 @@ class SignInController extends GetxController {
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(
-              apiResponse.message ?? 'Microsoft login failed');
+            apiResponse.message ?? 'Microsoft login failed',
+          );
           debugPrint('Microsoft login failed: ${apiResponse.message}');
         }
       } else {
@@ -181,6 +190,10 @@ class SignInController extends GetxController {
         EasyLoading.showInfo('Microsoft sign-in cancelled');
         debugPrint('Microsoft sign-in cancelled by user');
       }
+    } on TimeoutException {
+      EasyLoading.dismiss();
+      EasyLoading.showError('Microsoft sign-in timed out. Please try again.');
+      debugPrint('Microsoft Sign-In Controller timed out');
     } catch (e) {
       EasyLoading.dismiss();
       EasyLoading.showError('Microsoft sign-in error: ${e.toString()}');

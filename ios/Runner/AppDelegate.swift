@@ -1,5 +1,5 @@
-import Flutter
 import UIKit
+import Flutter
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -9,5 +9,14 @@ import UIKit
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    NSLog("AppDelegate openURL: %@", url.absoluteString)
+    return super.application(app, open: url, options: options)
   }
 }
