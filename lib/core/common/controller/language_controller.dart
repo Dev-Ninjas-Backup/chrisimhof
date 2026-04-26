@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
