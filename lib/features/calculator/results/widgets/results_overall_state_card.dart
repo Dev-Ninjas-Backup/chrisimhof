@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ResultsOverallStateCard extends StatelessWidget {
   final int score;
@@ -27,7 +28,7 @@ class ResultsOverallStateCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Overall state',
+            'Overall state'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -67,7 +68,7 @@ class ResultsOverallStateCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            label,
+                            label.tr,
                             style: getTextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
@@ -118,7 +119,6 @@ class _OverallStateRingPainter extends CustomPainter {
     const double startAngle = -math.pi / 2; // Start from top
     final double maxSweepAngle = math.pi * 2; // Full circle
     final double sweepAngle = maxSweepAngle * progress.clamp(0.0, 1.0);
-
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),

@@ -10,10 +10,30 @@ class CalculatorSessionResponse {
   });
 
   factory CalculatorSessionResponse.fromJson(Map<String, dynamic> json) {
+    // Handle two shapes:
+    // 1) API returns session object directly: { sessionId, completedSteps, nextStep, ..., data: {...} }
+    // 2) API returns wrapper: { success, message, data: { sessionId, ... } }
+    Map<String, dynamic> sessionJson;
+
+    if (json.containsKey('data') && json['data'] is Map<String, dynamic>) {
+      final dataMap = json['data'] as Map<String, dynamic>;
+      if (dataMap.containsKey('sessionId') || dataMap.containsKey('nextStep')) {
+        sessionJson = dataMap;
+      } else if (json.containsKey('sessionId')) {
+        sessionJson = json;
+      } else {
+        sessionJson = json;
+      }
+    } else if (json.containsKey('sessionId')) {
+      sessionJson = json;
+    } else {
+      sessionJson = json;
+    }
+
     return CalculatorSessionResponse(
       success: json['success'] ?? true,
       message: json['message'] ?? '',
-      data: CalculatorSession.fromJson(json),
+      data: CalculatorSession.fromJson(sessionJson),
     );
   }
 }

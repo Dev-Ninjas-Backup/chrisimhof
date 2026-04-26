@@ -8,12 +8,14 @@ class CustomRangeSlider extends StatelessWidget {
   final String headerText;
   final RangeSliderController controller;
   final bool required;
+  final int? divisions;
 
   const CustomRangeSlider({
     super.key,
     required this.headerText,
     required this.controller,
     this.required = true,
+    this.divisions,
   });
 
   @override
@@ -71,7 +73,8 @@ class CustomRangeSlider extends StatelessWidget {
                     value: controller.value.value,
                     min: controller.min,
                     max: controller.max,
-                    divisions: (controller.max - controller.min).toInt(),
+                    divisions:
+                        divisions ?? (controller.max - controller.min).toInt(),
                     onChanged: controller.updateValue,
                   ),
                 ),
@@ -80,27 +83,76 @@ class CustomRangeSlider extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(
-                      (controller.max - controller.min + 1).toInt(),
-                      (index) {
-                        double val = controller.min + index;
-                        return Obx(() {
-                          bool isSelected = val == controller.value.value;
-                          return Text(
-                            val.toInt().toString(),
-                            style: getTextStyle(
-                              fontSize: 14,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? AppColors.primaryButtonColor
-                                  : const Color(0xFF414651),
-                            ),
-                          );
-                        });
-                      },
-                    ),
+                    children: divisions != null
+                        ? List.generate(
+                            (controller.max - controller.min).toInt() + 1,
+                            (index) {
+                              final double val =
+                                  controller.min + index.toDouble();
+                              final String label = val.toInt().toString();
+                              return Obx(() {
+                                final bool isSelected =
+                                    (controller.value.value - val).abs() <
+                                    (0.5 + 1e-9);
+                                return Text(
+                                  label,
+                                  style: getTextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? AppColors.primaryButtonColor
+                                        : const Color(0xFF414651),
+                                  ),
+                                );
+                              });
+                            },
+                          )
+                        : List.generate(
+                            (controller.max - controller.min).toInt() + 1,
+                            (index) {
+                              final int divs = (controller.max - controller.min)
+                                  .toInt();
+                              final double step =
+                                  (controller.max - controller.min) / divs;
+                              final double val =
+                                  controller.min + (step * index);
+
+                              // Determine decimal places to display based on step precision
+                              int decimals = 0;
+                              double tmp = step;
+                              while ((tmp - tmp.floor()).abs() > 1e-9 &&
+                                  decimals < 4) {
+                                tmp *= 10;
+                                decimals += 1;
+                              }
+
+                              String label = val.toStringAsFixed(decimals);
+                              if (label.contains('.')) {
+                                label = label.replaceAll(RegExp(r'0+\$'), '');
+                                label = label.replaceAll(RegExp(r'\.\$'), '');
+                              }
+
+                              return Obx(() {
+                                final bool isSelected =
+                                    (controller.value.value - val).abs() <
+                                    (step / 2 + 1e-9);
+                                return Text(
+                                  label,
+                                  style: getTextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? AppColors.primaryButtonColor
+                                        : const Color(0xFF414651),
+                                  ),
+                                );
+                              });
+                            },
+                          ),
                   ),
                 ),
               ],

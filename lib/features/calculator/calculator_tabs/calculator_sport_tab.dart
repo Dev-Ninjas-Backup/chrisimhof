@@ -17,7 +17,7 @@ class CalculatorSportTab extends StatelessWidget {
     return GetBuilder<CalculatorController>(
       builder: (controller) {
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
               // Training intent options
@@ -64,11 +64,13 @@ class CalculatorSportTab extends StatelessWidget {
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 24),
-                  IntensitySlider(
-                    value: controller.sportIntensity.value,
-                    onChanged: (value) {
-                      controller.setSportIntensity(value);
-                    },
+                  Obx(
+                    () => IntensitySlider(
+                      value: controller.sportIntensity.value,
+                      onChanged: (value) {
+                        controller.setSportIntensity(value);
+                      },
+                    ),
                   ),
                   const SizedBox(height: 24),
                 ],

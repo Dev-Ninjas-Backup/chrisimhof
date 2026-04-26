@@ -33,6 +33,7 @@ class ProfileData {
   final String signInBy;
   final String accountStatus;
   final String role;
+  final String? language;
 
   ProfileData({
     required this.id,
@@ -49,6 +50,7 @@ class ProfileData {
     required this.signInBy,
     required this.accountStatus,
     required this.role,
+    required this.language,
   });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
@@ -72,6 +74,8 @@ class ProfileData {
       signInBy: json['signInBy'] ?? '',
       accountStatus: json['accountStatus'] ?? '',
       role: role['name'] ?? json['role'] ?? '',
+      language:
+          (json['language'] as String?) ?? (profile['language'] as String?),
     );
   }
 }

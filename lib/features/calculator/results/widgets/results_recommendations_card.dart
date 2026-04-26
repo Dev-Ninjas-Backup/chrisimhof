@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_icon_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ResultsRecommendationsCard extends StatelessWidget {
   final List<ApiRecommendation> recommendations;
@@ -22,7 +23,7 @@ class ResultsRecommendationsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recommendations of the day',
+            'Recommendations of the day'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,

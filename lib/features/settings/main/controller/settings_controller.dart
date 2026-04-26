@@ -5,8 +5,10 @@ import 'package:chrisimhof/features/settings/main/service/delete_account_service
 import 'package:chrisimhof/features/settings/main/service/logout_service.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:ui';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:chrisimhof/core/common/controller/language_controller.dart';
 
 class SettingsController extends GetxController {
   final isLoading = false.obs;
@@ -52,6 +54,28 @@ class SettingsController extends GetxController {
         userId.value = response.data!.userId.isNotEmpty
             ? response.data!.userId
             : response.data!.id;
+        // Apply language from profile if provided (EN / FR)
+        try {
+          final String? lang = response.data!.language?.toUpperCase();
+          if (lang != null && (lang == 'FR' || lang == 'EN')) {
+            // Update app locale without calling the backend
+            if (lang == 'FR') {
+              Get.updateLocale(const Locale('fr', 'FR'));
+            } else {
+              Get.updateLocale(const Locale('en', 'US'));
+            }
+
+            // Update LanguageController selection if available
+            try {
+              final lc = Get.find<LanguageController>();
+              lc.selectedLanguage.value = lang;
+            } catch (_) {
+              // ignore if controller not found
+            }
+          }
+        } catch (e) {
+          // ignore language update errors
+        }
       }
     } catch (e) {
       debugPrint('Profile error: $e');

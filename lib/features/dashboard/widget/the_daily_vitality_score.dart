@@ -20,7 +20,7 @@ class TheDailyVitalityScore extends StatelessWidget {
         children: [
           Container(
             width: 196,
-            height: 298,
+            height: 315,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -31,7 +31,7 @@ class TheDailyVitalityScore extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'The Daily Vitality\nScore'.tr,
+                    'The Daily Vitality Score'.tr,
                     style: getTextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,

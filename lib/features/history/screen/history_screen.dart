@@ -20,7 +20,7 @@ class HistoryScreen extends StatelessWidget {
           top: 78,
           left: 16,
           right: 16,
-          bottom: 32,
+          bottom: 100,
         ),
         child: Column(
           children: [
