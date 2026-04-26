@@ -6,12 +6,20 @@ import 'package:chrisimhof/features/nav_bar/widget/custom_navbar.dart';
 import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:ui';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
+import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
+import 'package:chrisimhof/core/common/controller/language_controller.dart';
+import 'package:chrisimhof/core/service/end_points.dart';
 
 const double kNavBarTotalHeight =
     32 + 12 + 56; // bottom + top padding + pill height
 
 class NavbarScreen extends StatelessWidget {
   const NavbarScreen({super.key});
+
+  static bool _languageApplied = false;
 
   static final List<Widget> _screens = [
     DashboardScreen(),
@@ -23,6 +31,37 @@ class NavbarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NavController());
+
+    if (!_languageApplied) {
+      _languageApplied = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          final String? accessToken =
+              await SharedPreferencesHelper.getAccessToken();
+          if (accessToken == null || accessToken.trim().isEmpty) return;
+
+          final ProfileService service = ProfileService();
+          final ProfileResponseModel resp = await service.getProfile(
+            accessToken: accessToken,
+          );
+
+          final String? lang = resp.data?.language?.toUpperCase();
+          if (lang != null && (lang == 'FR' || lang == 'EN')) {
+            if (lang == 'FR') {
+              Get.updateLocale(const Locale('fr', 'FR'));
+            } else {
+              Get.updateLocale(const Locale('en', 'US'));
+            }
+            try {
+              final lc = Get.find<LanguageController>();
+              lc.selectedLanguage.value = lang;
+            } catch (_) {}
+          }
+        } catch (e) {
+          debugPrint('Failed to apply user language: $e');
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,

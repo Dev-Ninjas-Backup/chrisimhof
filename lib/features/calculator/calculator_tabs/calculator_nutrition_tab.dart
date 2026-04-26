@@ -6,6 +6,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class CalculatorNutritionTab extends StatelessWidget {
@@ -16,7 +17,7 @@ class CalculatorNutritionTab extends StatelessWidget {
     final controller = Get.find<CalculatorController>();
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           CustomRangeSlider(
@@ -96,15 +97,22 @@ class CalculatorNutritionTab extends StatelessWidget {
               width: double.infinity,
             ),
           ),
-          if (controller.nutritionSubmitError.value.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 16),
-              child: Text(
-                controller.nutritionSubmitError.value.tr,
-                style: const TextStyle(color: Colors.red, fontSize: 14),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          Obx(() {
+            final errorMessage = controller.nutritionSubmitError.value;
+
+            if (errorMessage.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              EasyLoading.showError(errorMessage);
+              if (controller.nutritionSubmitError.value == errorMessage) {
+                controller.nutritionSubmitError.value = '';
+              }
+            });
+
+            return const SizedBox.shrink();
+          }),
         ],
       ),
     );

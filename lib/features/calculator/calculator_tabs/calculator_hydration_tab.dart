@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/common/widgets/custom_range_slider.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class CalculatorHydrationTab extends StatelessWidget {
@@ -13,7 +14,7 @@ class CalculatorHydrationTab extends StatelessWidget {
     final controller = Get.find<CalculatorController>();
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,12 +40,14 @@ class CalculatorHydrationTab extends StatelessWidget {
             required: false,
             headerText: "Already Consumed (L)".tr,
             controller: controller.hydrationConsumedController,
+            divisions: 40,
           ),
           const SizedBox(height: 26),
           CustomRangeSlider(
             required: false,
             headerText: "Daily Goal (L)".tr,
             controller: controller.hydrationDailyGoalController,
+            divisions: 40,
           ),
           const SizedBox(height: 24),
           Container(
@@ -79,18 +82,22 @@ class CalculatorHydrationTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Obx(
-            () => controller.hydrationSubmitError.value.isNotEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 16, bottom: 16),
-                    child: Text(
-                      controller.hydrationSubmitError.value.tr,
-                      style: const TextStyle(color: Colors.red, fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
+          Obx(() {
+            final errorMessage = controller.hydrationSubmitError.value;
+
+            if (errorMessage.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              EasyLoading.showError(errorMessage);
+              if (controller.hydrationSubmitError.value == errorMessage) {
+                controller.hydrationSubmitError.value = '';
+              }
+            });
+
+            return const SizedBox.shrink();
+          }),
           CustomButton(
             text: "Reset".tr,
             onTap: () {

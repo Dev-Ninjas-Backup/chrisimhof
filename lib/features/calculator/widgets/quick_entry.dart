@@ -17,7 +17,7 @@ class QuickEntrySelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Quick Entry",
+          "Quick Entry".tr,
           style: getTextStyle(
             color: AppColors.primaryTextColor,
             fontSize: 22,
@@ -38,7 +38,7 @@ class QuickEntrySelector extends StatelessWidget {
               height: 140,
               child: Center(
                 child: Text(
-                  'Failed to load presets',
+                  'Failed to load presets'.tr,
                   style: getTextStyle(
                     color: const Color(0xFF6B7280),
                     fontSize: 14,
@@ -48,15 +48,14 @@ class QuickEntrySelector extends StatelessWidget {
             );
           }
 
-          for (int i = 0; i < controller.caffeinePresets.length; i++) {
-          }
+          for (int i = 0; i < controller.caffeinePresets.length; i++) {}
 
           if (controller.caffeinePresets.isEmpty) {
             return SizedBox(
               height: 140,
               child: Center(
                 child: Text(
-                  'No presets available',
+                  'No presets available'.tr,
                   style: getTextStyle(
                     color: const Color(0xFF6B7280),
                     fontSize: 14,

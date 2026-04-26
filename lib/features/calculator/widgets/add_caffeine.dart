@@ -28,27 +28,27 @@ class AddCaffeineBottomSheet extends StatelessWidget {
             children: [
               _InputCard(
                 child: CustomTextFormField(
-                  label: 'Drink Name',
+                  label: 'Drink Name'.tr,
                   controller: controller.caffeineDrinkNameController,
-                  hintText: 'Enter Type',
+                  hintText: 'Enter Type'.tr,
                   textInputAction: TextInputAction.next,
                 ),
               ),
               const SizedBox(height: 24),
               _InputCard(
                 child: CustomTextFormField(
-                  label: 'Drink Type',
+                  label: 'Drink Type'.tr,
                   controller: controller.caffeineDrinkTypeController,
-                  hintText: 'Enter Type',
+                  hintText: 'Enter Type'.tr,
                   textInputAction: TextInputAction.next,
                 ),
               ),
               const SizedBox(height: 24),
               _InputCard(
                 child: CustomTextFormField(
-                  label: 'Amount (mg)',
+                  label: 'Amount (mg)'.tr,
                   controller: controller.caffeineAmountController,
-                  hintText: 'Enter Amount',
+                  hintText: 'Enter Amount'.tr,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.done,
                 ),
@@ -57,13 +57,13 @@ class AddCaffeineBottomSheet extends StatelessWidget {
               _ConsumedTimeCard(controller: controller),
               const SizedBox(height: 24),
               CustomButton(
-                text: 'Add Now',
+                text: 'Add Now'.tr,
                 onTap: () {
                   final bool isSubmitted = controller.submitAddCaffeineForm();
                   if (!isSubmitted) {
                     Get.snackbar(
-                      'Missing Information',
-                      'Please enter drink name, type, amount, and time.',
+                      'Missing Information'.tr,
+                      'Please enter drink name, type, amount, and time.'.tr,
                       snackPosition: SnackPosition.BOTTOM,
                     );
                     return;
@@ -116,7 +116,7 @@ class _ConsumedTimeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Consumed Time',
+            'Consumed Time'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,

@@ -5,6 +5,7 @@ import 'package:chrisimhof/features/calculator/widgets/caffeine_history_list.dar
 import 'package:chrisimhof/features/calculator/widgets/quick_entry.dart';
 import 'package:chrisimhof/features/calculator/widgets/value_slider_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -18,7 +19,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
     final CalculatorController controller = Get.find<CalculatorController>();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -91,6 +92,22 @@ class CalculatorCaffeineTab extends StatelessWidget {
               ),
             ),
           ),
+          Obx(() {
+            final errorMessage = controller.caffeineSubmitError.value;
+
+            if (errorMessage.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              EasyLoading.showError(errorMessage);
+              if (controller.caffeineSubmitError.value == errorMessage) {
+                controller.caffeineSubmitError.value = '';
+              }
+            });
+
+            return const SizedBox.shrink();
+          }),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [

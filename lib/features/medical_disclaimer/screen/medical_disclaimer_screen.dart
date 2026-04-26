@@ -13,42 +13,49 @@ class MedicalDisclaimerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 34),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Spacer(),
-            Image.asset(ImagePath.disclaimer, height: 106, width: 106),
-            SizedBox(height: 40),
-            Text(
-              'Medical Disclaimer'.tr,
-              style: getTextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryTextColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+          child: Center(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(context).height,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //Spacer(),
+                  Image.asset(ImagePath.disclaimer, height: 106, width: 106),
+                  SizedBox(height: 40),
+                  Text(
+                    'Medical Disclaimer'.tr,
+                    style: getTextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                  SizedBox(height: 32),
+                  Text(
+                    'RYVENZA provides lifestyle and performance recommendations based on user inputs.  It is not a medical device and does not provide medical advice, diagnosis, or treatment.  The information provided by the application is for informational and educational  purposes only.  Users should always consult a qualified healthcare professional for medical concerns.  Use of the application is at your own risk.'
+                        .tr,
+                    style: getTextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.secondaryTextColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 32),
-            Text(
-              'RYVENZA provides lifestyle and performance recommendations based on user inputs.  It is not a medical device and does not provide medical advice, diagnosis, or treatment.  The information provided by the application is for informational and educational  purposes only.  Users should always consult a qualified healthcare professional for medical concerns.  Use of the application is at your own risk.'
-                  .tr,
-              style: getTextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: AppColors.secondaryTextColor,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Spacer(),
-            CustomButton(
-              text: 'Continue'.tr,
-              onTap: () {
-                Get.offAll(NavbarScreen());
-              },
-            ),
-          ],
+          ),
         ),
+      ),
+      floatingActionButton: CustomButton(
+        text: 'Accept'.tr,
+        onTap: () {
+          Get.offAll(() => NavbarScreen());
+        },
+        width: Get.width - 32,
       ),
     );
   }

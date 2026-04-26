@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/widgets/results_icon_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ResultsMetricCard extends StatelessWidget {
   final ApiMetric metric;
@@ -47,7 +48,7 @@ class ResultsMetricCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${metric.score}% score',
+            'Score: @value%'.trParams({'value': metric.score.toString()}),
             style: getTextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,

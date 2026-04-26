@@ -433,4 +433,62 @@ class CalculatorService {
       throw Exception('Error calculating result: $e');
     }
   }
+
+  // Future<CalculateResultResponse> getLatestResult() async {
+  //   final uri = Uri.parse(Urls.latestResults);
+  //   final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+  //   try {
+  //     final response = await http
+  //         .get(
+  //           uri,
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             'Accept': 'application/json',
+  //             'Authorization': 'Bearer $accessToken',
+  //           },
+  //         )
+  //         .timeout(const Duration(seconds: 10));
+
+  //     final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+  //     if (response.statusCode == 200) {
+  //       return CalculateResultResponse.fromJson(jsonData);
+  //     } else {
+  //       throw Exception(jsonData['message'] ?? 'Failed to fetch latest result');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error fetching latest result: $e');
+  //   }
+  // }
+
+  /// Fetch raw latest-result JSON as a map. Use when you need fields not modeled
+  /// in `CalculateResultResponse` (e.g., `sleep`, `naps`, `hydration`, etc.).
+  Future<Map<String, dynamic>> getLatestResultRaw() async {
+    final uri = Uri.parse(Urls.latestResults);
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return jsonData;
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to fetch latest result');
+      }
+    } catch (e) {
+      throw Exception('Error fetching latest result raw: $e');
+    }
+  }
 }

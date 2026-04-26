@@ -26,7 +26,7 @@ class CalculatorScreen extends StatelessWidget {
             top: 78,
             left: 16,
             right: 16,
-            bottom: 34,
+            bottom: 50,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
