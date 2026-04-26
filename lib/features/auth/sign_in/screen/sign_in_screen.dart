@@ -7,10 +7,10 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/auth/sign_in/controller/sign_in_controller.dart';
+import 'package:chrisimhof/features/auth/create_account/controller/create_account_controller.dart';
 import 'package:chrisimhof/core/common/widgets/divider_widget.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/gestures.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +18,7 @@ class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
   final controller = Get.put(SignInController());
+  final createAccountController = Get.put(CreateAccountController());
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -33,7 +34,7 @@ class SignInScreen extends StatelessWidget {
               children: [
                 Align(
                   alignment: Alignment.topRight,
-                  child: LanguageToggleWidget(),
+                  child: LanguageToggleWidget(controller: createAccountController),
                 ),
                 Image.asset(ImagePath.appLogo, width: 120, height: 72),
                 SizedBox(height: 56),

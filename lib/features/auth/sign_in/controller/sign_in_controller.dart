@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/google_signin/model/user_model.dart';
 import 'package:chrisimhof/features/auth/google_signin/service/api_service.dart';

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:chrisimhof/features/auth/create_account/model/register_response_model.dart';
 import 'package:chrisimhof/features/auth/create_account/service/create_account_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
@@ -13,13 +14,50 @@ class CreateAccountController extends GetxController {
   final isPasswordHidden = true.obs;
   final isLoading = false.obs;
 
+  // Language selection observable (matches LanguageController pattern)
+  final RxString selectedLanguage = 'EN'.obs;
+
   final CreateAccountService _createAccountService = CreateAccountService();
 
   RegisterResponseModel? registerResponse;
 
+  @override
+  void onInit() {
+    super.onInit();
+    // Initialize language from current app locale
+    final currentLocale = Get.locale?.languageCode ?? 'en';
+    selectedLanguage.value = currentLocale == 'fr' ? 'FR' : 'EN';
+  }
+
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
   }
+
+  Future<void> changeLanguage(String langCode) async {
+    langCode = langCode.toUpperCase();
+
+    if (selectedLanguage.value == langCode) return; 
+
+    selectedLanguage.value = langCode;
+
+    try {
+      // Update locale in app immediately (no API call needed)
+      if (langCode == 'EN') {
+        Get.updateLocale(const Locale('en', 'US'));
+      } else if (langCode == 'FR') {
+        Get.updateLocale(const Locale('fr', 'FR'));
+      }
+
+      debugPrint('Language changed to: $langCode');
+    } catch (e) {
+      selectedLanguage.value = selectedLanguage.value == 'EN' ? 'FR' : 'EN';
+      debugPrint('Error changing language: $e');
+      rethrow;
+    }
+  }
+
+  bool isSelected(String langCode) =>
+      selectedLanguage.value == langCode.toUpperCase();
 
   String? validateFullName(String? value) {
     if (value == null || value.trim().isEmpty) {

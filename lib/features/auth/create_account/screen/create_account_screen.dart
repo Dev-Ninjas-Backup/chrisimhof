@@ -20,7 +20,7 @@ class CreateAccountScreen extends StatelessWidget {
   CreateAccountScreen({super.key});
 
   final CreateAccountController controller = Get.put(CreateAccountController());
-  final SignInController signInController = Get.find<SignInController>();
+  final SignInController signInController = Get.put(SignInController());
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
@@ -36,7 +36,7 @@ class CreateAccountScreen extends StatelessWidget {
               children: [
                 Align(
                   alignment: Alignment.topRight,
-                  child: LanguageToggleWidget(),
+                  child: LanguageToggleWidget(controller: controller),
                 ),
                 Image.asset(ImagePath.appLogo, width: 120, height: 72),
                 SizedBox(height: 56),
