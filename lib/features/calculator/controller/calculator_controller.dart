@@ -10,8 +10,10 @@ import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model
 import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
+import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/state_manager.dart';
 
 class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
@@ -192,14 +194,15 @@ class CalculatorController extends GetxController {
 
         if (sleep['fatigueLevel'] != null) {
           final fl = sleep['fatigueLevel'].toString().toLowerCase();
-          if (fl == 'low')
+          if (fl == 'low') {
             fatigueLevel.value = 'Low'.tr;
-          else if (fl == 'average' || fl == 'medium')
+          } else if (fl == 'average' || fl == 'medium') {
             fatigueLevel.value = 'Average'.tr;
-          else if (fl == 'high')
+          } else if (fl == 'high') {
             fatigueLevel.value = 'High'.tr;
-          else
+          } else {
             fatigueLevel.value = sleep['fatigueLevel'].toString();
+          }
         }
 
         if (sleep['desiredSleepStart'] != null) {
@@ -437,12 +440,13 @@ class CalculatorController extends GetxController {
 
         if (sport['activityIntensity'] != null) {
           final ai = sport['activityIntensity'].toString().toLowerCase();
-          if (ai == 'light')
+          if (ai == 'light') {
             sportIntensity.value = 0.0;
-          else if (ai == 'moderate')
+          } else if (ai == 'moderate') {
             sportIntensity.value = 1.0;
-          else if (ai == 'high')
+          } else if (ai == 'high') {
             sportIntensity.value = 2.0;
+          }
           appliedSport = true;
         }
         if (sport['trainingIntent'] != null) {
@@ -499,14 +503,15 @@ class CalculatorController extends GetxController {
 
         if (sleep['fatigueLevel'] != null) {
           final fl = sleep['fatigueLevel'].toString().toLowerCase();
-          if (fl == 'low')
+          if (fl == 'low') {
             fatigueLevel.value = 'Low'.tr;
-          else if (fl == 'average' || fl == 'medium')
+          } else if (fl == 'average' || fl == 'medium') {
             fatigueLevel.value = 'Average'.tr;
-          else if (fl == 'high')
+          } else if (fl == 'high') {
             fatigueLevel.value = 'High'.tr;
-          else
+          } else {
             fatigueLevel.value = sleep['fatigueLevel'].toString();
+          }
         }
 
         if (sleep['desiredSleepStart'] != null) {
@@ -831,8 +836,8 @@ class CalculatorController extends GetxController {
     preferredTimeController = TimeController();
     durationController = TextEditingController();
     currentNapDurationController = TextEditingController();
-    sleepLastNightController = RangeSliderController(initialValue: 8);
-    sleepGoalController = RangeSliderController(initialValue: 8);
+    sleepLastNightController = RangeSliderController(initialValue: 1);
+    sleepGoalController = RangeSliderController(initialValue: 1);
   }
 
   void _initializeWorkControllers() {
@@ -845,14 +850,14 @@ class CalculatorController extends GetxController {
     hydrationConsumedController = RangeSliderController(
       min: 0.0,
       max: 4.0,
-      initialValue: 1.0,
+      initialValue: 0.0,
     );
     hydrationDailyGoalController = RangeSliderController(
       min: 0.0,
       max: 4.0,
-      initialValue: 2.5,
+      initialValue: 0.0,
     );
-    desiredNumberOfMealsController = RangeSliderController(initialValue: 3.0);
+    desiredNumberOfMealsController = RangeSliderController(initialValue: 1.0);
     firstMealTimeController = TimeController();
     lastMealTimeController = TimeController();
   }
@@ -871,6 +876,7 @@ class CalculatorController extends GetxController {
   }
 
   void _loadCaffeineHistory() {}
+
 
   Future<void> _fetchCaffeinePresets() async {
     try {
