@@ -10,10 +10,8 @@ import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model
 import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
 
 class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
