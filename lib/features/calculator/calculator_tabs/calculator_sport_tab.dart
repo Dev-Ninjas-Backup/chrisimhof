@@ -1,9 +1,12 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
+import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -64,6 +67,15 @@ class CalculatorSportTab extends StatelessWidget {
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 24),
+                  const SizedBox(height: 30),
+              Obx(
+                () => ActivityTypeSelector(
+                  selectedActivity: controller.selectedActivityType.value,
+                  onSelect: (activity) {
+                    controller.selectActivityType(activity);
+                  },
+                ),
+              ),
                   Obx(
                     () => IntensitySlider(
                       value: controller.sportIntensity.value,
@@ -118,6 +130,7 @@ class CalculatorSportTab extends StatelessWidget {
                 onTap: () {
                   controller.sportDurationController.clear();
                   controller.setTrainingIntent('NO_TRAINING');
+                  controller.selectedActivityType.value = '';
                   controller.setSportIntensity(0);
                 },
                 backgroundColor: Colors.grey[300],

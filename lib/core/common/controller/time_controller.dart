@@ -2,9 +2,9 @@ import 'package:get/get.dart';
 
 class TimeController extends GetxController {
   // store hour in 24-hour format (0-23). default was 6 PM previously so use 18
-  final RxInt hour = 18.obs;
-  final RxInt minute = 11.obs;
-  final RxString period = 'PM'.obs;
+  final RxInt hour = 00.obs;
+  final RxInt minute = 00.obs;
+  final RxString period = 'AM'.obs;
 
   // accumulators for drag-based scrolling (handled from UI via controller)
   double _hourDragAcc = 0.0;
@@ -86,8 +86,8 @@ class TimeController extends GetxController {
   String get to24HourFormat => formattedTime;
 
   void reset() {
-    hour.value = 18;
-    minute.value = 11;
-    period.value = 'PM';
+    hour.value = 00;
+    minute.value = 00;
+    period.value = 'AM';
   }
 }

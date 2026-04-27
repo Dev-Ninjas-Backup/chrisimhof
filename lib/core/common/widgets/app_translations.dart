@@ -552,9 +552,10 @@ class AppTranslations extends Translations {
       'Last Meal Time': 'Heure du dernier repas',
       'Already had a meal today?': 'Avez-vous déjà mangé aujourd\'hui ?',
       'Yes': 'Oui',
+      'Hello!': 'Bonjour!',
       'No': 'Non',
       'Duration (min)': 'Durée (min)',
-      ''
+      'I won\'t work today': 'Je ne travaillerai pas aujourd\'hui',
       'Recommended hydration 2.5L per day':
           'Hydratation recommandée 2,5 L par jour',
       'Already Consumed (L)': 'Déjà consommé (L)',

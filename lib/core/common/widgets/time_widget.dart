@@ -40,23 +40,18 @@ class TimeWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: _TimePartColumn(
+                  topValue: () => ((controller.hour.value - 1 + 24) % 24)
+                      .toString()
+                      .padLeft(2, '0'),
+                  centerValue: () => controller.formattedHour,
+                  bottomValue: () => ((controller.hour.value + 1) % 24)
+                      .toString()
+                      .padLeft(2, '0'),
                   onUpTap: controller.increaseHour,
                   onDownTap: controller.decreaseHour,
                   onVerticalDragUpdate: (details) =>
                       controller.handleHourDrag(details.delta.dy),
                   onVerticalDragEnd: (_) => controller.handleHourDragEnd(),
-                  child: Obx(
-                    () => Text(
-                      // show 24-hour format using controller's 24h conversion
-                      controller.to24HourFormat.split(':').first,
-                      textAlign: TextAlign.center,
-                      style: getTextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ),
                 ),
               ),
               Padding(
@@ -72,22 +67,18 @@ class TimeWidget extends StatelessWidget {
               ),
               Expanded(
                 child: _TimePartColumn(
+                  topValue: () => ((controller.minute.value - 1 + 60) % 60)
+                      .toString()
+                      .padLeft(2, '0'),
+                  centerValue: () => controller.formattedMinute,
+                  bottomValue: () => ((controller.minute.value + 1) % 60)
+                      .toString()
+                      .padLeft(2, '0'),
                   onUpTap: controller.increaseMinute,
                   onDownTap: controller.decreaseMinute,
                   onVerticalDragUpdate: (details) =>
                       controller.handleMinuteDrag(details.delta.dy),
                   onVerticalDragEnd: (_) => controller.handleMinuteDragEnd(),
-                  child: Obx(
-                    () => Text(
-                      controller.formattedMinute,
-                      textAlign: TextAlign.center,
-                      style: getTextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],
@@ -99,16 +90,20 @@ class TimeWidget extends StatelessWidget {
 }
 
 class _TimePartColumn extends StatelessWidget {
+  final String Function() topValue;
+  final String Function() centerValue;
+  final String Function() bottomValue;
   final VoidCallback onUpTap;
   final VoidCallback onDownTap;
-  final Widget child;
   final GestureDragUpdateCallback? onVerticalDragUpdate;
   final GestureDragEndCallback? onVerticalDragEnd;
 
   const _TimePartColumn({
+    required this.topValue,
+    required this.centerValue,
+    required this.bottomValue,
     required this.onUpTap,
     required this.onDownTap,
-    required this.child,
     this.onVerticalDragUpdate,
     this.onVerticalDragEnd,
   });
@@ -119,36 +114,56 @@ class _TimePartColumn extends StatelessWidget {
       onVerticalDragUpdate: onVerticalDragUpdate,
       onVerticalDragEnd: onVerticalDragEnd,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _ArrowButton(icon: Icons.keyboard_arrow_up_rounded, onTap: onUpTap),
-          const SizedBox(height: 10),
-          child,
-          const SizedBox(height: 10),
-          _ArrowButton(
-            icon: Icons.keyboard_arrow_down_rounded,
+          InkWell(
+            onTap: onUpTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Obx(
+                () => Text(
+                  topValue(),
+                  textAlign: TextAlign.center,
+                  style: getTextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF9AA0A6),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Obx(
+            () => Text(
+              centerValue(),
+              textAlign: TextAlign.center,
+              style: getTextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryTextColor,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          InkWell(
             onTap: onDownTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Obx(
+                () => Text(
+                  bottomValue(),
+                  textAlign: TextAlign.center,
+                  style: getTextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF9AA0A6),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ArrowButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _ArrowButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(100),
-      onTap: onTap,
-      child: SizedBox(
-        width: 32,
-        height: 32,
-        child: Icon(icon, size: 32, color: AppColors.secondaryTextColor),
       ),
     );
   }

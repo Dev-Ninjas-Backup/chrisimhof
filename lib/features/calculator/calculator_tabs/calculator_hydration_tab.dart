@@ -101,8 +101,8 @@ class CalculatorHydrationTab extends StatelessWidget {
           CustomButton(
             text: "Reset".tr,
             onTap: () {
-              controller.hydrationConsumedController.updateValue(1.0);
-              controller.hydrationDailyGoalController.updateValue(2.5);
+              controller.hydrationConsumedController.updateValue(0.0);
+              controller.hydrationDailyGoalController.updateValue(0.0);
               controller.hydrationSubmitError.value = '';
             },
             backgroundColor: Colors.grey[300],

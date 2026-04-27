@@ -8,7 +8,7 @@ class RangeSliderController extends GetxController {
   RangeSliderController({
     this.min = 1.0,
     this.max = 10.0,
-    double initialValue = 5.0,
+    double initialValue = 0.0,
   }) {
     value.value = initialValue;
   }

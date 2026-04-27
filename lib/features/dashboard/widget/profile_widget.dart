@@ -40,7 +40,7 @@ class ProfileWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hello!',
+                'Hello!'.tr,
                 style: getTextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,

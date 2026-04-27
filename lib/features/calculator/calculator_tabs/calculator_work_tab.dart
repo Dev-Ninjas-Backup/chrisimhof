@@ -27,7 +27,7 @@ class CalculatorWorkTab extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Obx(
             () => CustomButton(
               text: controller.isWorkSubmitting.value
@@ -58,31 +58,23 @@ class CalculatorWorkTab extends StatelessWidget {
 
           return const SizedBox.shrink();
         }),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: TabButton(
-                text: 'Skip'.tr,
-                onTap: () {
-                  controller.skipWorkData();
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TabButton(
-                text: 'Reset'.tr,
-                onTap: () {
-                  controller.workBeginsController.reset();
-                  controller.workCompleteController.reset();
-                  controller.daysWorkedController.clear();
-                  controller.selectShiftType('STANDARD');
-                },
-              ),
-            ),
-          ],
+        TabButton(
+          text: 'I won\'t work today'.tr,
+          onTap: () {
+            controller.skipWorkData();
+          },
         ),
+        const SizedBox(height: 16),
+        TabButton(
+          text: 'Reset'.tr,
+          onTap: () {
+            controller.workBeginsController.reset();
+            controller.workCompleteController.reset();
+            controller.daysWorkedController.clear();
+            controller.selectShiftType('STANDARD');
+          },
+        ),
+        const SizedBox(height: 10),
       ],
     );
   }

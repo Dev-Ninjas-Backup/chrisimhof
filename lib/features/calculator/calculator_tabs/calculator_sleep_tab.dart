@@ -211,8 +211,8 @@ class CalculatorSleepTab extends StatelessWidget {
             controller.clearAllNaps();
             controller.setWantsNap(false);
             controller.wakeUpController.reset();
-            controller.sleepLastNightController.updateValue(8);
-            controller.sleepGoalController.updateValue(8);
+            controller.sleepLastNightController.updateValue(1);
+            controller.sleepGoalController.updateValue(1);
             controller.fatigueLevel.value = 'Low';
             controller.desiredSleepStartController.reset();
             controller.desiredSleepEndController.reset();
