@@ -1,6 +1,7 @@
 import 'package:chrisimhof/features/auth/create_account/screen/create_account_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_email_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:chrisimhof/features/history_details/screen/history_details_screen.dart';
 import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
@@ -13,6 +14,8 @@ class AppRoutes {
   static String changePasswordScreen = '/changePasswordScreen';
   static String forgetPasswordEmailScreen = '/forgetPasswordEmailScreen';
   static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
+  static String historyDetailsScreen = '/historyDetailsScreen';
+
 
   static String getSplashScreen() => splashScreen;
   static String getSignInScreen() => signInScreen;
@@ -20,6 +23,8 @@ class AppRoutes {
   static String getChangePasswordScreen() => changePasswordScreen;
   static String getForgetPasswordEmailScreen() => forgetPasswordEmailScreen;
   static String getMedicalDisclaimerScreen() => medicalDisclaimerScreen;
+  static String getHistoryDetailsScreen() => historyDetailsScreen;
+
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -33,6 +38,10 @@ class AppRoutes {
     GetPage(
       name: medicalDisclaimerScreen,
       page: () => MedicalDisclaimerScreen(),
+    ),
+    GetPage(
+      name: historyDetailsScreen,
+      page: () =>  HistoryDetailsScreen(),
     ),
   ];
 }

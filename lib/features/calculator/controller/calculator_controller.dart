@@ -877,6 +877,7 @@ class CalculatorController extends GetxController {
 
   void _loadCaffeineHistory() {}
 
+
   Future<void> _fetchCaffeinePresets() async {
     try {
       isCaffeinePresetsLoading.value = true;
