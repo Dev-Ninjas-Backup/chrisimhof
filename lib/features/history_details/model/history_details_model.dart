@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+// --------------- HistoryDetailsResponse ---------------
+
 class HistoryDetailsResponse {
   final String id;
   final int overallScore;
   final ScoreBreakdown scoreBreakdown;
   final List<HistoryRecommendation> recommendations;
   final List<ActivityItem> activityItems;
+  final List<WeeklyScore> weeklyScores;
   final String createdAt;
 
   HistoryDetailsResponse({
@@ -14,13 +17,49 @@ class HistoryDetailsResponse {
     required this.scoreBreakdown,
     required this.recommendations,
     required this.activityItems,
+    required this.weeklyScores,
     required this.createdAt,
   });
 
+  factory HistoryDetailsResponse.fromJson(Map<String, dynamic> json) {
+    // Map result.scoreBreakdown
+    final resultJson = json['result'] as Map<String, dynamic>? ?? {};
+    final scoreBreakdownJson =
+        resultJson['scoreBreakdown'] as Map<String, dynamic>? ?? {};
+
+    // Map recommendations from result.recommendations
+    final rawRecs =
+        resultJson['recommendations'] as List<dynamic>? ?? [];
+
+    // Build ActivityItems from result.napAnalysis or fall back to empty
+    // The API does not return activityItems directly — kept as empty so the
+    // UI degrades gracefully. Swap the body below if the endpoint adds them.
+    final List<ActivityItem> activityItems = [];
+
+    // Build WeeklyScores — not present in the current API shape either.
+    final List<WeeklyScore> weeklyScores = [];
+
+    return HistoryDetailsResponse(
+      id: json['id'] as String? ?? '',
+      overallScore: json['overallScore'] as int? ?? 0,
+      scoreBreakdown: ScoreBreakdown.fromJson(scoreBreakdownJson),
+      recommendations: rawRecs
+          .map((e) =>
+              HistoryRecommendation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      activityItems: activityItems,
+      weeklyScores: weeklyScores,
+      createdAt: json['createdAt'] as String? ?? '',
+    );
+  }
+
   @override
   String toString() =>
-      'HistoryDetailsResponse(id: $id, overallScore: $overallScore, recommendations: ${recommendations.length})';
+      'HistoryDetailsResponse(id: $id, overallScore: $overallScore, '
+      'recommendations: ${recommendations.length})';
 }
+
+// --------------- ScoreBreakdown ---------------
 
 class ScoreBreakdown {
   final int sleep;
@@ -34,7 +73,18 @@ class ScoreBreakdown {
     required this.hydration,
     required this.caffeine,
   });
+
+  factory ScoreBreakdown.fromJson(Map<String, dynamic> json) {
+    return ScoreBreakdown(
+      sleep: json['sleep'] as int? ?? 0,
+      nutrition: json['nutrition'] as int? ?? 0,
+      hydration: json['hydration'] as int? ?? 0,
+      caffeine: json['caffeine'] as int? ?? 0,
+    );
+  }
 }
+
+// --------------- HistoryRecommendation ---------------
 
 class HistoryRecommendation {
   final String id;
@@ -52,7 +102,20 @@ class HistoryRecommendation {
     required this.priority,
     required this.isPremium,
   });
+
+  factory HistoryRecommendation.fromJson(Map<String, dynamic> json) {
+    return HistoryRecommendation(
+      id: json['id'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+      priority: json['priority'] as int? ?? 0,
+      isPremium: json['isPremium'] as bool? ?? false,
+    );
+  }
 }
+
+// --------------- HistoryMetric ---------------
 
 class HistoryMetric {
   final String title;
@@ -81,6 +144,8 @@ class HistoryMetric {
   }
 }
 
+// --------------- ActivityItem ---------------
+
 class ActivityItem {
   final String title;
   final Color color;
@@ -95,7 +160,20 @@ class ActivityItem {
   String get percentLabel => '${percent.round()}%';
 }
 
-// Static mock data
+// --------------- WeeklyScore ---------------
+
+class WeeklyScore {
+  final int dayIndex; // 0 = Sun, 1 = Mon, ... 6 = Sat
+  final double score;
+
+  const WeeklyScore({
+    required this.dayIndex,
+    required this.score,
+  });
+}
+
+// --------------- Static mock data (kept for offline/dev use) ---------------
+
 final mockHistoryDetailsData = HistoryDetailsResponse(
   id: 'history_001',
   overallScore: 78,
@@ -106,31 +184,11 @@ final mockHistoryDetailsData = HistoryDetailsResponse(
     caffeine: 68,
   ),
   activityItems: [
-    ActivityItem(
-      title: 'Work',
-      percent: 35,
-      color: const Color(0xFF111827),
-    ),
-    ActivityItem(
-      title: 'Sleep',
-      percent: 30,
-      color: const Color(0xFF006E4A),
-    ),
-    ActivityItem(
-      title: 'Exercise',
-      percent: 20,
-      color: const Color(0xFF34D399),
-    ),
-    ActivityItem(
-      title: 'Meals',
-      percent: 10,
-      color: const Color(0xFFD5D7DA),
-    ),
-    ActivityItem(
-      title: 'Free time',
-      percent: 5,
-      color: const Color(0xFF535862),
-    ),
+    const ActivityItem(title: 'Work', percent: 35, color: Color(0xFF111827)),
+    const ActivityItem(title: 'Sleep', percent: 30, color: Color(0xFF006E4A)),
+    const ActivityItem(title: 'Exercise', percent: 20, color: Color(0xFF34D399)),
+    const ActivityItem(title: 'Meals', percent: 10, color: Color(0xFFD5D7DA)),
+    const ActivityItem(title: 'Free time', percent: 5, color: Color(0xFF535862)),
   ],
   recommendations: [
     HistoryRecommendation(
@@ -157,6 +215,15 @@ final mockHistoryDetailsData = HistoryDetailsResponse(
       priority: 3,
       isPremium: false,
     ),
+  ],
+  weeklyScores: const [
+    WeeklyScore(dayIndex: 0, score: 65),
+    WeeklyScore(dayIndex: 1, score: 72),
+    WeeklyScore(dayIndex: 2, score: 68),
+    WeeklyScore(dayIndex: 3, score: 81),
+    WeeklyScore(dayIndex: 4, score: 75),
+    WeeklyScore(dayIndex: 5, score: 78),
+    WeeklyScore(dayIndex: 6, score: 85),
   ],
   createdAt: '2024-04-28T10:30:00Z',
 );

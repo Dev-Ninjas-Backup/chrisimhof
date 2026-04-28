@@ -27,7 +27,7 @@ class HistoryDetailsActivitySplitCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Daily Activity Split',
+            'Activity Split',
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
