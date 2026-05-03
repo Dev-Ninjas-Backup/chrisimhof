@@ -4,6 +4,7 @@ import 'package:chrisimhof/features/history_details/widgets/history_details_acti
 import 'package:chrisimhof/features/history_details/widgets/history_details_metric_card.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_overall_state_card.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_recommendations_card.dart';
+import 'package:chrisimhof/features/history_details/widgets/history_details_weekly_analytics_card.dart';
 import 'package:flutter/material.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -18,22 +19,37 @@ class HistoryDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
+     appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primaryTextColor),
           onPressed: () => Navigator.pop(context),
         ),
+        centerTitle: true,
         title: Text(
           'History Details',
           style: getTextStyle(
             color: AppColors.primaryTextColor,
-            fontSize: 20,
+            fontSize: 23, 
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text(
+                '17 March 2026 20:48:33',
+                style: getTextStyle(
+                  color: AppColors.primaryTextColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Obx(
         () {
@@ -101,6 +117,12 @@ class HistoryDetailsScreen extends StatelessWidget {
                 // Daily Activity Split Section
                 HistoryDetailsActivitySplitCard(
                   activityItems: resultData.activityItems,
+                ),
+                const SizedBox(height: 16),
+                
+                // Weekly Analytics Section
+                HistoryDetailsWeeklyAnalyticsCard(
+                  weeklyScores: resultData.weeklyScores,
                 ),
                 const SizedBox(height: 16),
                 

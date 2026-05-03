@@ -50,4 +50,6 @@ class Urls {
       '$baseUrl/api/v1/users/$userId/permanent';
   static const String latestResults =
       '$baseUrl/api/v1/calculator/latest-result';
+  static String historyDetails(String historyId) =>
+      '$baseUrl/api/v1/history/$historyId';
 }
