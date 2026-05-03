@@ -10,7 +10,7 @@ import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CalculatorResultsScreen extends StatefulWidget {
+class CalculatorResultsScreen extends StatelessWidget {
   final CalculateResultResponse initialData;
   final String? sessionId;
 
@@ -21,48 +21,30 @@ class CalculatorResultsScreen extends StatefulWidget {
   });
 
   @override
-  State<CalculatorResultsScreen> createState() =>
-      _CalculatorResultsScreenState();
-}
+  Widget build(BuildContext context) {
+    final String tag = DateTime.now().microsecondsSinceEpoch.toString();
 
-class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
-  late final String _tag;
-  late final CalculatorResultsController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _tag = DateTime.now().microsecondsSinceEpoch.toString();
-    _controller = Get.put(
+    final CalculatorResultsController controller = Get.put(
       CalculatorResultsController(
-        initialData: widget.initialData,
-        sessionId: widget.sessionId,
+        initialData: initialData,
+        sessionId: sessionId,
       ),
-      tag: _tag,
+      tag: tag,
     );
 
-    if (widget.sessionId != null) {
-      _controller.calculateResultsFromAPI();
+    if (sessionId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.calculateResultsFromAPI();
+      });
     }
-  }
 
-  @override
-  void dispose() {
-    if (Get.isRegistered<CalculatorResultsController>(tag: _tag)) {
-      Get.delete<CalculatorResultsController>(tag: _tag);
-    }
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Obx(() {
-          final resultData = _controller.resultData.value;
+          final resultData = controller.resultData.value;
 
-          if (_controller.isLoading.value && resultData == null) {
+          if (controller.isLoading.value && resultData == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -79,7 +61,7 @@ class _CalculatorResultsScreenState extends State<CalculatorResultsScreen> {
                 const SizedBox(height: 24),
                 ResultsOverallStateCard(
                   score: resultData.overallScore,
-                  label: _controller.getLabelForScore(resultData.overallScore),
+                  label: controller.getLabelForScore(resultData.overallScore),
                 ),
                 const SizedBox(height: 16),
                 GridView.builder(
