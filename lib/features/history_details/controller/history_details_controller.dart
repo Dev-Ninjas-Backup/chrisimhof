@@ -1,25 +1,35 @@
 import 'package:chrisimhof/features/history_details/model/history_details_model.dart';
+import 'package:chrisimhof/features/history_details/service/history_details_service.dart';
 import 'package:get/get.dart';
+
 class HistoryDetailsController extends GetxController {
   final Rxn<HistoryDetailsResponse> resultData = Rxn<HistoryDetailsResponse>();
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
+  late String historyId;
+  late final HistoryDetailsService _service;
 
-  // Add these for the dropdown
-  final List<String> analyticPeriodOptions = ['Last 7 Days', 'Last 30 Days', 'Last Month'];
+  final List<String> analyticPeriodOptions = [
+    'Last 7 Days',
+    'Last 30 Days',
+    'Last Month',
+  ];
   final RxString selectedPeriod = 'Last 7 Days'.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadHistoryDetailsData();
+    _service = HistoryDetailsService();
+    // Get historyId from arguments passed when navigating to this screen
+    historyId = Get.arguments ?? '';
+    if (historyId.isNotEmpty) {
+      loadHistoryDetailsData();
+    }
   }
 
-  // Update selection logic
   void updateSelectedPeriod(String? newValue) {
     if (newValue != null) {
       selectedPeriod.value = newValue;
-      // You can add logic here to fetch new data based on the period
     }
   }
 
@@ -28,12 +38,18 @@ class HistoryDetailsController extends GetxController {
   }
 
   Future<void> loadHistoryDetailsData() async {
+    if (historyId.isEmpty) {
+      error.value = 'History ID not provided';
+      return;
+    }
+
     isLoading.value = true;
     error.value = '';
     try {
-      resultData.value = mockHistoryDetailsData;
+      final data = await _service.fetchHistoryDetails(historyId);
+      resultData.value = data;
     } catch (e) {
-      error.value = e.toString();
+      error.value = 'Failed to load history details: ${e.toString()}';
     } finally {
       isLoading.value = false;
     }
