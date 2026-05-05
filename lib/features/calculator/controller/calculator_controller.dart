@@ -877,7 +877,6 @@ class CalculatorController extends GetxController {
 
   void _loadCaffeineHistory() {}
 
-
   Future<void> _fetchCaffeinePresets() async {
     try {
       isCaffeinePresetsLoading.value = true;
@@ -1420,6 +1419,7 @@ class CalculatorController extends GetxController {
 
       int activityDuration = 0;
       String activityIntensity = 'LIGHT';
+      String activityType = ActivityType.walk.apiValue;
 
       if (intent == 'WILL_TRAIN' || intent == 'ALREADY_TRAINED') {
         if (sportDurationController.text.isEmpty) {
@@ -1434,20 +1434,45 @@ class CalculatorController extends GetxController {
           isSportSubmitting.value = false;
           return;
         }
+        // Determine activity type (UI stores display name)
+        try {
+          if (selectedActivityType.value.isNotEmpty) {
+            activityType = ActivityType.fromDisplayName(
+              selectedActivityType.value,
+            ).apiValue;
+          }
+        } catch (_) {
+          activityType = selectedActivityType.value.toUpperCase();
+        }
 
+        // Map slider intensity to API values
         if (sportIntensity.value == 1.0) {
           activityIntensity = 'MODERATE';
         } else if (sportIntensity.value == 2.0) {
-          activityIntensity = 'HARD';
+          activityIntensity = 'HIGH';
         } else {
           activityIntensity = 'LIGHT';
         }
       }
 
+      // Build activities array per new API shape
+      final activities = <SportActivity>[];
+      if (intent == 'NO_TRAINING' ||
+          intent == 'WILL_TRAIN' ||
+          intent == 'ALREADY_TRAINED') {
+        activities.add(
+          SportActivity(
+            activityType: activityType,
+            intensity: activityIntensity,
+            durationMin: activityDuration,
+            performedAt: '',
+          ),
+        );
+      }
+
       final request = SportRequest(
         trainingIntent: intent,
-        activityDuration: activityDuration,
-        activityIntensity: activityIntensity,
+        activities: activities,
       );
 
       final response = await _calculatorService.submitSportData(
