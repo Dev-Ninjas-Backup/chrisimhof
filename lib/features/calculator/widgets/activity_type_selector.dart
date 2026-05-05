@@ -17,11 +17,8 @@ class ActivityTypeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<ActivityType> activities = [
       ActivityType.walk,
-      ActivityType.run,
-      ActivityType.cycle,
-      ActivityType.gym,
-      ActivityType.rest,
-      ActivityType.sport,
+      ActivityType.cardio,
+      ActivityType.strength,
     ];
 
     return Column(

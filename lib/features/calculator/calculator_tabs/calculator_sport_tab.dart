@@ -4,6 +4,7 @@ import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
+import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
 import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
@@ -68,14 +69,14 @@ class CalculatorSportTab extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   const SizedBox(height: 30),
-              Obx(
-                () => ActivityTypeSelector(
-                  selectedActivity: controller.selectedActivityType.value,
-                  onSelect: (activity) {
-                    controller.selectActivityType(activity);
-                  },
-                ),
-              ),
+                  Obx(
+                    () => ActivityTypeSelector(
+                      selectedActivity: controller.selectedActivityType.value,
+                      onSelect: (activity) {
+                        controller.selectActivityType(activity);
+                      },
+                    ),
+                  ),
                   Obx(
                     () => IntensitySlider(
                       value: controller.sportIntensity.value,
@@ -90,28 +91,187 @@ class CalculatorSportTab extends StatelessWidget {
               const SizedBox(height: 120),
 
               CustomButton(
-                text: "Calculate".tr,
+                text: "Add Activity".tr,
                 onTap: () async {
                   try {
                     await controller.submitSportData();
                     if (controller.sportSubmitError.value.isEmpty) {
-                      Get.to(
-                        () => CalculatorResultsScreen(
-                          initialData: CalculateResultResponse(
-                            id: '',
-                            overallScore: 0,
-                            scoreBreakdown: ScoreBreakdown(
-                              sleep: 0,
-                              nutrition: 0,
-                              hydration: 0,
-                              caffeine: 0,
-                            ),
-                            recommendations: [],
-                            createdAt: '',
+                      // Show bottom sheet summary matching Figma
+                      final activityLabel =
+                          controller.selectedActivityType.value.isNotEmpty
+                          ? controller.selectedActivityType.value
+                          : 'Walking'.tr;
+                      final durationText =
+                          controller.sportDurationController.text.isNotEmpty
+                          ? '${controller.sportDurationController.text} min'
+                          : '0 min';
+                      final activityTypeText =
+                          controller.selectedActivityType.value.isNotEmpty
+                          ? controller.selectedActivityType.value
+                          : ActivityType.walk.displayName;
+                      final intensityText =
+                          (controller.sportIntensity.value == 2.0)
+                          ? 'High'.tr
+                          : (controller.sportIntensity.value == 1.0)
+                          ? 'Moderate'.tr
+                          : 'Light'.tr;
+
+                      Get.bottomSheet(
+                        Container(
+                          padding: EdgeInsets.only(
+                            top: 20,
+                            left: 16,
+                            right: 16,
+                            bottom:
+                                MediaQuery.of(context).viewInsets.bottom + 24,
                           ),
-                          sessionId:
-                              controller.calculatorSession.value?.sessionId,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Activity Time'.tr,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              // First row: activity label and duration with chevron
+                              InkWell(
+                                onTap: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          activityLabel,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      Text(
+                                        durationText,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Icon(Icons.chevron_right),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 1),
+
+                              // Activity Type row
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Activity Type'.tr,
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                    ),
+                                    Text(
+                                      activityTypeText,
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Divider(height: 1),
+
+                              // Intensity row
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Intensity'.tr,
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                    ),
+                                    Text(
+                                      intensityText,
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Calculate button
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        AppColors.primaryButtonColor,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Get.back();
+                                    try {
+                                      Get.to(
+                                        () => CalculatorResultsScreen(
+                                          initialData: CalculateResultResponse(
+                                            id: '',
+                                            overallScore: 0,
+                                            scoreBreakdown: ScoreBreakdown(
+                                              sleep: 0,
+                                              nutrition: 0,
+                                              hydration: 0,
+                                              caffeine: 0,
+                                            ),
+                                            recommendations: [],
+                                            createdAt: '',
+                                          ),
+                                          sessionId: controller
+                                              .calculatorSession
+                                              .value
+                                              ?.sessionId,
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      EasyLoading.showError(e.toString());
+                                    }
+                                  },
+                                  child: Text(
+                                    'Calculate'.tr,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
                       );
                     } else {
                       EasyLoading.showError(

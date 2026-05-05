@@ -1,18 +1,33 @@
-class SportRequest {
-  final String trainingIntent; // NO_TRAINING | WILL_TRAIN | ALREADY_TRAINED
-  final int activityDuration;
-  final String activityIntensity;
+class SportActivity {
+  final String activityType; // e.g. WALK, CARDIO, STRENGTH
+  final String intensity; // LIGHT | MODERATE | HIGH
+  final int durationMin;
+  final String performedAt; // ISO string or empty
 
-  SportRequest({
-    required this.trainingIntent,
-    required this.activityDuration,
-    required this.activityIntensity,
+  SportActivity({
+    required this.activityType,
+    required this.intensity,
+    required this.durationMin,
+    required this.performedAt,
   });
 
   Map<String, dynamic> toJson() => {
+    'activityType': activityType,
+    'intensity': intensity,
+    'durationMin': durationMin,
+    'performedAt': performedAt,
+  };
+}
+
+class SportRequest {
+  final String trainingIntent; // NO_TRAINING | WILL_TRAIN | ALREADY_TRAINED
+  final List<SportActivity> activities;
+
+  SportRequest({required this.trainingIntent, required this.activities});
+
+  Map<String, dynamic> toJson() => {
     'trainingIntent': trainingIntent,
-    'activityDuration': activityDuration,
-    'activityIntensity': activityIntensity,
+    'activities': activities.map((a) => a.toJson()).toList(),
   };
 }
 
