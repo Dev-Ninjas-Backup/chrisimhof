@@ -42,9 +42,8 @@ class HistoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.to(
-        () => HistoryDetailsScreen(),
-      ),
+      onTap: () =>
+          Get.to(() => HistoryDetailsScreen(), arguments: historyItem.id),
       child: Container(
         padding: const EdgeInsets.all(16),
         width: Get.width,

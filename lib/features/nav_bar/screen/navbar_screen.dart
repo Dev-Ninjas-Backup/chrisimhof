@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:chrisimhof/features/analytics/screen/analytics_screen.dart';
 import 'package:chrisimhof/features/dashboard/screen/dashboard_screen.dart';
 import 'package:chrisimhof/features/history/screen/history_screen.dart';

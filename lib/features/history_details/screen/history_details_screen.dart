@@ -1,10 +1,8 @@
 import 'package:chrisimhof/features/history_details/controller/history_details_controller.dart';
 import 'package:chrisimhof/features/history_details/model/history_details_model.dart';
-import 'package:chrisimhof/features/history_details/widgets/history_details_activity_split_card.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_metric_card.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_overall_state_card.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_recommendations_card.dart';
-import 'package:chrisimhof/features/history_details/widgets/history_details_weekly_analytics_card.dart';
 import 'package:flutter/material.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -12,6 +10,34 @@ import 'package:get/get.dart';
 
 class HistoryDetailsScreen extends StatelessWidget {
   const HistoryDetailsScreen({super.key});
+
+  String _formatDateTime(String dateTimeString) {
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
+      final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+      final minute = dateTime.minute.toString().padLeft(2, '0');
+      final second = dateTime.second.toString().padLeft(2, '0');
+
+      return '${dateTime.day} ${months[dateTime.month - 1]} ${dateTime.year} $hour:$minute:$second';
+    } catch (e) {
+      return dateTimeString;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +53,22 @@ class HistoryDetailsScreen extends StatelessWidget {
         }
 
         if (resultData == null) {
-          return const SizedBox.shrink();
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                controller.error.value.isNotEmpty
+                    ? controller.error.value
+                    : 'No data available',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
         }
 
         return SingleChildScrollView(
@@ -53,7 +94,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                           'History Details',
                           style: getTextStyle(
                             color: AppColors.primaryTextColor,
-                            fontSize: 23,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -63,7 +104,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 16.0),
                         child: Text(
-                          '17 March 2026 20:48:33',
+                          _formatDateTime(resultData.createdAt),
                           style: getTextStyle(
                             color: AppColors.primaryTextColor,
                             fontSize: 12,
@@ -120,18 +161,6 @@ class HistoryDetailsScreen extends StatelessWidget {
                   ];
                   return HistoryDetailsMetricCard(metric: metrics[index]);
                 },
-              ),
-              const SizedBox(height: 16),
-
-              // Daily Activity Split Section
-              HistoryDetailsActivitySplitCard(
-                activityItems: resultData.activityItems,
-              ),
-              const SizedBox(height: 16),
-
-              // Weekly Analytics Section
-              HistoryDetailsWeeklyAnalyticsCard(
-                weeklyScores: resultData.weeklyScores,
               ),
               const SizedBox(height: 16),
 
