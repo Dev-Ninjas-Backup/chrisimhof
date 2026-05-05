@@ -26,6 +26,7 @@ class CalculatorController extends GetxController {
   final RxString sessionError = ''.obs;
   final RxMap<String, dynamic> liveScores = <String, dynamic>{}.obs;
   int _sessionFetchSerial = 0;
+  bool _screenEntryRefreshQueued = false;
 
   // Sleep submission
   final RxBool isSleepSubmitting = false.obs;
@@ -119,6 +120,16 @@ class CalculatorController extends GetxController {
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
+  }
+
+  void handleCalculatorScreenEntered() {
+    if (_screenEntryRefreshQueued) return;
+
+    _screenEntryRefreshQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _screenEntryRefreshQueued = false;
+      fetchCalculatorSession(applyPrefill: true, showInitialLoading: true);
+    });
   }
 
   Future<void> fetchCalculatorSession({
