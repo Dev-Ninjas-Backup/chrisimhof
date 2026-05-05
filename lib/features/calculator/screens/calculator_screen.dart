@@ -11,13 +11,33 @@ import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_t
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CalculatorScreen extends StatelessWidget {
+class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final CalculatorController controller = Get.put(CalculatorController());
+  State<CalculatorScreen> createState() => _CalculatorScreenState();
+}
 
+class _CalculatorScreenState extends State<CalculatorScreen> {
+  late final CalculatorController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.isRegistered<CalculatorController>()
+        ? Get.find<CalculatorController>()
+        : Get.put(CalculatorController());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchCalculatorSession(
+        applyPrefill: true,
+        showInitialLoading: true,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(

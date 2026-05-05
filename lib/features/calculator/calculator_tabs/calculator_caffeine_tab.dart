@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
+import 'package:chrisimhof/features/calculator/widgets/calculator_live_score_section.dart';
 import 'package:chrisimhof/features/calculator/widgets/caffeine_history_list.dart';
 import 'package:chrisimhof/features/calculator/widgets/quick_entry.dart';
 import 'package:chrisimhof/features/calculator/widgets/value_slider_card.dart';
@@ -31,6 +32,9 @@ class CalculatorCaffeineTab extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 16),
+
+          const CalculatorLiveScoreSection(sectionKey: 'caffeine'),
           const SizedBox(height: 16),
 
           Obx(
