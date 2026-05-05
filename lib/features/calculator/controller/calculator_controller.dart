@@ -84,6 +84,9 @@ class CalculatorController extends GetxController {
   // training intent for sport: NO_TRAINING, WILL_TRAIN, ALREADY_TRAINED
   final RxString trainingIntent = 'NO_TRAINING'.obs;
   final RxDouble sportIntensity = 0.0.obs;
+  // Sport activities list (from session / latest results)
+  final RxList<Map<String, dynamic>> sportActivities =
+      <Map<String, dynamic>>[].obs;
 
   // Caffeine Tab Controllers
   final RxDouble caffeine24hValue = 0.0.obs;
@@ -422,6 +425,32 @@ class CalculatorController extends GetxController {
       final sport = d['sport'];
       if (sport != null && sport is Map<String, dynamic>) {
         var appliedSport = false;
+
+        // Support new shape: sport.activities (list)
+        if (sport['activities'] != null && sport['activities'] is List) {
+          final list = <Map<String, dynamic>>[];
+          for (final a in (sport['activities'] as List)) {
+            if (a is Map<String, dynamic>) {
+              final type = a['activityType'] ?? a['activity'] ?? '';
+              final intensity = a['intensity'] ?? '';
+              final duration = a['durationMin'] ?? a['duration'] ?? 0;
+              final performedAt = a['performedAt'] ?? '';
+              list.add({
+                'activityType': type.toString(),
+                'intensity': intensity.toString(),
+                'durationMin': duration,
+                'performedAt': performedAt.toString(),
+              });
+            }
+          }
+
+          if (list.isNotEmpty) {
+            sportActivities.assignAll(list);
+            appliedSport = true;
+          }
+        }
+
+        // Backwards compatible single-field mapping
         if (sport['activityType'] != null) {
           try {
             selectedActivityType.value = ActivityType.fromApiValue(
@@ -785,6 +814,32 @@ class CalculatorController extends GetxController {
       if (!appliedSections.contains('sport') &&
           activityObj is Map<String, dynamic>) {
         var appliedAct = false;
+
+        // If activity list present in latest result, populate sportActivities
+        if (activityObj['activities'] != null &&
+            activityObj['activities'] is List) {
+          final list = <Map<String, dynamic>>[];
+          for (final a in (activityObj['activities'] as List)) {
+            if (a is Map<String, dynamic>) {
+              final type = a['activityType'] ?? a['activity'] ?? '';
+              final intensity = a['intensity'] ?? '';
+              final duration = a['durationMin'] ?? a['duration'] ?? 0;
+              final performedAt = a['performedAt'] ?? '';
+              list.add({
+                'activityType': type.toString(),
+                'intensity': intensity.toString(),
+                'durationMin': duration,
+                'performedAt': performedAt.toString(),
+              });
+            }
+          }
+
+          if (list.isNotEmpty) {
+            sportActivities.assignAll(list);
+            appliedAct = true;
+          }
+        }
+
         if (activityObj['activityType'] != null) {
           try {
             selectedActivityType.value = ActivityType.fromApiValue(
@@ -1017,7 +1072,6 @@ class CalculatorController extends GetxController {
         isReadyToCalculate: response.isReadyToCalculate,
         prefilled: false,
       );
-
       changeTab(5);
     } catch (e) {
       caffeineSubmitError.value = e.toString();
@@ -1449,7 +1503,7 @@ class CalculatorController extends GetxController {
         if (sportIntensity.value == 1.0) {
           activityIntensity = 'MODERATE';
         } else if (sportIntensity.value == 2.0) {
-          activityIntensity = 'HIGH';
+          activityIntensity = 'HARD';
         } else {
           activityIntensity = 'LIGHT';
         }
@@ -1457,9 +1511,7 @@ class CalculatorController extends GetxController {
 
       // Build activities array per new API shape
       final activities = <SportActivity>[];
-      if (intent == 'NO_TRAINING' ||
-          intent == 'WILL_TRAIN' ||
-          intent == 'ALREADY_TRAINED') {
+      if (intent == 'WILL_TRAIN' || intent == 'ALREADY_TRAINED') {
         activities.add(
           SportActivity(
             activityType: activityType,
@@ -1489,6 +1541,21 @@ class CalculatorController extends GetxController {
         isReadyToCalculate: response.isReadyToCalculate,
         prefilled: false,
       );
+      // Immediately reflect submitted activities in the local UI list
+      if (activities.isNotEmpty) {
+        final list = activities
+            .map(
+              (a) => {
+                'activityType': a.activityType,
+                'intensity': a.intensity,
+                'durationMin': a.durationMin,
+                'performedAt': a.performedAt,
+              },
+            )
+            .toList();
+        // Append so new activities appear at the end
+        sportActivities.addAll(list);
+      }
     } catch (e) {
       sportSubmitError.value = e.toString();
     } finally {

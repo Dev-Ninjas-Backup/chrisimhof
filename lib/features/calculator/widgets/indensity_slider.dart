@@ -54,7 +54,7 @@ class IntensitySlider extends StatelessWidget {
           children: [
             _buildLabel("Low", value == 0),
             _buildLabel("Moderate", value == 1),
-            _buildLabel("High", value == 2),
+            _buildLabel("Hard", value == 2),
           ],
         ),
       ],
