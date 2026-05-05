@@ -46,6 +46,7 @@ class CalculatorSession {
   final bool isReadyToCalculate;
   final bool prefilled;
   final dynamic data;
+  final dynamic liveScores;
 
   CalculatorSession({
     this.sessionId,
@@ -55,6 +56,7 @@ class CalculatorSession {
     required this.isReadyToCalculate,
     required this.prefilled,
     this.data,
+    this.liveScores,
   });
 
   factory CalculatorSession.fromJson(Map<String, dynamic> json) {
@@ -68,6 +70,7 @@ class CalculatorSession {
       isReadyToCalculate: json['isReadyToCalculate'] ?? false,
       prefilled: json['prefilled'] ?? false,
       data: json['data'],
+      liveScores: json['liveScores'],
     );
   }
 }

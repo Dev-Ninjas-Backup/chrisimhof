@@ -10,10 +10,8 @@ import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model
 import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
 
 class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
@@ -24,7 +22,10 @@ class CalculatorController extends GetxController {
   final CalculatorService _calculatorService = CalculatorService();
   final Rx<CalculatorSession?> calculatorSession = Rx(null);
   final RxBool isSessionLoading = true.obs;
+  final RxBool isLiveScoresRefreshing = false.obs;
   final RxString sessionError = ''.obs;
+  final RxMap<String, dynamic> liveScores = <String, dynamic>{}.obs;
+  int _sessionFetchSerial = 0;
 
   // Sleep submission
   final RxBool isSleepSubmitting = false.obs;
@@ -118,17 +119,30 @@ class CalculatorController extends GetxController {
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
-    _fetchCalculatorSession();
   }
 
-  Future<void> _fetchCalculatorSession() async {
+  Future<void> fetchCalculatorSession({
+    bool applyPrefill = true,
+    bool showInitialLoading = true,
+  }) async {
+    final requestSerial = ++_sessionFetchSerial;
+
     try {
-      isSessionLoading.value = true;
+      if (showInitialLoading) {
+        isSessionLoading.value = true;
+      } else {
+        isLiveScoresRefreshing.value = true;
+      }
       sessionError.value = '';
 
       final response = await _calculatorService.getCalculatorSession();
 
+      if (requestSerial != _sessionFetchSerial) return;
+
       calculatorSession.value = response.data;
+      _applyLiveScores(response.data.liveScores);
+
+      if (!applyPrefill) return;
 
       // Apply any prefilled data from the session (sleep/work/nutrition/hydration/caffeine/sport)
       final applied = _applySessionPrefill(response.data);
@@ -152,9 +166,46 @@ class CalculatorController extends GetxController {
         }
       }
     } catch (e) {
-      sessionError.value = e.toString();
+      if (requestSerial == _sessionFetchSerial) {
+        sessionError.value = e.toString();
+      }
     } finally {
-      isSessionLoading.value = false;
+      if (requestSerial == _sessionFetchSerial) {
+        if (showInitialLoading) {
+          isSessionLoading.value = false;
+        } else {
+          isLiveScoresRefreshing.value = false;
+        }
+      }
+    }
+  }
+
+  void _applyLiveScores(dynamic rawLiveScores) {
+    if (rawLiveScores is! Map) {
+      liveScores.clear();
+      return;
+    }
+
+    liveScores.assignAll(Map<String, dynamic>.from(rawLiveScores));
+
+    final sections = liveScores['sections'];
+    if (sections is! Map) return;
+
+    final caffeine = sections['caffeine'];
+    if (caffeine is Map) {
+      final totalConsumedMg = caffeine['totalConsumedMg'];
+      final rolling24hMg = caffeine['rolling24hMg'];
+      final activeMg = caffeine['activeMg'];
+
+      if (totalConsumedMg is num) {
+        caffeine24hValue.value = totalConsumedMg.toDouble();
+      } else if (rolling24hMg is num) {
+        caffeine24hValue.value = rolling24hMg.toDouble();
+      }
+
+      if (activeMg is num) {
+        caffeineLastEightHoursValue.value = activeMg.toDouble();
+      }
     }
   }
 
@@ -171,7 +222,7 @@ class CalculatorController extends GetxController {
       // Sleep
       final sleep = d['sleep'];
       if (sleep != null && sleep is Map<String, dynamic>) {
-        var _sleepApplied = false;
+        var sleepApplied = false;
         if (sleep['wakeUpTime'] != null) {
           final parts = (sleep['wakeUpTime'] as String).split(':');
           if (parts.length == 2) {
@@ -254,11 +305,11 @@ class CalculatorController extends GetxController {
           if (list.isNotEmpty) {
             wantsNap.value = true;
             naps.assignAll(list);
-            _sleepApplied = true;
+            sleepApplied = true;
           }
         }
         // mark sleep applied only if at least one field was set
-        if (_sleepApplied ||
+        if (sleepApplied ||
             sleep['wakeUpTime'] != null ||
             sleep['sleepHours'] != null ||
             sleep['desiredSleepHours'] != null ||
@@ -859,12 +910,13 @@ class CalculatorController extends GetxController {
 
         if (activityObj['activityIntensity'] != null) {
           final ai = activityObj['activityIntensity'].toString().toLowerCase();
-          if (ai == 'light')
+          if (ai == 'light') {
             sportIntensity.value = 0.0;
-          else if (ai == 'moderate')
+          } else if (ai == 'moderate') {
             sportIntensity.value = 1.0;
-          else if (ai == 'high')
+          } else if (ai == 'high') {
             sportIntensity.value = 2.0;
+          }
           appliedAct = true;
         }
 
@@ -1118,7 +1170,10 @@ class CalculatorController extends GetxController {
   }
 
   void changeTab(int index) {
+    if (index < 0 || index >= tabs.length) return;
+
     selectedTabIndex.value = index;
+    fetchCalculatorSession(applyPrefill: false, showInitialLoading: false);
   }
 
   String _formatErrorMessage(Object error, {String? servicePrefix}) {
