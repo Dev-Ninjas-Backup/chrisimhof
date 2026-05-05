@@ -39,7 +39,7 @@ class HistoryDetailsController extends GetxController {
 
   Future<void> loadHistoryDetailsData() async {
     if (historyId.isEmpty) {
-      error.value = 'History ID not provided';
+      error.value = 'History ID not provided'.tr;
       return;
     }
 
@@ -49,16 +49,17 @@ class HistoryDetailsController extends GetxController {
       final data = await _service.fetchHistoryDetails(historyId);
       resultData.value = data;
     } catch (e) {
-      error.value = 'Failed to load history details: ${e.toString()}';
+      // keep the dynamic exception text but translate the static prefix
+      error.value = '${'Failed to load history details'.tr}: ${e.toString()}';
     } finally {
       isLoading.value = false;
     }
   }
 
   String getLabelForScore(int score) {
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Good';
-    if (score >= 40) return 'Fair';
-    return 'Needs Improvement';
+    if (score >= 80) return 'Excellent'.tr;
+    if (score >= 60) return 'Good'.tr;
+    if (score >= 40) return 'Fair'.tr;
+    return 'Needs Improvement'.tr;
   }
 }

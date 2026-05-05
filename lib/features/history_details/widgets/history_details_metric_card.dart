@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/history_details/model/history_details_model.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_icon_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class HistoryDetailsMetricCard extends StatelessWidget {
   final HistoryMetric metric;
@@ -25,7 +26,7 @@ class HistoryDetailsMetricCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  metric.title,
+                  metric.title.tr,
                   style: getTextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -47,7 +48,7 @@ class HistoryDetailsMetricCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Score: ${metric.score}%',
+            'Score: @value%'.trParams({'value': metric.score.toString()}),
             style: getTextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,

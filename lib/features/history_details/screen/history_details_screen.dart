@@ -15,21 +15,21 @@ class HistoryDetailsScreen extends StatelessWidget {
     try {
       final dateTime = DateTime.parse(dateTimeString);
       final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
+        'Jan'.tr,
+        'Feb'.tr,
+        'Mar'.tr,
+        'Apr'.tr,
+        'May'.tr,
+        'Jun'.tr,
+        'Jul'.tr,
+        'Aug'.tr,
+        'Sep'.tr,
+        'Oct'.tr,
+        'Nov'.tr,
+        'Dec'.tr,
       ];
       final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
-      final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+      final period = dateTime.hour >= 12 ? 'PM'.tr : 'AM'.tr;
       final minute = dateTime.minute.toString().padLeft(2, '0');
       final second = dateTime.second.toString().padLeft(2, '0');
 
@@ -59,7 +59,7 @@ class HistoryDetailsScreen extends StatelessWidget {
               child: Text(
                 controller.error.value.isNotEmpty
                     ? controller.error.value
-                    : 'No data available',
+                    : 'No data available'.tr,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -91,10 +91,10 @@ class HistoryDetailsScreen extends StatelessWidget {
                     Expanded(
                       child: Center(
                         child: Text(
-                          'History Details',
+                          'History Details'.tr,
                           style: getTextStyle(
                             color: AppColors.primaryTextColor,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
