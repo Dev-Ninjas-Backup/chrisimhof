@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/history_details/model/history_details_model.dart';
 import 'package:chrisimhof/features/history_details/widgets/history_details_icon_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class HistoryDetailsRecommendationsCard extends StatelessWidget {
   final List<HistoryRecommendation> recommendations;
@@ -25,7 +26,7 @@ class HistoryDetailsRecommendationsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recommendations of the day',
+            'Recommendations of the day'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
