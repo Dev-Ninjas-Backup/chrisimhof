@@ -9,6 +9,7 @@ import 'package:chrisimhof/features/calculator/results/model/calculate_result_mo
 import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
 import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
+import 'package:chrisimhof/features/calculator/widgets/sport_activity_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -88,6 +89,8 @@ class CalculatorSportTab extends StatelessWidget {
                   const SizedBox(height: 24),
                 ],
               ),
+              const SizedBox(height: 24),
+              const SportActivityList(),
               const SizedBox(height: 120),
 
               CustomButton(
@@ -111,10 +114,10 @@ class CalculatorSportTab extends StatelessWidget {
                           : ActivityType.walk.displayName;
                       final intensityText =
                           (controller.sportIntensity.value == 2.0)
-                          ? 'High'.tr
+                          ? 'Hard'.tr
                           : (controller.sportIntensity.value == 1.0)
-                          ? 'Moderate'.tr
-                          : 'Light'.tr;
+                              ? 'Moderate'.tr
+                              : 'Light'.tr;
 
                       Get.bottomSheet(
                         Container(
