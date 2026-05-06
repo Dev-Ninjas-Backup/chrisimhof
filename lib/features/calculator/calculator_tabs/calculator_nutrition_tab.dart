@@ -17,107 +17,104 @@ class CalculatorNutritionTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CalculatorController>();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          const CalculatorLiveScoreSection(sectionKey: 'nutrition'),
-          const SizedBox(height: 16),
-          CustomRangeSlider(
-            required: false,
-            headerText: "Desired Number of Meals".tr,
-            controller: controller.desiredNumberOfMealsController,
-          ),
-          const SizedBox(height: 24),
-          // CustomRangeSlider(
-          //   required: false,
-          //   headerText: "Meals Per Day".tr,
-          //   controller: controller.desiredNumberOfMealsController,
-          // ),
-          // const SizedBox(height: 24),
-          TimeWidget(
-            topTitle: 'First Meal Time'.tr,
-            controller: controller.firstMealTimeController,
-          ),
-          const SizedBox(height: 24),
-          TimeWidget(
-            topTitle: 'Last Meal Time'.tr,
-            controller: controller.lastMealTimeController,
-          ),
-          const SizedBox(height: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Already had a meal today?".tr,
-                style: getTextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
+    return Column(
+      children: [
+        const CalculatorLiveScoreSection(sectionKey: 'nutrition'),
+        const SizedBox(height: 16),
+        CustomRangeSlider(
+          required: false,
+          headerText: "Desired Number of Meals".tr,
+          controller: controller.desiredNumberOfMealsController,
+        ),
+        const SizedBox(height: 24),
+        // CustomRangeSlider(
+        //   required: false,
+        //   headerText: "Meals Per Day".tr,
+        //   controller: controller.desiredNumberOfMealsController,
+        // ),
+        // const SizedBox(height: 24),
+        TimeWidget(
+          topTitle: 'First Meal Time'.tr,
+          controller: controller.firstMealTimeController,
+        ),
+        const SizedBox(height: 24),
+        TimeWidget(
+          topTitle: 'Last Meal Time'.tr,
+          controller: controller.lastMealTimeController,
+        ),
+        const SizedBox(height: 24),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Already had a meal today?".tr,
+              style: getTextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryTextColor,
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: Obx(
-                      () => SelectableTabButton(
-                        text: 'Yes'.tr,
-                        isSelected:
-                            controller.hasMealTodaySelection.value == 'Yes',
-                        onTap: () =>
-                            controller.hasMealTodaySelection.value = 'Yes',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Obx(
-                      () => SelectableTabButton(
-                        text: 'No'.tr,
-                        isSelected:
-                            controller.hasMealTodaySelection.value == 'No',
-                        onTap: () =>
-                            controller.hasMealTodaySelection.value = 'No',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 130),
-          Obx(
-            () => CustomButton(
-              text: controller.isNutritionSubmitting.value
-                  ? 'Submitting...'.tr
-                  : 'Next'.tr,
-              onTap: controller.isNutritionSubmitting.value
-                  ? null
-                  : () {
-                      controller.submitNutritionData();
-                    },
-              width: double.infinity,
             ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Obx(
+                    () => SelectableTabButton(
+                      text: 'Yes'.tr,
+                      isSelected:
+                          controller.hasMealTodaySelection.value == 'Yes',
+                      onTap: () =>
+                          controller.hasMealTodaySelection.value = 'Yes',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Obx(
+                    () => SelectableTabButton(
+                      text: 'No'.tr,
+                      isSelected:
+                          controller.hasMealTodaySelection.value == 'No',
+                      onTap: () =>
+                          controller.hasMealTodaySelection.value = 'No',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 130),
+        Obx(
+          () => CustomButton(
+            text: controller.isNutritionSubmitting.value
+                ? 'Submitting...'.tr
+                : 'Next'.tr,
+            onTap: controller.isNutritionSubmitting.value
+                ? null
+                : () {
+                    controller.submitNutritionData();
+                  },
+            width: double.infinity,
           ),
-          Obx(() {
-            final errorMessage = controller.nutritionSubmitError.value;
+        ),
+        Obx(() {
+          final errorMessage = controller.nutritionSubmitError.value;
 
-            if (errorMessage.isEmpty) {
-              return const SizedBox.shrink();
-            }
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              EasyLoading.showError(errorMessage);
-              if (controller.nutritionSubmitError.value == errorMessage) {
-                controller.nutritionSubmitError.value = '';
-              }
-            });
-
+          if (errorMessage.isEmpty) {
             return const SizedBox.shrink();
-          }),
-        ],
-      ),
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            EasyLoading.showError(errorMessage);
+            if (controller.nutritionSubmitError.value == errorMessage) {
+              controller.nutritionSubmitError.value = '';
+            }
+          });
+
+          return const SizedBox.shrink();
+        }),
+      ],
     );
   }
 }

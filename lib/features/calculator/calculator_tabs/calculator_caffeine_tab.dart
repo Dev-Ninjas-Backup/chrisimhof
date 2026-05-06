@@ -18,7 +18,6 @@ class CalculatorCaffeineTab extends StatelessWidget {
     final CalculatorController controller = Get.find<CalculatorController>();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
