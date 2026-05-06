@@ -90,7 +90,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
                     : 'Next'.tr,
                 onTap: () {
                   if (!controller.isCaffeineSubmitting.value) {
-                    _handleSubmitCaffeine(controller);
+                    handleSubmitCaffeine(controller);
                   }
                 },
               ),
@@ -145,7 +145,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
     );
   }
 
-  void _handleSubmitCaffeine(CalculatorController controller) async {
+  void handleSubmitCaffeine(CalculatorController controller) async {
     try {
       await controller.submitCaffeineIntake();
     } catch (e) {
