@@ -8,6 +8,7 @@ class AnalyticsResponseModel {
   final List<SleepTrendPoint> sleepTrend;
   final WellnessRadar wellnessRadar;
   final ActivitySplit activitySplit;
+  final CircadianAnalysis? circadianAnalysis;
 
   const AnalyticsResponseModel({
     required this.period,
@@ -19,6 +20,7 @@ class AnalyticsResponseModel {
     required this.sleepTrend,
     required this.wellnessRadar,
     required this.activitySplit,
+    this.circadianAnalysis,
   });
 
   factory AnalyticsResponseModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,51 @@ class AnalyticsResponseModel {
       activitySplit: ActivitySplit.fromJson(
         json['activitySplit'] as Map<String, dynamic>? ?? const {},
       ),
+      circadianAnalysis: json['circadianAnalysis'] != null
+          ? CircadianAnalysis.fromJson(
+              json['circadianAnalysis'] as Map<String, dynamic>,
+            )         : null);
+    }
+  }
+
+
+class CircadianPoint {
+  final int hour;
+  final double avgScore;
+  final int sampleCount;
+
+  const CircadianPoint({
+    required this.hour,
+    required this.avgScore,
+    required this.sampleCount,
+  });
+
+  factory CircadianPoint.fromJson(Map<String, dynamic> json) {
+    return CircadianPoint(
+      hour: _toInt(json['hour']),
+      avgScore: _toDouble(json['avgScore']),
+      sampleCount: _toInt(json['sampleCount']),
+    );
+  }
+}
+
+class CircadianAnalysis {
+  final List<CircadianPoint> data;
+  final int? peakHour;
+
+  const CircadianAnalysis({
+    required this.data,
+    this.peakHour,
+  });
+
+  factory CircadianAnalysis.fromJson(Map<String, dynamic> json) {
+    final dataList = (json['data'] as List<dynamic>? ?? [])
+        .map((item) => CircadianPoint.fromJson(item as Map<String, dynamic>))
+        .toList();
+
+    return CircadianAnalysis(
+      data: dataList,
+      peakHour: json['peakHour'] != null ? _toInt(json['peakHour']) : null,
     );
   }
 }
