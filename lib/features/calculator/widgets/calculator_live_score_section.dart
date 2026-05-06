@@ -155,19 +155,17 @@ class CalculatorLiveScoreSection extends StatelessWidget {
         ];
       case 'caffeine':
         return [
-          if (section['totalConsumedMg'] != null)
-            'Total consumed: @value mg'.trParams({
-              'value': _formatValue(section['totalConsumedMg']),
-            }),
+          // if (section['totalConsumedMg'] != null)
+          //   'Total consumed: ${_formatValue(section['totalConsumedMg'])} mg'.tr,
           if (section['rolling8hMg'] != null)
             'Last 8 hours: @value mg'.trParams({
               'value': _formatValue(section['rolling8hMg']),
             }),
           if (section['rolling24hMg'] != null)
-            'Last 24 hours: @value mg'.trParams({
-              'value': _formatValue(section['rolling24hMg']),
-            }),
-          if (_text(section['subtitle']).isNotEmpty) _text(section['subtitle']),
+            'Last 24 hours: ${_formatValue(section['rolling24hMg'])} mg'.tr,
+          if (section['activeMg'] != null)
+            'Active Mg: ${_formatValue(section['activeMg'])} mg'.tr,
+          // if (_text(section['subtitle']).isNotEmpty) _text(section['subtitle']),
         ];
       case 'sport':
         return [

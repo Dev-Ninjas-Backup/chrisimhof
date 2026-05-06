@@ -14,112 +14,109 @@ class CalculatorHydrationTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CalculatorController>();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CalculatorLiveScoreSection(sectionKey: 'hydration'),
-          // const SizedBox(height: 16),
-          // Container(
-          //   padding: const EdgeInsets.all(10),
-          //   width: double.infinity,
-          //   decoration: BoxDecoration(
-          //     color: const Color(0xFFE9EAEB),
-          //     borderRadius: BorderRadius.circular(10),
-          //   ),
-          //   child: Text(
-          //     "Recommended hydration 2.5L per day".tr,
-          //     textAlign: TextAlign.center,
-          //     style: getTextStyle(
-          //       color: Colors.black,
-          //       fontSize: 14,
-          //       fontWeight: FontWeight.w500,
-          //     ),
-          //   ),
-          // ),
-          const SizedBox(height: 24),
-          CustomRangeSlider(
-            required: false,
-            headerText: "Already Consumed (L)".tr,
-            controller: controller.hydrationConsumedController,
-            divisions: 40,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const CalculatorLiveScoreSection(sectionKey: 'hydration'),
+        // const SizedBox(height: 16),
+        // Container(
+        //   padding: const EdgeInsets.all(10),
+        //   width: double.infinity,
+        //   decoration: BoxDecoration(
+        //     color: const Color(0xFFE9EAEB),
+        //     borderRadius: BorderRadius.circular(10),
+        //   ),
+        //   child: Text(
+        //     "Recommended hydration 2.5L per day".tr,
+        //     textAlign: TextAlign.center,
+        //     style: getTextStyle(
+        //       color: Colors.black,
+        //       fontSize: 14,
+        //       fontWeight: FontWeight.w500,
+        //     ),
+        //   ),
+        // ),
+        const SizedBox(height: 24),
+        CustomRangeSlider(
+          required: false,
+          headerText: "Already Consumed (L)".tr,
+          controller: controller.hydrationConsumedController,
+          divisions: 40,
+        ),
+        const SizedBox(height: 26),
+        CustomRangeSlider(
+          required: false,
+          headerText: "Daily Goal (L)".tr,
+          controller: controller.hydrationDailyGoalController,
+          divisions: 40,
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(10),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE9EAEB),
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(height: 26),
-          CustomRangeSlider(
-            required: false,
-            headerText: "Daily Goal (L)".tr,
-            controller: controller.hydrationDailyGoalController,
-            divisions: 40,
+          child: Text(
+            "Hydration recommendation may adjust automatically based on sport activity"
+                .tr,
+            style: getTextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(10),
+        ),
+        const SizedBox(height: 130),
+        Obx(
+          () => CustomButton(
+            text: controller.isHydrationSubmitting.value
+                ? 'Submitting...'.tr
+                : 'Next'.tr,
+            onTap: controller.isHydrationSubmitting.value
+                ? null
+                : () {
+                    controller.submitHydrationData();
+                  },
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE9EAEB),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              "Hydration recommendation may adjust automatically based on sport activity"
-                  .tr,
-              style: getTextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ),
-          const SizedBox(height: 130),
-          Obx(
-            () => CustomButton(
-              text: controller.isHydrationSubmitting.value
-                  ? 'Submitting...'.tr
-                  : 'Next'.tr,
-              onTap: controller.isHydrationSubmitting.value
-                  ? null
-                  : () {
-                      controller.submitHydrationData();
-                    },
-              width: double.infinity,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Obx(() {
-            final errorMessage = controller.hydrationSubmitError.value;
+        ),
+        const SizedBox(height: 16),
+        Obx(() {
+          final errorMessage = controller.hydrationSubmitError.value;
 
-            if (errorMessage.isEmpty) {
-              return const SizedBox.shrink();
-            }
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              EasyLoading.showError(errorMessage);
-              if (controller.hydrationSubmitError.value == errorMessage) {
-                controller.hydrationSubmitError.value = '';
-              }
-            });
-
+          if (errorMessage.isEmpty) {
             return const SizedBox.shrink();
-          }),
-          CustomButton(
-            text: "Reset".tr,
-            onTap: () async {
-              try {
-                final msg = await controller.resetSession();
+          }
 
-                controller.hydrationConsumedController.updateValue(0.0);
-                controller.hydrationDailyGoalController.updateValue(0.0);
-                controller.hydrationSubmitError.value = '';
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            EasyLoading.showError(errorMessage);
+            if (controller.hydrationSubmitError.value == errorMessage) {
+              controller.hydrationSubmitError.value = '';
+            }
+          });
 
-                EasyLoading.showSuccess(msg);
-              } catch (e) {
-                EasyLoading.showError(e.toString());
-              }
-            },
-            backgroundColor: Colors.grey[300],
-          ),
-        ],
-      ),
+          return const SizedBox.shrink();
+        }),
+        CustomButton(
+          text: "Reset".tr,
+          onTap: () async {
+            try {
+              final msg = await controller.resetSession();
+
+              controller.hydrationConsumedController.updateValue(0.0);
+              controller.hydrationDailyGoalController.updateValue(0.0);
+              controller.hydrationSubmitError.value = '';
+
+              EasyLoading.showSuccess(msg);
+            } catch (e) {
+              EasyLoading.showError(e.toString());
+            }
+          },
+          backgroundColor: Colors.grey[300],
+        ),
+      ],
     );
   }
 }
