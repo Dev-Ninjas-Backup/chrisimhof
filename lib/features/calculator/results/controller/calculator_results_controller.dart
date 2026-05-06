@@ -1,5 +1,6 @@
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class CalculatorResultsController extends GetxController {
@@ -46,6 +47,20 @@ class CalculatorResultsController extends GetxController {
 
     try {
       final response = await _calculatorService.calculateResult(sessionId!);
+
+      if (kDebugMode) {
+        try {
+          print('===== CALCULATE RESULT API RESPONSE =====');
+          print('overall: ${response.overallScore}');
+          print('sleep: ${response.scoreBreakdown.sleep}');
+          print('nutrition: ${response.scoreBreakdown.nutrition}');
+          print('hydration: ${response.scoreBreakdown.hydration}');
+          print('caffeine: ${response.scoreBreakdown.caffeine}');
+          print('activity: ${response.scoreBreakdown.activity}');
+          print('recovery: ${response.scoreBreakdown.recovery}');
+          print('=========================================');
+        } catch (_) {}
+      }
 
       resultData.value = response;
     } catch (e) {

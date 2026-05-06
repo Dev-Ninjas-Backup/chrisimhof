@@ -277,6 +277,53 @@ class CalculatorSportTab extends StatelessWidget {
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                backgroundColor: AppColors.primaryButtonColor,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryButtonColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    try {
+                      Get.to(
+                        () => CalculatorResultsScreen(
+                          initialData: CalculateResultResponse(
+                            id: '',
+                            overallScore: 0,
+                            scoreBreakdown: ScoreBreakdown(
+                              sleep: 0,
+                              nutrition: 0,
+                              hydration: 0,
+                              caffeine: 0,
+                              activity: 0,
+                              recovery: 0,
+                            ),
+                            recommendations: [],
+                            createdAt: '',
+                          ),
+                          sessionId:
+                              controller.calculatorSession.value?.sessionId,
+                        ),
+                      );
+                    } catch (e) {
+                      EasyLoading.showError(e.toString());
+                    }
+                  },
+                  child: Text(
+                    'Calculate'.tr,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

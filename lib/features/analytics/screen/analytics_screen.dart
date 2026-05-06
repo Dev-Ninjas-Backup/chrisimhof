@@ -5,6 +5,7 @@ import 'package:chrisimhof/features/analytics/widget/daily_activity_split_card.d
 import 'package:chrisimhof/features/analytics/widget/sleep_trend_card.dart';
 import 'package:chrisimhof/features/analytics/widget/weekly_analytics_card.dart';
 import 'package:chrisimhof/features/analytics/widget/wellness_score_card.dart';
+import 'package:chrisimhof/features/analytics/widget/history_details_weekly_analytics_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -38,6 +39,8 @@ class AnalyticsScreen extends StatelessWidget {
               WellnessScoreCard(),
               SizedBox(height: 16),
               DailyActivitySplitCard(),
+              SizedBox(height: 16),
+              HistoryDetailsWeeklyAnalyticsCard(),
             ],
           ),
         ),
