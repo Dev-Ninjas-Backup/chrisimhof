@@ -434,6 +434,38 @@ class CalculatorService {
     }
   }
 
+  Future<Map<String, dynamic>> resetSession(String sessionId) async {
+    final uri = Uri.parse(Urls.sessionReset(sessionId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+
+    try {
+      final response = await http
+          .delete(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': '*/*',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.body.isEmpty) {
+        return {'message': 'Session reset.'};
+      }
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return jsonData;
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to reset session');
+      }
+    } catch (e) {
+      throw Exception('Error resetting session: $e');
+    }
+  }
+
   // Future<CalculateResultResponse> getLatestResult() async {
   //   final uri = Uri.parse(Urls.latestResults);
   //   final accessToken = await SharedPreferencesHelper.getAccessToken();

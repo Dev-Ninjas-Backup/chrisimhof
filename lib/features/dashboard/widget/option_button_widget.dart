@@ -12,7 +12,7 @@ class OptionButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16),
-      margin: EdgeInsets.only(bottom: 16, left: 16, right: 16),
+      margin: EdgeInsets.only(bottom: 16),
       width: Get.width,
       decoration: BoxDecoration(
         color: Colors.white,

@@ -56,7 +56,7 @@ class CalculatorSleepTab extends StatelessWidget {
           return Column(
             children: [
               CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
+                contentPadding: EdgeInsets.only(left: 16),
                 title: Text('I want to take a nap'.tr),
                 value: controller.wantsNap.value,
                 onChanged: (val) => controller.setWantsNap(val ?? false),
@@ -210,15 +210,23 @@ class CalculatorSleepTab extends StatelessWidget {
         }),
         CustomButton(
           text: "Reset".tr,
-          onTap: () {
-            controller.clearAllNaps();
-            controller.setWantsNap(false);
-            controller.wakeUpController.reset();
-            controller.sleepLastNightController.updateValue(1);
-            controller.sleepGoalController.updateValue(1);
-            controller.fatigueLevel.value = 'Low';
-            controller.desiredSleepStartController.reset();
-            controller.desiredSleepEndController.reset();
+          onTap: () async {
+            try {
+              final msg = await controller.resetSession();
+
+              controller.clearAllNaps();
+              controller.setWantsNap(false);
+              controller.wakeUpController.reset();
+              controller.sleepLastNightController.updateValue(1);
+              controller.sleepGoalController.updateValue(1);
+              controller.fatigueLevel.value = 'Low';
+              controller.desiredSleepStartController.reset();
+              controller.desiredSleepEndController.reset();
+
+              EasyLoading.showSuccess(msg);
+            } catch (e) {
+              EasyLoading.showError(e.toString());
+            }
           },
           width: double.infinity,
           backgroundColor: const Color(0xFFF3F4F6),

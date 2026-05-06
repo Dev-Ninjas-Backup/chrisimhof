@@ -29,7 +29,7 @@ class HistoryDetailsScreen extends StatelessWidget {
         'Dec'.tr,
       ];
       final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
-      final period = dateTime.hour >= 12 ? 'PM'.tr : 'AM'.tr;
+      //final period = dateTime.hour >= 12 ? 'PM'.tr : 'AM'.tr;
       final minute = dateTime.minute.toString().padLeft(2, '0');
       final second = dateTime.second.toString().padLeft(2, '0');
 

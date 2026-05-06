@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-
-// --------------- HistoryDetailsResponse ---------------
-
 class HistoryDetailsResponse {
   final String id;
   final int overallScore;

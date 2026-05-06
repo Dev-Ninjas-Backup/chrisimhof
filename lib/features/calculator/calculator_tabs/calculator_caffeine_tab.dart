@@ -8,8 +8,6 @@ import 'package:chrisimhof/features/calculator/widgets/value_slider_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 
 class CalculatorCaffeineTab extends StatelessWidget {
@@ -55,6 +53,7 @@ class CalculatorCaffeineTab extends StatelessWidget {
             () => CaffeineTrackerCard(
               current24hValue: controller.caffeine24hValue.value,
               maxValue: controller.caffeinMaxValue.value,
+              interactive: false,
             ),
           ),
           const SizedBox(height: 32),
@@ -123,8 +122,16 @@ class CalculatorCaffeineTab extends StatelessWidget {
               Expanded(
                 child: TabButton(
                   text: 'Reset'.tr,
-                  onTap: () {
-                    controller.resetCaffeineTracking();
+                  onTap: () async {
+                    try {
+                      final msg = await controller.resetSession();
+
+                      controller.resetCaffeineTracking();
+
+                      EasyLoading.showSuccess(msg);
+                    } catch (e) {
+                      EasyLoading.showError(e.toString());
+                    }
                   },
                 ),
               ),
