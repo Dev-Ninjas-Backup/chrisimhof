@@ -1,5 +1,5 @@
 enum ActivityType {
-  walk('WALK', 'Walking'),
+  walk('WALKING', 'Walking'),
   cardio('CARDIO', 'Cardio'),
   strength('STRENGTH', 'Strength Training');
 

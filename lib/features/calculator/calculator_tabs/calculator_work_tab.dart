@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
+import 'package:chrisimhof/features/calculator/widgets/calculator_live_score_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,8 @@ class CalculatorWorkTab extends StatelessWidget {
 
     return Column(
       children: [
+        const CalculatorLiveScoreSection(sectionKey: 'work'),
+        const SizedBox(height: 16),
         TimeWidget(
           topTitle: 'Work Begins'.tr,
           controller: controller.workBeginsController,

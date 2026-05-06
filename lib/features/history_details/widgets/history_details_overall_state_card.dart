@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class HistoryDetailsOverallStateCard extends StatelessWidget {
   final int score;
@@ -27,7 +28,7 @@ class HistoryDetailsOverallStateCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Overall state',
+            'Overall state'.tr,
             style: getTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -94,10 +95,7 @@ class _OverallStateRingPainter extends CustomPainter {
   final double progress;
   final int score;
 
-  const _OverallStateRingPainter({
-    required this.progress,
-    required this.score,
-  });
+  const _OverallStateRingPainter({required this.progress, required this.score});
 
   @override
   void paint(Canvas canvas, Size size) {

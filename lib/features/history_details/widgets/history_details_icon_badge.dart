@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/utils.dart';
 
 class HistoryDetailsIconBadge extends StatelessWidget {
   final String iconKey;

@@ -10,10 +10,8 @@ import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model
 import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
-import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
 
 class CalculatorController extends GetxController {
   final tabs = ['Sleep', 'Work', 'Nutrition', 'Hydration', 'Caffeine', 'Sport'];
@@ -24,7 +22,10 @@ class CalculatorController extends GetxController {
   final CalculatorService _calculatorService = CalculatorService();
   final Rx<CalculatorSession?> calculatorSession = Rx(null);
   final RxBool isSessionLoading = true.obs;
+  final RxBool isLiveScoresRefreshing = false.obs;
   final RxString sessionError = ''.obs;
+  final RxMap<String, dynamic> liveScores = <String, dynamic>{}.obs;
+  int _sessionFetchSerial = 0;
 
   // Sleep submission
   final RxBool isSleepSubmitting = false.obs;
@@ -84,6 +85,9 @@ class CalculatorController extends GetxController {
   // training intent for sport: NO_TRAINING, WILL_TRAIN, ALREADY_TRAINED
   final RxString trainingIntent = 'NO_TRAINING'.obs;
   final RxDouble sportIntensity = 0.0.obs;
+  // Sport activities list (from session / latest results)
+  final RxList<Map<String, dynamic>> sportActivities =
+      <Map<String, dynamic>>[].obs;
 
   // Caffeine Tab Controllers
   final RxDouble caffeine24hValue = 0.0.obs;
@@ -115,17 +119,30 @@ class CalculatorController extends GetxController {
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
-    _fetchCalculatorSession();
   }
 
-  Future<void> _fetchCalculatorSession() async {
+  Future<void> fetchCalculatorSession({
+    bool applyPrefill = true,
+    bool showInitialLoading = true,
+  }) async {
+    final requestSerial = ++_sessionFetchSerial;
+
     try {
-      isSessionLoading.value = true;
+      if (showInitialLoading) {
+        isSessionLoading.value = true;
+      } else {
+        isLiveScoresRefreshing.value = true;
+      }
       sessionError.value = '';
 
       final response = await _calculatorService.getCalculatorSession();
 
+      if (requestSerial != _sessionFetchSerial) return;
+
       calculatorSession.value = response.data;
+      _applyLiveScores(response.data.liveScores);
+
+      if (!applyPrefill) return;
 
       // Apply any prefilled data from the session (sleep/work/nutrition/hydration/caffeine/sport)
       final applied = _applySessionPrefill(response.data);
@@ -149,9 +166,46 @@ class CalculatorController extends GetxController {
         }
       }
     } catch (e) {
-      sessionError.value = e.toString();
+      if (requestSerial == _sessionFetchSerial) {
+        sessionError.value = e.toString();
+      }
     } finally {
-      isSessionLoading.value = false;
+      if (requestSerial == _sessionFetchSerial) {
+        if (showInitialLoading) {
+          isSessionLoading.value = false;
+        } else {
+          isLiveScoresRefreshing.value = false;
+        }
+      }
+    }
+  }
+
+  void _applyLiveScores(dynamic rawLiveScores) {
+    if (rawLiveScores is! Map) {
+      liveScores.clear();
+      return;
+    }
+
+    liveScores.assignAll(Map<String, dynamic>.from(rawLiveScores));
+
+    final sections = liveScores['sections'];
+    if (sections is! Map) return;
+
+    final caffeine = sections['caffeine'];
+    if (caffeine is Map) {
+      final totalConsumedMg = caffeine['totalConsumedMg'];
+      final rolling24hMg = caffeine['rolling24hMg'];
+      final activeMg = caffeine['activeMg'];
+
+      if (totalConsumedMg is num) {
+        caffeine24hValue.value = totalConsumedMg.toDouble();
+      } else if (rolling24hMg is num) {
+        caffeine24hValue.value = rolling24hMg.toDouble();
+      }
+
+      if (activeMg is num) {
+        caffeineLastEightHoursValue.value = activeMg.toDouble();
+      }
     }
   }
 
@@ -168,7 +222,7 @@ class CalculatorController extends GetxController {
       // Sleep
       final sleep = d['sleep'];
       if (sleep != null && sleep is Map<String, dynamic>) {
-        var _sleepApplied = false;
+        var sleepApplied = false;
         if (sleep['wakeUpTime'] != null) {
           final parts = (sleep['wakeUpTime'] as String).split(':');
           if (parts.length == 2) {
@@ -251,11 +305,11 @@ class CalculatorController extends GetxController {
           if (list.isNotEmpty) {
             wantsNap.value = true;
             naps.assignAll(list);
-            _sleepApplied = true;
+            sleepApplied = true;
           }
         }
         // mark sleep applied only if at least one field was set
-        if (_sleepApplied ||
+        if (sleepApplied ||
             sleep['wakeUpTime'] != null ||
             sleep['sleepHours'] != null ||
             sleep['desiredSleepHours'] != null ||
@@ -422,6 +476,32 @@ class CalculatorController extends GetxController {
       final sport = d['sport'];
       if (sport != null && sport is Map<String, dynamic>) {
         var appliedSport = false;
+
+        // Support new shape: sport.activities (list)
+        if (sport['activities'] != null && sport['activities'] is List) {
+          final list = <Map<String, dynamic>>[];
+          for (final a in (sport['activities'] as List)) {
+            if (a is Map<String, dynamic>) {
+              final type = a['activityType'] ?? a['activity'] ?? '';
+              final intensity = a['intensity'] ?? '';
+              final duration = a['durationMin'] ?? a['duration'] ?? 0;
+              final performedAt = a['performedAt'] ?? '';
+              list.add({
+                'activityType': type.toString(),
+                'intensity': intensity.toString(),
+                'durationMin': duration,
+                'performedAt': performedAt.toString(),
+              });
+            }
+          }
+
+          if (list.isNotEmpty) {
+            sportActivities.assignAll(list);
+            appliedSport = true;
+          }
+        }
+
+        // Backwards compatible single-field mapping
         if (sport['activityType'] != null) {
           try {
             selectedActivityType.value = ActivityType.fromApiValue(
@@ -785,6 +865,32 @@ class CalculatorController extends GetxController {
       if (!appliedSections.contains('sport') &&
           activityObj is Map<String, dynamic>) {
         var appliedAct = false;
+
+        // If activity list present in latest result, populate sportActivities
+        if (activityObj['activities'] != null &&
+            activityObj['activities'] is List) {
+          final list = <Map<String, dynamic>>[];
+          for (final a in (activityObj['activities'] as List)) {
+            if (a is Map<String, dynamic>) {
+              final type = a['activityType'] ?? a['activity'] ?? '';
+              final intensity = a['intensity'] ?? '';
+              final duration = a['durationMin'] ?? a['duration'] ?? 0;
+              final performedAt = a['performedAt'] ?? '';
+              list.add({
+                'activityType': type.toString(),
+                'intensity': intensity.toString(),
+                'durationMin': duration,
+                'performedAt': performedAt.toString(),
+              });
+            }
+          }
+
+          if (list.isNotEmpty) {
+            sportActivities.assignAll(list);
+            appliedAct = true;
+          }
+        }
+
         if (activityObj['activityType'] != null) {
           try {
             selectedActivityType.value = ActivityType.fromApiValue(
@@ -804,12 +910,13 @@ class CalculatorController extends GetxController {
 
         if (activityObj['activityIntensity'] != null) {
           final ai = activityObj['activityIntensity'].toString().toLowerCase();
-          if (ai == 'light')
+          if (ai == 'light') {
             sportIntensity.value = 0.0;
-          else if (ai == 'moderate')
+          } else if (ai == 'moderate') {
             sportIntensity.value = 1.0;
-          else if (ai == 'high')
+          } else if (ai == 'high') {
             sportIntensity.value = 2.0;
+          }
           appliedAct = true;
         }
 
@@ -1017,7 +1124,6 @@ class CalculatorController extends GetxController {
         isReadyToCalculate: response.isReadyToCalculate,
         prefilled: false,
       );
-
       changeTab(5);
     } catch (e) {
       caffeineSubmitError.value = e.toString();
@@ -1064,7 +1170,10 @@ class CalculatorController extends GetxController {
   }
 
   void changeTab(int index) {
+    if (index < 0 || index >= tabs.length) return;
+
     selectedTabIndex.value = index;
+    fetchCalculatorSession(applyPrefill: false, showInitialLoading: false);
   }
 
   String _formatErrorMessage(Object error, {String? servicePrefix}) {
@@ -1449,7 +1558,7 @@ class CalculatorController extends GetxController {
         if (sportIntensity.value == 1.0) {
           activityIntensity = 'MODERATE';
         } else if (sportIntensity.value == 2.0) {
-          activityIntensity = 'HIGH';
+          activityIntensity = 'HARD';
         } else {
           activityIntensity = 'LIGHT';
         }
@@ -1457,9 +1566,7 @@ class CalculatorController extends GetxController {
 
       // Build activities array per new API shape
       final activities = <SportActivity>[];
-      if (intent == 'NO_TRAINING' ||
-          intent == 'WILL_TRAIN' ||
-          intent == 'ALREADY_TRAINED') {
+      if (intent == 'WILL_TRAIN' || intent == 'ALREADY_TRAINED') {
         activities.add(
           SportActivity(
             activityType: activityType,
@@ -1489,6 +1596,21 @@ class CalculatorController extends GetxController {
         isReadyToCalculate: response.isReadyToCalculate,
         prefilled: false,
       );
+      // Immediately reflect submitted activities in the local UI list
+      if (activities.isNotEmpty) {
+        final list = activities
+            .map(
+              (a) => {
+                'activityType': a.activityType,
+                'intensity': a.intensity,
+                'durationMin': a.durationMin,
+                'performedAt': a.performedAt,
+              },
+            )
+            .toList();
+        // Append so new activities appear at the end
+        sportActivities.addAll(list);
+      }
     } catch (e) {
       sportSubmitError.value = e.toString();
     } finally {

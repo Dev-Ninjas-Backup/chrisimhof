@@ -8,7 +8,9 @@ import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/results/model/calculate_result_model.dart';
 import 'package:chrisimhof/features/calculator/results/screen/calculator_results_screen.dart';
 import 'package:chrisimhof/features/calculator/widgets/activity_type_selector.dart';
+import 'package:chrisimhof/features/calculator/widgets/calculator_live_score_section.dart';
 import 'package:chrisimhof/features/calculator/widgets/indensity_slider.dart';
+import 'package:chrisimhof/features/calculator/widgets/sport_activity_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -24,6 +26,8 @@ class CalculatorSportTab extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
+              const CalculatorLiveScoreSection(sectionKey: 'sport'),
+              const SizedBox(height: 16),
               // Training intent options
               Column(
                 children: [
@@ -88,12 +92,18 @@ class CalculatorSportTab extends StatelessWidget {
                   const SizedBox(height: 24),
                 ],
               ),
+              const SizedBox(height: 24),
+              const SportActivityList(),
               const SizedBox(height: 120),
 
               CustomButton(
                 text: "Add Activity".tr,
                 onTap: () async {
                   try {
+                    final bottomInset = MediaQuery.of(
+                      context,
+                    ).viewInsets.bottom;
+
                     await controller.submitSportData();
                     if (controller.sportSubmitError.value.isEmpty) {
                       // Show bottom sheet summary matching Figma
@@ -111,7 +121,7 @@ class CalculatorSportTab extends StatelessWidget {
                           : ActivityType.walk.displayName;
                       final intensityText =
                           (controller.sportIntensity.value == 2.0)
-                          ? 'High'.tr
+                          ? 'Hard'.tr
                           : (controller.sportIntensity.value == 1.0)
                           ? 'Moderate'.tr
                           : 'Light'.tr;
@@ -122,8 +132,7 @@ class CalculatorSportTab extends StatelessWidget {
                             top: 20,
                             left: 16,
                             right: 16,
-                            bottom:
-                                MediaQuery.of(context).viewInsets.bottom + 24,
+                            bottom: bottomInset + 24,
                           ),
                           decoration: const BoxDecoration(
                             color: Colors.white,

@@ -4,6 +4,7 @@ import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:chrisimhof/features/calculator/widgets/fatigue_level.dart';
+import 'package:chrisimhof/features/calculator/widgets/calculator_live_score_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,8 @@ class CalculatorSleepTab extends StatelessWidget {
 
     return Column(
       children: [
+        const CalculatorLiveScoreSection(sectionKey: 'sleep'),
+        const SizedBox(height: 16),
         TimeWidget(
           topTitle: 'Wake-up-Time'.tr,
           controller: controller.wakeUpController,

@@ -16,21 +16,21 @@ class HistoryWidget extends StatelessWidget {
       // Will be handled by locale
       // Simple formatting: Apr 20, 2026 · 9:09 PM
       final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
+        'Jan'.tr,
+        'Feb'.tr,
+        'Mar'.tr,
+        'Apr'.tr,
+        'May'.tr,
+        'Jun'.tr,
+        'Jul'.tr,
+        'Aug'.tr,
+        'Sep'.tr,
+        'Oct'.tr,
+        'Nov'.tr,
+        'Dec'.tr,
       ];
       final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
-      final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+      final period = dateTime.hour >= 12 ? 'PM'.tr : 'AM'.tr;
       final minute = dateTime.minute.toString().padLeft(2, '0');
 
       return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year} · $hour:$minute $period';
@@ -42,9 +42,8 @@ class HistoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.to(
-        () => HistoryDetailsScreen(),
-      ),
+      onTap: () =>
+          Get.to(() => HistoryDetailsScreen(), arguments: historyItem.id),
       child: Container(
         padding: const EdgeInsets.all(16),
         width: Get.width,
@@ -96,7 +95,7 @@ class HistoryWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${historyItem.sleepScore}% sleep • ${historyItem.activityScore}% activity',
+                    '${historyItem.sleepScore}% ${'Sleep'.tr} • ${historyItem.activityScore}% ${'Activity'.tr}',
                     style: getTextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

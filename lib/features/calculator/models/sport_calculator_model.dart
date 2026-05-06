@@ -27,7 +27,7 @@ class SportRequest {
 
   Map<String, dynamic> toJson() => {
     'trainingIntent': trainingIntent,
-    'activities': activities.map((a) => a.toJson()).toList(),
+    if (activities.isNotEmpty) 'activities': activities.map((a) => a.toJson()).toList(),
   };
 }
 
