@@ -224,58 +224,6 @@ class CalculatorSportTab extends StatelessWidget {
                               ),
 
                               const SizedBox(height: 20),
-
-                              // Calculate button
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        AppColors.primaryButtonColor,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Get.back();
-                                    try {
-                                      Get.to(
-                                        () => CalculatorResultsScreen(
-                                          initialData: CalculateResultResponse(
-                                            id: '',
-                                            overallScore: 0,
-                                            scoreBreakdown: ScoreBreakdown(
-                                              sleep: 0,
-                                              nutrition: 0,
-                                              hydration: 0,
-                                              caffeine: 0,
-                                            ),
-                                            recommendations: [],
-                                            createdAt: '',
-                                          ),
-                                          sessionId: controller
-                                              .calculatorSession
-                                              .value
-                                              ?.sessionId,
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      EasyLoading.showError(e.toString());
-                                    }
-                                  },
-                                  child: Text(
-                                    'Calculate'.tr,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -294,13 +242,67 @@ class CalculatorSportTab extends StatelessWidget {
                 backgroundColor: AppColors.primaryButtonColor,
               ),
               const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryButtonColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    try {
+                      Get.to(
+                        () => CalculatorResultsScreen(
+                          initialData: CalculateResultResponse(
+                            id: '',
+                            overallScore: 0,
+                            scoreBreakdown: ScoreBreakdown(
+                              sleep: 0,
+                              nutrition: 0,
+                              hydration: 0,
+                              caffeine: 0,
+                            ),
+                            recommendations: [],
+                            createdAt: '',
+                          ),
+                          sessionId:
+                              controller.calculatorSession.value?.sessionId,
+                        ),
+                      );
+                    } catch (e) {
+                      EasyLoading.showError(e.toString());
+                    }
+                  },
+                  child: Text(
+                    'Calculate'.tr,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               CustomButton(
                 text: "Reset".tr,
-                onTap: () {
-                  controller.sportDurationController.clear();
-                  controller.setTrainingIntent('NO_TRAINING');
-                  controller.selectedActivityType.value = '';
-                  controller.setSportIntensity(0);
+                onTap: () async {
+                  try {
+                    final msg = await controller.resetSession();
+
+                    controller.sportDurationController.clear();
+                    controller.setTrainingIntent('NO_TRAINING');
+                    controller.selectedActivityType.value = '';
+                    controller.setSportIntensity(0);
+
+                    EasyLoading.showSuccess(msg);
+                  } catch (e) {
+                    EasyLoading.showError(e.toString());
+                  }
                 },
                 backgroundColor: Colors.grey[300],
               ),

@@ -10,6 +10,7 @@ import 'package:chrisimhof/features/calculator/widgets/calculator_tab_button.dar
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class CalculatorScreen extends StatelessWidget {
   const CalculatorScreen({super.key});
@@ -36,6 +37,20 @@ class CalculatorScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Show global EasyLoading while session data is being fetched
+              Obx(() {
+                if (controller.isSessionLoading.value) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    EasyLoading.show(status: 'Loading...'.tr);
+                  });
+                } else {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    EasyLoading.dismiss();
+                  });
+                }
+
+                return const SizedBox.shrink();
+              }),
               CustomAppBar(title: 'Calculator'.tr, showBackButton: true),
               const SizedBox(height: 24),
 

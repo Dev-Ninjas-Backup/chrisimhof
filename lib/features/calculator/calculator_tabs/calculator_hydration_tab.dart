@@ -20,24 +20,24 @@ class CalculatorHydrationTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const CalculatorLiveScoreSection(sectionKey: 'hydration'),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(10),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE9EAEB),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              "Recommended hydration 2.5L per day".tr,
-              textAlign: TextAlign.center,
-              style: getTextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+          // const SizedBox(height: 16),
+          // Container(
+          //   padding: const EdgeInsets.all(10),
+          //   width: double.infinity,
+          //   decoration: BoxDecoration(
+          //     color: const Color(0xFFE9EAEB),
+          //     borderRadius: BorderRadius.circular(10),
+          //   ),
+          //   child: Text(
+          //     "Recommended hydration 2.5L per day".tr,
+          //     textAlign: TextAlign.center,
+          //     style: getTextStyle(
+          //       color: Colors.black,
+          //       fontSize: 14,
+          //       fontWeight: FontWeight.w500,
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: 24),
           CustomRangeSlider(
             required: false,
@@ -103,10 +103,18 @@ class CalculatorHydrationTab extends StatelessWidget {
           }),
           CustomButton(
             text: "Reset".tr,
-            onTap: () {
-              controller.hydrationConsumedController.updateValue(0.0);
-              controller.hydrationDailyGoalController.updateValue(0.0);
-              controller.hydrationSubmitError.value = '';
+            onTap: () async {
+              try {
+                final msg = await controller.resetSession();
+
+                controller.hydrationConsumedController.updateValue(0.0);
+                controller.hydrationDailyGoalController.updateValue(0.0);
+                controller.hydrationSubmitError.value = '';
+
+                EasyLoading.showSuccess(msg);
+              } catch (e) {
+                EasyLoading.showError(e.toString());
+              }
             },
             backgroundColor: Colors.grey[300],
           ),

@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ActivityTypeSelector extends StatelessWidget {
   final String selectedActivity;
@@ -26,7 +27,7 @@ class ActivityTypeSelector extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          "Activity Type",
+          "Activity Type".tr,
           style: getTextStyle(
             color: AppColors.primaryTextColor,
             fontSize: 18,

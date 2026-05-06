@@ -11,6 +11,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
   const AddCaffeineBottomSheet({super.key});
 
   @override
+
   Widget build(BuildContext context) {
     final CalculatorController controller = Get.find<CalculatorController>();
     final EdgeInsets viewInsets = MediaQuery.of(context).viewInsets;

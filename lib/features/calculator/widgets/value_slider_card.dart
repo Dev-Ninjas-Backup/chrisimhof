@@ -8,13 +8,14 @@ import 'package:get/get.dart';
 class CaffeineTrackerCard extends StatelessWidget {
   final double current24hValue;
   final double maxValue;
+  final bool interactive;
 
   const CaffeineTrackerCard({
     super.key,
     required this.current24hValue,
     this.maxValue = 600.0,
+    this.interactive = true,
   });
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CalculatorController>();
@@ -104,6 +105,8 @@ class CaffeineTrackerCard extends StatelessWidget {
                 activeTrackColor: AppColors.primaryButtonColor,
                 inactiveTrackColor: const Color(0xFFF1F3F5),
                 thumbColor: const Color(0xFF1A1F26),
+                disabledActiveTrackColor: AppColors.primaryButtonColor,
+                disabledThumbColor: const Color(0xFF1A1F26),
                 thumbShape: const RoundSliderThumbShape(
                   enabledThumbRadius: 10.0,
                   elevation: 0,
@@ -115,9 +118,14 @@ class CaffeineTrackerCard extends StatelessWidget {
                 value: math.min(controller.caffeine24hValue.value, maxValue),
                 min: 0,
                 max: maxValue,
-                onChanged: (val) {
-                  controller.caffeine24hValue.value = math.min(val, maxValue);
-                },
+                onChanged: interactive
+                    ? (val) {
+                        controller.caffeine24hValue.value = math.min(
+                          val,
+                          maxValue,
+                        );
+                      }
+                    : null,
               ),
             ),
           ),

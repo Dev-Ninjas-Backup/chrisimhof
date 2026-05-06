@@ -124,14 +124,14 @@ class CalculatorController extends GetxController {
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
   }
-  
+
   String _baseDrinkName(String raw) {
     final title = raw.trim();
     final idx = title.indexOf('(');
     if (idx == -1) return title;
     return title.substring(0, idx).trim();
   }
-  
+
   String? _extractTrailingParenToken(String raw) {
     final title = raw.trim();
     final parenReg = RegExp(r'\(([^)]*)\)');
@@ -1164,7 +1164,6 @@ class CalculatorController extends GetxController {
         );
       }
 
-
       final request = CaffeineIntakeRequest(caffeineIntakes: intakes);
 
       final response = await _calculatorService.submitCaffeineIntake(
@@ -1686,5 +1685,33 @@ class CalculatorController extends GetxController {
     caffeineAmountController.dispose();
     caffeineIntakeTimeController.dispose();
     super.onClose();
+  }
+
+  /// Reset the current calculator session on the server and refresh local session.
+  /// Returns the server message on success.
+  Future<String> resetSession() async {
+    if (calculatorSession.value == null ||
+        calculatorSession.value!.sessionId == null) {
+      throw Exception('Session not initialized');
+    }
+
+    final sessionId = calculatorSession.value!.sessionId!;
+
+    try {
+      final resp = await _calculatorService.resetSession(sessionId);
+      final message = (resp['message'] is String && resp['message'] != null)
+          ? resp['message'].toString()
+          : 'Session reset.';
+
+      // Refresh local session to reflect cleared data
+      await fetchCalculatorSession(
+        applyPrefill: true,
+        showInitialLoading: false,
+      );
+
+      return message;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 }

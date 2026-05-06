@@ -52,4 +52,6 @@ class Urls {
       '$baseUrl/api/v1/calculator/latest-result';
   static String historyDetails(String historyId) =>
       '$baseUrl/api/v1/history/$historyId';
+  static String sessionReset(String sessionId) =>
+      '$baseUrl/api/v1/calculator/session/$sessionId/reset';
 }
