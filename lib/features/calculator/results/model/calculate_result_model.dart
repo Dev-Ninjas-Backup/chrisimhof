@@ -40,12 +40,16 @@ class ScoreBreakdown {
   final int nutrition;
   final int hydration;
   final int caffeine;
+  final int activity;
+  final int recovery;
 
   ScoreBreakdown({
     required this.sleep,
     required this.nutrition,
     required this.hydration,
     required this.caffeine,
+    required this.activity,
+    required this.recovery,
   });
 
   factory ScoreBreakdown.fromJson(Map<String, dynamic> json) => ScoreBreakdown(
@@ -53,6 +57,8 @@ class ScoreBreakdown {
     nutrition: json['nutrition'] as int? ?? 0,
     hydration: json['hydration'] as int? ?? 0,
     caffeine: json['caffeine'] as int? ?? 0,
+    activity: json['activity'] as int? ?? 0,
+    recovery: json['recovery'] as int? ?? 0,
   );
 }
 
@@ -101,6 +107,10 @@ class ApiMetric {
         return 'caffeine';
       case 'nutrition':
         return 'nutrition';
+      case 'activity':
+        return 'activity';
+      case 'recovery':
+        return 'recovery';
       default:
         return 'circle';
     }
