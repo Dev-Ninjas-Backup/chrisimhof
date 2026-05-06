@@ -129,7 +129,10 @@ class CalculatorLiveScoreSection extends StatelessWidget {
 
     if (score == null) return label.tr;
 
-    return '$label score: ${_formatValue(score)}'.tr;
+    return '@label score: @value'.trParams({
+      'label': label.tr,
+      'value': _formatValue(score),
+    });
   }
 
   List<String> _sectionLines(Map<String, dynamic> section) {
@@ -137,9 +140,13 @@ class CalculatorLiveScoreSection extends StatelessWidget {
       case 'sleep':
         return [
           if (section['sleepHours'] != null)
-            'Sleep hours: ${_formatValue(section['sleepHours'])}h'.tr,
+            'Sleep hours: @value h'.trParams({
+              'value': _formatValue(section['sleepHours']),
+            }),
           if (section['sleepDebt'] != null)
-            'Sleep debt: ${_formatValue(section['sleepDebt'])}h'.tr,
+            'Sleep debt: @value h'.trParams({
+              'value': _formatValue(section['sleepDebt']),
+            }),
         ];
       case 'hydration':
         return [
@@ -151,7 +158,9 @@ class CalculatorLiveScoreSection extends StatelessWidget {
           // if (section['totalConsumedMg'] != null)
           //   'Total consumed: ${_formatValue(section['totalConsumedMg'])} mg'.tr,
           if (section['rolling8hMg'] != null)
-            'Last 8 hours: ${_formatValue(section['rolling8hMg'])} mg'.tr,
+            'Last 8 hours: @value mg'.trParams({
+              'value': _formatValue(section['rolling8hMg']),
+            }),
           if (section['rolling24hMg'] != null)
             'Last 24 hours: ${_formatValue(section['rolling24hMg'])} mg'.tr,
           if (section['activeMg'] != null)
@@ -161,14 +170,17 @@ class CalculatorLiveScoreSection extends StatelessWidget {
       case 'sport':
         return [
           if (_text(section['recommendedIntensity']).isNotEmpty)
-            'Recommended intensity: ${_text(section['recommendedIntensity'])}'
-                .tr,
+            'Recommended intensity: @value'.trParams({
+              'value': _text(section['recommendedIntensity']),
+            }),
           if (section['isRestDayRecommended'] != null)
-            'Rest day recommended: ${_formatBool(section['isRestDayRecommended'])}'
-                .tr,
+            'Rest day recommended: @value'.trParams({
+              'value': _formatBool(section['isRestDayRecommended']),
+            }),
           if (_text(section['suggestedTrainingTime']).isNotEmpty)
-            'Suggested training time: ${_text(section['suggestedTrainingTime'])}'
-                .tr,
+            'Suggested training time: @value'.trParams({
+              'value': _text(section['suggestedTrainingTime']),
+            }),
           if (_text(section['suggestedTimeReason']).isNotEmpty)
             _text(section['suggestedTimeReason']),
           if (_text(section['durationGuidance']).isNotEmpty)
@@ -202,7 +214,7 @@ class CalculatorLiveScoreSection extends StatelessWidget {
   }
 
   static String _formatBool(dynamic value) {
-    if (value is bool) return value ? 'Yes' : 'No';
+    if (value is bool) return value ? 'Yes'.tr : 'No'.tr;
     return value?.toString() ?? '-';
   }
 
