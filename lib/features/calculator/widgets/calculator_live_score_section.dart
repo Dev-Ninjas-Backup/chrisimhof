@@ -1,4 +1,5 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -104,22 +105,22 @@ class CalculatorLiveScoreSection extends StatelessWidget {
 
   String get _scoreKey => sectionKey == 'sport' ? 'activity' : sectionKey;
 
-  String get _scoreLabel {
-    switch (sectionKey) {
-      case 'sleep':
-        return 'Sleep'.tr;
-      case 'nutrition':
-        return 'Nutrition'.tr;
-      case 'hydration':
-        return 'Hydration'.tr;
-      case 'caffeine':
-        return 'Caffeine'.tr;
-      case 'sport':
-        return 'Activity'.tr;
-      default:
-        return sectionKey.tr;
-    }
-  }
+  // String get _scoreLabel {
+  //   switch (sectionKey) {
+  //     case 'sleep':
+  //       return 'Sleep'.tr;
+  //     case 'nutrition':
+  //       return 'Nutrition'.tr;
+  //     case 'hydration':
+  //       return 'Hydration'.tr;
+  //     case 'caffeine':
+  //       return 'Caffeine'.tr;
+  //     case 'sport':
+  //       return 'Activity'.tr;
+  //     default:
+  //       return sectionKey.tr;
+  //   }
+  // }
 
   String _sectionTitle(num? score) {
     final label = sectionKey == 'sport'
@@ -206,11 +207,11 @@ class CalculatorLiveScoreSection extends StatelessWidget {
   static String _text(dynamic value) => value?.toString().trim() ?? '';
 }
 
-class _ScoreChip extends StatelessWidget {
+class ScoreChip extends StatelessWidget {
   final String label;
   final dynamic value;
 
-  const _ScoreChip({required this.label, required this.value});
+  const ScoreChip({super.key, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +224,7 @@ class _ScoreChip extends StatelessWidget {
       ),
       child: Text(
         '$label: ${CalculatorLiveScoreSection._formatValue(value)}',
-        style: const TextStyle(
+        style: getTextStyle(
           color: Colors.white,
           fontSize: 12,
           fontWeight: FontWeight.w600,
