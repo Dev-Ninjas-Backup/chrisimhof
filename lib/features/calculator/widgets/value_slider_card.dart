@@ -43,7 +43,7 @@ class CaffeineTrackerCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "${controller.caffeineLastEightHoursValue.value.toInt()}mg",
+                  "${controller.caffeineRolling8hMgValue.value.toInt()}mg",
                   overflow: TextOverflow.ellipsis,
                   style: getTextStyle(
                     color: AppColors.primaryTextColor,

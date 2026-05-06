@@ -24,43 +24,33 @@ class CalculatorCaffeineTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Caffeine (last 8 hours)".tr,
-            style: getTextStyle(
-              color: AppColors.primaryTextColor,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-
           const CalculatorLiveScoreSection(sectionKey: 'caffeine'),
           const SizedBox(height: 16),
 
-          Obx(
-            () => Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primaryButtonColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                "Active caffeine in your body now: @value mg".trParams({
-                  'value': controller.caffeineLastEightHoursValue.value
-                      .toInt()
-                      .toString(),
-                }),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 32),
+          // Obx(
+          //   () => Container(
+          //     width: double.infinity,
+          //     padding: const EdgeInsets.symmetric(vertical: 10),
+          //     decoration: BoxDecoration(
+          //       color: AppColors.primaryButtonColor,
+          //       borderRadius: BorderRadius.circular(8),
+          //     ),
+          //     child: Text(
+          //       "Active caffeine in your body now: @value mg".trParams({
+          //         'value': controller.caffeineLastEightHoursValue.value
+          //             .toInt()
+          //             .toString(),
+          //       }),
+          //       textAlign: TextAlign.center,
+          //       style: const TextStyle(
+          //         color: Colors.white,
+          //         fontSize: 16,
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 32),
           Obx(
             () => CaffeineTrackerCard(
               current24hValue: controller.caffeine24hValue.value,

@@ -17,8 +17,8 @@ class CalculatorWorkTab extends StatelessWidget {
 
     return Column(
       children: [
-        const CalculatorLiveScoreSection(sectionKey: 'work'),
-        const SizedBox(height: 16),
+        // const CalculatorLiveScoreSection(sectionKey: 'work'),
+        // const SizedBox(height: 16),
         TimeWidget(
           topTitle: 'Work Begins'.tr,
           controller: controller.workBeginsController,

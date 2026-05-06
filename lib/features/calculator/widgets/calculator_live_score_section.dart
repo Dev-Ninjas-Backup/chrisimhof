@@ -35,66 +35,46 @@ class CalculatorLiveScoreSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Live scores'.tr,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                if (controller.isLiveScoresRefreshing.value)
-                  const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
-              ],
-            ),
-            if (scoreBreakdown.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _ScoreChip(label: 'Sleep'.tr, value: scoreBreakdown['sleep']),
-                  _ScoreChip(
-                    label: 'Nutrition'.tr,
-                    value: scoreBreakdown['nutrition'],
-                  ),
-                  _ScoreChip(
-                    label: 'Hydration'.tr,
-                    value: scoreBreakdown['hydration'],
-                  ),
-                  _ScoreChip(
-                    label: 'Caffeine'.tr,
-                    value: scoreBreakdown['caffeine'],
-                  ),
-                  _ScoreChip(
-                    label: 'Recovery'.tr,
-                    value: scoreBreakdown['recovery'],
-                  ),
-                  _ScoreChip(
-                    label: 'Activity'.tr,
-                    value: scoreBreakdown['activity'],
-                  ),
-                ],
-              ),
-            ],
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: Text(
+            //         'Live scores'.tr,
+            //         style: const TextStyle(
+            //           color: Colors.white,
+            //           fontSize: 16,
+            //           fontWeight: FontWeight.w700,
+            //         ),
+            //       ),
+            //     ),
+            //     if (controller.isLiveScoresRefreshing.value)
+            //       const SizedBox(
+            //         width: 16,
+            //         height: 16,
+            //         child: CircularProgressIndicator(
+            //           strokeWidth: 2,
+            //           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            //         ),
+            //       ),
+            //   ],
+            // ),
+            // if (scoreBreakdown.isNotEmpty) ...[
+            //   const SizedBox(height: 10),
+            //   Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: _ScoreChip(
+            //       label: _scoreLabel,
+            //       value: scoreBreakdown[_scoreKey],
+            //     ),
+            //   ),
+            // ],
             if (section.isNotEmpty || sectionScore != null) ...[
               const SizedBox(height: 12),
               Text(
                 _sectionTitle(sectionScore),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -106,7 +86,7 @@ class CalculatorLiveScoreSection extends StatelessWidget {
                     line,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                       height: 1.25,
                     ),
@@ -123,6 +103,23 @@ class CalculatorLiveScoreSection extends StatelessWidget {
   String get _apiSectionKey => sectionKey == 'sport' ? 'activity' : sectionKey;
 
   String get _scoreKey => sectionKey == 'sport' ? 'activity' : sectionKey;
+
+  String get _scoreLabel {
+    switch (sectionKey) {
+      case 'sleep':
+        return 'Sleep'.tr;
+      case 'nutrition':
+        return 'Nutrition'.tr;
+      case 'hydration':
+        return 'Hydration'.tr;
+      case 'caffeine':
+        return 'Caffeine'.tr;
+      case 'sport':
+        return 'Activity'.tr;
+      default:
+        return sectionKey.tr;
+    }
+  }
 
   String _sectionTitle(num? score) {
     final label = sectionKey == 'sport'
