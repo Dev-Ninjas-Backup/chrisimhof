@@ -59,8 +59,10 @@ class AddCaffeineBottomSheet extends StatelessWidget {
               const SizedBox(height: 24),
               CustomButton(
                 text: 'Add Now'.tr,
-                onTap: () {
+                onTap: () async {
                   final bool isSubmitted = controller.submitAddCaffeineForm();
+                  await controller.submitCaffeineIntake();
+
                   if (!isSubmitted) {
                     Get.snackbar(
                       'Missing Information'.tr,
