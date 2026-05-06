@@ -594,6 +594,8 @@ class AppTranslations extends Translations {
       'Desired Duration (min)': 'Durée souhaitée (min)',
       'Calculate': 'Calculer',
       'Error': 'Erreur',
+      'Real Wake-up Time': 'Heure de réveil réelle',
+      'Real Bed Time (h)': 'Heure de début de sommeil réelle (h)',
       'Failed to submit sport activity: @error':
           'Échec de l\'envoi de l\'activité sportive : @error',
       'Wake-up-Time': 'Heure de réveil',

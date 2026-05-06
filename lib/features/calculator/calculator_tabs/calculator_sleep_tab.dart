@@ -21,12 +21,12 @@ class CalculatorSleepTab extends StatelessWidget {
         const CalculatorLiveScoreSection(sectionKey: 'sleep'),
         const SizedBox(height: 16),
         TimeWidget(
-          topTitle: 'Wake-up-Time'.tr,
+          topTitle: 'Real Wake-up Time'.tr,
           controller: controller.wakeUpController,
         ),
         const SizedBox(height: 16),
         CustomRangeSlider(
-          headerText: 'Sleep Last Night (h)'.tr,
+          headerText: 'Real Bed Time (h)'.tr,
           controller: controller.sleepLastNightController,
         ),
         const SizedBox(height: 16),
