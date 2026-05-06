@@ -29,7 +29,6 @@ class HistoryDetailsScreen extends StatelessWidget {
         'Dec'.tr,
       ];
       final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
-      //final period = dateTime.hour >= 12 ? 'PM'.tr : 'AM'.tr;
       final minute = dateTime.minute.toString().padLeft(2, '0');
       final second = dateTime.second.toString().padLeft(2, '0');
 
@@ -118,18 +117,16 @@ class HistoryDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Overall State Section
               HistoryDetailsOverallStateCard(
                 score: resultData.overallScore,
                 label: controller.getLabelForScore(resultData.overallScore),
               ),
               const SizedBox(height: 16),
 
-              // 2x2 Grid for State Summary Cards
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: 4,
+                itemCount: 6,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
@@ -139,24 +136,34 @@ class HistoryDetailsScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final metrics = [
                     HistoryMetric(
-                      title: 'Sleep',
+                      title: 'Sleep'.tr,
                       score: resultData.scoreBreakdown.sleep,
                       category: 'sleep',
                     ),
                     HistoryMetric(
-                      title: 'Hydration',
+                      title: 'Hydration'.tr,
                       score: resultData.scoreBreakdown.hydration,
                       category: 'hydration',
                     ),
                     HistoryMetric(
-                      title: 'Caffeine',
+                      title: 'Caffeine'.tr,
                       score: resultData.scoreBreakdown.caffeine,
                       category: 'caffeine',
                     ),
                     HistoryMetric(
-                      title: 'Nutrition',
+                      title: 'Nutrition'.tr,
                       score: resultData.scoreBreakdown.nutrition,
                       category: 'nutrition',
+                    ),
+                    HistoryMetric(
+                      title: 'Activity'.tr,
+                      score: resultData.scoreBreakdown.activity,
+                      category: 'activity',
+                    ),
+                    HistoryMetric(
+                      title: 'Recovery'.tr,
+                      score: resultData.scoreBreakdown.recovery,
+                      category: 'recovery',
                     ),
                   ];
                   return HistoryDetailsMetricCard(metric: metrics[index]);
@@ -164,7 +171,6 @@ class HistoryDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Recommendations Section
               HistoryDetailsRecommendationsCard(
                 recommendations: resultData.recommendations,
               ),
