@@ -26,6 +26,7 @@ class CalculatorController extends GetxController {
   final RxString sessionError = ''.obs;
   final RxMap<String, dynamic> liveScores = <String, dynamic>{}.obs;
   int _sessionFetchSerial = 0;
+  bool _screenEntryRefreshQueued = false;
 
   // Sleep submission
   final RxBool isSleepSubmitting = false.obs;
@@ -93,6 +94,7 @@ class CalculatorController extends GetxController {
   final RxDouble caffeine24hValue = 0.0.obs;
   final RxDouble caffeinMaxValue = 400.0.obs;
   final RxDouble caffeineLastEightHoursValue = 0.0.obs;
+  final RxDouble caffeineRolling8hMgValue = 0.0.obs;
   late TimeController caffeineIntakeTimeController;
   late TextEditingController caffeineDrinkNameController;
   late TextEditingController caffeineDrinkTypeController;
@@ -119,6 +121,16 @@ class CalculatorController extends GetxController {
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
+  }
+
+  void handleCalculatorScreenEntered() {
+    if (_screenEntryRefreshQueued) return;
+
+    _screenEntryRefreshQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _screenEntryRefreshQueued = false;
+      fetchCalculatorSession(applyPrefill: true, showInitialLoading: true);
+    });
   }
 
   Future<void> fetchCalculatorSession({
@@ -195,7 +207,7 @@ class CalculatorController extends GetxController {
     if (caffeine is Map) {
       final totalConsumedMg = caffeine['totalConsumedMg'];
       final rolling24hMg = caffeine['rolling24hMg'];
-      final activeMg = caffeine['activeMg'];
+      final rolling8hMg = caffeine['rolling8hMg'];
 
       if (totalConsumedMg is num) {
         caffeine24hValue.value = totalConsumedMg.toDouble();
@@ -203,8 +215,9 @@ class CalculatorController extends GetxController {
         caffeine24hValue.value = rolling24hMg.toDouble();
       }
 
-      if (activeMg is num) {
-        caffeineLastEightHoursValue.value = activeMg.toDouble();
+      if (rolling8hMg is num) {
+        caffeineRolling8hMgValue.value = rolling8hMg.toDouble();
+        caffeineLastEightHoursValue.value = rolling8hMg.toDouble();
       }
     }
   }
@@ -464,6 +477,7 @@ class CalculatorController extends GetxController {
                 .toList(),
           );
           caffeine24hValue.value = total;
+          caffeineRolling8hMgValue.value = total;
           caffeineLastEightHoursValue.value =
               total; // best-effort: server didn't provide windowed totals
           appliedCaffeine = true;
@@ -817,9 +831,11 @@ class CalculatorController extends GetxController {
           appliedCaffeine = true;
         }
 
-        if (caffeineObj['activeMg'] != null) {
-          caffeineLastEightHoursValue.value = (caffeineObj['activeMg'] as num)
+        if (caffeineObj['rolling8hMg'] != null) {
+          caffeineRolling8hMgValue.value = (caffeineObj['rolling8hMg'] as num)
               .toDouble();
+          caffeineLastEightHoursValue.value =
+              (caffeineObj['rolling8hMg'] as num).toDouble();
           appliedCaffeine = true;
         }
 
@@ -850,6 +866,7 @@ class CalculatorController extends GetxController {
                   int.tryParse(e['dose']!.replaceAll('mg', '').trim()) ?? 0;
             }
             caffeine24hValue.value = total;
+            caffeineRolling8hMgValue.value = total;
             caffeineLastEightHoursValue.value = total;
             appliedCaffeine = true;
           }
@@ -1002,6 +1019,7 @@ class CalculatorController extends GetxController {
     caffeineHistory.add({'name': name, 'dose': '${mgAmount}mg', 'time': time});
     caffeine24hValue.value += mgAmount;
     caffeineLastEightHoursValue.value += mgAmount;
+    caffeineRolling8hMgValue.value += mgAmount;
   }
 
   void resetAddCaffeineForm() {
@@ -1036,10 +1054,12 @@ class CalculatorController extends GetxController {
     caffeineHistory.clear();
     caffeine24hValue.value = 0;
     caffeineLastEightHoursValue.value = 0;
+    caffeineRolling8hMgValue.value = 0;
   }
 
   void resetCaffeineTracking() {
     caffeineLastEightHoursValue.value = 0;
+    caffeineRolling8hMgValue.value = 0;
   }
 
   void removeCaffeineEntry(int index) {
@@ -1057,6 +1077,11 @@ class CalculatorController extends GetxController {
       );
       caffeineLastEightHoursValue.value =
           (caffeineLastEightHoursValue.value - removedDose).clamp(
+            0.0,
+            double.infinity,
+          );
+      caffeineRolling8hMgValue.value =
+          (caffeineRolling8hMgValue.value - removedDose).clamp(
             0.0,
             double.infinity,
           );
