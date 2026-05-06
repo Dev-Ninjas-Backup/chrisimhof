@@ -99,6 +99,8 @@ class CalculatorController extends GetxController {
   late TextEditingController caffeineDrinkNameController;
   late TextEditingController caffeineDrinkTypeController;
   late TextEditingController caffeineAmountController;
+  // Selected token for drink type dropdown (e.g. COFFEE, ESPRESSO, CUSTOM)
+  final RxString selectedCaffeineDrinkType = 'COFFEE'.obs;
   final RxList<Map<String, dynamic>> caffeineHistory =
       <Map<String, dynamic>>[].obs;
 
@@ -121,6 +123,27 @@ class CalculatorController extends GetxController {
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
+  }
+  
+  String _baseDrinkName(String raw) {
+    final title = raw.trim();
+    final idx = title.indexOf('(');
+    if (idx == -1) return title;
+    return title.substring(0, idx).trim();
+  }
+  
+  String? _extractTrailingParenToken(String raw) {
+    final title = raw.trim();
+    final parenReg = RegExp(r'\(([^)]*)\)');
+    final matches = parenReg.allMatches(title).toList();
+    if (matches.isEmpty) return null;
+    final last = matches.last;
+    final content = title.substring(last.start + 1, last.end - 1).trim();
+    if (content.isEmpty) return null;
+    // If content looks like a token (all uppercase or contains underscore), return as-is
+    if (RegExp(r'^[A-Z0-9_\-]+$').hasMatch(content)) return content;
+    // otherwise return uppercase token
+    return content.toUpperCase();
   }
 
   void handleCalculatorScreenEntered() {
@@ -997,6 +1020,7 @@ class CalculatorController extends GetxController {
     caffeineAmountController = TextEditingController();
     // Initialize with sample caffeine history
     caffeineHistory.assignAll([]);
+    selectedCaffeineDrinkType.value = 'COFFEE';
   }
 
   void _loadCaffeineHistory() {}
@@ -1027,6 +1051,7 @@ class CalculatorController extends GetxController {
     caffeineDrinkTypeController.clear();
     caffeineAmountController.clear();
     caffeineIntakeTimeController.reset();
+    selectedCaffeineDrinkType.value = 'COFFEE';
   }
 
   bool submitAddCaffeineForm() {
@@ -1102,7 +1127,8 @@ class CalculatorController extends GetxController {
       // Convert caffeineHistory to CaffeineIntake objects
       final List<CaffeineIntake> intakes = [];
       for (final entry in caffeineHistory) {
-        final name = entry['name'] ?? '';
+        final rawName = (entry['name'] ?? '').toString();
+        final name = _baseDrinkName(rawName);
         final dose = entry['dose'] ?? '';
         var time = entry['time'] ?? '';
 
@@ -1114,12 +1140,17 @@ class CalculatorController extends GetxController {
           time = caffeineIntakeTimeController.to24HourFormat;
         }
 
-        // Try to find the drink type from presets
-        String drinkType = 'COFFEE'; // default
-        for (final preset in caffeinePresets) {
-          if (preset.label.toLowerCase() == name.toLowerCase()) {
-            drinkType = preset.drinkType;
-            break;
+        // Determine drinkType: prefer explicit token in original name, else match presets, default to COFFEE
+        String drinkType = 'COFFEE';
+        final token = _extractTrailingParenToken(rawName);
+        if (token != null && token.isNotEmpty) {
+          drinkType = token;
+        } else {
+          for (final preset in caffeinePresets) {
+            if (preset.label.toLowerCase() == name.toLowerCase()) {
+              drinkType = preset.drinkType;
+              break;
+            }
           }
         }
 
@@ -1132,6 +1163,7 @@ class CalculatorController extends GetxController {
           ),
         );
       }
+
 
       final request = CaffeineIntakeRequest(caffeineIntakes: intakes);
 

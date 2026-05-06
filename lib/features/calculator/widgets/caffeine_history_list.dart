@@ -81,7 +81,7 @@ class CaffeineHistoryList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
+                _displayDrinkName(title),
                 style: getTextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               Text(
@@ -112,5 +112,11 @@ class CaffeineHistoryList extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  String _displayDrinkName(String title) {
+    final idx = title.indexOf('(');
+    if (idx == -1) return title.trim();
+    return title.substring(0, idx).trim();
   }
 }

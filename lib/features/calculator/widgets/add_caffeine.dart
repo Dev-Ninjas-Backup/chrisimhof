@@ -37,12 +37,46 @@ class AddCaffeineBottomSheet extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               _InputCard(
-                child: CustomTextFormField(
-                  label: 'Drink Type'.tr,
-                  controller: controller.caffeineDrinkTypeController,
-                  hintText: 'Enter Type'.tr,
-                  textInputAction: TextInputAction.next,
-                ),
+                child: Obx(() {
+                  const options = [
+                    'ESPRESSO',
+                    'COFFEE',
+                    'ENERGY_DRINK',
+                    'TEA',
+                    'GREEN_TEA',
+                    'PRE_WORKOUT',
+                  ];
+
+                  final display = {
+                    'ESPRESSO': 'Espresso'.tr,
+                    'COFFEE': 'Coffee'.tr,
+                    'ENERGY_DRINK': 'Energy Drink'.tr,
+                    'TEA': 'Tea'.tr,
+                    'GREEN_TEA': 'Green Tea'.tr,
+                    'PRE_WORKOUT': 'Pre-workout'.tr,
+                  };
+
+                  final selected = controller.selectedCaffeineDrinkType.value;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Drink Type'.tr, style: getTextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: options.contains(selected) ? selected : 'COFFEE',
+                        items: options
+                            .map((o) => DropdownMenuItem<String>(value: o, child: Text(display[o] ?? o)))
+                            .toList(),
+                        onChanged: (v) {
+                          if (v == null) return;
+                          controller.selectedCaffeineDrinkType.value = v;
+                          controller.caffeineDrinkTypeController.text = v;
+                        },
+                      ),
+                    ],
+                  );
+                }),
               ),
               const SizedBox(height: 24),
               _InputCard(
