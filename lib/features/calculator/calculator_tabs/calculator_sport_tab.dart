@@ -265,6 +265,8 @@ class CalculatorSportTab extends StatelessWidget {
                               nutrition: 0,
                               hydration: 0,
                               caffeine: 0,
+                              activity: 0,
+                              recovery: 0,
                             ),
                             recommendations: [],
                             createdAt: '',

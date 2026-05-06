@@ -67,7 +67,7 @@ class CalculatorResultsScreen extends StatelessWidget {
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 4,
+                  itemCount: 6,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
@@ -95,6 +95,16 @@ class CalculatorResultsScreen extends StatelessWidget {
                         'Nutrition'.tr,
                         resultData.scoreBreakdown.nutrition,
                         'nutrition',
+                      ),
+                      _buildMetric(
+                        'Activity'.tr,
+                        resultData.scoreBreakdown.activity,
+                        'activity',
+                      ),
+                      _buildMetric(
+                        'Recovery'.tr,
+                        resultData.scoreBreakdown.recovery,
+                        'recovery',
                       ),
                     ];
                     return ResultsMetricCard(metric: metrics[index]);
