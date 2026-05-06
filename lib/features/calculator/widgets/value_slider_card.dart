@@ -34,7 +34,7 @@ class CaffeineTrackerCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Caffeine (last 8 hours)".tr,
+                  "last 8 hours".tr,
                   overflow: TextOverflow.ellipsis,
                   style: getTextStyle(
                     color: AppColors.primaryTextColor,
