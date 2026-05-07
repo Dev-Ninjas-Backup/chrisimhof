@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/analytics/controller/analytics_controller.dart';
 import 'package:chrisimhof/features/analytics/widget/daily_activity_split_card.dart';
 import 'package:chrisimhof/features/analytics/widget/sleep_trend_card.dart';
@@ -39,6 +40,78 @@ class AnalyticsScreen extends StatelessWidget {
               WellnessScoreCard(),
               SizedBox(height: 16),
               DailyActivitySplitCard(),
+              SizedBox(height: 16),
+              // Circadian peak summary (shows peak hour, score, and insight)
+              Obx(() {
+                final controller = Get.find<AnalyticsController>();
+                final circ = controller.analyticsData.value?.circadianAnalysis;
+                if (circ == null) return const SizedBox.shrink();
+
+                final peakHourLabel = circ.peakHour != null
+                    ? '${circ.peakHour.toString().padLeft(2, '0')}:00'
+                    : '';
+                final peakScoreLabel = circ.peakScore != null
+                    ? '${circ.peakScore}%'
+                    : '';
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Peak Performance'.tr,
+                        style: getTextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          if (peakHourLabel.isNotEmpty)
+                            Text(
+                              peakHourLabel,
+                              style: getTextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTextColor,
+                              ),
+                            ),
+                          if (peakHourLabel.isNotEmpty &&
+                              peakScoreLabel.isNotEmpty)
+                            const SizedBox(width: 8),
+                          if (peakScoreLabel.isNotEmpty)
+                            Text(
+                              peakScoreLabel,
+                              style: getTextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTextColor,
+                              ),
+                            ),
+                        ],
+                      ),
+                      if ((circ.insight ?? '').isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          circ.insight!,
+                          style: getTextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              }),
               SizedBox(height: 16),
               HistoryDetailsWeeklyAnalyticsCard(),
             ],

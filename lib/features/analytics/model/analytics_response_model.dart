@@ -45,10 +45,11 @@ class AnalyticsResponseModel {
       circadianAnalysis: json['circadianAnalysis'] != null
           ? CircadianAnalysis.fromJson(
               json['circadianAnalysis'] as Map<String, dynamic>,
-            )         : null);
-    }
+            )
+          : null,
+    );
   }
-
+}
 
 class CircadianPoint {
   final int hour;
@@ -73,10 +74,14 @@ class CircadianPoint {
 class CircadianAnalysis {
   final List<CircadianPoint> data;
   final int? peakHour;
+  final int? peakScore;
+  final String? insight;
 
   const CircadianAnalysis({
     required this.data,
     this.peakHour,
+    this.peakScore,
+    this.insight,
   });
 
   factory CircadianAnalysis.fromJson(Map<String, dynamic> json) {
@@ -87,6 +92,8 @@ class CircadianAnalysis {
     return CircadianAnalysis(
       data: dataList,
       peakHour: json['peakHour'] != null ? _toInt(json['peakHour']) : null,
+      peakScore: json['peakScore'] != null ? _toInt(json['peakScore']) : null,
+      insight: json['insight']?.toString(),
     );
   }
 }

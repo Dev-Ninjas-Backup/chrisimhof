@@ -16,6 +16,7 @@ class AnalyticsController extends GetxController {
     'Fri',
     'Sat',
   ];
+  static final List<int> _dayHours = List.generate(24, (index) => index);
 
   final selectedPeriod = 'Last 7 Days'.obs;
   final isLoading = false.obs;
@@ -120,40 +121,35 @@ class AnalyticsController extends GetxController {
   List<FlSpot> get circadianSpots {
     final circadian = analyticsData.value?.circadianAnalysis;
     if (circadian == null || circadian.data.isEmpty) {
-      debugPrint('❌ No circadian data - empty chart');
-      return const [];
+      debugPrint('❌ No circadian data - showing 24 zero-value hours');
+      return _dayHours.map((hour) => FlSpot(hour.toDouble(), 0)).toList();
     }
-    debugPrint('✅ Using real circadian spots: ${circadian.data.length} points');
-    return circadian.data
-        .map((point) => FlSpot(point.hour.toDouble(), point.avgScore))
-        .toList()
-      ..sort((a, b) => a.x.compareTo(b.x));
+
+    final scoresByHour = <int, List<double>>{};
+    for (final point in circadian.data) {
+      if (point.hour < 0 || point.hour > 23) continue;
+      scoresByHour.putIfAbsent(point.hour, () => []).add(point.avgScore);
+    }
+
+    debugPrint(
+      '✅ Using circadian spots for all 24 hours from ${circadian.data.length} API points',
+    );
+    return _dayHours.map((hour) {
+      final values = scoresByHour[hour];
+      final score = values == null || values.isEmpty
+          ? 0.0
+          : values.fold<double>(0, (sum, value) => sum + value) / values.length;
+      return FlSpot(hour.toDouble(), score);
+    }).toList();
   }
 
   /// Circadian chart x-axis labels (hours to display)
   List<int> get circadianLabels {
-    final circadian = analyticsData.value?.circadianAnalysis;
-    if (circadian == null || circadian.data.isEmpty) {
-      debugPrint('❌ No circadian labels - empty');
-      return const [];
-    }
-    final hours = circadian.data.map((point) => point.hour).toSet().toList();
-    hours.sort();
-    debugPrint('✅ Using real circadian labels: $hours');
-    return hours;
+    return List.unmodifiable(_dayHours);
   }
 
   /// Circadian chart max x value (24-hour format)
-  double get circadianMaxX {
-    final circadian = analyticsData.value?.circadianAnalysis;
-    if (circadian == null || circadian.data.isEmpty) {
-      return 0;
-    }
-    final maxHour = circadian.data
-        .map((p) => p.hour)
-        .reduce((a, b) => a > b ? a : b);
-    return maxHour.toDouble() + 1;
-  }
+  double get circadianMaxX => 23;
 
   List<double> get wellnessValues {
     final radar = analyticsData.value?.wellnessRadar;

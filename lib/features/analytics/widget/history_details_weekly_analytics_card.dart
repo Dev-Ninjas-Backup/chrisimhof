@@ -94,12 +94,13 @@ class HistoryDetailsWeeklyAnalyticsCard extends StatelessWidget {
   Widget _buildChart(AnalyticsController controller) {
     return Obx(() {
       final spots = controller.circadianSpots;
-      final labels = controller.circadianLabels;
+      //final labels = controller.circadianLabels;
       final maxX = controller.circadianMaxX;
       final latestSpot = spots.isNotEmpty ? spots.last : const FlSpot(0, 0);
 
       return LineChart(
         LineChartData(
+          clipData: const FlClipData.all(),
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
@@ -130,14 +131,16 @@ class HistoryDetailsWeeklyAnalyticsCard extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: 1,
-                reservedSize: 50,
+                // Increase reservedSize so labels have more room below the chart
+                reservedSize: 70,
                 getTitlesWidget: (value, meta) {
                   final hourInt = value.toInt();
-                  if (labels.contains(hourInt)) {
+                  // Show only even-numbered hours (00, 02, 04, ...)
+                  if (hourInt % 4 == 0) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: Text(
-                        hourInt.toString(),
+                        hourInt.toString().padLeft(2, '0'),
                         style: getTextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
@@ -152,8 +155,8 @@ class HistoryDetailsWeeklyAnalyticsCard extends StatelessWidget {
             ),
           ),
           minX: 0,
-          maxX: maxX,
-          minY: 0,
+          maxX: maxX + 0.5,
+          minY: -0.5,
           maxY: 100,
           lineTouchData: LineTouchData(
             enabled: true,
@@ -183,6 +186,7 @@ class HistoryDetailsWeeklyAnalyticsCard extends StatelessWidget {
               spots: spots,
               isCurved: true,
               curveSmoothness: 0.4,
+              preventCurveOverShooting: true,
               color: const Color(0xFF1DB97B),
               barWidth: 2.5,
               isStrokeCapRound: true,
@@ -214,6 +218,7 @@ class HistoryDetailsWeeklyAnalyticsCard extends StatelessWidget {
                       LineChartBarData(
                         spots: spots,
                         isCurved: true,
+                        preventCurveOverShooting: true,
                         color: const Color(0xFF1DB97B),
                       ),
                       0,
