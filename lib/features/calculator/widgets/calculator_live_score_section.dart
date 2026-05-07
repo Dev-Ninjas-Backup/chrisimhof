@@ -164,7 +164,7 @@ class CalculatorLiveScoreSection extends StatelessWidget {
           if (section['rolling24hMg'] != null)
             'Last 24 hours: ${_formatValue(section['rolling24hMg'])} mg'.tr,
           if (section['activeMgLabel'] != null)
-            'Active Mg Label: ${_formatValue(section['activeMgLabel'])}'.tr,
+            _formatValue(section['activeMgLabel']).tr,
           // if (_text(section['subtitle']).isNotEmpty) _text(section['subtitle']),
         ];
       case 'sport':
