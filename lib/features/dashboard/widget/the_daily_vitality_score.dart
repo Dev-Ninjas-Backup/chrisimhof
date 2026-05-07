@@ -13,7 +13,7 @@ class TheDailyVitalityScore extends StatelessWidget {
   Widget build(BuildContext context) {
     final DashboardController controller = Get.put(DashboardController());
     return Padding(
-      padding: const EdgeInsets.only(top: 24, left: 16, bottom: 16),
+      padding: const EdgeInsets.only(top: 24, bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
