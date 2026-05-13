@@ -90,13 +90,48 @@ class TheDailyVitalityScore extends StatelessWidget {
           SizedBox(width: 12),
 
           Expanded(
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: Image.asset(
-                ImagePath.manBody,
-                height: 268,
-                fit: BoxFit.contain,
-              ),
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Image.asset(
+                    ImagePath.manBody,
+                    height: 268,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 16,
+                  left: 0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Optimal Bedtime'.tr,
+                        style: getTextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.secondaryTextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Obx(
+                        () => Text(
+                          controller.optimalBedtime.value.isEmpty
+                              ? '-'
+                              : controller.optimalBedtime.value,
+                          style: getTextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.secondaryTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],

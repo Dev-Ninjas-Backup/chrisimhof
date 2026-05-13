@@ -14,6 +14,7 @@ class DashboardController extends GetxController {
   final improvementPercentLabel = "".obs;
   final isLoading = true.obs;
   final errorMessage = ''.obs;
+  final optimalBedtime = ''.obs;
 
   final dashboardItems = <DashboardItemModel>[].obs;
   final sleepAdaptationNote = ''.obs;
@@ -24,7 +25,7 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchDashboardData();
+    fetchDashboardData().whenComplete(() => fetchOptimalBedtime());
   }
 
   Future<void> fetchDashboardData() async {
@@ -39,7 +40,7 @@ class DashboardController extends GetxController {
       levelText.value = dashboard.scoreLevel;
       streak.value = dashboard.streak;
       sleepAdaptationNote.value = dashboard.sleepAdaptationNote;
-      
+
       // Update improvement percentage from scoreChange
       if (dashboard.scoreChange != null) {
         improvementPercentLabel.value = dashboard.scoreChange!.label;
@@ -47,73 +48,87 @@ class DashboardController extends GetxController {
 
       // Build dashboard items from cards
       final items = <DashboardItemModel>[];
-      
+
       if (dashboard.cards.sleep != null) {
-        items.add(DashboardItemModel(
-          title: 'Sleep',
-          image: IconPath.moon,
-          percent: '${dashboard.cards.sleep!.score}%',
-          description: dashboard.cards.sleep!.subtitle,
-        ));
+        items.add(
+          DashboardItemModel(
+            title: 'Sleep',
+            image: IconPath.moon,
+            percent: '${dashboard.cards.sleep!.score}%',
+            description: dashboard.cards.sleep!.subtitle,
+          ),
+        );
       }
-      
+
       if (dashboard.cards.hydration != null) {
-        items.add(DashboardItemModel(
-          title: 'Hydration',
-          image: IconPath.waterDrops,
-          percent: '${dashboard.cards.hydration!.score}%',
-          description: dashboard.cards.hydration!.subtitle,
-        ));
+        items.add(
+          DashboardItemModel(
+            title: 'Hydration',
+            image: IconPath.waterDrops,
+            percent: '${dashboard.cards.hydration!.score}%',
+            description: dashboard.cards.hydration!.subtitle,
+          ),
+        );
       }
-      
+
       if (dashboard.cards.caffeine != null) {
-        items.add(DashboardItemModel(
-          title: 'Caffeine',
-          image: IconPath.vector,
-          percent: '${dashboard.cards.caffeine!.score}%',
-          description: dashboard.cards.caffeine!.subtitle,
-        ));
+        items.add(
+          DashboardItemModel(
+            title: 'Caffeine',
+            image: IconPath.vector,
+            percent: '${dashboard.cards.caffeine!.score}%',
+            description: dashboard.cards.caffeine!.subtitle,
+          ),
+        );
       }
-      
+
       if (dashboard.cards.nutrition != null) {
-        items.add(DashboardItemModel(
-          title: 'Nutrition',
-          image: IconPath.iron,
-          percent: '${dashboard.cards.nutrition!.score}%',
-          description: dashboard.cards.nutrition!.subtitle,
-        ));
+        items.add(
+          DashboardItemModel(
+            title: 'Nutrition',
+            image: IconPath.iron,
+            percent: '${dashboard.cards.nutrition!.score}%',
+            description: dashboard.cards.nutrition!.subtitle,
+          ),
+        );
       }
-      
+
       if (dashboard.cards.activity != null) {
-        items.add(DashboardItemModel(
-          title: 'Activity',
-          image: IconPath.waterDrops,
-          percent: '${dashboard.cards.activity!.score}%',
-          description: dashboard.cards.activity!.subtitle,
-        ));
+        items.add(
+          DashboardItemModel(
+            title: 'Activity',
+            image: IconPath.waterDrops,
+            percent: '${dashboard.cards.activity!.score}%',
+            description: dashboard.cards.activity!.subtitle,
+          ),
+        );
       }
-      
+
       if (dashboard.cards.recovery != null) {
-        items.add(DashboardItemModel(
-          title: 'Recovery',
-          image: IconPath.iron,
-          percent: '${dashboard.cards.recovery!.score}%',
-          description: dashboard.cards.recovery!.subtitle,
-        ));
+        items.add(
+          DashboardItemModel(
+            title: 'Recovery',
+            image: IconPath.iron,
+            percent: '${dashboard.cards.recovery!.score}%',
+            description: dashboard.cards.recovery!.subtitle,
+          ),
+        );
       }
-      
+
       dashboardItems.value = items;
 
       // Update daily recommendations
       dailyRecommendations.value = dashboard.dailyRecommendations
-          .map((rec) => DashboardRecommendation(
-                id: rec.id,
-                category: rec.category,
-                priority: rec.priority,
-                isPremium: rec.isPremium,
-                title: rec.title,
-                body: rec.body,
-              ))
+          .map(
+            (rec) => DashboardRecommendation(
+              id: rec.id,
+              category: rec.category,
+              priority: rec.priority,
+              isPremium: rec.isPremium,
+              title: rec.title,
+              body: rec.body,
+            ),
+          )
           .toList();
 
       // Update weekly trend
@@ -129,6 +144,20 @@ class DashboardController extends GetxController {
 
   Future<void> refreshDashboard() async {
     await fetchDashboardData();
+  }
+
+  Future<void> fetchOptimalBedtime() async {
+    try {
+      final time = await dashboardService.fetchOptimalBedtime();
+      if (time != null) {
+        optimalBedtime.value = time;
+      } else {
+        optimalBedtime.value = '';
+      }
+    } catch (e) {
+      // leave empty or set a friendly fallback
+      optimalBedtime.value = '';
+    }
   }
 
   String get formattedScore => '${vitalityScore.value.toInt()}%';
