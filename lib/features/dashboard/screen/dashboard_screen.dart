@@ -2,7 +2,6 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/widget/daily_recommendations.dart';
 import 'package:chrisimhof/features/dashboard/widget/list_widget.dart';
-import 'package:chrisimhof/features/dashboard/widget/option_button_widget.dart';
 import 'package:chrisimhof/features/dashboard/widget/profile_widget.dart';
 import 'package:chrisimhof/features/dashboard/widget/the_daily_vitality_score.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +61,6 @@ class DashboardScreen extends StatelessWidget {
                 children: [
                   ProfileWidget(),
                   TheDailyVitalityScore(),
-                  OptionButtonWidget(),
                   Obx(
                     () => GridView.builder(
                       padding: const EdgeInsets.only(right: 16),

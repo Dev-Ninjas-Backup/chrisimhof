@@ -54,4 +54,6 @@ class Urls {
       '$baseUrl/api/v1/history/$historyId';
   static String sessionReset(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/reset';
+  static const String optimalBedtime =
+      '$baseUrl/api/v1/calculator/optimal-bedtime';
 }

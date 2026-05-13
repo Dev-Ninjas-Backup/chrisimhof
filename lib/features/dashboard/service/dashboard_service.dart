@@ -36,4 +36,40 @@ class DashboardService {
       rethrow;
     }
   }
+
+  Future<String?> fetchOptimalBedtime() async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken();
+
+      final response = await http.get(
+        Uri.parse(Urls.optimalBedtime),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (kDebugMode) {
+        debugPrint('Optimal bedtime status: ${response.statusCode}');
+        debugPrint('Optimal bedtime body: ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        // Expecting response like: { "time": "02:00", ... }
+        if (jsonResponse is Map && jsonResponse['time'] != null) {
+          return jsonResponse['time'] as String;
+        }
+        return null;
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized: Invalid or expired token');
+      } else {
+        throw Exception(
+          'Failed to fetch optimal bedtime: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
