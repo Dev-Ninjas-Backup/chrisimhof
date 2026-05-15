@@ -7,14 +7,55 @@ import 'package:chrisimhof/features/calculator/controller/calculator_controller.
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_hydration_tab.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_sleep_tab.dart';
 import 'package:chrisimhof/features/calculator/widgets/calculator_tab_button.dart';
+import 'package:chrisimhof/features/calculator/widgets/calculator_tab_swipe_detector.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class CalculatorScreen extends StatelessWidget {
+class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
 
+  @override
+  State<CalculatorScreen> createState() => _CalculatorScreenState();
+}
+
+class _CalculatorScreenState extends State<CalculatorScreen> {
+  final ScrollController _tabScrollController = ScrollController();
+  late final List<GlobalKey> _tabKeys;
+  int _lastVisibleTabIndex = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabKeys = List.generate(6, (_) => GlobalKey());
+  }
+
+  @override
+  void dispose() {
+    _tabScrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToActiveTab(int index) {
+    if (_lastVisibleTabIndex == index) return;
+    _lastVisibleTabIndex = index;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || index < 0 || index >= _tabKeys.length) return;
+      final context = _tabKeys[index].currentContext;
+      if (context == null) return;
+
+      Scrollable.ensureVisible(
+        context,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     final CalculatorController controller =
@@ -56,46 +97,92 @@ class CalculatorScreen extends StatelessWidget {
 
               /// ✅ Tabs
               Obx(
-                () => SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(
-                      controller.tabs.length,
-                      (index) => CalculatorTabButton(
-                        title: controller.tabs[index].tr,
-                        isActive: controller.selectedTabIndex.value == index,
-                        onTap: () => controller.changeTab(index),
+                () {
+                  _scrollToActiveTab(controller.selectedTabIndex.value);
+
+                  return SingleChildScrollView(
+                    controller: _tabScrollController,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(
+                        controller.tabs.length,
+                        (index) => CalculatorTabButton(
+                          key: _tabKeys[index],
+                          title: controller.tabs[index].tr,
+                          isActive: controller.selectedTabIndex.value == index,
+                          onTap: () async {
+                            await controller.requestTabChange(index);
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
 
               const SizedBox(height: 24),
 
               Obx(() {
-                switch (controller.selectedTabIndex.value) {
-                  case 0:
-                    return CalculatorSleepTab();
+                final currentIndex = controller.selectedTabIndex.value;
+                final slideDirection =
+                    controller.tabTransitionDirection.value.toDouble();
 
-                  case 1:
-                    return CalculatorWorkTab();
+                return CalculatorTabSwipeDetector(
+                  onSwipeLeft: () {
+                    controller.requestTabChange(currentIndex + 1);
+                  },
+                  onSwipeRight: () {
+                    controller.requestTabChange(currentIndex - 1);
+                  },
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 320),
+                    reverseDuration: const Duration(milliseconds: 260),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final isIncoming = child.key == ValueKey(currentIndex);
+                      final beginOffset = isIncoming
+                          ? Offset(slideDirection * 0.16, 0)
+                          : Offset(slideDirection * -0.08, 0);
 
-                  case 2:
-                    return const CalculatorNutritionTab();
-
-                  case 3:
-                    return const CalculatorHydrationTab();
-
-                  case 4:
-                    return const CalculatorCaffeineTab();
-
-                  case 5:
-                    return const CalculatorSportTab();
-
-                  default:
-                    return const SizedBox();
-                }
+                      return ClipRect(
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: beginOffset,
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                        ),
+                      );
+                    },
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          ...previousChildren,
+                          ...(currentChild != null
+                              ? [currentChild]
+                              : const <Widget>[]),
+                        ],
+                      );
+                    },
+                    child: KeyedSubtree(
+                      key: ValueKey(currentIndex),
+                      child: switch (currentIndex) {
+                        0 => CalculatorSleepTab(),
+                        1 => CalculatorWorkTab(),
+                        2 => const CalculatorNutritionTab(),
+                        3 => const CalculatorHydrationTab(),
+                        4 => const CalculatorCaffeineTab(),
+                        5 => const CalculatorSportTab(),
+                        _ => const SizedBox(),
+                      },
+                    ),
+                  ),
+                );
               }),
             ],
           ),

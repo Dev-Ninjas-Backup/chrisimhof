@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chrisimhof/core/common/controller/range_slider_controller.dart';
 import 'package:chrisimhof/core/common/controller/time_controller.dart';
 import 'package:chrisimhof/features/calculator/models/calculator_session_model.dart';
@@ -10,6 +12,7 @@ import 'package:chrisimhof/features/calculator/models/nutrition_calculator_model
 import 'package:chrisimhof/features/calculator/models/sport_calculator_model.dart';
 import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
+import 'package:chrisimhof/features/calculator/widgets/calculator_save_changes_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -115,6 +118,9 @@ class CalculatorController extends GetxController {
   // Caffeine Intake Submission
   final RxBool isCaffeineSubmitting = false.obs;
   final RxString caffeineSubmitError = ''.obs;
+  final Map<int, String> _savedTabStateSignatures = {};
+  final Map<int, Map<String, dynamic>> _savedTabStateSnapshots = {};
+  final RxInt tabTransitionDirection = 1.obs;
 
   @override
   void onInit() {
@@ -203,6 +209,8 @@ class CalculatorController extends GetxController {
           // ignore fallback errors
         }
       }
+
+      _captureAllTabStateSignatures();
     } catch (e) {
       if (requestSerial == _sessionFetchSerial) {
         sessionError.value = e.toString();
@@ -1185,11 +1193,15 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitCaffeineIntake() async {
+    await _submitCaffeineIntake();
+  }
+
+  Future<bool> _submitCaffeineIntake({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
         caffeineSubmitError.value = 'Session not initialized';
-        return;
+        return false;
       }
 
       isCaffeineSubmitting.value = true;
@@ -1251,12 +1263,16 @@ class CalculatorController extends GetxController {
         isReadyToCalculate: response.isReadyToCalculate,
         prefilled: false,
       );
-      changeTab(5);
+      _markTabStateSaved(4);
+      changeTab(nextTabOverride ?? 5);
+      return true;
     } catch (e) {
       caffeineSubmitError.value = e.toString();
     } finally {
       isCaffeineSubmitting.value = false;
     }
+
+    return false;
   }
 
   Future<void> skipCaffeineIntake() async {
@@ -1299,8 +1315,291 @@ class CalculatorController extends GetxController {
   void changeTab(int index) {
     if (index < 0 || index >= tabs.length) return;
 
+    _setTabTransitionDirection(index);
     selectedTabIndex.value = index;
     fetchCalculatorSession(applyPrefill: false, showInitialLoading: false);
+  }
+
+  Future<bool> requestTabChange(int index) async {
+    if (index < 0 || index >= tabs.length) return false;
+
+    final currentIndex = selectedTabIndex.value;
+    if (currentIndex == index) return true;
+
+    if (!_hasUnsavedChanges(currentIndex)) {
+      changeTab(index);
+      return true;
+    }
+
+    final shouldSave = await _showSaveChangesDialog();
+    if (shouldSave == null) {
+      return false;
+    }
+
+    if (shouldSave == false) {
+      _restoreTabState(currentIndex);
+      changeTab(index);
+      return true;
+    }
+
+    return _saveCurrentTabAndNavigate(index);
+  }
+
+  void _setTabTransitionDirection(int targetIndex) {
+    final currentIndex = selectedTabIndex.value;
+    if (targetIndex == currentIndex) return;
+    tabTransitionDirection.value = targetIndex > currentIndex ? 1 : -1;
+  }
+
+  Future<bool?> _showSaveChangesDialog() {
+    return Get.dialog<bool>(
+      const CalculatorSaveChangesDialog(),
+      barrierDismissible: true,
+    );
+  }
+
+  bool _hasUnsavedChanges(int index) {
+    final savedSignature = _savedTabStateSignatures[index];
+    if (savedSignature == null) return false;
+    return _buildTabStateSignature(index) != savedSignature;
+  }
+
+  void _captureAllTabStateSignatures() {
+    for (var i = 0; i < tabs.length; i++) {
+      _savedTabStateSignatures[i] = _buildTabStateSignature(i);
+      _savedTabStateSnapshots[i] = _buildTabStateSnapshot(i);
+    }
+  }
+
+  void _markTabStateSaved(int index) {
+    _savedTabStateSignatures[index] = _buildTabStateSignature(index);
+    _savedTabStateSnapshots[index] = _buildTabStateSnapshot(index);
+  }
+
+  Future<bool> _saveCurrentTabAndNavigate(int targetIndex) async {
+    switch (selectedTabIndex.value) {
+      case 0:
+        return _submitSleepData(nextTabOverride: targetIndex);
+      case 1:
+        return _submitWorkData(nextTabOverride: targetIndex);
+      case 2:
+        return _submitNutritionData(nextTabOverride: targetIndex);
+      case 3:
+        return _submitHydrationData(nextTabOverride: targetIndex);
+      case 4:
+        return _submitCaffeineIntake(nextTabOverride: targetIndex);
+      case 5:
+        return _submitSportData(nextTabOverride: targetIndex);
+      default:
+        return false;
+    }
+  }
+
+  String _buildTabStateSignature(int index) {
+    return jsonEncode(_buildTabStateSnapshot(index));
+  }
+
+  Map<String, dynamic> _buildTabStateSnapshot(int index) {
+    switch (index) {
+      case 0:
+        return {
+          'wakeUpTime': wakeUpController.to24HourFormat,
+          'sleepHours': sleepLastNightController.value.value,
+          'desiredSleepHours': sleepGoalController.value.value,
+          'fatigueLevel': fatigueLevel.value,
+          'desiredSleepStart': desiredSleepStartController.to24HourFormat,
+          'desiredWakeTime': desiredSleepEndController.to24HourFormat,
+          'wantsNap': wantsNap.value,
+          'naps': naps
+              .map((nap) => Map<String, dynamic>.from(nap))
+              .toList(growable: false),
+          'currentNapDuration': currentNapDurationController.text,
+          'preferredNapTime': preferredTimeController.to24HourFormat,
+        };
+      case 1:
+        return {
+          'workBegins': workBeginsController.to24HourFormat,
+          'workComplete': workCompleteController.to24HourFormat,
+          'daysWorked': daysWorkedController.text,
+          'shiftType': selectedShiftType.value,
+        };
+      case 2:
+        return {
+          'desiredMealCount': desiredNumberOfMealsController.value.value,
+          'firstMealTime': firstMealTimeController.to24HourFormat,
+          'lastMealTime': lastMealTimeController.to24HourFormat,
+          'hadMealToday': hasMealTodaySelection.value,
+          'selectedMealTag': selectedMealTag.value,
+          'meals': nutritionMeals
+              .map(
+                (meal) => {
+                  'time': meal.time,
+                  'tag': meal.tag,
+                  'order': meal.order,
+                },
+              )
+              .toList(growable: false),
+        };
+      case 3:
+        return {
+          'waterConsumedL': hydrationConsumedController.value.value,
+          'waterGoalL': hydrationDailyGoalController.value.value,
+        };
+      case 4:
+        return {
+          'caffeineHistory': caffeineHistory
+              .map((entry) => Map<String, dynamic>.from(entry))
+              .toList(growable: false),
+          'caffeineIntakeTime': caffeineIntakeTimeController.to24HourFormat,
+          'drinkName': caffeineDrinkNameController.text,
+          'drinkType': caffeineDrinkTypeController.text,
+          'amount': caffeineAmountController.text,
+          'selectedDrinkType': selectedCaffeineDrinkType.value,
+          'caffeine24h': caffeine24hValue.value,
+          'caffeine8h': caffeineLastEightHoursValue.value,
+          'rolling8h': caffeineRolling8hMgValue.value,
+        };
+      case 5:
+        return {
+          'duration': sportDurationController.text,
+          'activityType': selectedActivityType.value,
+          'trainingIntent': trainingIntent.value,
+          'intensity': sportIntensity.value,
+        };
+      default:
+        return const {};
+    }
+  }
+
+  void _restoreTabState(int index) {
+    final snapshot = _savedTabStateSnapshots[index];
+    if (snapshot == null) return;
+
+    switch (index) {
+      case 0:
+        _applyTimeStringToController(
+          snapshot['wakeUpTime'] as String?,
+          wakeUpController,
+        );
+        sleepLastNightController.updateValue(
+          (snapshot['sleepHours'] as num?)?.toDouble() ??
+              sleepLastNightController.min,
+        );
+        sleepGoalController.updateValue(
+          (snapshot['desiredSleepHours'] as num?)?.toDouble() ??
+              sleepGoalController.min,
+        );
+        fatigueLevel.value = snapshot['fatigueLevel']?.toString() ?? 'Low'.tr;
+        _applyTimeStringToController(
+          snapshot['desiredSleepStart'] as String?,
+          desiredSleepStartController,
+        );
+        _applyTimeStringToController(
+          snapshot['desiredWakeTime'] as String?,
+          desiredSleepEndController,
+        );
+        wantsNap.value = snapshot['wantsNap'] as bool? ?? false;
+        final savedNaps =
+            (snapshot['naps'] as List?)
+                ?.whereType<Map>()
+                .map((nap) => Map<String, dynamic>.from(nap))
+                .toList(growable: false) ??
+            const <Map<String, dynamic>>[];
+        naps.assignAll(savedNaps);
+        currentNapDurationController.text =
+            snapshot['currentNapDuration']?.toString() ?? '';
+        _applyTimeStringToController(
+          snapshot['preferredNapTime'] as String?,
+          preferredTimeController,
+        );
+        break;
+      case 1:
+        _applyTimeStringToController(
+          snapshot['workBegins'] as String?,
+          workBeginsController,
+        );
+        _applyTimeStringToController(
+          snapshot['workComplete'] as String?,
+          workCompleteController,
+        );
+        daysWorkedController.text = snapshot['daysWorked']?.toString() ?? '';
+        selectedShiftType.value =
+            snapshot['shiftType']?.toString() ?? 'STANDARD';
+        break;
+      case 2:
+        desiredNumberOfMealsController.updateValue(
+          (snapshot['desiredMealCount'] as num?)?.toDouble() ??
+              desiredNumberOfMealsController.min,
+        );
+        _applyTimeStringToController(
+          snapshot['firstMealTime'] as String?,
+          firstMealTimeController,
+        );
+        _applyTimeStringToController(
+          snapshot['lastMealTime'] as String?,
+          lastMealTimeController,
+        );
+        hasMealTodaySelection.value =
+            snapshot['hadMealToday']?.toString() ?? 'No';
+        selectedMealTag.value =
+            snapshot['selectedMealTag']?.toString() ?? 'LIGHT';
+        final savedMeals =
+            (snapshot['meals'] as List?)
+                ?.whereType<Map>()
+                .map(
+                  (meal) => NutritionMealRequest(
+                    time: meal['time']?.toString() ?? '00:00',
+                    tag: meal['tag']?.toString() ?? 'LIGHT',
+                    order: (meal['order'] as num?)?.toInt() ?? 1,
+                  ),
+                )
+                .toList(growable: false) ??
+            const <NutritionMealRequest>[];
+        nutritionMeals.assignAll(savedMeals);
+        break;
+      case 3:
+        hydrationConsumedController.updateValue(
+          (snapshot['waterConsumedL'] as num?)?.toDouble() ?? 0.0,
+        );
+        hydrationDailyGoalController.updateValue(
+          (snapshot['waterGoalL'] as num?)?.toDouble() ?? 0.0,
+        );
+        break;
+      case 4:
+        final savedHistory =
+            (snapshot['caffeineHistory'] as List?)
+                ?.whereType<Map>()
+                .map((entry) => Map<String, dynamic>.from(entry))
+                .toList(growable: false) ??
+            const <Map<String, dynamic>>[];
+        caffeineHistory.assignAll(savedHistory);
+        _applyTimeStringToController(
+          snapshot['caffeineIntakeTime'] as String?,
+          caffeineIntakeTimeController,
+        );
+        caffeineDrinkNameController.text =
+            snapshot['drinkName']?.toString() ?? '';
+        caffeineDrinkTypeController.text =
+            snapshot['drinkType']?.toString() ?? '';
+        caffeineAmountController.text = snapshot['amount']?.toString() ?? '';
+        selectedCaffeineDrinkType.value =
+            snapshot['selectedDrinkType']?.toString() ?? 'COFFEE';
+        caffeine24hValue.value =
+            (snapshot['caffeine24h'] as num?)?.toDouble() ?? 0.0;
+        caffeineLastEightHoursValue.value =
+            (snapshot['caffeine8h'] as num?)?.toDouble() ?? 0.0;
+        caffeineRolling8hMgValue.value =
+            (snapshot['rolling8h'] as num?)?.toDouble() ?? 0.0;
+        break;
+      case 5:
+        sportDurationController.text = snapshot['duration']?.toString() ?? '';
+        selectedActivityType.value =
+            snapshot['activityType']?.toString() ?? '';
+        trainingIntent.value =
+            snapshot['trainingIntent']?.toString() ?? 'NO_TRAINING';
+        sportIntensity.value = (snapshot['intensity'] as num?)?.toDouble() ?? 0;
+        break;
+    }
   }
 
   String _formatErrorMessage(Object error, {String? servicePrefix}) {
@@ -1314,15 +1613,19 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitSleepData() async {
+    await _submitSleepData();
+  }
+
+  Future<bool> _submitSleepData({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null) {
         sleepSubmitError.value = 'Session not initialized (value is null)';
-        return;
+        return false;
       }
 
       if (calculatorSession.value!.sessionId == null) {
         sleepSubmitError.value = 'Session ID is null';
-        return;
+        return false;
       }
 
       isSleepSubmitting.value = true;
@@ -1378,8 +1681,9 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        // Navigate to next tab (work tab)
-        changeTab(1);
+        _markTabStateSaved(0);
+        changeTab(nextTabOverride ?? 1);
+        return true;
       } else {
         sleepSubmitError.value = response.message;
       }
@@ -1391,18 +1695,24 @@ class CalculatorController extends GetxController {
     } finally {
       isSleepSubmitting.value = false;
     }
+
+    return false;
   }
 
   Future<void> submitWorkData() async {
+    await _submitWorkData();
+  }
+
+  Future<bool> _submitWorkData({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null) {
         workSubmitError.value = 'Session not initialized (value is null)';
-        return;
+        return false;
       }
 
       if (calculatorSession.value!.sessionId == null) {
         workSubmitError.value = 'Session ID is null';
-        return;
+        return false;
       }
 
       isWorkSubmitting.value = true;
@@ -1429,8 +1739,9 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        // Navigate to next tab (nutrition tab)
-        changeTab(2);
+        _markTabStateSaved(1);
+        changeTab(nextTabOverride ?? 2);
+        return true;
       } else {
         workSubmitError.value = response.message;
       }
@@ -1442,14 +1753,20 @@ class CalculatorController extends GetxController {
     } finally {
       isWorkSubmitting.value = false;
     }
+
+    return false;
   }
 
   Future<void> skipWorkData() async {
+    await _skipWorkData();
+  }
+
+  Future<bool> _skipWorkData({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
         workSubmitError.value = 'Session not initialized';
-        return;
+        return false;
       }
 
       isWorkSubmitting.value = true;
@@ -1470,8 +1787,9 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        // Navigate to next tab (nutrition tab)
-        changeTab(2);
+        _markTabStateSaved(1);
+        changeTab(nextTabOverride ?? 2);
+        return true;
       } else {
         workSubmitError.value = response.message;
       }
@@ -1483,14 +1801,20 @@ class CalculatorController extends GetxController {
     } finally {
       isWorkSubmitting.value = false;
     }
+
+    return false;
   }
 
   Future<void> submitNutritionData() async {
+    await _submitNutritionData();
+  }
+
+  Future<bool> _submitNutritionData({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
         nutritionSubmitError.value = 'Session not initialized';
-        return;
+        return false;
       }
 
       isNutritionSubmitting.value = true;
@@ -1498,7 +1822,7 @@ class CalculatorController extends GetxController {
 
       if (nutritionMeals.isEmpty) {
         nutritionSubmitError.value = 'Please add at least one meal'.tr;
-        return;
+        return false;
       }
 
       // Convert Yes/No to boolean
@@ -1532,8 +1856,9 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        // Navigate to next tab (hydration tab)
-        changeTab(3);
+        _markTabStateSaved(2);
+        changeTab(nextTabOverride ?? 3);
+        return true;
       } else {
         nutritionSubmitError.value = response.message;
       }
@@ -1545,14 +1870,20 @@ class CalculatorController extends GetxController {
     } finally {
       isNutritionSubmitting.value = false;
     }
+
+    return false;
   }
 
   Future<void> submitHydrationData() async {
+    await _submitHydrationData();
+  }
+
+  Future<bool> _submitHydrationData({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
         hydrationSubmitError.value = 'Session not initialized';
-        return;
+        return false;
       }
 
       isHydrationSubmitting.value = true;
@@ -1593,7 +1924,9 @@ class CalculatorController extends GetxController {
           prefilled: false,
         );
 
-        changeTab(4);
+        _markTabStateSaved(3);
+        changeTab(nextTabOverride ?? 4);
+        return true;
       } else {
         hydrationSubmitError.value = response.message;
       }
@@ -1602,6 +1935,8 @@ class CalculatorController extends GetxController {
     } finally {
       isHydrationSubmitting.value = false;
     }
+
+    return false;
   }
 
   void selectActivityType(String activityType) {
@@ -1654,11 +1989,15 @@ class CalculatorController extends GetxController {
   }
 
   Future<void> submitSportData() async {
+    await _submitSportData();
+  }
+
+  Future<bool> _submitSportData({int? nextTabOverride}) async {
     try {
       if (calculatorSession.value == null ||
           calculatorSession.value!.sessionId == null) {
         sportSubmitError.value = 'Session not initialized';
-        return;
+        return false;
       }
       // Validate/prepare based on training intent
       isSportSubmitting.value = true;
@@ -1674,14 +2013,14 @@ class CalculatorController extends GetxController {
         if (sportDurationController.text.isEmpty) {
           sportSubmitError.value = 'Please enter activity duration';
           isSportSubmitting.value = false;
-          return;
+          return false;
         }
 
         activityDuration = int.tryParse(sportDurationController.text) ?? 0;
         if (activityDuration <= 0) {
           sportSubmitError.value = 'Invalid activity duration';
           isSportSubmitting.value = false;
-          return;
+          return false;
         }
         // Determine activity type (UI stores display name)
         try {
@@ -1751,11 +2090,18 @@ class CalculatorController extends GetxController {
         // Append so new activities appear at the end
         sportActivities.addAll(list);
       }
+      _markTabStateSaved(5);
+      if (nextTabOverride != null && nextTabOverride != 5) {
+        changeTab(nextTabOverride);
+      }
+      return true;
     } catch (e) {
       sportSubmitError.value = e.toString();
     } finally {
       isSportSubmitting.value = false;
     }
+
+    return false;
   }
 
   @override
