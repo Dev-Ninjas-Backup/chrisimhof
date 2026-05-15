@@ -1455,9 +1455,6 @@ class CalculatorController extends GetxController {
           'drinkType': caffeineDrinkTypeController.text,
           'amount': caffeineAmountController.text,
           'selectedDrinkType': selectedCaffeineDrinkType.value,
-          'caffeine24h': caffeine24hValue.value,
-          'caffeine8h': caffeineLastEightHoursValue.value,
-          'rolling8h': caffeineRolling8hMgValue.value,
         };
       case 5:
         return {
