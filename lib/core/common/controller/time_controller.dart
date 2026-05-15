@@ -80,6 +80,7 @@ class TimeController extends GetxController {
   }
 
   String get formattedHour => hour.value.toString().padLeft(2, '0');
+
   String get formattedMinute => minute.value.toString().padLeft(2, '0');
   String get formattedTime => '$formattedHour:$formattedMinute';
 

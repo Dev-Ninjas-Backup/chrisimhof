@@ -79,6 +79,9 @@ class CalculatorController extends GetxController {
   late TimeController firstMealTimeController;
   late TimeController lastMealTimeController;
   final RxString hasMealTodaySelection = 'No'.obs;
+  final RxString selectedMealTag = 'LIGHT'.obs;
+  final RxList<NutritionMealRequest> nutritionMeals =
+      <NutritionMealRequest>[].obs;
 
   // Sport Tab Controllers
   late TextEditingController sportDurationController;
@@ -402,48 +405,8 @@ class CalculatorController extends GetxController {
       // Nutrition
       final nutrition = d['nutrition'];
       if (nutrition != null && nutrition is Map<String, dynamic>) {
-        var appliedNutrition = false;
-        if (nutrition['firstMealTime'] != null) {
-          final parts = (nutrition['firstMealTime'] as String).split(':');
-          if (parts.length == 2) {
-            firstMealTimeController.hour.value =
-                int.tryParse(parts[0]) ?? firstMealTimeController.hour.value;
-            firstMealTimeController.minute.value =
-                int.tryParse(parts[1]) ?? firstMealTimeController.minute.value;
-            firstMealTimeController.period.value =
-                firstMealTimeController.hour.value >= 12 ? 'PM' : 'AM';
-            appliedNutrition = true;
-          }
-        }
-
-        if (nutrition['lastMealTime'] != null) {
-          final parts = (nutrition['lastMealTime'] as String).split(':');
-          if (parts.length == 2) {
-            lastMealTimeController.hour.value =
-                int.tryParse(parts[0]) ?? lastMealTimeController.hour.value;
-            lastMealTimeController.minute.value =
-                int.tryParse(parts[1]) ?? lastMealTimeController.minute.value;
-            lastMealTimeController.period.value =
-                lastMealTimeController.hour.value >= 12 ? 'PM' : 'AM';
-            appliedNutrition = true;
-          }
-        }
-
-        if (nutrition['desiredMealCount'] != null) {
-          desiredNumberOfMealsController.updateValue(
-            (nutrition['desiredMealCount'] as num).toDouble(),
-          );
-          appliedNutrition = true;
-        }
-
-        if (nutrition['hadMealToday'] != null) {
-          hasMealTodaySelection.value = (nutrition['hadMealToday'] as bool)
-              ? 'Yes'
-              : 'No';
-          appliedNutrition = true;
-        }
-
-        if (appliedNutrition) applied.add('nutrition');
+        _applyNutritionPrefillFromMap(nutrition);
+        if (nutrition.isNotEmpty) applied.add('nutrition');
       }
 
       // Hydration
@@ -775,48 +738,8 @@ class CalculatorController extends GetxController {
       final nutrition = root['nutrition'];
       if (!appliedSections.contains('nutrition') &&
           nutrition is Map<String, dynamic>) {
-        var appliedNutrition = false;
-        if (nutrition['firstMealTime'] != null) {
-          final parts = (nutrition['firstMealTime'] as String).split(':');
-          if (parts.length == 2) {
-            firstMealTimeController.hour.value =
-                int.tryParse(parts[0]) ?? firstMealTimeController.hour.value;
-            firstMealTimeController.minute.value =
-                int.tryParse(parts[1]) ?? firstMealTimeController.minute.value;
-            firstMealTimeController.period.value =
-                firstMealTimeController.hour.value >= 12 ? 'PM' : 'AM';
-            appliedNutrition = true;
-          }
-        }
-
-        if (nutrition['lastMealTime'] != null) {
-          final parts = (nutrition['lastMealTime'] as String).split(':');
-          if (parts.length == 2) {
-            lastMealTimeController.hour.value =
-                int.tryParse(parts[0]) ?? lastMealTimeController.hour.value;
-            lastMealTimeController.minute.value =
-                int.tryParse(parts[1]) ?? lastMealTimeController.minute.value;
-            lastMealTimeController.period.value =
-                lastMealTimeController.hour.value >= 12 ? 'PM' : 'AM';
-            appliedNutrition = true;
-          }
-        }
-
-        if (nutrition['desiredMealCount'] != null) {
-          desiredNumberOfMealsController.updateValue(
-            (nutrition['desiredMealCount'] as num).toDouble(),
-          );
-          appliedNutrition = true;
-        }
-
-        if (nutrition['hadMealToday'] != null) {
-          hasMealTodaySelection.value = (nutrition['hadMealToday'] as bool)
-              ? 'Yes'
-              : 'No';
-          appliedNutrition = true;
-        }
-
-        if (appliedNutrition) appliedSections.add('nutrition');
+        _applyNutritionPrefillFromMap(nutrition);
+        if (nutrition.isNotEmpty) appliedSections.add('nutrition');
       }
 
       // Hydration explicit mapping
@@ -1007,6 +930,154 @@ class CalculatorController extends GetxController {
     desiredNumberOfMealsController = RangeSliderController(initialValue: 1.0);
     firstMealTimeController = TimeController();
     lastMealTimeController = TimeController();
+  }
+
+  void selectMealTag(String tag) {
+    selectedMealTag.value = tag;
+  }
+
+  void addNutritionMeal() {
+    final nextOrder = nutritionMeals.length + 1;
+    nutritionMeals.add(
+      NutritionMealRequest(
+        time: _suggestNutritionMealTime(nextOrder),
+        tag: selectedMealTag.value,
+        order: nextOrder,
+      ),
+    );
+  }
+
+  void updateNutritionMeal(int index, NutritionMealRequest meal) {
+    if (index < 0 || index >= nutritionMeals.length) return;
+
+    nutritionMeals[index] = meal.copyWith(order: index + 1);
+    nutritionMeals.refresh();
+  }
+
+  void removeNutritionMeal(int index) {
+    if (index < 0 || index >= nutritionMeals.length) return;
+
+    nutritionMeals.removeAt(index);
+    nutritionMeals.assignAll(
+      nutritionMeals
+          .asMap()
+          .entries
+          .map((entry) => entry.value.copyWith(order: entry.key + 1))
+          .toList(),
+    );
+  }
+
+  void clearNutritionMeals() {
+    nutritionMeals.clear();
+  }
+
+  void resetNutritionFormState() {
+    desiredNumberOfMealsController.updateValue(1);
+    firstMealTimeController.reset();
+    lastMealTimeController.reset();
+    hasMealTodaySelection.value = 'No';
+    selectedMealTag.value = 'LIGHT';
+    nutritionMeals.clear();
+  }
+
+  void _applyTimeStringToController(
+    String? rawTime,
+    TimeController controller,
+  ) {
+    if (rawTime == null) return;
+
+    final parts = rawTime.split(':');
+    if (parts.length != 2) return;
+
+    controller.hour.value = int.tryParse(parts[0]) ?? controller.hour.value;
+    controller.minute.value = int.tryParse(parts[1]) ?? controller.minute.value;
+    controller.period.value = controller.hour.value >= 12 ? 'PM' : 'AM';
+  }
+
+  void _applyNutritionPrefillFromMap(Map<String, dynamic> nutrition) {
+    var appliedNutrition = false;
+
+    if (nutrition['firstMealTime'] != null) {
+      _applyTimeStringToController(
+        nutrition['firstMealTime'] as String?,
+        firstMealTimeController,
+      );
+      appliedNutrition = true;
+    }
+
+    if (nutrition['lastMealTime'] != null) {
+      _applyTimeStringToController(
+        nutrition['lastMealTime'] as String?,
+        lastMealTimeController,
+      );
+      appliedNutrition = true;
+    }
+
+    if (nutrition['desiredMealCount'] != null) {
+      desiredNumberOfMealsController.updateValue(
+        (nutrition['desiredMealCount'] as num).toDouble(),
+      );
+      appliedNutrition = true;
+    }
+
+    if (nutrition['hadMealToday'] != null) {
+      hasMealTodaySelection.value = (nutrition['hadMealToday'] as bool)
+          ? 'Yes'
+          : 'No';
+      appliedNutrition = true;
+    }
+
+    if (nutrition['meals'] is List) {
+      final parsedMeals =
+          (nutrition['meals'] as List)
+              .whereType<Map>()
+              .map(
+                (meal) => NutritionMealRequest.fromJson(
+                  Map<String, dynamic>.from(meal),
+                ),
+              )
+              .toList()
+            ..sort((a, b) => a.order.compareTo(b.order));
+
+      nutritionMeals.assignAll(parsedMeals);
+      appliedNutrition = appliedNutrition || parsedMeals.isNotEmpty;
+    } else {
+      nutritionMeals.clear();
+    }
+  }
+
+  int _timeControllerToMinutes(TimeController controller) {
+    return (controller.hour.value * 60) + controller.minute.value;
+  }
+
+  String _minutesTo24HourString(int totalMinutes) {
+    final normalized = totalMinutes % (24 * 60);
+    final hour = (normalized ~/ 60).toString().padLeft(2, '0');
+    final minute = (normalized % 60).toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  String _suggestNutritionMealTime(int order) {
+    final firstMinutes = _timeControllerToMinutes(firstMealTimeController);
+    final lastMinutes = _timeControllerToMinutes(lastMealTimeController);
+
+    if (order <= 1) {
+      return _minutesTo24HourString(firstMinutes);
+    }
+
+    final slotCount = order;
+    final totalSpan = lastMinutes >= firstMinutes
+        ? lastMinutes - firstMinutes
+        : (24 * 60 - firstMinutes) + lastMinutes;
+
+    if (slotCount <= 1 || totalSpan == 0) {
+      return _minutesTo24HourString(firstMinutes);
+    }
+
+    final step = totalSpan / (slotCount - 1);
+    final minutes = firstMinutes + (step * (order - 1)).round();
+
+    return _minutesTo24HourString(minutes);
   }
 
   void _initializeSportControllers() {
@@ -1425,6 +1496,11 @@ class CalculatorController extends GetxController {
       isNutritionSubmitting.value = true;
       nutritionSubmitError.value = '';
 
+      if (nutritionMeals.isEmpty) {
+        nutritionSubmitError.value = 'Please add at least one meal'.tr;
+        return;
+      }
+
       // Convert Yes/No to boolean
       final hadMealToday = hasMealTodaySelection.value == 'Yes';
 
@@ -1433,6 +1509,11 @@ class CalculatorController extends GetxController {
         desiredMealCount: desiredNumberOfMealsController.value.value.toInt(),
         firstMealTime: firstMealTimeController.to24HourFormat,
         lastMealTime: lastMealTimeController.to24HourFormat,
+        meals: nutritionMeals
+            .asMap()
+            .entries
+            .map((entry) => entry.value.copyWith(order: entry.key + 1))
+            .toList(),
       );
 
       final response = await _calculatorService.submitNutritionData(
@@ -1457,7 +1538,10 @@ class CalculatorController extends GetxController {
         nutritionSubmitError.value = response.message;
       }
     } catch (e) {
-      nutritionSubmitError.value = e.toString();
+      nutritionSubmitError.value = _formatErrorMessage(
+        e,
+        servicePrefix: 'Error submitting nutrition data:',
+      );
     } finally {
       isNutritionSubmitting.value = false;
     }

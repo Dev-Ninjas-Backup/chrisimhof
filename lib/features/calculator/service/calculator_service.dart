@@ -199,9 +199,14 @@ class CalculatorService {
         return NutritionCalculatorResponse.fromJson(jsonData);
       } else {
         throw Exception(
-          jsonData['message'] ?? 'Failed to submit nutrition data',
+          _extractErrorMessage(
+            jsonData['message'],
+            'Failed to submit nutrition data',
+          ),
         );
       }
+    } on Exception {
+      rethrow;
     } catch (e) {
       throw Exception('Error submitting nutrition data: $e');
     }

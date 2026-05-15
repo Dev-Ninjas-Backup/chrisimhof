@@ -1,26 +1,58 @@
 class NutritionCalculatorRequest {
-  // final int mealsPerDay;
   final bool hadMealToday;
   final int desiredMealCount;
   final String firstMealTime;
   final String lastMealTime;
+  final List<NutritionMealRequest> meals;
 
   NutritionCalculatorRequest({
-    // required this.mealsPerDay,
     required this.hadMealToday,
     required this.desiredMealCount,
     required this.firstMealTime,
     required this.lastMealTime,
+    required this.meals,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      // 'mealsPerDay': mealsPerDay,
       'hadMealToday': hadMealToday,
       'desiredMealCount': desiredMealCount,
       'firstMealTime': firstMealTime,
       'lastMealTime': lastMealTime,
+      'meals': meals.map((meal) => meal.toJson()).toList(),
     };
+  }
+}
+
+class NutritionMealRequest {
+  final String time;
+  final String tag;
+  final int order;
+
+  NutritionMealRequest({
+    required this.time,
+    required this.tag,
+    required this.order,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {'time': time, 'tag': tag, 'order': order};
+  }
+
+  factory NutritionMealRequest.fromJson(Map<String, dynamic> json) {
+    return NutritionMealRequest(
+      time: json['time']?.toString() ?? '00:00',
+      tag: json['tag']?.toString() ?? 'LIGHT',
+      order: (json['order'] as num?)?.toInt() ?? 1,
+    );
+  }
+
+  NutritionMealRequest copyWith({String? time, String? tag, int? order}) {
+    return NutritionMealRequest(
+      time: time ?? this.time,
+      tag: tag ?? this.tag,
+      order: order ?? this.order,
+    );
   }
 }
 
