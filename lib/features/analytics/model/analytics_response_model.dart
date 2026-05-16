@@ -161,15 +161,36 @@ class WellnessRadar {
 class ActivitySplit {
   final double totalHours;
   final List<ActivitySplitItem> items;
+  final bool locked;
+  final String? message;
 
-  const ActivitySplit({required this.totalHours, required this.items});
+  const ActivitySplit({
+    required this.totalHours,
+    required this.items,
+    this.locked = false,
+    this.message,
+  });
 
   factory ActivitySplit.fromJson(Map<String, dynamic> json) {
+    final isLocked = json['locked'] == true;
+    final message = json['message']?.toString();
+
+    if (isLocked) {
+      return ActivitySplit(
+        totalHours: _toDouble(json['totalHours'], fallback: 0),
+        items: const [],
+        locked: true,
+        message: message,
+      );
+    }
+
     return ActivitySplit(
       totalHours: _toDouble(json['totalHours'], fallback: 24),
       items: (json['items'] as List<dynamic>? ?? [])
           .map((item) => ActivitySplitItem.fromJson(item))
           .toList(),
+      locked: false,
+      message: message,
     );
   }
 }

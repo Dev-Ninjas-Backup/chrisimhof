@@ -39,6 +39,7 @@ class AnalyticsScreen extends StatelessWidget {
               SizedBox(height: 16),
               WellnessScoreCard(),
               SizedBox(height: 16),
+              
               DailyActivitySplitCard(),
               SizedBox(height: 16),
               // Circadian peak summary (shows peak hour, score, and insight)
