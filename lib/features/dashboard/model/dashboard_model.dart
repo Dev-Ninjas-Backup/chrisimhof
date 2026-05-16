@@ -8,12 +8,40 @@ class ScoreChange {
     required this.percent,
     required this.label,
   });
-
   factory ScoreChange.fromJson(Map<String, dynamic> json) {
     return ScoreChange(
       direction: json['direction'] ?? 'up',
       percent: json['percent'] ?? 0,
       label: json['label'] ?? '',
+    );
+  }
+}
+
+class OptimalBedtime {
+  final String time;
+  final List<String> reasons;
+  final String label;
+  final String? adjustedLabel;
+  final String source;
+  final bool sleepAsap;
+
+  OptimalBedtime({
+    required this.time,
+    this.reasons = const [],
+    required this.label,
+    this.adjustedLabel,
+    required this.source,
+    this.sleepAsap = false,
+  });
+
+  factory OptimalBedtime.fromJson(Map<String, dynamic> json) {
+    return OptimalBedtime(
+      time: json['time'] ?? '',
+      reasons: (json['reasons'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      label: json['label'] ?? '',
+      adjustedLabel: json['adjustedLabel'],
+      source: json['source'] ?? '',
+      sleepAsap: json['sleepAsap'] ?? false,
     );
   }
 }
@@ -27,11 +55,13 @@ class DashboardModel {
   final int streak;
   final String sleepAdaptationNote;
   final List<DailyRecommendation> dailyRecommendations;
+  final OptimalBedtime? optimalBedtime;
 
   DashboardModel({
     required this.currentScore,
     required this.scoreLevel,
     this.scoreChange,
+    this.optimalBedtime,
     required this.cards,
     required this.weeklyTrend,
     required this.streak,
@@ -43,6 +73,9 @@ class DashboardModel {
     return DashboardModel(
       currentScore: json['currentScore'] ?? 0,
       scoreLevel: json['scoreLevel'] ?? '',
+      optimalBedtime: json['optimalBedtime'] != null
+          ? OptimalBedtime.fromJson(Map<String, dynamic>.from(json['optimalBedtime']))
+          : null,
       scoreChange: json['scoreChange'] != null 
         ? ScoreChange.fromJson(json['scoreChange']) 
         : null,

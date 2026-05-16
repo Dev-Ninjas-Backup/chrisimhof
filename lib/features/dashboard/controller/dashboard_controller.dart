@@ -14,7 +14,9 @@ class DashboardController extends GetxController {
   final improvementPercentLabel = "".obs;
   final isLoading = true.obs;
   final errorMessage = ''.obs;
-  final optimalBedtime = ''.obs;
+  final optimalBedtimeLevel = ''.obs;
+  final RxString optimalBedtime = "".obs;
+  final RxBool isOptimalBedtimeSleepAsap = false.obs;
 
   final dashboardItems = <DashboardItemModel>[].obs;
   final sleepAdaptationNote = ''.obs;
@@ -26,7 +28,7 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchDashboardData().whenComplete(() => fetchOptimalBedtime());
+    fetchDashboardData();
   }
 
   Future<void> fetchDashboardData() async {
@@ -41,6 +43,9 @@ class DashboardController extends GetxController {
       levelText.value = dashboard.scoreLevel;
       streak.value = dashboard.streak;
       sleepAdaptationNote.value = dashboard.sleepAdaptationNote;
+      optimalBedtimeLevel.value = dashboard.optimalBedtime?.label ?? " ";
+      optimalBedtime.value = dashboard.optimalBedtime?.time ?? " ";
+      isOptimalBedtimeSleepAsap.value = dashboard.optimalBedtime?.sleepAsap ?? false;
 
       // Update improvement percentage from scoreChange
       if (dashboard.scoreChange != null) {
@@ -147,19 +152,19 @@ class DashboardController extends GetxController {
     await fetchDashboardData();
   }
 
-  Future<void> fetchOptimalBedtime() async {
-    try {
-      final time = await dashboardService.fetchOptimalBedtime();
-      if (time != null) {
-        optimalBedtime.value = time;
-      } else {
-        optimalBedtime.value = '';
-      }
-    } catch (e) {
-      // leave empty or set a friendly fallback
-      optimalBedtime.value = '';
-    }
-  }
+  // Future<void> fetchOptimalBedtime() async {
+  //   try {
+  //     final time = await dashboardService.fetchOptimalBedtime();
+  //     if (time != null) {
+  //       optimalBedtime.value = time;
+  //     } else {
+  //       optimalBedtime.value = '';
+  //     }
+  //   } catch (e) {
+  //     // leave empty or set a friendly fallback
+  //     optimalBedtime.value = '';
+  //   }
+  // }
 
   String get formattedScore => '${vitalityScore.value.toInt()}%';
 
@@ -234,7 +239,7 @@ class DashboardController extends GetxController {
     try {
       isQuickAddSubmitting.value = true;
       await dashboardService.updateCalculatorSession(payload);
-      await Future.wait([fetchDashboardData(), fetchOptimalBedtime()]);
+      await Future.wait([fetchDashboardData()]);
     } finally {
       isQuickAddSubmitting.value = false;
     }
