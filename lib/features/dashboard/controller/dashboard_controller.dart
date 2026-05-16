@@ -21,6 +21,7 @@ class DashboardController extends GetxController {
   final dailyRecommendations = <DashboardRecommendation>[].obs;
   final weeklyTrendData = <WeeklyTrendItem>[].obs;
   final streak = 0.obs;
+  final isQuickAddSubmitting = false.obs;
 
   @override
   void onInit() {
@@ -161,6 +162,83 @@ class DashboardController extends GetxController {
   }
 
   String get formattedScore => '${vitalityScore.value.toInt()}%';
+
+  Future<void> quickAddHydration({
+    required double waterConsumedL,
+    required double waterGoalL,
+  }) async {
+    await _submitQuickAdd({
+      'waterConsumedL': waterConsumedL,
+      'waterGoalL': waterGoalL,
+    });
+  }
+
+  Future<void> quickAddCaffeine({
+    required int amountMg,
+    required String consumedAt,
+    required String drinkType,
+    required String drinkName,
+  }) async {
+    await _submitQuickAdd({
+      'newCaffeineIntakes': [
+        {
+          'amountMg': amountMg,
+          'consumedAt': consumedAt,
+          'drinkType': drinkType,
+          'drinkName': drinkName,
+        },
+      ],
+    });
+  }
+
+  Future<void> quickAddSport({
+    required String activityType,
+    required String intensity,
+    required int durationMin,
+    String? performedAt,
+  }) async {
+    await _submitQuickAdd({
+      'newActivities': [
+        {
+          'activityType': activityType,
+          'intensity': intensity,
+          'durationMin': durationMin,
+          'performedAt':
+              performedAt ?? DateTime.now().toUtc().toIso8601String(),
+        },
+      ],
+    });
+  }
+
+  Future<void> quickAddNutrition({
+    required String mealTime,
+    required String mealTag,
+    required int order,
+    required int mealsPerDay,
+    required String firstMealTime,
+    required String lastMealTime,
+    required bool hadMealToday,
+  }) async {
+    await _submitQuickAdd({
+      'newMeals': [
+        {'time': mealTime, 'tag': mealTag, 'order': order},
+      ],
+      'hadMealToday': hadMealToday,
+      'mealsPerDay': mealsPerDay,
+      'firstMealTime': firstMealTime,
+      'lastMealTime': lastMealTime,
+    });
+  }
+
+  Future<void> _submitQuickAdd(Map<String, dynamic> payload) async {
+    try {
+      isQuickAddSubmitting.value = true;
+      await dashboardService.updateCalculatorSession(payload);
+      await Future.wait([fetchDashboardData(), fetchOptimalBedtime()]);
+    } finally {
+      isQuickAddSubmitting.value = false;
+    }
+  }
 }
 
 class DashboardRecommendation {

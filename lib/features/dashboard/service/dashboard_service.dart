@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DashboardService {
+  String? _calculatorSessionId;
+
   Future<DashboardModel> fetchDashboard() async {
     try {
       final token = await SharedPreferencesHelper.getAccessToken();
@@ -70,6 +72,76 @@ class DashboardService {
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<String> fetchCalculatorSessionId({bool forceRefresh = false}) async {
+    if (!forceRefresh &&
+        _calculatorSessionId != null &&
+        _calculatorSessionId!.isNotEmpty) {
+      return _calculatorSessionId!;
+    }
+
+    final token = await SharedPreferencesHelper.getAccessToken();
+    final response = await http.get(
+      Uri.parse(Urls.createCalculatorSession),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch calculator session');
+    }
+
+    final jsonResponse = jsonDecode(response.body);
+    String? sessionId;
+
+    if (jsonResponse is Map<String, dynamic>) {
+      final data = jsonResponse['data'];
+      if (data is Map<String, dynamic>) {
+        sessionId = data['sessionId']?.toString();
+      }
+      sessionId ??= jsonResponse['sessionId']?.toString();
+    }
+
+    if (sessionId == null || sessionId.isEmpty) {
+      throw Exception('Calculator session id was not returned');
+    }
+
+    _calculatorSessionId = sessionId;
+    return sessionId;
+  }
+
+  Future<void> updateCalculatorSession(Map<String, dynamic> payload) async {
+    final token = await SharedPreferencesHelper.getAccessToken();
+    final sessionId = await fetchCalculatorSessionId();
+
+    final response = await http.patch(
+      Uri.parse(Urls.updateCalculatorSession(sessionId)),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode == 401) {
+      throw Exception('Unauthorized: Invalid or expired token');
+    }
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      if (response.body.isNotEmpty) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse is Map<String, dynamic> &&
+            jsonResponse['message'] != null) {
+          throw Exception(jsonResponse['message'].toString());
+        }
+      }
+
+      throw Exception('Failed to update calculator session');
     }
   }
 }
