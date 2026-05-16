@@ -106,28 +106,54 @@ class TheDailyVitalityScore extends StatelessWidget {
                   left: 0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Optimal Bedtime'.tr,
-                        style: getTextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.secondaryTextColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Obx(
-                        () => Text(
-                          controller.optimalBedtime.value.isEmpty
-                              ? '-'
-                              : controller.optimalBedtime.value,
-                          style: getTextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.secondaryTextColor,
-                          ),
-                        ),
-                      ),
+                      // Text(
+                      //   'Optimal Bedtime'.tr,
+                      //   style: getTextStyle(
+                      //     fontSize: 14,
+                      //     fontWeight: FontWeight.w400,
+                      //     color: AppColors.secondaryTextColor,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 8),
+                      controller.optimalBedtime.value.isEmpty
+                          ? Obx(
+                              () => Text(
+                                controller.optimalBedtimeLevel.value.isEmpty
+                                    ? '-'
+                                    : controller.optimalBedtimeLevel.value,
+                                style: getTextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      controller.isOptimalBedtimeSleepAsap.value
+                                      ? Colors.red
+                                      : AppColors.secondaryTextColor,
+                                ),
+                              ),
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Optimal Bedtime'.tr,
+                                  style:  getTextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  controller.optimalBedtime.value,
+                                  style:  getTextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ),
