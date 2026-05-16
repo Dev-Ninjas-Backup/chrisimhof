@@ -68,7 +68,7 @@ class QuickAddWidget extends StatelessWidget {
               Expanded(
                 child: _QuickAddItem(
                   title: 'Nutrition'.tr,
-                  iconPath: IconPath.apple,
+                  iconPath: IconPath.iron,
                   onAdd: () => _showNutritionSheet(context),
                 ),
               ),
@@ -491,21 +491,21 @@ class _QuickAddItem extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 52,
-          height: 52,
-          padding: const EdgeInsets.all(12),
+          width: 36,
+          height: 36,
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: const Color(0xFFF6F7F8),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Image.asset(iconPath, fit: BoxFit.contain),
+          child: Image.asset(iconPath, fit: BoxFit.cover),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             title,
             style: getTextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.primaryTextColor,
             ),
@@ -514,8 +514,8 @@ class _QuickAddItem extends StatelessWidget {
         GestureDetector(
           onTap: onAdd,
           child: Container(
-            width: 52,
-            height: 52,
+            width: 36,
+            height: 36,
             decoration: const BoxDecoration(
               color: Color(0xFFF5F7F8),
               shape: BoxShape.circle,
@@ -523,7 +523,7 @@ class _QuickAddItem extends StatelessWidget {
             child: const Icon(
               Icons.add,
               color: AppColors.primaryButtonColor,
-              size: 28,
+              size: 20,
             ),
           ),
         ),
