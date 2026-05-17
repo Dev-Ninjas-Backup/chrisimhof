@@ -76,6 +76,9 @@ class CalculatorController extends GetxController {
   // Hydration Tab Controllers
   late RangeSliderController hydrationConsumedController;
   late RangeSliderController hydrationDailyGoalController;
+  late TextEditingController hydrationAmountController;
+  final RxList<Map<String, dynamic>> hydrationEntries =
+      <Map<String, dynamic>>[].obs;
 
   // Nutrition Tab Controllers
   late RangeSliderController desiredNumberOfMealsController;
@@ -420,20 +423,8 @@ class CalculatorController extends GetxController {
       // Hydration
       final hydration = d['hydration'];
       if (hydration != null && hydration is Map<String, dynamic>) {
-        var appliedHydration = false;
-        if (hydration['waterConsumedL'] != null) {
-          hydrationConsumedController.updateValue(
-            (hydration['waterConsumedL'] as num).toDouble(),
-          );
-          appliedHydration = true;
-        }
-        if (hydration['waterGoalL'] != null) {
-          hydrationDailyGoalController.updateValue(
-            (hydration['waterGoalL'] as num).toDouble(),
-          );
-          appliedHydration = true;
-        }
-        if (appliedHydration) applied.add('hydration');
+        _applyHydrationPrefillFromMap(hydration);
+        if (hydration.isNotEmpty) applied.add('hydration');
       }
 
       // Caffeine
@@ -754,20 +745,8 @@ class CalculatorController extends GetxController {
       final hydrationObj = root['hydration'];
       if (!appliedSections.contains('hydration') &&
           hydrationObj is Map<String, dynamic>) {
-        var appliedHydration = false;
-        if (hydrationObj['waterConsumedL'] != null) {
-          hydrationConsumedController.updateValue(
-            (hydrationObj['waterConsumedL'] as num).toDouble(),
-          );
-          appliedHydration = true;
-        }
-        if (hydrationObj['waterGoalL'] != null) {
-          hydrationDailyGoalController.updateValue(
-            (hydrationObj['waterGoalL'] as num).toDouble(),
-          );
-          appliedHydration = true;
-        }
-        if (appliedHydration) appliedSections.add('hydration');
+        _applyHydrationPrefillFromMap(hydrationObj);
+        if (hydrationObj.isNotEmpty) appliedSections.add('hydration');
       }
 
       // Caffeine explicit mapping
@@ -927,17 +906,98 @@ class CalculatorController extends GetxController {
   void _initializeNutritionControllers() {
     hydrationConsumedController = RangeSliderController(
       min: 0.0,
-      max: 4.0,
+      max: 10.0,
       initialValue: 0.0,
     );
     hydrationDailyGoalController = RangeSliderController(
       min: 0.0,
-      max: 4.0,
-      initialValue: 0.0,
+      max: 10.0,
+      initialValue: 2.5,
     );
+    hydrationAmountController = TextEditingController();
     desiredNumberOfMealsController = RangeSliderController(initialValue: 1.0);
     firstMealTimeController = TimeController();
     lastMealTimeController = TimeController();
+  }
+
+  bool addHydrationIntake(double amountL) {
+    if (amountL <= 0) return false;
+
+    final currentTotal = hydrationConsumedController.value.value;
+    final nextTotal = currentTotal + amountL;
+    hydrationConsumedController.updateValue(nextTotal);
+    final addedAmount = hydrationConsumedController.value.value - currentTotal;
+
+    if (addedAmount <= 0) return false;
+
+    hydrationEntries.add({
+      'amountL': addedAmount,
+      'label': 'Water',
+      'loggedAt': _formatHydrationLoggedAt(DateTime.now()),
+    });
+    hydrationAmountController.clear();
+    return true;
+  }
+
+  bool submitHydrationEntryForm() {
+    final amount = double.tryParse(hydrationAmountController.text.trim());
+    if (amount == null) return false;
+    return addHydrationIntake(amount);
+  }
+
+  void removeHydrationEntry(int index) {
+    if (index < 0 || index >= hydrationEntries.length) return;
+
+    final removedEntry = hydrationEntries.removeAt(index);
+    final removedAmount =
+        (removedEntry['amountL'] as num?)?.toDouble() ??
+        double.tryParse(removedEntry['amountL']?.toString() ?? '') ??
+        0.0;
+
+    hydrationConsumedController.updateValue(
+      hydrationConsumedController.value.value - removedAmount,
+    );
+  }
+
+  void resetHydrationTracking() {
+    hydrationEntries.clear();
+    hydrationAmountController.clear();
+    hydrationConsumedController.updateValue(0.0);
+    hydrationDailyGoalController.updateValue(2.5);
+    hydrationSubmitError.value = '';
+  }
+
+  void _applyHydrationPrefillFromMap(Map<String, dynamic> hydration) {
+    var consumed = 0.0;
+
+    if (hydration['waterConsumedL'] != null) {
+      consumed = (hydration['waterConsumedL'] as num).toDouble();
+      hydrationConsumedController.updateValue(consumed);
+    }
+
+    if (hydration['waterGoalL'] != null) {
+      hydrationDailyGoalController.updateValue(
+        (hydration['waterGoalL'] as num).toDouble(),
+      );
+    }
+
+    if (consumed > 0) {
+      hydrationEntries.assignAll([
+        {
+          'amountL': hydrationConsumedController.value.value,
+          'label': 'Logged today',
+          'loggedAt': '',
+        },
+      ]);
+    } else {
+      hydrationEntries.clear();
+    }
+  }
+
+  String _formatHydrationLoggedAt(DateTime value) {
+    final hour = value.hour.toString().padLeft(2, '0');
+    final minute = value.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 
   void selectMealTag(String tag) {
@@ -1446,6 +1506,9 @@ class CalculatorController extends GetxController {
         return {
           'waterConsumedL': hydrationConsumedController.value.value,
           'waterGoalL': hydrationDailyGoalController.value.value,
+          'hydrationEntries': hydrationEntries
+              .map((entry) => Map<String, dynamic>.from(entry))
+              .toList(growable: false),
         };
       case 4:
         return {
@@ -1561,8 +1624,15 @@ class CalculatorController extends GetxController {
           (snapshot['waterConsumedL'] as num?)?.toDouble() ?? 0.0,
         );
         hydrationDailyGoalController.updateValue(
-          (snapshot['waterGoalL'] as num?)?.toDouble() ?? 0.0,
+          (snapshot['waterGoalL'] as num?)?.toDouble() ?? 2.5,
         );
+        final savedEntries =
+            (snapshot['hydrationEntries'] as List?)
+                ?.whereType<Map>()
+                .map((entry) => Map<String, dynamic>.from(entry))
+                .toList(growable: false) ??
+            const <Map<String, dynamic>>[];
+        hydrationEntries.assignAll(savedEntries);
         break;
       case 4:
         final savedHistory =
@@ -2107,6 +2177,7 @@ class CalculatorController extends GetxController {
     durationController.dispose();
     currentNapDurationController.dispose();
     daysWorkedController.dispose();
+    hydrationAmountController.dispose();
     sportDurationController.dispose();
     caffeineDrinkNameController.dispose();
     caffeineDrinkTypeController.dispose();
