@@ -14,6 +14,7 @@ import 'package:chrisimhof/features/calculator/models/activity_type_enum.dart';
 import 'package:chrisimhof/features/calculator/service/calculator_service.dart';
 import 'package:chrisimhof/features/calculator/widgets/calculator_save_changes_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class CalculatorController extends GetxController {
@@ -30,6 +31,12 @@ class CalculatorController extends GetxController {
   final RxMap<String, dynamic> liveScores = <String, dynamic>{}.obs;
   int _sessionFetchSerial = 0;
   bool _screenEntryRefreshQueued = false;
+  bool _isScreenActive = false;
+  Worker? _sessionLoadingWorker;
+
+  final ScrollController tabScrollController = ScrollController();
+  late final List<GlobalKey> tabKeys;
+  int _lastVisibleTabIndex = -1;
 
   // Sleep submission
   final RxBool isSleepSubmitting = false.obs;
@@ -128,6 +135,7 @@ class CalculatorController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    tabKeys = List.generate(tabs.length, (_) => GlobalKey());
     _initializeSleepControllers();
     _initializeWorkControllers();
     _initializeNutritionControllers();
@@ -135,6 +143,10 @@ class CalculatorController extends GetxController {
     _initializeCaffeineControllers();
     _loadCaffeineHistory();
     _fetchCaffeinePresets();
+    _sessionLoadingWorker = ever<bool>(
+      isSessionLoading,
+      _syncSessionLoadingOverlay,
+    );
   }
 
   String _baseDrinkName(String raw) {
@@ -159,12 +171,66 @@ class CalculatorController extends GetxController {
   }
 
   void handleCalculatorScreenEntered() {
+    if (_isScreenActive) return;
+
+    _isScreenActive = true;
+    _syncSessionLoadingOverlay(isSessionLoading.value);
+
     if (_screenEntryRefreshQueued) return;
 
     _screenEntryRefreshQueued = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isScreenActive) {
+        _screenEntryRefreshQueued = false;
+        return;
+      }
       _screenEntryRefreshQueued = false;
       fetchCalculatorSession(applyPrefill: true, showInitialLoading: true);
+    });
+  }
+
+  void handleCalculatorScreenExited() {
+    _isScreenActive = false;
+    _dismissSessionLoadingOverlay();
+  }
+
+  void _syncSessionLoadingOverlay(bool isLoading) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isScreenActive) {
+        _dismissSessionLoadingOverlay();
+        return;
+      }
+
+      if (isLoading) {
+        EasyLoading.show(status: 'Loading...'.tr);
+      } else {
+        _dismissSessionLoadingOverlay();
+      }
+    });
+  }
+
+  void _dismissSessionLoadingOverlay() {
+    if (EasyLoading.isShow) {
+      EasyLoading.dismiss();
+    }
+  }
+
+  void scrollToActiveTab(int index) {
+    if (_lastVisibleTabIndex == index) return;
+    _lastVisibleTabIndex = index;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isScreenActive || index < 0 || index >= tabKeys.length) return;
+
+      final context = tabKeys[index].currentContext;
+      if (context == null) return;
+
+      Scrollable.ensureVisible(
+        context,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
 
@@ -2174,6 +2240,9 @@ class CalculatorController extends GetxController {
 
   @override
   void onClose() {
+    _sessionLoadingWorker?.dispose();
+    _dismissSessionLoadingOverlay();
+    tabScrollController.dispose();
     durationController.dispose();
     currentNapDurationController.dispose();
     daysWorkedController.dispose();
