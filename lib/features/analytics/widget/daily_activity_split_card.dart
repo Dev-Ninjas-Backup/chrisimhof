@@ -50,16 +50,16 @@ class DailyActivitySplitCard extends StatelessWidget {
               final split = data.activitySplit;
               if (split.locked) {
                 return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.lock, size: 36, color: Colors.grey),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () {
-                          Get.to(const SubscriptionsScreen());
-                        },
-                        child: Text(
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.to(const SubscriptionsScreen());
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.lock, size: 36, color:AppColors.primaryButtonColor),
+                        const SizedBox(height: 8),
+                        Text(
                           split.message ??
                               'Upgrade to Premium to unlock daily activity split.',
                           textAlign: TextAlign.center,
@@ -69,8 +69,8 @@ class DailyActivitySplitCard extends StatelessWidget {
                             color: AppColors.secondaryTextColor,
                           ).copyWith(decoration: TextDecoration.underline),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               }
