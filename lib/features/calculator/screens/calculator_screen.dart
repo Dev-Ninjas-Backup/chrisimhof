@@ -11,103 +11,55 @@ import 'package:chrisimhof/features/calculator/widgets/calculator_tab_swipe_dete
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class CalculatorScreen extends StatefulWidget {
-  const CalculatorScreen({super.key});
+class CalculatorScreen extends StatelessWidget {
+  CalculatorScreen({super.key});
 
-  @override
-  State<CalculatorScreen> createState() => _CalculatorScreenState();
-}
+  final CalculatorController controller =
+      Get.isRegistered<CalculatorController>()
+      ? Get.find<CalculatorController>()
+      : Get.put(CalculatorController());
 
-class _CalculatorScreenState extends State<CalculatorScreen> {
-  final ScrollController _tabScrollController = ScrollController();
-  late final List<GlobalKey> _tabKeys;
-  int _lastVisibleTabIndex = -1;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabKeys = List.generate(6, (_) => GlobalKey());
-  }
-
-  @override
-  void dispose() {
-    _tabScrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollToActiveTab(int index) {
-    if (_lastVisibleTabIndex == index) return;
-    _lastVisibleTabIndex = index;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || index < 0 || index >= _tabKeys.length) return;
-      final context = _tabKeys[index].currentContext;
-      if (context == null) return;
-
-      Scrollable.ensureVisible(
-        context,
-        alignment: 0.5,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-      );
-    });
-  }
-
-  @override
   @override
   Widget build(BuildContext context) {
-    final CalculatorController controller =
-        Get.isRegistered<CalculatorController>()
-        ? Get.find<CalculatorController>()
-        : Get.put(CalculatorController());
-
     controller.handleCalculatorScreenEntered();
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 78,
-            left: 16,
-            right: 16,
-            bottom: 50,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Show global EasyLoading while session data is being fetched
-              Obx(() {
-                if (controller.isSessionLoading.value) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    EasyLoading.show(status: 'Loading...'.tr);
-                  });
-                } else {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    EasyLoading.dismiss();
-                  });
-                }
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) {
+          controller.handleCalculatorScreenExited();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 78,
+              left: 16,
+              right: 16,
+              bottom: 50,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomAppBar(title: 'Calculator'.tr, showBackButton: true),
+                const SizedBox(height: 24),
 
-                return const SizedBox.shrink();
-              }),
-              CustomAppBar(title: 'Calculator'.tr, showBackButton: true),
-              const SizedBox(height: 24),
-
-              /// ✅ Tabs
-              Obx(
-                () {
-                  _scrollToActiveTab(controller.selectedTabIndex.value);
+                /// ✅ Tabs
+                Obx(() {
+                  controller.scrollToActiveTab(
+                    controller.selectedTabIndex.value,
+                  );
 
                   return SingleChildScrollView(
-                    controller: _tabScrollController,
+                    controller: controller.tabScrollController,
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: List.generate(
                         controller.tabs.length,
                         (index) => CalculatorTabButton(
-                          key: _tabKeys[index],
+                          key: controller.tabKeys[index],
                           title: controller.tabs[index].tr,
                           isActive: controller.selectedTabIndex.value == index,
                           onTap: () async {
@@ -117,74 +69,74 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       ),
                     ),
                   );
-                },
-              ),
+                }),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              Obx(() {
-                final currentIndex = controller.selectedTabIndex.value;
-                final slideDirection =
-                    controller.tabTransitionDirection.value.toDouble();
+                Obx(() {
+                  final currentIndex = controller.selectedTabIndex.value;
+                  final slideDirection = controller.tabTransitionDirection.value
+                      .toDouble();
 
-                return CalculatorTabSwipeDetector(
-                  onSwipeLeft: () {
-                    controller.requestTabChange(currentIndex + 1);
-                  },
-                  onSwipeRight: () {
-                    controller.requestTabChange(currentIndex - 1);
-                  },
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 320),
-                    reverseDuration: const Duration(milliseconds: 260),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, animation) {
-                      final isIncoming = child.key == ValueKey(currentIndex);
-                      final beginOffset = isIncoming
-                          ? Offset(slideDirection * 0.16, 0)
-                          : Offset(slideDirection * -0.08, 0);
+                  return CalculatorTabSwipeDetector(
+                    onSwipeLeft: () {
+                      controller.requestTabChange(currentIndex + 1);
+                    },
+                    onSwipeRight: () {
+                      controller.requestTabChange(currentIndex - 1);
+                    },
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 320),
+                      reverseDuration: const Duration(milliseconds: 260),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) {
+                        final isIncoming = child.key == ValueKey(currentIndex);
+                        final beginOffset = isIncoming
+                            ? Offset(slideDirection * 0.16, 0)
+                            : Offset(slideDirection * -0.08, 0);
 
-                      return ClipRect(
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: beginOffset,
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: FadeTransition(
-                            opacity: animation,
-                            child: child,
+                        return ClipRect(
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: beginOffset,
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    layoutBuilder: (currentChild, previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: [
-                          ...previousChildren,
-                          ...(currentChild != null
-                              ? [currentChild]
-                              : const <Widget>[]),
-                        ],
-                      );
-                    },
-                    child: KeyedSubtree(
-                      key: ValueKey(currentIndex),
-                      child: switch (currentIndex) {
-                        0 => CalculatorSleepTab(),
-                        1 => CalculatorWorkTab(),
-                        2 => const CalculatorNutritionTab(),
-                        3 => const CalculatorHydrationTab(),
-                        4 => const CalculatorCaffeineTab(),
-                        5 => const CalculatorSportTab(),
-                        _ => const SizedBox(),
+                        );
                       },
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topCenter,
+                          children: [
+                            ...previousChildren,
+                            ...(currentChild != null
+                                ? [currentChild]
+                                : const <Widget>[]),
+                          ],
+                        );
+                      },
+                      child: KeyedSubtree(
+                        key: ValueKey(currentIndex),
+                        child: switch (currentIndex) {
+                          0 => CalculatorSleepTab(),
+                          1 => CalculatorWorkTab(),
+                          2 => const CalculatorNutritionTab(),
+                          3 => const CalculatorHydrationTab(),
+                          4 => const CalculatorCaffeineTab(),
+                          5 => const CalculatorSportTab(),
+                          _ => const SizedBox(),
+                        },
+                      ),
                     ),
-                  ),
-                );
-              }),
-            ],
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),
