@@ -86,6 +86,12 @@ class TimeController extends GetxController {
 
   String get to24HourFormat => formattedTime;
 
+  void setFromDateTime(DateTime value) {
+    hour.value = value.hour;
+    minute.value = value.minute;
+    period.value = value.hour >= 12 ? 'PM' : 'AM';
+  }
+
   void reset() {
     hour.value = 00;
     minute.value = 00;

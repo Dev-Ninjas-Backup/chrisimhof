@@ -1,5 +1,4 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/features/calculator/calculator_tabs/calculator_work_tab.dart';
 import 'package:chrisimhof/features/calculator/widgets/calculator_live_score_section.dart';
 import 'package:chrisimhof/features/calculator/widgets/caffeine_history_list.dart';
@@ -59,14 +58,13 @@ class CalculatorCaffeineTab extends StatelessWidget {
           CaffeineHistoryList(),
           const SizedBox(height: 32),
           QuickEntrySelector(
-            onEntrySelected: (name, amount) {
-              controller.addCaffeineIntake(name, amount, 'Now');
+            onEntrySelected: (preset, consumedAt) {
+              controller.addCaffeineIntake(
+                '${preset.label} (${preset.drinkType})',
+                preset.defaultMg,
+                consumedAt,
+              );
             },
-          ),
-          SizedBox(height: 32),
-          TimeWidget(
-            topTitle: 'Time of Intake'.tr,
-            controller: controller.caffeineIntakeTimeController,
           ),
           const SizedBox(height: 130),
           Padding(

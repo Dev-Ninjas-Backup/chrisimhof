@@ -1,11 +1,13 @@
+import 'package:chrisimhof/features/calculator/widgets/quick_entry_confirm_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/calculator/controller/calculator_controller.dart';
+import 'package:chrisimhof/features/calculator/models/caffeine_preset_model.dart';
 import 'package:get/get.dart';
 
 class QuickEntrySelector extends StatelessWidget {
-  final Function(String, int) onEntrySelected;
+  final void Function(CaffeinePreset preset, String consumedAt) onEntrySelected;
 
   const QuickEntrySelector({super.key, required this.onEntrySelected});
 
@@ -48,8 +50,6 @@ class QuickEntrySelector extends StatelessWidget {
             );
           }
 
-          for (int i = 0; i < controller.caffeinePresets.length; i++) {}
-
           if (controller.caffeinePresets.isEmpty) {
             return SizedBox(
               height: 140,
@@ -70,7 +70,11 @@ class QuickEntrySelector extends StatelessWidget {
             child: Row(
               children: controller.caffeinePresets.map((preset) {
                 return GestureDetector(
-                  onTap: () => onEntrySelected(preset.label, preset.defaultMg),
+                  onTap: () => _showConfirmSheet(
+                    context: context,
+                    controller: controller,
+                    preset: preset,
+                  ),
                   child: Container(
                     width: 140,
                     margin: const EdgeInsets.only(right: 12),
@@ -108,6 +112,38 @@ class QuickEntrySelector extends StatelessWidget {
           );
         }),
       ],
+    );
+  }
+
+  void _showConfirmSheet({
+    required BuildContext context,
+    required CalculatorController controller,
+    required CaffeinePreset preset,
+  }) {
+    controller.caffeineIntakeTimeController.setFromDateTime(DateTime.now());
+
+    Get.bottomSheet(
+      QuickEntryConfirmSheet(
+        preset: preset,
+        onConfirm: () {
+          if (preset.defaultMg <= 0) {
+            Get.snackbar(
+              'Missing Information'.tr,
+              'Enter a valid caffeine amount'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+            return;
+          }
+
+          onEntrySelected(
+            preset,
+            controller.caffeineIntakeTimeController.to24HourFormat,
+          );
+          Get.back();
+        },
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 }

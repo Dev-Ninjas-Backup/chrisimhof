@@ -1095,7 +1095,7 @@ class CalculatorController extends GetxController {
   void _initializeCaffeineControllers() {
     caffeineIntakeTimeController = TimeController();
     caffeineDrinkNameController = TextEditingController();
-    caffeineDrinkTypeController = TextEditingController();
+    caffeineDrinkTypeController = TextEditingController(text: 'COFFEE');
     caffeineAmountController = TextEditingController();
     // Initialize with sample caffeine history
     caffeineHistory.assignAll([]);
@@ -1127,7 +1127,7 @@ class CalculatorController extends GetxController {
 
   void resetAddCaffeineForm() {
     caffeineDrinkNameController.clear();
-    caffeineDrinkTypeController.clear();
+    caffeineDrinkTypeController.text = 'COFFEE';
     caffeineAmountController.clear();
     caffeineIntakeTimeController.reset();
     selectedCaffeineDrinkType.value = 'COFFEE';
@@ -1135,7 +1135,9 @@ class CalculatorController extends GetxController {
 
   bool submitAddCaffeineForm() {
     final String drinkName = caffeineDrinkNameController.text.trim();
-    final String drinkType = caffeineDrinkTypeController.text.trim();
+    final String drinkType = caffeineDrinkTypeController.text.trim().isNotEmpty
+        ? caffeineDrinkTypeController.text.trim()
+        : selectedCaffeineDrinkType.value;
     final int? amount = int.tryParse(caffeineAmountController.text.trim());
 
     if (drinkName.isEmpty ||
@@ -1590,8 +1592,7 @@ class CalculatorController extends GetxController {
         break;
       case 5:
         sportDurationController.text = snapshot['duration']?.toString() ?? '';
-        selectedActivityType.value =
-            snapshot['activityType']?.toString() ?? '';
+        selectedActivityType.value = snapshot['activityType']?.toString() ?? '';
         trainingIntent.value =
             snapshot['trainingIntent']?.toString() ?? 'NO_TRAINING';
         sportIntensity.value = (snapshot['intensity'] as num?)?.toDouble() ?? 0;
