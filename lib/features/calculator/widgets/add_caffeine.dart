@@ -11,7 +11,6 @@ class AddCaffeineBottomSheet extends StatelessWidget {
   const AddCaffeineBottomSheet({super.key});
 
   @override
-
   Widget build(BuildContext context) {
     final CalculatorController controller = Get.find<CalculatorController>();
     final EdgeInsets viewInsets = MediaQuery.of(context).viewInsets;
@@ -62,12 +61,25 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Drink Type'.tr, style: getTextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      Text(
+                        'Drink Type'.tr,
+                        style: getTextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        value: options.contains(selected) ? selected : 'COFFEE',
+                        initialValue: options.contains(selected)
+                            ? selected
+                            : 'COFFEE',
                         items: options
-                            .map((o) => DropdownMenuItem<String>(value: o, child: Text(display[o] ?? o)))
+                            .map(
+                              (o) => DropdownMenuItem<String>(
+                                value: o,
+                                child: Text(display[o] ?? o),
+                              ),
+                            )
                             .toList(),
                         onChanged: (v) {
                           if (v == null) return;
@@ -93,10 +105,9 @@ class AddCaffeineBottomSheet extends StatelessWidget {
               _ConsumedTimeCard(controller: controller),
               const SizedBox(height: 24),
               CustomButton(
-                text: 'Add Now'.tr,
-                onTap: () async {
+                text: 'Add Entry'.tr,
+                onTap: () {
                   final bool isSubmitted = controller.submitAddCaffeineForm();
-                  await controller.submitCaffeineIntake();
 
                   if (!isSubmitted) {
                     Get.snackbar(
