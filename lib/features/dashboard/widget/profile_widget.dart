@@ -1,6 +1,9 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
+import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,44 +25,54 @@ class ProfileWidget extends StatelessWidget {
           ? imageUrl!
           : controller.avatarUrl.value;
 
-      return Row(
-        children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: Colors.grey.shade200,
-            backgroundImage: displayImage.isNotEmpty
-                ? NetworkImage(displayImage)
-                : null,
-            child: displayImage.isEmpty
-                ? const Icon(Icons.person, size: 20, color: Colors.grey)
-                : null,
-          ),
-          const SizedBox(width: 16),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Hello!'.tr,
-                style: getTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
+      return GestureDetector(
+        onTap: () {
+          try {
+           // Get.offAll(() => const NavbarScreen());
+            // ensure nav controller exists then switch to Settings (index 3)
+            final nav = Get.find<NavController>();
+            nav.changeTab(3);
+          } catch (_) {}
+        },
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.grey.shade200,
+              backgroundImage: displayImage.isNotEmpty
+                  ? NetworkImage(displayImage)
+                  : null,
+              child: displayImage.isEmpty
+                  ? const Icon(Icons.person, size: 20, color: Colors.grey)
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello!'.tr,
+                  style: getTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.secondaryTextColor,
+                  ),
                 ),
-              ),
-              Text(
-                displayName.isNotEmpty ? displayName : 'User',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.secondaryTextColor,
+                Text(
+                  displayName.isNotEmpty ? displayName : 'User',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: getTextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.secondaryTextColor,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       );
     });
   }

@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/analytics/controller/analytics_controller.dart';
+import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_screen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -93,6 +94,35 @@ class HistoryDetailsWeeklyAnalyticsCard extends StatelessWidget {
 
   Widget _buildChart(AnalyticsController controller) {
     return Obx(() {
+      final data = controller.analyticsData.value;
+      if (data == null) return const SizedBox.shrink();
+
+      if (data.circadianAnalysis == null) {
+        return Center(
+          child: GestureDetector(
+            onTap: () {
+              Get.to(const SubscriptionsScreen());
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock, size: 36, color: AppColors.primaryButtonColor),
+                const SizedBox(height: 8),
+                Text(
+                  'Upgrade to Premium to unlock circadian performance analysis.',
+                  textAlign: TextAlign.center,
+                  style: getTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.secondaryTextColor,
+                  ).copyWith(decoration: TextDecoration.underline),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
       final spots = controller.circadianSpots;
       //final labels = controller.circadianLabels;
       final maxX = controller.circadianMaxX;
