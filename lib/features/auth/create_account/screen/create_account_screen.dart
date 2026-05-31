@@ -1,20 +1,13 @@
-import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
-import 'package:chrisimhof/core/common/widgets/language_toggle_widget.dart';
-import 'package:chrisimhof/core/common/widgets/social_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
-import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/auth/create_account/controller/create_account_controller.dart';
-import 'package:chrisimhof/core/common/widgets/divider_widget.dart';
+import 'package:chrisimhof/features/auth/sign_in/controller/sign_in_controller.dart';
+import 'package:chrisimhof/features/auth/widgets/ryvenza_auth_widgets.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/gestures.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../sign_in/controller/sign_in_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CreateAccountScreen extends StatelessWidget {
   CreateAccountScreen({super.key});
@@ -25,150 +18,130 @@ class CreateAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Form(
+    return RyvenzaAuthScaffold(
+      title: 'Create account',
+      subtitle: 'Start with a private rhythm plan built around your day.',
+      children: [
+        const PrivacyByDesignCard(),
+        Form(
           key: formKey,
-          child: Container(
-            padding: EdgeInsets.only(top: 62, left: 16, right: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            children: [
+              RyvenzaTextField(
+                label: 'Name',
+                hintText: 'Enter your full name',
+                controller: controller.fullNameController,
+                textInputAction: TextInputAction.next,
+                prefixIcon: Icons.person_outline_rounded,
+                validator: controller.validateFullName,
+              ),
+              RyvenzaTextField(
+                label: 'Email',
+                hintText: 'Enter your email',
+                controller: controller.emailController,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                prefixIcon: Icons.alternate_email_rounded,
+                validator: controller.validateEmail,
+              ),
+              Obx(
+                () => RyvenzaTextField(
+                  label: 'Password',
+                  hintText: 'Enter your password',
+                  controller: controller.passwordController,
+                  obscureText: controller.isPasswordHidden.value,
+                  textInputAction: TextInputAction.done,
+                  prefixIcon: Icons.lock_outline_rounded,
+                  validator: controller.validatePassword,
+                  suffixIcon: IconButton(
+                    onPressed: controller.togglePasswordVisibility,
+                    icon: Icon(
+                      controller.isPasswordHidden.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.textSoft,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Obx(
+                () => RyvenzaAuthButton(
+                  text: 'Create account',
+                  isMint: true,
+                  onTap: controller.isLoading.value
+                      ? null
+                      : () {
+                          if (formKey.currentState!.validate()) {
+                            controller.createAccount();
+                          }
+                        },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text(
+              'By continuing, you accept Terms and Privacy.'.tr,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.manrope(
+                color: AppColors.textSoft,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const RyvenzaAuthDivider(),
+        RyvenzaSocialButton(
+          label: 'Continue with Google',
+          imagePath: IconPath.google,
+          onTap: signInController.signInWithGoogle,
+        ),
+        const SizedBox(height: 10),
+        RyvenzaSocialButton(
+          label: 'Continue with Apple',
+          imagePath: IconPath.apple,
+          onTap: signInController.signInWithApple,
+          dark: true,
+        ),
+        const SizedBox(height: 10),
+        RyvenzaSocialButton(
+          label: 'Continue with Microsoft',
+          imagePath: IconPath.microsoft,
+          onTap: signInController.signInWithMicrosoft,
+        ),
+        const SizedBox(height: 20),
+        Center(
+          child: RichText(
+            text: TextSpan(
+              text: '${'Do you have an account?'.tr} ',
+              style: GoogleFonts.manrope(
+                fontSize: 12,
+                color: AppColors.textSoft,
+                fontWeight: FontWeight.w600,
+              ),
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: LanguageToggleWidget(controller: controller),
-                ),
-                Image.asset(ImagePath.appLogo, width: 120, height: 72),
-                SizedBox(height: 56),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Create Your Account'.tr,
-                    style: getTextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryTextColor,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 15),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Your intelligent system for better performance.'.tr,
-                    style: getTextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.secondaryTextColor,
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 56),
-                CustomTextFormField(
-                  label: 'Full Name'.tr,
-                  hintText: 'Enter your full name'.tr,
-                  isRequired: true,
-                  controller: controller.fullNameController,
-                  validator: (value) => controller.validateFullName(value),
-                ),
-                SizedBox(height: 16),
-                CustomTextFormField(
-                  label: 'Email'.tr,
-                  hintText: 'Enter your email'.tr,
-                  isRequired: true,
-                  controller: controller.emailController,
-                  validator: (value) => controller.validateEmail(value),
-                ),
-                SizedBox(height: 16),
-                Obx(
-                  () => CustomTextFormField(
-                    label: 'Password'.tr,
-                    isRequired: true,
-                    hintText: 'Enter your password'.tr,
-                    controller: controller.passwordController,
-                    suffixIcon: IconButton(
-                      onPressed: controller.togglePasswordVisibility,
-                      icon: Icon(
-                        controller.isPasswordHidden.value
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: AppColors.secondaryTextColor,
-                      ),
-                    ),
-                    obscureText: controller.isPasswordHidden.value,
-                    textInputAction: TextInputAction.done,
-                    validator: (value) => controller.validatePassword(value),
-                  ),
-                ),
-                SizedBox(height: 40),
-                Obx(
-                  () => CustomButton(
-                    text: 'Create Account'.tr,
-                    onTap: controller.isLoading.value
-                        ? null
-                        : () {
-                            if (formKey.currentState!.validate()) {
-                              controller.createAccount();
-                            }
-                          },
-                  ),
-                ),
-                SizedBox(height: 32),
-                DividerWidget(),
-                SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SocialButton(
-                      imagePath: IconPath.google,
-                      onTap: signInController.signInWithGoogle,
-                    ),
-                    SizedBox(width: 16),
-                    SocialButton(
-                      imagePath: IconPath.apple,
-                      backgroundColor: Colors.black,
-                      onTap: signInController.signInWithApple,
-                    ),
-                    SizedBox(width: 16),
-                    SocialButton(
-                      imagePath: IconPath.microsoft,
-                      onTap: signInController.signInWithMicrosoft,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 32),
-                RichText(
-                  text: TextSpan(
-                    text: '${'Do you have an account?'.tr} ',
-                    style: getTextStyle(
-                      fontSize: 14,
-                      color: AppColors.secondaryTextColor,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    children: [
-                      TextSpan(
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Get.toNamed(AppRoutes.signInScreen);
-                          },
-                        text: 'Sign In'.tr,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.primaryButtonColor,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ],
+                TextSpan(
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Get.toNamed(AppRoutes.signInScreen);
+                    },
+                  text: 'Sign In'.tr,
+                  style: GoogleFonts.manrope(
+                    fontSize: 12,
+                    color: AppColors.secondaryButtonColor,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
