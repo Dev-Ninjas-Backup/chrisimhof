@@ -18,7 +18,7 @@ class SplashScreenController extends GetxController {
       if (accessToken != null && accessToken.isNotEmpty) {
         Get.offAll(() => NavbarScreen());
       } else {
-        Get.offNamed(AppRoutes.getSignInScreen());
+        Get.offNamed(AppRoutes.getWelcomeScreen());
       }
     });
   }
