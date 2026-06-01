@@ -21,8 +21,8 @@ class RyvenzaLogo extends StatelessWidget {
           'RYVENZA',
           style: GoogleFonts.outfit(
             color: color,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
+            fontSize: 28,
+            fontWeight: FontWeight.w500,
             letterSpacing: 3,
           ),
         ),

@@ -4,12 +4,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingsTopBar extends StatelessWidget {
-  const SettingsTopBar();
+  const SettingsTopBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 28),
       child: Row(
         children: [
           const SizedBox(width: 36),
@@ -20,7 +20,7 @@ class SettingsTopBar extends StatelessWidget {
               style: GoogleFonts.outfit(
                 color: AppColors.primaryTextColor,
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),

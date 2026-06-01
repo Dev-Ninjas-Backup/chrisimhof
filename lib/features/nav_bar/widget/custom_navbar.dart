@@ -1,8 +1,8 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomNavBar extends StatelessWidget {
   const CustomNavBar({super.key});
@@ -17,7 +17,7 @@ class CustomNavBar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.authDark,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.24),
@@ -30,7 +30,7 @@ class CustomNavBar extends StatelessWidget {
           final int activeIndex = controller.currentIndex.value;
 
           return Padding(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(controller.items.length, (index) {
@@ -72,13 +72,14 @@ class _NavItem extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
-          height: 38,
           constraints: BoxConstraints(
             minWidth: isActive ? 88 : 46,
             maxWidth: isActive ? 110 : 46,
           ),
-          padding: EdgeInsets.symmetric(horizontal: isActive ? 12 : 0),
-          margin: const EdgeInsets.symmetric(horizontal: 1),
+          padding: EdgeInsets.symmetric(
+            horizontal: isActive ? 16 : 0,
+            vertical: 8,
+          ),
           decoration: BoxDecoration(
             color: isActive ? AppColors.primaryButtonColor : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
@@ -105,10 +106,10 @@ class _NavItem extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.fade,
                           softWrap: false,
-                          style: GoogleFonts.manrope(
+                          style: getTextStyle(
                             color: const Color(0xFF0A1410),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       )

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ProfileHero extends StatelessWidget {
-  const ProfileHero({required this.controller});
+class ProfileCard extends StatelessWidget {
+  const ProfileCard({super.key, required this.controller});
 
   final SettingsController controller;
 
@@ -23,8 +23,8 @@ class ProfileHero extends StatelessWidget {
 
       return Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.only(bottom: 30),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -36,8 +36,8 @@ class ProfileHero extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 64,
+              height: 64,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -49,7 +49,7 @@ class ProfileHero extends StatelessWidget {
                       child: Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _Initials(initials),
+                        errorBuilder: (_, _, _) => _Initials(initials),
                       ),
                     )
                   : _Initials(initials),
@@ -65,7 +65,7 @@ class ProfileHero extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.outfit(
                       color: Colors.white,
-                      fontSize: 15,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -76,7 +76,7 @@ class ProfileHero extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.manrope(
                       color: const Color(0xFFB9C9C3),
-                      fontSize: 11,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -105,8 +105,8 @@ class ProfileHero extends StatelessWidget {
                           'Premium'.tr,
                           style: GoogleFonts.manrope(
                             color: AppColors.mint,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
