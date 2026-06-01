@@ -1,9 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
-import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,7 +26,7 @@ class ProfileWidget extends StatelessWidget {
       return GestureDetector(
         onTap: () {
           try {
-           // Get.offAll(() => const NavbarScreen());
+            // Get.offAll(() => const NavbarScreen());
             // ensure nav controller exists then switch to Settings (index 3)
             final nav = Get.find<NavController>();
             nav.changeTab(3);

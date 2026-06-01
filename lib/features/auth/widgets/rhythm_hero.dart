@@ -28,7 +28,7 @@ class RhythmHeroPainter extends CustomPainter {
         stops: const [0, 0.55, 1],
       ).createShader(Offset.zero & size);
 
-    canvas.drawCircle(center, radius * 0.9, glow);
+    canvas.drawCircle(center, radius * 1.9, glow);
 
     final Paint outer = Paint()
       ..style = PaintingStyle.stroke
@@ -75,9 +75,9 @@ class RhythmHeroPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..color = AppColors.primaryButtonColor.withValues(alpha: 0.75);
     final Path pulsePath = Path()
-      ..moveTo(center.dx - radius * 0.55, center.dy)
+      ..moveTo(center.dx - radius * 0.50, center.dy)
       ..quadraticBezierTo(
-        center.dx - radius * 0.28,
+        center.dx - radius * 0.34,
         center.dy - 10,
         center.dx - radius * 0.13,
         center.dy,
@@ -90,8 +90,8 @@ class RhythmHeroPainter extends CustomPainter {
       )
       ..quadraticBezierTo(
         center.dx + radius * 0.34,
-        center.dy - 7,
-        center.dx + radius * 0.55,
+        center.dy - 10,
+        center.dx + radius * 0.50,
         center.dy,
       );
     canvas.drawPath(pulsePath, pulse);

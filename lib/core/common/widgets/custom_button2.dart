@@ -1,6 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 
 class CustomAuthButton extends StatelessWidget {
@@ -46,13 +46,14 @@ class CustomAuthButton extends StatelessWidget {
           children: [
             Text(
               text.tr,
-              style: GoogleFonts.manrope(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
+              style: getTextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: foreground,
               ),
             ),
             const SizedBox(width: 6),
-            Icon(icon, size: 18),
+            Icon(icon, size: 20),
           ],
         ),
       ),
@@ -65,10 +66,14 @@ class CustomSecondaryButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onTap,
+    this.side = const BorderSide(color: AppColors.borderSoft),
+    this.foregroundColor = AppColors.primaryTextColor,
   });
 
   final String text;
   final VoidCallback? onTap;
+  final BorderSide side;
+  final Color foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -78,16 +83,20 @@ class CustomSecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryTextColor,
+          foregroundColor: foregroundColor,
           backgroundColor: Colors.white,
-          side: const BorderSide(color: AppColors.borderSoft),
+          side: side,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
         child: Text(
           text.tr,
-          style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w800),
+          style: getTextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: foregroundColor,
+          ),
         ),
       ),
     );

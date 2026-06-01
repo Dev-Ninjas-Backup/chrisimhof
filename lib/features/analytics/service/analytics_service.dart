@@ -24,7 +24,7 @@ class AnalyticsService {
           .timeout(const Duration(seconds: 10));
 
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
-      debugPrint("Analytic: "+jsonData.toString());
+      debugPrint("Analytic: $jsonData");
 
       if (response.statusCode == 200) {
         return AnalyticsResponseModel.fromJson(jsonData);
