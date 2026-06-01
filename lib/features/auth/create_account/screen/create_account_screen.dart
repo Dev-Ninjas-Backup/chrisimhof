@@ -27,7 +27,7 @@ class CreateAccountScreen extends StatelessWidget {
           key: formKey,
           child: Column(
             children: [
-              RyvenzaTextField(
+              CustomTextField(
                 label: 'Name',
                 hintText: 'Enter your full name',
                 controller: controller.fullNameController,
@@ -35,7 +35,7 @@ class CreateAccountScreen extends StatelessWidget {
                 prefixIcon: Icons.person_outline_rounded,
                 validator: controller.validateFullName,
               ),
-              RyvenzaTextField(
+              CustomTextField(
                 label: 'Email',
                 hintText: 'Enter your email',
                 controller: controller.emailController,
@@ -45,7 +45,7 @@ class CreateAccountScreen extends StatelessWidget {
                 validator: controller.validateEmail,
               ),
               Obx(
-                () => RyvenzaTextField(
+                () => CustomTextField(
                   label: 'Password',
                   hintText: 'Enter your password',
                   controller: controller.passwordController,
@@ -66,7 +66,7 @@ class CreateAccountScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Obx(
-                () => RyvenzaAuthButton(
+                () => CustomAuthButton(
                   text: 'Create account',
                   isMint: true,
                   onTap: controller.isLoading.value
@@ -96,20 +96,20 @@ class CreateAccountScreen extends StatelessWidget {
           ),
         ),
         const RyvenzaAuthDivider(),
-        RyvenzaSocialButton(
+        CustomSocialButton(
           label: 'Continue with Google',
           imagePath: IconPath.google,
           onTap: signInController.signInWithGoogle,
         ),
         const SizedBox(height: 10),
-        RyvenzaSocialButton(
+        CustomSocialButton(
           label: 'Continue with Apple',
           imagePath: IconPath.apple,
           onTap: signInController.signInWithApple,
           dark: true,
         ),
         const SizedBox(height: 10),
-        RyvenzaSocialButton(
+        CustomSocialButton(
           label: 'Continue with Microsoft',
           imagePath: IconPath.microsoft,
           onTap: signInController.signInWithMicrosoft,

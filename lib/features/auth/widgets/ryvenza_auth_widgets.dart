@@ -1,14 +1,14 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/features/auth/widgets/ryvenza_top_bar.dart';
+import 'package:chrisimhof/features/auth/widgets/CUstom_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-export 'package:chrisimhof/features/auth/widgets/ryvenza_top_bar.dart';
+export 'package:chrisimhof/features/auth/widgets/CUstom_top_bar.dart';
 export 'package:chrisimhof/features/auth/widgets/icon_tile.dart';
 export 'package:chrisimhof/features/auth/widgets/ryvenza_logo.dart';
 export 'package:chrisimhof/features/auth/widgets/rhythm_hero.dart';
-export 'package:chrisimhof/features/auth/widgets/ryvenza_text_field.dart';
-export 'package:chrisimhof/features/auth/widgets/ryvenza_buttons.dart';
+export 'package:chrisimhof/features/auth/widgets/custom_text_field.dart';
+export 'package:chrisimhof/features/auth/widgets/custom_buttons.dart';
 export 'package:chrisimhof/features/auth/widgets/auth_divider.dart';
 export 'package:chrisimhof/features/auth/widgets/social_button.dart';
 export 'package:chrisimhof/features/auth/widgets/privacy_by_design_card.dart';
@@ -34,7 +34,7 @@ class RyvenzaAuthScaffold extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            RyvenzaTopBar(title: title, showBackButton: showBackButton),
+            CustomTopBar(title: title, showBackButton: showBackButton),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(18, 10, 18, 32),

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 
-class RyvenzaSocialButton extends StatelessWidget {
-  const RyvenzaSocialButton({
+class CustomSocialButton extends StatelessWidget {
+  const CustomSocialButton({
     super.key,
     required this.label,
     required this.imagePath,

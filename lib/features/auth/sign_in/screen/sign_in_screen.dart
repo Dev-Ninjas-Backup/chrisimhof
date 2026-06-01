@@ -24,7 +24,7 @@ class SignInScreen extends StatelessWidget {
           key: formKey,
           child: Column(
             children: [
-              RyvenzaTextField(
+              CustomTextField(
                 label: 'Email',
                 hintText: 'Enter your email',
                 controller: controller.emailController,
@@ -34,7 +34,7 @@ class SignInScreen extends StatelessWidget {
                 validator: controller.validateEmail,
               ),
               Obx(
-                () => RyvenzaTextField(
+                () => CustomTextField(
                   label: 'Password',
                   hintText: 'Enter your password',
                   controller: controller.passwordController,
@@ -76,7 +76,7 @@ class SignInScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Obx(
-                () => RyvenzaAuthButton(
+                () => CustomAuthButton(
                   text: 'Log in',
                   onTap: controller.isLoading.value
                       ? null
@@ -91,20 +91,20 @@ class SignInScreen extends StatelessWidget {
           ),
         ),
         const RyvenzaAuthDivider(),
-        RyvenzaSocialButton(
+        CustomSocialButton(
           label: 'Continue with Google',
           imagePath: IconPath.google,
           onTap: controller.signInWithGoogle,
         ),
         const SizedBox(height: 10),
-        RyvenzaSocialButton(
+        CustomSocialButton(
           label: 'Continue with Apple',
           imagePath: IconPath.apple,
           onTap: controller.signInWithApple,
           dark: true,
         ),
         const SizedBox(height: 10),
-        RyvenzaSocialButton(
+        CustomSocialButton(
           label: 'Continue with Microsoft',
           imagePath: IconPath.microsoft,
           onTap: controller.signInWithMicrosoft,
