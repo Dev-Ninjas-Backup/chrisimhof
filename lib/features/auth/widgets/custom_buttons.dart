@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 
-class RyvenzaAuthButton extends StatelessWidget {
-  const RyvenzaAuthButton({
+class CustomAuthButton extends StatelessWidget {
+  const CustomAuthButton({
     super.key,
     required this.text,
     required this.onTap,
@@ -60,8 +60,8 @@ class RyvenzaAuthButton extends StatelessWidget {
   }
 }
 
-class RyvenzaSecondaryButton extends StatelessWidget {
-  const RyvenzaSecondaryButton({
+class CustomSecondaryButton extends StatelessWidget {
+  const CustomSecondaryButton({
     super.key,
     required this.text,
     required this.onTap,

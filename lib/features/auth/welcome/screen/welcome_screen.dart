@@ -90,13 +90,13 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 28),
-                    RyvenzaAuthButton(
+                    CustomAuthButton(
                       text: 'Create account',
                       isMint: true,
                       onTap: () => Get.toNamed(AppRoutes.createAccountScreen),
                     ),
                     const SizedBox(height: 10),
-                    RyvenzaSecondaryButton(
+                    CustomSecondaryButton(
                       text: 'Log in',
                       onTap: () => Get.toNamed(AppRoutes.signInScreen),
                     ),
