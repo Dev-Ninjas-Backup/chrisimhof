@@ -7,7 +7,7 @@ TextStyle getTextStyle({
   TextAlign textAlign = TextAlign.center,
   Color color = Colors.black,
 }) {
-  return GoogleFonts.plusJakartaSans(
+  return GoogleFonts.manrope(
     fontSize: fontSize,
     fontWeight: fontWeight,
     color: color,

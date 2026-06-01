@@ -1,10 +1,10 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SettingsGroup extends StatelessWidget {
-  const SettingsGroup({required this.rows, this.accent = false});
+  const SettingsGroup({super.key, required this.rows, this.accent = false});
 
   final List<SettingsRowData> rows;
   final bool accent;
@@ -12,7 +12,7 @@ class SettingsGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 30),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: AppColors.borderSoft),
@@ -34,6 +34,7 @@ class SettingsGroup extends StatelessWidget {
 
 class SettingsRow extends StatelessWidget {
   const SettingsRow({
+    super.key,
     required this.data,
     required this.accent,
     required this.showDivider,
@@ -79,10 +80,10 @@ class SettingsRow extends StatelessWidget {
                   data.label.tr,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.manrope(
+                  style: getTextStyle(
                     color: AppColors.primaryTextColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -93,14 +94,14 @@ class SettingsRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.manrope(
+                  style: getTextStyle(
                     color: data.highlightTrailing
                         ? AppColors.primaryButtonColor
                         : AppColors.textSoft,
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: data.highlightTrailing
-                        ? FontWeight.w800
-                        : FontWeight.w600,
+                        ? FontWeight.w700
+                        : FontWeight.w400,
                   ),
                 ),
               ],

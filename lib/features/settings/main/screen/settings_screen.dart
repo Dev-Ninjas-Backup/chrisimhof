@@ -1,12 +1,12 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button2.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
 import 'package:chrisimhof/features/settings/language/screens/language_screen.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
-import 'package:chrisimhof/features/settings/main/widgets/danger_button.dart';
-import 'package:chrisimhof/features/settings/main/widgets/profile_hero.dart';
-import 'package:chrisimhof/features/settings/main/widgets/section_label.dart';
+import 'package:chrisimhof/features/settings/main/widgets/profile_card.dart';
 import 'package:chrisimhof/features/settings/main/widgets/settings_group.dart';
 import 'package:chrisimhof/features/settings/main/widgets/settings_top_bar.dart';
 import 'package:chrisimhof/features/settings/main/widgets/section_header_with_badge.dart';
@@ -39,8 +39,8 @@ class SettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SettingsTopBar(),
-              ProfileHero(controller: controller),
-              const SectionLabel(label: 'Account'),
+              ProfileCard(controller: controller),
+              sectionLabel('Account'),
               SettingsGroup(
                 rows: [
                   SettingsRowData(
@@ -80,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SectionLabel(label: 'Baseline profile'),
+              sectionLabel('Baseline profile'),
               SettingsGroup(
                 accent: true,
                 rows: const [
@@ -108,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SectionHeaderWithBadge(label: 'Wearables', badge: 'Soon'),
               const WearablesGroup(),
-              const SectionLabel(label: 'More'),
+              sectionLabel('More'),
               SettingsGroup(
                 rows: [
                   SettingsRowData(
@@ -132,11 +132,13 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Obx(
-                () => DangerButton(
-                  label: controller.isLoading.value
+                () => CustomSecondaryButton(
+                  text: controller.isLoading.value
                       ? 'Logging out...'
                       : 'Log out',
                   onTap: controller.isLoading.value ? null : controller.logout,
+                  side: const BorderSide(color: AppColors.roseSoft, width: 1.5),
+                  foregroundColor: AppColors.rose,
                 ),
               ),
               const SizedBox(height: 14),
@@ -167,4 +169,16 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
- 
+Widget sectionLabel(String label) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 2, bottom: 7),
+    child: Text(
+      label.tr.toUpperCase(),
+      style: getTextStyle(
+        color: AppColors.textSoft,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
+}

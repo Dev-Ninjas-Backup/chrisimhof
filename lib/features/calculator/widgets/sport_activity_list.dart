@@ -76,7 +76,7 @@ class SportActivityList extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${duration} min',
+                              '$duration min',
                               style: getTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

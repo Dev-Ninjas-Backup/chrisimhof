@@ -1,10 +1,10 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class WearablesGroup extends StatelessWidget {
-  const WearablesGroup();
+  const WearablesGroup({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class WearablesGroup extends StatelessWidget {
     ];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 30),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
@@ -61,19 +61,19 @@ class WearablesGroup extends StatelessWidget {
                       children: [
                         Text(
                           row.label.tr,
-                          style: GoogleFonts.manrope(
+                          style: getTextStyle(
                             color: AppColors.primaryTextColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           row.sublabel.tr,
-                          style: GoogleFonts.manrope(
+                          style: getTextStyle(
                             color: AppColors.textSoft,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ],
@@ -81,10 +81,10 @@ class WearablesGroup extends StatelessWidget {
                   ),
                   Text(
                     'Later'.tr,
-                    style: GoogleFonts.manrope(
+                    style: getTextStyle(
                       color: AppColors.textSoft,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

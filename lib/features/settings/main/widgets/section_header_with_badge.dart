@@ -1,10 +1,14 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SectionHeaderWithBadge extends StatelessWidget {
-  const SectionHeaderWithBadge({required this.label, required this.badge});
+  const SectionHeaderWithBadge({
+    super.key,
+    required this.label,
+    required this.badge,
+  });
 
   final String label;
   final String badge;
@@ -17,11 +21,10 @@ class SectionHeaderWithBadge extends StatelessWidget {
         children: [
           Text(
             label.tr.toUpperCase(),
-            style: GoogleFonts.manrope(
+            style: getTextStyle(
               color: AppColors.textSoft,
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(width: 6),
@@ -33,11 +36,10 @@ class SectionHeaderWithBadge extends StatelessWidget {
             ),
             child: Text(
               badge.tr.toUpperCase(),
-              style: GoogleFonts.manrope(
+              style: getTextStyle(
                 color: AppColors.indigo,
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.4,
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),

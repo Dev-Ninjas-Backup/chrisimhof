@@ -1,6 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 
 class PrivacyByDesignCard extends StatelessWidget {
@@ -10,8 +10,8 @@ class PrivacyByDesignCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 18),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 30),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.mintSoft,
         borderRadius: BorderRadius.circular(18),
@@ -22,7 +22,7 @@ class PrivacyByDesignCard extends StatelessWidget {
           const Icon(
             Icons.shield_outlined,
             color: AppColors.secondaryButtonColor,
-            size: 20,
+            size: 24,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -31,22 +31,20 @@ class PrivacyByDesignCard extends StatelessWidget {
               children: [
                 Text(
                   'Private by design'.tr.toUpperCase(),
-                  style: GoogleFonts.manrope(
+                  style: getTextStyle(
                     color: AppColors.secondaryButtonColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.8,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Your routine data is used to personalize recommendations, not to judge your lifestyle.'
                       .tr,
-                  style: GoogleFonts.manrope(
+                  style: getTextStyle(
                     color: AppColors.textMid,
-                    fontSize: 12,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],

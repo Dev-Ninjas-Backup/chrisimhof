@@ -1,4 +1,5 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
@@ -30,7 +31,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,9 +39,8 @@ class CustomTextField extends StatelessWidget {
             label.tr.toUpperCase(),
             style: GoogleFonts.manrope(
               color: AppColors.textSoft,
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 6),
@@ -51,16 +51,16 @@ class CustomTextField extends StatelessWidget {
             textInputAction: textInputAction,
             keyboardType: keyboardType,
             cursorColor: AppColors.primaryTextColor,
-            style: GoogleFonts.manrope(
+            style: getTextStyle(
               color: AppColors.primaryTextColor,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               hintText: hintText?.tr,
-              hintStyle: GoogleFonts.manrope(
+              hintStyle: getTextStyle(
                 color: AppColors.textSoft,
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
               prefixIcon: prefixIcon == null

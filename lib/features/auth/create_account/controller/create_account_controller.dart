@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:chrisimhof/features/auth/create_account/model/register_response_model.dart';
 import 'package:chrisimhof/features/auth/create_account/service/create_account_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
@@ -36,7 +35,7 @@ class CreateAccountController extends GetxController {
   Future<void> changeLanguage(String langCode) async {
     langCode = langCode.toUpperCase();
 
-    if (selectedLanguage.value == langCode) return; 
+    if (selectedLanguage.value == langCode) return;
 
     selectedLanguage.value = langCode;
 
