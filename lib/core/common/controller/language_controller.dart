@@ -17,11 +17,13 @@ class LanguageController extends GetxController {
     selectedLanguage.value = currentLocale == 'fr' ? 'FR' : 'EN';
   }
 
-  Future<void> changeLanguage(String langCode) async {
+  Future<void> changeLanguage(String langCode, {bool force = false}) async {
     // Normalize to uppercase
     langCode = langCode.toUpperCase();
+    if (selectedLanguage.value == langCode && !force) return;
 
-    if (selectedLanguage.value == langCode) return;
+    // Save current value so we can revert on failure
+    final prev = selectedLanguage.value;
 
     // Optimistically set selection
     selectedLanguage.value = langCode;
@@ -56,12 +58,12 @@ class LanguageController extends GetxController {
         Get.offAll(() => const NavbarScreen());
       } else {
         // Revert selection on failure
-        selectedLanguage.value = selectedLanguage.value == 'EN' ? 'FR' : 'EN';
+        selectedLanguage.value = prev;
         throw Exception(jsonData['message'] ?? 'Failed to update language');
       }
     } catch (e) {
       // revert optimistic change if any error
-      selectedLanguage.value = selectedLanguage.value == 'EN' ? 'FR' : 'EN';
+      selectedLanguage.value = prev;
       rethrow;
     }
   }

@@ -456,6 +456,10 @@ class AppTranslations extends Translations {
           'Fonctionnalités de planification (calendrier idéal vs calendrier réel)',
       'Advanced modules like (fatigue management, caffeine tracking, and performance optimization':
           'Modules avancés tels que (gestion de la fatigue, suivi de la caféine et optimisation des performances)',
+
+      'The app can support French and British English wording.':
+          'L\'application peut prendre en charge le français et l\'anglais britannique.',
+
       '\$9.99/mo': '9,99 \$/mois',
       'Premium': 'Premium',
       'English': 'Anglais',
