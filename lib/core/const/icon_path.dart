@@ -15,4 +15,7 @@ class IconPath {
   static const String terms = 'assets/icons/terms_icon.png';
   static const String consent = 'assets/icons/consent_icon.png';
   static const String delete = 'assets/icons/delete_icon.png';
+  static const String medicalAdvice = 'assets/icons/medical_advice.png';
+  static const String safety = 'assets/icons/safety.png';
+  static const String professional = 'assets/icons/professional.png';
 }

@@ -5,7 +5,6 @@ import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
 import 'package:chrisimhof/features/settings/language/screens/language_screen.dart';
-import 'package:chrisimhof/features/settings/legal_and_data/screen/legal_and_data_screen.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:chrisimhof/features/settings/main/widgets/profile_card.dart';
 import 'package:chrisimhof/features/settings/main/widgets/settings_group.dart';

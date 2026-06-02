@@ -5,6 +5,7 @@ import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
 import 'package:chrisimhof/features/history_details/screen/history_details_screen.dart';
 import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
+import 'package:chrisimhof/features/settings/health_and_safety_notes/screen/health_and_safety_notes_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/screen/legal_and_data_screen.dart';
 import 'package:chrisimhof/features/settings/privacy_policy/screen/privacy_policy_screen.dart';
 import 'package:chrisimhof/features/settings/terms_of_use/screen/terms_of_use_screen.dart';
@@ -23,6 +24,7 @@ class AppRoutes {
   static String legalAndDataScreen = '/legalAndDataScreen';
   static String privacyPolicyScreen = '/privacyPolicyScreen';
   static String termsOfUseScreen = '/termsOfUseScreen';
+  static String healthAndSafetyScreen = '/healthAndSafetyScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -35,7 +37,7 @@ class AppRoutes {
   static String getLegalAndDataScreen() => legalAndDataScreen;
   static String getPrivacyPolicyScreen() => privacyPolicyScreen;
   static String getTermsOfUseScreen() => termsOfUseScreen;
-
+  static String getHealthAndSafetyScreen() => healthAndSafetyScreen;
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
     GetPage(name: welcomeScreen, page: () => const WelcomeScreen()),
@@ -54,5 +56,9 @@ class AppRoutes {
     GetPage(name: legalAndDataScreen, page: () => LegalAndDataScreen()),
     GetPage(name: privacyPolicyScreen, page: () => const PrivacyPolicyScreen()),
     GetPage(name: termsOfUseScreen, page: () => const TermsOfUseScreen()),
+    GetPage(
+      name: healthAndSafetyScreen,
+      page: () => const HealthAndSafetyNotesScreen(),
+    ),
   ];
 }
