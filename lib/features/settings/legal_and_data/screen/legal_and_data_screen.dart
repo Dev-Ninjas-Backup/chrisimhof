@@ -28,7 +28,7 @@ class LegalAndDataScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 28),
                 Text(
-                  'Legal & data',
+                  'Legal & data'.tr,
                   style: getTextStyle2(
                     fontSize: 36,
                     fontWeight: FontWeight.w600,
@@ -37,7 +37,8 @@ class LegalAndDataScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 12),
                 Text(
-                  'Everything important in one place, written for a wellbeing product.',
+                  'Everything important in one place, written for a wellbeing product.'
+                      .tr,
                   style: getTextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -48,16 +49,16 @@ class LegalAndDataScreen extends StatelessWidget {
                 BuildMenuItem(
                   iconPath: IconPath.health,
                   iconBackgroundColor: AppColors.roseSoft2,
-                  title: 'Health & safety note',
-                  subtitle: 'Lifestyle guidance, not medical care.',
+                  title: 'Health & safety note'.tr,
+                  subtitle: 'Lifestyle guidance, not medical care.'.tr,
                   onTap: () {},
                 ),
                 SizedBox(height: 16),
                 BuildMenuItem(
                   iconPath: IconPath.privacy,
                   iconBackgroundColor: AppColors.mint2,
-                  title: 'Privacy policy',
-                  subtitle: 'Personal data, employer view and retention.',
+                  title: 'Privacy policy'.tr,
+                  subtitle: 'Personal data, employer view and retention.'.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.privacyPolicyScreen);
                   },
@@ -66,8 +67,8 @@ class LegalAndDataScreen extends StatelessWidget {
                 BuildMenuItem(
                   iconPath: IconPath.terms,
                   iconBackgroundColor: AppColors.indigoSoft2,
-                  title: 'Terms of use',
-                  subtitle: 'Responsible use and account rules.',
+                  title: 'Terms of use'.tr,
+                  subtitle: 'Responsible use and account rules.'.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.termsOfUseScreen);
                   },
@@ -76,16 +77,16 @@ class LegalAndDataScreen extends StatelessWidget {
                 BuildMenuItem(
                   iconPath: IconPath.consent,
                   iconBackgroundColor: AppColors.indigoSoft3,
-                  title: 'Consent settings',
-                  subtitle: 'Connected sources and permissions.',
+                  title: 'Consent settings'.tr,
+                  subtitle: 'Connected sources and permissions.'.tr,
                   onTap: () {},
                 ),
                 SizedBox(height: 16),
                 BuildMenuItem(
                   iconPath: IconPath.delete,
                   iconBackgroundColor: AppColors.roseSoft2,
-                  title: 'Delete account',
-                  subtitle: 'Export or remove your data.',
+                  title: 'Delete account'.tr,
+                  subtitle: 'Export or remove your data.'.tr,
                   onTap: () {},
                 ),
               ],
