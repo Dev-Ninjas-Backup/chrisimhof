@@ -1,7 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SettingsTopBar extends StatelessWidget {
   const SettingsTopBar({super.key});
@@ -17,7 +17,7 @@ class SettingsTopBar extends StatelessWidget {
             child: Text(
               'Settings'.tr,
               textAlign: TextAlign.center,
-              style: GoogleFonts.outfit(
+              style: getTextStyle(
                 color: AppColors.primaryTextColor,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,

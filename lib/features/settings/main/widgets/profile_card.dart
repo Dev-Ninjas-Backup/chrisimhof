@@ -1,4 +1,5 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -63,7 +64,7 @@ class ProfileCard extends StatelessWidget {
                     name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.outfit(
+                    style: getTextStyle2(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -74,7 +75,7 @@ class ProfileCard extends StatelessWidget {
                     email,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.manrope(
+                    style: getTextStyle(
                       color: const Color(0xFFB9C9C3),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -144,7 +145,7 @@ class _Initials extends StatelessWidget {
     return Center(
       child: Text(
         initials,
-        style: GoogleFonts.outfit(
+        style: getTextStyle2(
           color: const Color(0xFF0A1410),
           fontSize: 18,
           fontWeight: FontWeight.w700,
