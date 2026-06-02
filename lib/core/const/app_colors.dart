@@ -8,6 +8,8 @@ class AppColors {
   static const Color mint = Color(0xFF83EDBA);
   static const Color mint2 = Color(0xFFF0FDF4);
   static const Color mintSoft = Color(0xFFE8FBF3);
+  static const Color mintSoftText = Color(0xFF065F46);
+  static const Color mintSoft2 = Color(0xFFECFDF5);
   static const Color indigo = Color(0xFF6366F1);
   static const Color indigoSoft = Color(0xFFE0E7FF);
   static const Color indigoSoft2 = Color(0xFFEFF6FF);
@@ -22,6 +24,7 @@ class AppColors {
   static const Color rose = Color(0xFFF43F5E);
   static const Color roseSoft = Color(0xFFFFE4E6);
   static const Color roseSoft2 = Color(0xFFFEF2F2);
+  static const Color orangeSoft = Color(0xFFFFF7ED);
   static const Color authDark = Color(0xFF0F1A16);
   static const Color authDarkAlt = Color(0xFF143226);
   static const Color logoutBorderColor = Color(0xFFC82323);

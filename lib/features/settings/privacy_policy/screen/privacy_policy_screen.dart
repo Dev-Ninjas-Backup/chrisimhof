@@ -1,4 +1,5 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/settings/privacy_policy/widgets/build_card.dart';
@@ -74,28 +75,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ),
 
                 SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.mint,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Accept privacy policy'.tr,
-                      style: getTextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                  ),
-                ),
+                CustomButton(text: 'Accept privacy policy', onTap: Get.back),
               ],
             ),
           ),

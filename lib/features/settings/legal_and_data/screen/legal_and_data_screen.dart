@@ -51,7 +51,9 @@ class LegalAndDataScreen extends StatelessWidget {
                   iconBackgroundColor: AppColors.roseSoft2,
                   title: 'Health & safety note'.tr,
                   subtitle: 'Lifestyle guidance, not medical care.'.tr,
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed(AppRoutes.healthAndSafetyScreen);
+                  },
                 ),
                 SizedBox(height: 16),
                 BuildMenuItem(

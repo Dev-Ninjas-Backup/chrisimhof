@@ -8,7 +8,6 @@ import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
