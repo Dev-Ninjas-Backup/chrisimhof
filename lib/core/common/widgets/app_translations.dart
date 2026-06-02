@@ -136,65 +136,6 @@ class AppTranslations extends Translations {
       'Advanced modules like (fatigue management, caffeine tracking, and performance optimization':
           'Advanced modules like (fatigue management, caffeine tracking, and performance optimization)',
       '\$9.99/mo': '\$9.99/mo',
-      '1. Introduction': '1. Introduction',
-      'RYVENZA is a lifestyle and performance optimization application providing  recommendations based on user inputs such as sleep, nutrition, hydration, caffeine,  and physical activity.  By using the application, you agree to these Terms of Use.':
-          'RYVENZA is a lifestyle and performance optimization application providing  recommendations based on user inputs such as sleep, nutrition, hydration, caffeine,  and physical activity.  By using the application, you agree to these Terms of Use.',
-      '2. User Accout': '2. User Account',
-      "Users may be required to create an account to access certain features. You are responsible for maintaining the confidentiality of your account credentials.":
-          "Users may be required to create an account to access certain features. You are responsible for maintaining the confidentiality of your account credentials.",
-      '3. Services': '3. Services',
-      "RYVENZA provides:\n- personalized recommendations\n- lifestyle data analysis\n- lifestyle data analysis\nautomated recommendations based on user inputs and  system logic.  The service may evolve and be updated at any time.":
-          "RYVENZA provides:\n- personalized recommendations\n- lifestyle data analysis\n- lifestyle data analysis\nautomated recommendations based on user inputs and  system logic.  The service may evolve and be updated at any time.",
-      '4. Subscription': '4. Subscription',
-      "RYVENZA offers free and premium features.  Premium features are accessible through paid subscriptions.  Subscriptions may renew automatically unless cancelled.":
-          "RYVENZA offers free and premium features.  Premium features are accessible through paid subscriptions.  Subscriptions may renew automatically unless cancelled.",
-      '5. Limitation of Liability': '5. Limitation of Liability',
-      "RYVENZA provides informational recommendations only.  We do not guarantee results, accuracy, or outcomes.  The user remains fully responsible for their decisions and actions.  Users acknowledge that recommendations are generated automatically and may not  be accurate or suitable for their specific situation.":
-          "RYVENZA provides informational recommendations only.  We do not guarantee results, accuracy, or outcomes.  The user remains fully responsible for their decisions and actions.  Users acknowledge that recommendations are generated automatically and may not  be accurate or suitable for their specific situation.",
-      '6. Acceptable Use': '6. Acceptable Use',
-      "Users agree not to:\n - misuse the application\n - attempt unauthorized access\n- reproduce or exploit the service":
-          "Users agree not to:\n - misuse the application\n - attempt unauthorized access\n- reproduce or exploit the service",
-      '7. Suspension': '7. Suspension',
-      "We reserve the right to suspend or terminate accounts in case of misuse.":
-          "We reserve the right to suspend or terminate accounts in case of misuse.",
-      '8. Modifications': '8. Modifications',
-      "We may update these Terms at any time.":
-          "We may update these Terms at any time.",
-      '9. Governing Law': '9. Governing Law',
-      "These Terms are governed by Swiss law.":
-          "These Terms are governed by Swiss law.",
-      '1. Data Controller': '1. Data Controller',
-      'RYVENZA App': 'RYVENZA App',
-      '2. Data Collected': '2. Data Collected',
-      "We may collect: \n- account data (email, login)\n- user inputs (sleep, nutrition, hydration, caffeine, activity)\n- usage data (app interactions)":
-          "We may collect: \n- account data (email, login)\n- user inputs (sleep, nutrition, hydration, caffeine, activity)\n- usage data (app interactions)",
-      '3. Purpose of Processing': '3. Purpose of Processing',
-      "Data is used to:\n- generate personalized recommendations\n- operate and improve the application":
-          "Data is used to:\n- generate personalized recommendations\n- operate and improve the application",
-      '4. Legal Basis': '4. Legal Basis',
-      "Processing is based on user consent.":
-          "Processing is based on user consent.",
-      '5. Data Storage': '5. Data Storage',
-      "Data is stored securely on cloud infrastructure.":
-          "Data is stored securely on cloud infrastructure.",
-      '6. Data Retention': '6. Data Retention',
-      "Data is retained as long as the account is active.":
-          "Data is retained as long as the account is active.",
-      '7. Data Sharing': '7. Data Sharing',
-      "We do not sell user data.  Some data may be processed by technical service providers (hosting, infrastructure).":
-          "We do not sell user data.  Some data may be processed by technical service providers (hosting, infrastructure).",
-      '8. User Rights': '8. User Rights',
-      "Users may:\n- access their data \n- request correction or deletion\n- withdraw consent":
-          "Users may:\n- access their data \n- request correction or deletion\n- withdraw consent",
-      '9. Security': '9. Security',
-      "We implement appropriate technical measures to protect user data.":
-          "We implement appropriate technical measures to protect user data.",
-      '10. International Transfers': '10. International Transfers',
-      "Data may be processed outside Switzerland or the EU with appropriate safeguards.":
-          "Data may be processed outside Switzerland or the EU with appropriate safeguards.",
-      '11. Changes': '11. Changes',
-      "We may update this policy at any time.":
-          "We may update this policy at any time.",
       'Premium': 'Premium',
       'English': 'English',
       'French': 'French',
@@ -454,7 +395,25 @@ class AppTranslations extends Translations {
       'Update Password': 'Mettre à jour le mot de passe',
       'Choose Language': 'Choisir la langue',
       'Privacy Policy': 'Politique de confidentialité',
-      'Terms of Use': 'Conditions d\'utilisation',
+
+      //Terms of use
+      'Terms': 'Conditions',
+      'Responsible use': 'Utilisation responsable',
+      'Short version of the terms, aligned with a non-medical wellbeing product.':
+          'Version courte des conditions, alignée avec un produit de bien-être non médical.',
+      '1. Lifestyle tool': '1. Outil de style de vie',
+      'RYVENZA supports timing habits. It is not a medical, emergency or occupational safety service.':
+          'RYVENZA soutient les habitudes de timing. Il ne s\'agit pas d\'un service médical, d\'urgence ou de sécurité au travail.',
+      '2. User responsibility': '2. Responsabilité de l\'utilisateur',
+      'You remain responsible for decisions, workplace rules and professional advice in your context.':
+          'Vous restez responsable des décisions, des règles du lieu de travail et des conseils professionnels dans votre contexte.',
+      '3. Inputs and accuracy': '3. Entrées et précision',
+      'Recommendations depend on the quality and regularity of the information you provide.':
+          'Les recommandations dépendent de la qualité et de la régularité des informations que vous fournissez.',
+      '4. Changes': '4. Changements',
+      'Features, plans and recommendations may evolve as the product improves.':
+          'Les fonctionnalités, les plans et les recommandations peuvent évoluer à mesure que le produit s\'améliore.',
+      'Accept terms': 'Accepter les conditions',
       'Subscriptions': 'Abonnements',
       'Basic': 'Basique',
       'Free': 'Gratuit',
@@ -480,65 +439,6 @@ class AppTranslations extends Translations {
       'Advanced modules like (fatigue management, caffeine tracking, and performance optimization':
           'Modules avancés tels que (gestion de la fatigue, suivi de la caféine et optimisation des performances)',
       '\$9.99/mo': '9,99 \$/mois',
-      '1. Introduction': '1. Introduction',
-      'RYVENZA is a lifestyle and performance optimization application providing  recommendations based on user inputs such as sleep, nutrition, hydration, caffeine,  and physical activity.  By using the application, you agree to these Terms of Use.':
-          'RYVENZA est une application d\'optimisation du mode de vie et des performances fournissant des recommandations basées sur les données de l\'utilisateur telles que le sommeil, la nutrition, l\'hydratation, la caféine et l\'activité physique. En utilisant l\'application, vous acceptez ces conditions d\'utilisation.',
-      '2. User Accout': '2. Compte utilisateur',
-      "Users may be required to create an account to access certain features. You are responsible for maintaining the confidentiality of your account credentials.":
-          "Les utilisateurs peuvent être tenus de créer un compte pour accéder à certaines fonctionnalités. Vous êtes responsable du maintien de la confidentialité de vos identifiants de compte.",
-      '3. Services': '3. Services',
-      "RYVENZA provides:\n- personalized recommendations\n- lifestyle data analysis\n- lifestyle data analysis\nautomated recommendations based on user inputs and  system logic.  The service may evolve and be updated at any time.":
-          "RYVENZA fournit :\n- des recommandations personnalisées\n- une analyse des données sur le mode de vie\n- une analyse des données sur le mode de vie\ndes recommandations automatisées basées sur les entrées de l'utilisateur et la logique du système. Le service peut évoluer et être mis à jour à tout moment.",
-      '4. Subscription': '4. Abonnement',
-      "RYVENZA offers free and premium features.  Premium features are accessible through paid subscriptions.  Subscriptions may renew automatically unless cancelled.":
-          "RYVENZA propose des fonctionnalités gratuites et premium. Les fonctionnalités premium sont accessibles via des abonnements payants. Les abonnements peuvent se renouveler automatiquement à moins d'être annulés.",
-      '5. Limitation of Liability': '5. Limitation de responsabilité',
-      "RYVENZA provides informational recommendations only.  We do not guarantee results, accuracy, or outcomes.  The user remains fully responsible for their decisions and actions.  Users acknowledge that recommendations are generated automatically and may not  be accurate or suitable for their specific situation.":
-          "RYVENZA fournit uniquement des recommandations informatives. Nous ne garantissons pas les résultats, l'exactitude ou les conséquences. L'utilisateur reste entièrement responsable de ses décisions et actions. Les utilisateurs reconnaissent que les recommandations sont générées automatiquement et peuvent ne pas être exactes ou adaptées à leur situation spécifique.",
-      '6. Acceptable Use': '6. Utilisation acceptable',
-      "Users agree not to:\n - misuse the application\n - attempt unauthorized access\n- reproduce or exploit the service":
-          "Les utilisateurs acceptent de ne pas :\n - faire un mauvais usage de l'application\n - tenter un accès non autorisé\n - reproduire ou exploiter le service",
-      '7. Suspension': '7. Suspension',
-      "We reserve the right to suspend or terminate accounts in case of misuse.":
-          "Nous nous réservons le droit de suspendre ou de résilier les comptes en cas de mauvaise utilisation.",
-      '8. Modifications': '8. Modifications',
-      "We may update these Terms at any time.":
-          "Nous pouvons mettre à jour ces conditions à tout moment.",
-      '9. Governing Law': '9. Droit applicable',
-      "These Terms are governed by Swiss law.":
-          "Ces conditions sont régies par le droit suisse.",
-      '1. Data Controller': '1. Responsable du traitement',
-      'RYVENZA App': 'Application RYVENZA',
-      '2. Data Collected': '2. Données collectées',
-      "We may collect: \n- account data (email, login)\n- user inputs (sleep, nutrition, hydration, caffeine, activity)\n- usage data (app interactions)":
-          "Nous pouvons collecter : \n- données de compte (e-mail, identifiant)\n- entrées utilisateur (sommeil, nutrition, hydratation, caféine, activité)\n- données d'utilisation (interactions avec l'application)",
-      '3. Purpose of Processing': '3. Finalité du traitement',
-      "Data is used to:\n- generate personalized recommendations\n- operate and improve the application":
-          "Les données sont utilisées pour :\n- générer des recommandations personnalisées\n- exploiter et améliorer l'application",
-      '4. Legal Basis': '4. Base légale',
-      "Processing is based on user consent.":
-          "Le traitement est basé sur le consentement de l'utilisateur.",
-      '5. Data Storage': '5. Stockage des données',
-      "Data is stored securely on cloud infrastructure.":
-          "Les données sont stockées de manière sécurisée sur une infrastructure cloud.",
-      '6. Data Retention': '6. Conservation des données',
-      "Data is retained as long as the account is active.":
-          "Les données sont conservées tant que le compte est actif.",
-      '7. Data Sharing': '7. Partage des données',
-      "We do not sell user data.  Some data may be processed by technical service providers (hosting, infrastructure).":
-          "Nous ne vendons pas les données des utilisateurs. Certaines données peuvent être traitées par des prestataires techniques (hébergement, infrastructure).",
-      '8. User Rights': '8. Droits des utilisateurs',
-      "Users may:\n- access their data \n- request correction or deletion\n- withdraw consent":
-          "Les utilisateurs peuvent :\n- accéder à leurs données\n- demander une correction ou une suppression\n- retirer leur consentement",
-      '9. Security': '9. Sécurité',
-      "We implement appropriate technical measures to protect user data.":
-          "Nous mettons en œuvre des mesures techniques appropriées pour protéger les données des utilisateurs.",
-      '10. International Transfers': '10. Transferts internationaux',
-      "Data may be processed outside Switzerland or the EU with appropriate safeguards.":
-          "Les données peuvent être traitées en dehors de la Suisse ou de l'UE avec des garanties appropriées.",
-      '11. Changes': '11. Modifications',
-      "We may update this policy at any time.":
-          "Nous pouvons mettre à jour cette politique à tout moment.",
       'Premium': 'Premium',
       'English': 'Anglais',
       'French': 'Français',

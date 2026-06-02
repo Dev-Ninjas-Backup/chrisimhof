@@ -30,7 +30,7 @@ class CustomButton extends StatelessWidget {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10000),
+            borderRadius: BorderRadius.circular(18),
           ),
         ),
         child: Text(
