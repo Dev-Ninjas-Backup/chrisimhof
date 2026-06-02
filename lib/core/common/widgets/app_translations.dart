@@ -361,7 +361,25 @@ class AppTranslations extends Translations {
 
       // Legal & Data (Settings)
       'Legal & data': 'Légal et données',
+      'Safety': 'Sécurité',
       'Health & safety note': 'Remarque santé et sécurité',
+      'RYVENZA gives lifestyle timing guidance. It is not medical care.':
+          'RYVENZA fournit des conseils de timing de mode de vie. Ce n\'est pas un soin médical.',
+      'GENERAL WELLBEING ONLY': 'UNIQUEMENT BIEN-ÊTRE GÉNÉRAL',
+      'Plan the when, not diagnose the why.':
+          'Planifiez le quand, ne diagnostiquez pas le pourquoi.',
+      'Sleep, caffeine, hydration, meals, activity and recovery suggestions are informative and based on the data you enter.':
+          'Les suggestions concernant le sommeil, la caféine, l\'hydratation, les repas, l\'activité et la récupération sont informatives et basées sur les données que vous saisissez.',
+      'Not medical advice': 'Pas un avis médical',
+      'No diagnosis, treatment, prevention, cure or emergency':
+          'Aucun diagnostic, traitement, prévention, guérison ou urgence',
+      'Ask a professional': 'Consultez un professionnel',
+      'Use extra caution with medical conditions, medication,':
+          'Faites preuve de prudence supplémentaire en cas de problèmes médicaux, de médicaments,',
+      'Safety comes first': 'La sécurité passe avant tout',
+      'Do not use RYVENZA to decide if you are fit to drive, work, operate':
+          'N\'utilisez pas RYVENZA pour décider si vous êtes apte à conduire, travailler ou opérer',
+      'I understand': 'Je comprends',
       'Lifestyle guidance, not medical care.':
           'Conseils de mode de vie, pas des soins médicaux.',
       'Personal data, employer view and retention.':
