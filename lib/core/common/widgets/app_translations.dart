@@ -76,6 +76,23 @@ class AppTranslations extends Translations {
 
       // Settings
       'Settings': 'Settings',
+
+      // Legal & Data (Settings)
+      'Legal & data': 'Legal & data',
+      'Health & safety note': 'Health & safety note',
+      'Lifestyle guidance, not medical care.':
+          'Lifestyle guidance, not medical care.',
+      'Personal data, employer view and retention.':
+          'Personal data, employer view and retention.',
+      'Everything important in one place, written for a wellbeing product.':
+          'Everything important in one place, written for a wellbeing product.',
+      'Responsible use and account rules.':
+          'Responsible use and account rules.',
+      'Connected sources and permissions.':
+          'Connected sources and permissions.',
+      'Export or remove your data.': 'Export or remove your data.',
+      'Privacy policy': 'Privacy policy',
+      'Terms of use': 'Terms of use',
       'Delete Account': 'Delete Account',
       'Deleting account...': 'Deleting account...',
       'Account deleted successfully': 'Account deleted successfully',
@@ -381,6 +398,42 @@ class AppTranslations extends Translations {
 
       // Settings
       'Settings': 'Paramètres',
+
+      //privacy
+      'Privacy': 'Confidentialité',
+      'Privacy first by design': 'Confidentialité d\'abord par conception',
+      'RYVENZA should feel useful without exposing individual health-like habits to an employer.':
+          'RYVENZA devrait sembler utile sans révéler les habitudes individuelles de santé à un employeur.',
+      'Your inputs': 'Vos données',
+      'Profile basics, work rhythm, sleep target, caffeine, hydration, meals, activity and recovery logs you choose to enter.':
+          'Les bases du profil, le rythme de travail, l\'objectif de sommeil, la caféine, l\'hydratation, les repas, les activités et les journaux de récupération que vous choisissez d\'entrer.',
+      'Why we use them': 'Pourquoi nous les utilisons',
+      'To calculate timing recommendations, personalize reminders and improve the product experience.':
+          'Pour calculer les recommandations de timing, personnaliser les rappels et améliorer l\'expérience du produit.',
+      'Employer view': 'Vue employeur',
+      'In a company pilot, employers see aggregated trends only. No individual profile, log, note or recommendation is shown.':
+          'Dans un pilote d\'entreprise, les employeurs ne voient que les tendances agrégées. Aucun profil individuel, journal, note ou recommandation n\'est affiché.',
+      'Your controls': 'Vos contrôles',
+      'You can edit core inputs, disconnect sources, export data or request deletion from settings.':
+          'Vous pouvez modifier les entrées de base, déconnecter les sources, exporter les données ou demander la suppression depuis les paramètres.',
+      'Accept privacy policy': 'Accepter la politique de confidentialité',
+
+      // Legal & Data (Settings)
+      'Legal & data': 'Légal et données',
+      'Health & safety note': 'Remarque santé et sécurité',
+      'Lifestyle guidance, not medical care.':
+          'Conseils de mode de vie, pas des soins médicaux.',
+      'Personal data, employer view and retention.':
+          'Données personnelles, vue employeur et conservation.',
+      'Everything important in one place, written for a wellbeing product.':
+          'Tout ce qui est important au même endroit, rédigé pour un produit de bien-être.',
+      'Terms of use': 'Conditions d\'utilisation',
+      'Responsible use and account rules.':
+          'Utilisation responsable et règles du compte.',
+      'Connected sources and permissions.':
+          'Sources connectées et autorisations.',
+      'Export or remove your data.': 'Exporter ou supprimer vos données.',
+      'Privacy policy': 'Politique de confidentialité',
       'Overall state': 'État général',
       'Delete Account': 'Supprimer le compte',
       'Deleting account...': 'Suppression du compte...',
