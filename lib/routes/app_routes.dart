@@ -5,6 +5,9 @@ import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
 import 'package:chrisimhof/features/history_details/screen/history_details_screen.dart';
 import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
+import 'package:chrisimhof/features/settings/legal_and_data/screen/legal_and_data_screen.dart';
+import 'package:chrisimhof/features/settings/privacy_policy/screen/privacy_policy_screen.dart';
+import 'package:chrisimhof/features/settings/terms_of_use/screen/terms_of_use_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +20,9 @@ class AppRoutes {
   static String forgetPasswordEmailScreen = '/forgetPasswordEmailScreen';
   static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
   static String historyDetailsScreen = '/historyDetailsScreen';
+  static String legalAndDataScreen = '/legalAndDataScreen';
+  static String privacyPolicyScreen = '/privacyPolicyScreen';
+  static String termsOfUseScreen = '/termsOfUseScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -26,6 +32,9 @@ class AppRoutes {
   static String getForgetPasswordEmailScreen() => forgetPasswordEmailScreen;
   static String getMedicalDisclaimerScreen() => medicalDisclaimerScreen;
   static String getHistoryDetailsScreen() => historyDetailsScreen;
+  static String getLegalAndDataScreen() => legalAndDataScreen;
+  static String getPrivacyPolicyScreen() => privacyPolicyScreen;
+  static String getTermsOfUseScreen() => termsOfUseScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -42,5 +51,8 @@ class AppRoutes {
       page: () => MedicalDisclaimerScreen(),
     ),
     GetPage(name: historyDetailsScreen, page: () => HistoryDetailsScreen()),
+    GetPage(name: legalAndDataScreen, page: () => LegalAndDataScreen()),
+    GetPage(name: privacyPolicyScreen, page: () => const PrivacyPolicyScreen()),
+    GetPage(name: termsOfUseScreen, page: () => const TermsOfUseScreen()),
   ];
 }
