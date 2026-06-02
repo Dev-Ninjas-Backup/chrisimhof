@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/settings/privacy_policy/widgets/build_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,222 +13,91 @@ class PrivacyPolicyScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 78,
-            left: 16,
-            right: 16,
-            bottom: 50,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomAppBar(title: 'Privacy Policy'.tr, showBackButton: true),
-              SizedBox(height: 32),
-              Text(
-                '1. Data Controller'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomAppBar(
+                  title: 'Privacy'.tr,
+                  showBackButton: true,
+                  showMoreButton: true,
                 ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'RYVENZA App'.tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
+                SizedBox(height: 28),
+                Text(
+                  'Privacy first by design'.tr,
+                  style: getTextStyle2(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTextColor,
+                  ),
                 ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '2. Data Collected'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
+                SizedBox(height: 12),
+                Text(
+                  'RYVENZA should feel useful without exposing individual health-like habits to an employer.'
+                      .tr,
+                  style: getTextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textMid,
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "We may collect: \n- account data (email, login)\n- user inputs (sleep, nutrition, hydration, caffeine, activity)\n- usage data (app interactions)"
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
+                SizedBox(height: 30),
+
+                BuildCard(
+                  title: 'Your inputs'.tr,
+                  body:
+                      'Profile basics, work rhythm, sleep target, caffeine, hydration, meals, activity and recovery logs you choose to enter.'
+                          .tr,
                 ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '3. Purpose of Processing'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
+                SizedBox(height: 16),
+                BuildCard(
+                  title: 'Why we use them'.tr,
+                  body:
+                      'To calculate timing recommendations, personalize reminders and improve the product experience.'
+                          .tr,
                 ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Data is used to:\n- generate personalized recommendations\n- operate and improve the application"
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
+                SizedBox(height: 16),
+                BuildCard(
+                  title: 'Employer view'.tr,
+                  body:
+                      'In a company pilot, employers see aggregated trends only. No individual profile, log, note or recommendation is shown.'
+                          .tr,
                 ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '4. Legal Basis'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
+                SizedBox(height: 16),
+                BuildCard(
+                  title: 'Your controls'.tr,
+                  body:
+                      'You can edit core inputs, disconnect sources, export data or request deletion from settings.'
+                          .tr,
                 ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Processing is based on user consent.".tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
+
+                SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.mint,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Accept privacy policy'.tr,
+                      style: getTextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '5. Data Storage'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Data is stored securely on cloud infrastructure.".tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '6. Data Retention'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Data is retained as long as the account is active.".tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '7. Data Sharing'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "We do not sell user data.  Some data may be processed by technical service providers (hosting, infrastructure)."
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '8. User Rights'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Users may:\n- access their data \n- request correction or deletion\n- withdraw consent"
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '9. Security'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "We implement appropriate technical measures to protect user data."
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '10. International Transfers'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Data may be processed outside Switzerland or the EU with appropriate safeguards."
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              SizedBox(height: 24),
-              Text(
-                '11. Changes'.tr,
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                "We may update this policy at any time.".tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
