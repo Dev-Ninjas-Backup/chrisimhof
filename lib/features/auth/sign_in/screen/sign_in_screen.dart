@@ -31,7 +31,7 @@ class SignInScreen extends StatelessWidget {
               const SizedBox(height: 45),
               Text(
                 "Welcome Back".tr,
-                style: GoogleFonts.outfit(
+                style: getTextStyle2(
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryTextColor,

@@ -13,3 +13,16 @@ TextStyle getTextStyle({
     color: color,
   );
 }
+
+TextStyle getTextStyle2({
+  double fontSize = 36.0,
+  FontWeight fontWeight = FontWeight.w600,
+  TextAlign textAlign = TextAlign.center,
+  Color color = Colors.black,
+}) {
+  return GoogleFonts.outfit(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+  );
+}
