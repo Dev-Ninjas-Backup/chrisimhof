@@ -460,6 +460,38 @@ class AppTranslations extends Translations {
       'The app can support French and British English wording.':
           'L\'application peut prendre en charge le français et l\'anglais britannique.',
 
+      'Consent settings': 'Paramètres de consentement',
+      'Delete account': 'Supprimer le compte',
+      'Choose what RYVENZA can use to personalise your rhythm. You can change this later.':
+          'Choisissez ce que RYVENZA peut utiliser pour personnaliser votre rythme. Vous pouvez changer cela plus tard.',
+      'Lifestyle recommendations': 'Recommandations de style de vie',
+      'Use sleep, caffeine, hydration, meals, activity and work rhythm to calculate timing suggestions.':
+          'Utilisez le sommeil, la caféine, l\'hydratation, les repas, l\'activité et le rythme de travail pour calculer les suggestions de timing.',
+      'Reminders': 'Rappels',
+      'Allow gentle nudges for hydration, caffeine cut-off, sleep window and recovery.':
+          'Autoriser des rappels discrets pour l\'hydratation, l\'arrêt de la caféine, la fenêtre de sommeil et la récupération.',
+      'Connected sources': 'Sources connectées',
+      'Use optional connected data only after you link a source yourself.':
+          'Utilisez les données connectées facultatives uniquement après avoir lié une source vous-même.',
+      'Company pilot insights': 'Aperçus du pilote d\'entreprise',
+      'Share aggregated and anonymised trends only. No individual logs are shown to an employer.':
+          'Partager uniquement les tendances agrégées et anonymisées. Aucun journal individuel n\'est montré à un employeur.',
+      'Usage analytics': 'Analytique d\'utilisation',
+      'Help improve RYVENZA with privacy-preserving usage analytics.':
+          'Aidez à améliorer RYVENZA avec une analytique d\'utilisation respectueuse de la vie privée.',
+      'Save consent settings': 'Enregistrer les paramètres de consentement',
+
+      'This action removes your personal RYVENZA profile and app data after confirmation.':
+          'Cette action supprime votre profil personnel RYVENZA et les données de l\'application après confirmation.',
+      'Before deleting': 'Avant de supprimer',
+      'Export your data first if you want a copy. Company-level aggregated pilot metrics may remain anonymised.':
+          'Exportez d\'abord vos données si vous souhaitez une copie. Les métriques agrégées au niveau de l\'entreprise du pilote peuvent rester anonymisées.',
+      'I understand this cannot be undone.':
+          'Je comprends que cela ne peut pas être annulé.',
+      'I want to remove my personal profile.':
+          'Je souhaite supprimer mon profil personnel.',
+      'Delete my account': 'Supprimer mon compte',
+
       '\$9.99/mo': '9,99 \$/mois',
       'Premium': 'Premium',
       'English': 'Anglais',

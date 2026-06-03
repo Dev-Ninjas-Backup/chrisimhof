@@ -15,7 +15,6 @@ import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
@@ -138,26 +137,6 @@ class SettingsScreen extends StatelessWidget {
                   onTap: controller.isLoading.value ? null : controller.logout,
                   side: const BorderSide(color: AppColors.roseSoft, width: 1.5),
                   foregroundColor: AppColors.rose,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Center(
-                child: Obx(
-                  () => TextButton(
-                    onPressed: controller.isDeleteLoading.value
-                        ? null
-                        : controller.deleteAccount,
-                    child: Text(
-                      controller.isDeleteLoading.value
-                          ? 'Deleting account...'.tr
-                          : 'Delete account'.tr,
-                      style: GoogleFonts.manrope(
-                        color: AppColors.rose,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],

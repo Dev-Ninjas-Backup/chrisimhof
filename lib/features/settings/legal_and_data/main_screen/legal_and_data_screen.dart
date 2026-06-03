@@ -91,7 +91,9 @@ class LegalAndDataScreen extends StatelessWidget {
                   iconBackgroundColor: AppColors.roseSoft2,
                   title: 'Delete account'.tr,
                   subtitle: 'Export or remove your data.'.tr,
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed(AppRoutes.deleteAccountScreen);
+                  },
                 ),
               ],
             ),
