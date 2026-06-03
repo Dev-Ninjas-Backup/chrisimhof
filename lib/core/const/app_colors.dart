@@ -14,6 +14,7 @@ class AppColors {
   static const Color indigoSoft = Color(0xFFE0E7FF);
   static const Color indigoSoft2 = Color(0xFFEFF6FF);
   static const Color indigoSoft3 = Color(0xFFF5F3FF);
+  static const Color indigoSoft4 = Color(0xFFFAF5FF);
   static const Color primaryTextColor = Color(0xFF111827);
   static const Color secondaryTextColor = Color(0xFF414651);
   static const Color textMid = Color(0xFF4B5563);

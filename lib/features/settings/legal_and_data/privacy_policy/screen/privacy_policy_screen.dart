@@ -2,7 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/settings/privacy_policy/widgets/build_card.dart';
+import 'package:chrisimhof/features/settings/legal_and_data/privacy_policy/widgets/build_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

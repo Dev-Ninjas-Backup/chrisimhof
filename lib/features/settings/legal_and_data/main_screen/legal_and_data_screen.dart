@@ -81,7 +81,9 @@ class LegalAndDataScreen extends StatelessWidget {
                   iconBackgroundColor: AppColors.indigoSoft3,
                   title: 'Consent settings'.tr,
                   subtitle: 'Connected sources and permissions.'.tr,
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed(AppRoutes.consentSettingsScreen);
+                  },
                 ),
                 SizedBox(height: 16),
                 BuildMenuItem(

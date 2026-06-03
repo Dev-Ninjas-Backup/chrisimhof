@@ -18,4 +18,8 @@ class IconPath {
   static const String medicalAdvice = 'assets/icons/medical_advice.png';
   static const String safety = 'assets/icons/safety.png';
   static const String professional = 'assets/icons/professional.png';
+  static const String lifestyle = 'assets/icons/lifestyle.png';
+  static const String reminder = 'assets/icons/reminder.png';
+  static const String connectedSource = 'assets/icons/connected_sources.png';
+  static const String usageAnalytics = 'assets/icons/usage_analytics.png';
 }
