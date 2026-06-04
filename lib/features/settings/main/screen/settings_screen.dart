@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button2.dart';
@@ -8,7 +9,6 @@ import 'package:chrisimhof/features/settings/language/screens/language_screen.da
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:chrisimhof/features/settings/main/widgets/profile_card.dart';
 import 'package:chrisimhof/features/settings/main/widgets/settings_group.dart';
-import 'package:chrisimhof/features/settings/main/widgets/settings_top_bar.dart';
 import 'package:chrisimhof/features/settings/main/widgets/section_header_with_badge.dart';
 import 'package:chrisimhof/features/settings/main/widgets/wearables_group.dart';
 import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_screen.dart';
@@ -36,7 +36,8 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingsTopBar(),
+              CustomAppBar(title: 'Settings', showBackButton: false),
+              const SizedBox(height: 28),
               ProfileCard(controller: controller),
               sectionLabel('Account'),
               SettingsGroup(

@@ -29,7 +29,6 @@ class LanguageScreen extends StatelessWidget {
                   CustomAppBar(
                     title: 'Choose Language'.tr,
                     showBackButton: true,
-                    showMoreButton: true,
                   ),
                   SizedBox(height: 28),
                   Text(
