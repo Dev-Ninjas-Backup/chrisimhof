@@ -547,7 +547,7 @@ class _SubmitQuickAddButton extends StatelessWidget {
             ? 'Updating...'.tr
             : 'Save'.tr,
         onTap: controller.isQuickAddSubmitting.value ? null : onPressed,
-        width: double.infinity,
+
       ),
     );
   }

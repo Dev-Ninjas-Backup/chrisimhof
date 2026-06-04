@@ -1,7 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/core/common/widgets/custom_button2.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
@@ -122,22 +122,25 @@ class SettingsScreen extends StatelessWidget {
                     label: 'Legal & Data',
                     onTap: () => Get.toNamed(AppRoutes.legalAndDataScreen),
                   ),
-                  // SettingsRowData(
-                  //   icon: Icons.info_outline_rounded,
-                  //   label: 'Terms of use',
-                  //   onTap: () => Get.to(() => TermsOfUseScreen()),
-                  // ),
+                  SettingsRowData(
+                    icon: Icons.storage_outlined,
+                    label: 'Data controls',
+                    onTap: () => Get.toNamed(AppRoutes.dataControlsScreen),
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
               Obx(
-                () => CustomSecondaryButton(
+                () => CustomButton(
                   text: controller.isLoading.value
                       ? 'Logging out...'
                       : 'Log out',
                   onTap: controller.isLoading.value ? null : controller.logout,
-                  side: const BorderSide(color: AppColors.roseSoft, width: 1.5),
-                  foregroundColor: AppColors.rose,
+                  textColor: AppColors.rose,
+                  backgroundColor: Colors.transparent,
+                  borderColor: AppColors.rose,
+                  borderWidth: 1,
+                  iconColor: AppColors.rose,
                 ),
               ),
             ],

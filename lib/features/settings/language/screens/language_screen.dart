@@ -74,6 +74,7 @@ class LanguageScreen extends StatelessWidget {
                       controller.selectedLanguage.value,
                       force: true,
                     ),
+                    icon: null,
                   ),
                 ],
               ),

@@ -75,7 +75,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ),
 
                 SizedBox(height: 30),
-                CustomButton(text: 'Accept privacy policy', onTap: Get.back),
+                CustomButton(
+                  text: 'Accept privacy policy',
+                  onTap: Get.back,
+                  icon: null,
+                ),
               ],
             ),
           ),

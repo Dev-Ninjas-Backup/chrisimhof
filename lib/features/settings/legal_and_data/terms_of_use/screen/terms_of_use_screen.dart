@@ -74,7 +74,11 @@ class TermsOfUseScreen extends StatelessWidget {
                 ),
 
                 SizedBox(height: 30),
-                CustomButton(text: 'Accept terms'.tr, onTap: Get.back),
+                CustomButton(
+                  text: 'Accept terms'.tr,
+                  onTap: Get.back,
+                  icon: null,
+                ),
               ],
             ),
           ),

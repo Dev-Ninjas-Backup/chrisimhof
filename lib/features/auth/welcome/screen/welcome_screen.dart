@@ -1,4 +1,4 @@
-import 'package:chrisimhof/core/common/widgets/custom_button2.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
@@ -82,15 +82,18 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 43),
-                    CustomAuthButton(
-                      text: 'Create account',
-                      isMint: true,
+
+                    CustomButton(
+                      text: 'Create account'.tr,
                       onTap: () => Get.toNamed(AppRoutes.createAccountScreen),
                     ),
                     const SizedBox(height: 10),
-                    CustomSecondaryButton(
-                      text: 'Log in',
+                    CustomButton(
+                      text: 'Log in'.tr,
                       onTap: () => Get.toNamed(AppRoutes.signInScreen),
+                      borderWidth: 1,
+                      backgroundColor: Colors.white,
+                      icon: null,
                     ),
                     const SizedBox(height: 35),
                   ],

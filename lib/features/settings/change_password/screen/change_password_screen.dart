@@ -90,10 +90,11 @@ class ChangePasswordScreen extends StatelessWidget {
                   onTap: controller.isLoading.value
                       ? null
                       : controller.updatePassword,
-                  width: double.infinity,
+
                   backgroundColor: controller.isLoading.value
                       ? AppColors.primaryButtonColor.withValues(alpha: 0.5)
                       : AppColors.primaryButtonColor,
+                  icon: null,
                 ),
               ],
             ),

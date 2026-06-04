@@ -71,10 +71,10 @@ class DeleteAccountScreen extends StatelessWidget {
                   return CustomButton(
                     text: 'Delete my account'.tr,
                     onTap: enabled ? controller.deleteAccount : null,
-                    width: double.infinity,
                     backgroundColor: enabled
                         ? AppColors.red
                         : const Color(0xFFECEFF0),
+                    icon: null,
                   );
                 }),
               ],

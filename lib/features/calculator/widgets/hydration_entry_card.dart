@@ -66,7 +66,7 @@ class HydrationEntryCard extends StatelessWidget {
                 EasyLoading.showError('Enter a valid hydration amount'.tr);
               }
             },
-            width: double.infinity,
+
           ),
         ],
       ),

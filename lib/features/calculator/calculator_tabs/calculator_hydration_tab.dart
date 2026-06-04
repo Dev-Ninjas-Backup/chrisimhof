@@ -73,7 +73,7 @@ class CalculatorHydrationTab extends StatelessWidget {
                 : () {
                     controller.submitHydrationData();
                   },
-            width: double.infinity,
+
           ),
         ),
         const SizedBox(height: 16),

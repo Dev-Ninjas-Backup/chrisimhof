@@ -55,7 +55,6 @@ class MedicalDisclaimerScreen extends StatelessWidget {
         onTap: () {
           Get.offAll(() => NavbarScreen());
         },
-        width: Get.width - 32,
       ),
     );
   }

@@ -117,8 +117,8 @@ class ConsentSettingsScreen extends StatelessWidget {
                 CustomButton(
                   text: 'Save consent settings'.tr,
                   onTap: controller.saveSettings,
-                  width: double.infinity,
                   backgroundColor: AppColors.primaryButtonColor,
+                  icon: null,
                 ),
               ],
             ),
