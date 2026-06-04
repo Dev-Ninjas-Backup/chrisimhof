@@ -123,7 +123,11 @@ class HealthAndSafetyNotesScreen extends StatelessWidget {
                 ),
 
                 SizedBox(height: 30),
-                CustomButton(text: 'I understand'.tr, onTap: Get.back),
+                CustomButton(
+                  text: 'I understand'.tr,
+                  onTap: Get.back,
+                  icon: null,
+                ),
               ],
             ),
           ),

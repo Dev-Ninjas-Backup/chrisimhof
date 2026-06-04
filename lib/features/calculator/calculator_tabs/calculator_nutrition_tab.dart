@@ -57,7 +57,7 @@ class CalculatorNutritionTab extends StatelessWidget {
             onTap: controller.isNutritionSubmitting.value
                 ? null
                 : controller.submitNutritionData,
-            width: double.infinity,
+
           ),
         ),
         const SizedBox(height: 16),
@@ -210,7 +210,7 @@ Widget _nutritionMealListSection(
         CustomButton(
           text: 'Add'.tr,
           onTap: controller.addNutritionMeal,
-          width: double.infinity,
+
         ),
       ],
     ),
@@ -439,7 +439,6 @@ Future<void> _showMealEditor(
                   );
                   Navigator.of(context).pop();
                 },
-                width: double.infinity,
               ),
               const SizedBox(height: 12),
               _secondaryActionButton(

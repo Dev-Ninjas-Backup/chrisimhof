@@ -1,6 +1,7 @@
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/core/common/widgets/custom_button2.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
@@ -8,14 +9,12 @@ import 'package:chrisimhof/features/settings/language/screens/language_screen.da
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:chrisimhof/features/settings/main/widgets/profile_card.dart';
 import 'package:chrisimhof/features/settings/main/widgets/settings_group.dart';
-import 'package:chrisimhof/features/settings/main/widgets/settings_top_bar.dart';
 import 'package:chrisimhof/features/settings/main/widgets/section_header_with_badge.dart';
 import 'package:chrisimhof/features/settings/main/widgets/wearables_group.dart';
 import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_screen.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
@@ -37,7 +36,8 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingsTopBar(),
+              CustomAppBar(title: 'Settings', showBackButton: false),
+              const SizedBox(height: 28),
               ProfileCard(controller: controller),
               sectionLabel('Account'),
               SettingsGroup(
@@ -122,42 +122,25 @@ class SettingsScreen extends StatelessWidget {
                     label: 'Legal & Data',
                     onTap: () => Get.toNamed(AppRoutes.legalAndDataScreen),
                   ),
-                  // SettingsRowData(
-                  //   icon: Icons.info_outline_rounded,
-                  //   label: 'Terms of use',
-                  //   onTap: () => Get.to(() => TermsOfUseScreen()),
-                  // ),
+                  SettingsRowData(
+                    icon: Icons.storage_outlined,
+                    label: 'Data controls',
+                    onTap: () => Get.toNamed(AppRoutes.dataControlsScreen),
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
               Obx(
-                () => CustomSecondaryButton(
+                () => CustomButton(
                   text: controller.isLoading.value
                       ? 'Logging out...'
                       : 'Log out',
                   onTap: controller.isLoading.value ? null : controller.logout,
-                  side: const BorderSide(color: AppColors.roseSoft, width: 1.5),
-                  foregroundColor: AppColors.rose,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Center(
-                child: Obx(
-                  () => TextButton(
-                    onPressed: controller.isDeleteLoading.value
-                        ? null
-                        : controller.deleteAccount,
-                    child: Text(
-                      controller.isDeleteLoading.value
-                          ? 'Deleting account...'.tr
-                          : 'Delete account'.tr,
-                      style: GoogleFonts.manrope(
-                        color: AppColors.rose,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+                  textColor: AppColors.rose,
+                  backgroundColor: Colors.transparent,
+                  borderColor: AppColors.rose,
+                  borderWidth: 1,
+                  iconColor: AppColors.rose,
                 ),
               ),
             ],

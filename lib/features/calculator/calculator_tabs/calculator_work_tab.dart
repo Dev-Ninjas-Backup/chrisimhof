@@ -40,7 +40,7 @@ class CalculatorWorkTab extends StatelessWidget {
                   : () {
                       controller.submitWorkData();
                     },
-              width: double.infinity,
+
             ),
           ),
         ),

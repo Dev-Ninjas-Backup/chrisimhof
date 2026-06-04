@@ -6,39 +6,63 @@ import 'package:get/get.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
-  final double? width;
   final Color? backgroundColor;
+  final Color? iconColor;
+  final Color? textColor;
+  final Color? borderColor;
+  final int? borderWidth;
+  final IconData? icon;
 
   const CustomButton({
     super.key,
     required this.text,
     required this.onTap,
-    this.width,
     this.backgroundColor,
+    this.iconColor,
+    this.textColor,
+    this.borderColor,
+    this.borderWidth,
+    this.icon = Icons.chevron_right_rounded,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width ?? 408,
+      width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primaryButtonColor,
-          foregroundColor: Colors.white,
+          foregroundColor: textColor ?? Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
+            side: borderWidth != null
+                ? BorderSide(
+                    width: borderWidth!.toDouble(),
+                    color: borderColor ?? Color(0xFFE5E5E5),
+                  )
+                : BorderSide.none,
           ),
         ),
-        child: Text(
-          text.tr,
-          style: getTextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                text.tr,
+                style: getTextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textColor ?? Colors.black,
+                ),
+              ),
+              if (icon != null) const SizedBox(width: 4),
+              if (icon != null)
+                Icon(icon, size: 20, color: iconColor ?? Colors.black),
+            ],
           ),
         ),
       ),

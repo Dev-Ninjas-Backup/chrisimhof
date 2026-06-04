@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 class QuickAddWidget extends StatelessWidget {
   QuickAddWidget({super.key});
 
-  final DashboardController controller = Get.find<DashboardController>();
+  final DashboardController controller = Get.put(DashboardController());
 
   @override
   Widget build(BuildContext context) {
@@ -303,10 +303,8 @@ class QuickAddWidget extends StatelessWidget {
               decoration: _dropdownDecoration('Meal Tag'.tr),
               items: const ['LIGHT', 'HEAVY', 'FATTY']
                   .map(
-                    (tag) => DropdownMenuItem<String>(
-                      value: tag,
-                      child: Text(tag),
-                    ),
+                    (tag) =>
+                        DropdownMenuItem<String>(value: tag, child: Text(tag)),
                   )
                   .toList(),
               onChanged: (value) {
@@ -363,7 +361,9 @@ class QuickAddWidget extends StatelessWidget {
           const SizedBox(height: 8),
           _SubmitQuickAddButton(
             onPressed: () async {
-              final mealsPerDay = int.tryParse(mealsPerDayController.text.trim());
+              final mealsPerDay = int.tryParse(
+                mealsPerDayController.text.trim(),
+              );
               final order = int.tryParse(mealOrderController.text.trim());
 
               if (mealsPerDay == null || order == null) {
@@ -547,7 +547,7 @@ class _SubmitQuickAddButton extends StatelessWidget {
             ? 'Updating...'.tr
             : 'Save'.tr,
         onTap: controller.isQuickAddSubmitting.value ? null : onPressed,
-        width: double.infinity,
+
       ),
     );
   }
