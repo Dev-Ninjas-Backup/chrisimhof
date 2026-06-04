@@ -10,10 +10,12 @@ class BuildMenuItem extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.iconColor,
   });
 
   final String iconPath;
   final Color iconBackgroundColor;
+  final Color? iconColor;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
@@ -39,7 +41,12 @@ class BuildMenuItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
-                child: Image.asset(iconPath, width: 24, height: 24),
+                child: Image.asset(
+                  iconPath,
+                  width: 24,
+                  height: 24,
+                  color: iconColor,
+                ),
               ),
             ),
             SizedBox(width: 16),

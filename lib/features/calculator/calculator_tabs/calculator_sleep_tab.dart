@@ -171,7 +171,7 @@ class CalculatorSleepTab extends StatelessWidget {
                       controller.preferredTimeController.to24HourFormat,
                     );
                   },
-                  width: double.infinity,
+
                 ),
               ],
             ],
@@ -188,7 +188,7 @@ class CalculatorSleepTab extends StatelessWidget {
                 : () {
                     controller.submitSleepData();
                   },
-            width: double.infinity,
+
           ),
         ),
         const SizedBox(height: 16),
@@ -228,7 +228,7 @@ class CalculatorSleepTab extends StatelessWidget {
               EasyLoading.showError(e.toString());
             }
           },
-          width: double.infinity,
+
           backgroundColor: const Color(0xFFF3F4F6),
         ),
       ],

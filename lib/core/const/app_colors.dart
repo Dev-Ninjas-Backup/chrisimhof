@@ -14,6 +14,7 @@ class AppColors {
   static const Color indigoSoft = Color(0xFFE0E7FF);
   static const Color indigoSoft2 = Color(0xFFEFF6FF);
   static const Color indigoSoft3 = Color(0xFFF5F3FF);
+  static const Color indigoSoft4 = Color(0xFFFAF5FF);
   static const Color primaryTextColor = Color(0xFF111827);
   static const Color secondaryTextColor = Color(0xFF414651);
   static const Color textMid = Color(0xFF4B5563);
@@ -21,6 +22,9 @@ class AppColors {
   static const Color subtle = Color(0xFFF3F6F4);
   static const Color borderColor = Color(0xFFD5D7DA);
   static const Color borderSoft = Color(0xFFEEF2F0);
+  static const Color red = Color(0xFFE11D48);
+  static const Color green = Color(0xFF15803D);
+  static const Color blue = Color(0xFF3B82F6);
   static const Color rose = Color(0xFFF43F5E);
   static const Color roseSoft = Color(0xFFFFE4E6);
   static const Color roseSoft2 = Color(0xFFFEF2F2);

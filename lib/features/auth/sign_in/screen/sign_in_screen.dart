@@ -1,4 +1,4 @@
-import 'package:chrisimhof/core/common/widgets/custom_button2.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/auth/sign_in/controller/sign_in_controller.dart';
@@ -101,9 +101,11 @@ class SignInScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
+
                     Obx(
-                      () => CustomAuthButton(
+                      () => CustomButton(
                         text: 'Log in',
+                        textColor: Colors.white,
                         onTap: controller.isLoading.value
                             ? null
                             : () {
@@ -111,6 +113,8 @@ class SignInScreen extends StatelessWidget {
                                   controller.login();
                                 }
                               },
+                        iconColor: Colors.white,
+                        backgroundColor: AppColors.primaryTextColor,
                       ),
                     ),
                   ],
@@ -136,20 +140,37 @@ class SignInScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              CustomSecondaryButton(
+              CustomButton(
                 text: 'Continue with Google',
                 onTap: controller.signInWithGoogle,
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                iconColor: Colors.black,
+                borderWidth: 1,
+                icon: null,
               ),
               const SizedBox(height: 10),
-              CustomSecondaryButton(
+              CustomButton(
                 text: 'Continue with Apple',
                 onTap: controller.signInWithApple,
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                iconColor: Colors.black,
+                borderWidth: 1,
+                icon: null,
               ),
+
               const SizedBox(height: 10),
-              CustomSecondaryButton(
+              CustomButton(
                 text: 'Continue with Microsoft',
                 onTap: controller.signInWithMicrosoft,
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                iconColor: Colors.black,
+                borderWidth: 1,
+                icon: null,
               ),
+
               const SizedBox(height: 20),
               Center(
                 child: RichText(
