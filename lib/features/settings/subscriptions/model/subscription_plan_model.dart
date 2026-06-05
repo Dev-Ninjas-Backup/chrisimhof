@@ -57,9 +57,9 @@ class SubscriptionPlan {
 
   // Get formatted price for display
   String get formattedPrice {
-    if (price == 0) return 'Free';
-    final priceInDollars = price / 100;
-    return '\$${priceInDollars.toStringAsFixed(2)}/$intervalLabel';
+    if (price == 0) return 'CHF 0';
+    final priceInDollars = (price / 100).toDouble();
+    return 'CHF $priceInDollars / $intervalLabel';
   }
 
   String get intervalLabel {

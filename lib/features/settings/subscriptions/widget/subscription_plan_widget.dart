@@ -1,93 +1,104 @@
-import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class SubscriptionPlanWidget extends StatelessWidget {
   final String planName;
   final String planPrice;
-  final String buttonText;
-  final Color buttonColor;
   final List<String> features;
+  final bool isSelected;
+  final String description;
   final VoidCallback? onTap;
-  final Color widgetColor;
 
   const SubscriptionPlanWidget({
     super.key,
     required this.planName,
     required this.planPrice,
-    required this.buttonText,
-    required this.buttonColor,
     required this.features,
+    required this.isSelected,
+    required this.description,
     this.onTap,
-    required this.widgetColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      width: Get.width,
-      decoration: BoxDecoration(
-        color: widgetColor,
-        border: Border.all(color: AppColors.borderColor, width: 1),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            planName,
-            style: getTextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.secondaryTextColor,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.all(32),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryButtonColor : Colors.white,
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primaryButtonColor
+                : AppColors.borderSoft,
+            width: 1.5,
           ),
-          const SizedBox(height: 8),
-          Text(
-            planPrice,
-            style: getTextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-              color: AppColors.secondaryTextColor,
-            ),
-          ),
-          const SizedBox(height: 32),
-          ...features.expand(
-            (feature) => [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    size: 18,
-                    color: AppColors.secondaryTextColor,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      feature,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.secondaryTextColor,
-                      ),
-                    ),
-                  ),
-                ],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Plan name
+            Text(
+              planName,
+              style: getTextStyle2(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? Colors.black : AppColors.primaryTextColor,
               ),
-              if (feature != features.last) const SizedBox(height: 12),
-            ],
-          ),
-          const SizedBox(height: 32),
-          CustomButton(
-            text: buttonText,
-            onTap: onTap,
-            backgroundColor: buttonColor,
-          ),
-        ],
+            ),
+            const SizedBox(height: 4),
+            // Plan price
+            Text(
+              planPrice,
+              style: getTextStyle2(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? Colors.black : AppColors.primaryButtonColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              description,
+              style: getTextStyle2(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: isSelected ? Colors.black : AppColors.textMid,
+              ),
+            ),
+            const SizedBox(height: 20),
+            if (isSelected)
+              ...features.map(
+                (feature) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(IconPath.rectangle, width: 10, height: 10),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          feature,
+                          style: getTextStyle2(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected
+                                ? Colors.black
+                                : AppColors.primaryTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

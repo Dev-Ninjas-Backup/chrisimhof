@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -42,17 +43,12 @@ class WearablesGroup extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 28,
-                    height: 28,
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: AppColors.subtle,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
-                      Icons.watch_outlined,
-                      color: AppColors.textMid,
-                      size: 15,
-                    ),
+                    child: Image.asset(IconPath.watch, width: 20, height: 20),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
