@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
@@ -43,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
               SettingsGroup(
                 rows: [
                   SettingsRowData(
-                    icon: Icons.person_outline_rounded,
+                    iconpath: IconPath.professional,
                     label: 'Edit profile',
                     onTap: () {
                       final String name = controller.fullName.value.isNotEmpty
@@ -59,18 +60,18 @@ class SettingsScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  const SettingsRowData(
-                    icon: Icons.business_center_outlined,
+                  SettingsRowData(
+                    iconpath: IconPath.work,
                     label: 'Work schedule',
                     trailing: 'Soon',
                   ),
                   SettingsRowData(
-                    icon: Icons.lock_outline_rounded,
+                    iconpath: IconPath.privacy,
                     label: 'Change password',
                     onTap: () => Get.to(() => ChangePasswordScreen()),
                   ),
                   SettingsRowData(
-                    icon: Icons.language_rounded,
+                    iconpath: IconPath.language,
                     label: 'Language',
                     trailing: Get.locale?.languageCode == 'fr'
                         ? 'Français'
@@ -84,22 +85,22 @@ class SettingsScreen extends StatelessWidget {
                 accent: true,
                 rows: const [
                   SettingsRowData(
-                    icon: Icons.dark_mode_outlined,
+                    iconpath: IconPath.sleep,
                     label: 'Sleep target',
                     trailing: '7h 45m',
                   ),
                   SettingsRowData(
-                    icon: Icons.psychology_outlined,
+                    iconpath: IconPath.chronotype,
                     label: 'Chronotype',
                     trailing: 'Evening leaning',
                   ),
                   SettingsRowData(
-                    icon: Icons.local_cafe_outlined,
+                    iconpath: IconPath.caffeine,
                     label: 'Caffeine sensitivity',
                     trailing: 'Medium',
                   ),
                   SettingsRowData(
-                    icon: Icons.fitness_center_rounded,
+                    iconpath: IconPath.sport,
                     label: 'Sport profile',
                     trailing: 'Strength + cardio',
                   ),
@@ -111,19 +112,19 @@ class SettingsScreen extends StatelessWidget {
               SettingsGroup(
                 rows: [
                   SettingsRowData(
-                    icon: Icons.workspace_premium_outlined,
+                    iconpath: IconPath.premium,
                     label: 'Subscription',
                     trailing: 'Premium',
                     highlightTrailing: true,
                     onTap: () => Get.to(() => SubscriptionsScreen()),
                   ),
                   SettingsRowData(
-                    icon: Icons.shield_outlined,
+                    iconpath: IconPath.legalData,
                     label: 'Legal & Data',
                     onTap: () => Get.toNamed(AppRoutes.legalAndDataScreen),
                   ),
                   SettingsRowData(
-                    icon: Icons.storage_outlined,
+                    iconpath: IconPath.dataControls,
                     label: 'Data controls',
                     onTap: () => Get.toNamed(AppRoutes.dataControlsScreen),
                   ),

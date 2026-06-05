@@ -22,4 +22,15 @@ class IconPath {
   static const String reminder = 'assets/icons/reminder.png';
   static const String connectedSource = 'assets/icons/connected_sources.png';
   static const String usageAnalytics = 'assets/icons/usage_analytics.png';
+  static const String premium = 'assets/icons/premium_icon.png';
+  static const String sleep = 'assets/icons/sleep.png';
+  static const String chronotype = 'assets/icons/chronotype.png';
+  static const String caffeine = 'assets/icons/caffeine.png';
+  static const String sport = 'assets/icons/sport.png';
+  static const String dataControls = 'assets/icons/data_controls.png';
+  static const String legalData = 'assets/icons/legal_and_data.png';
+  static const String language = 'assets/icons/language.png';
+  static const String watch = 'assets/icons/watch.png';
+  static const String work = 'assets/icons/work.png';
+  static const String rectangle = 'assets/icons/rectangle.png';
 }

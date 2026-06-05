@@ -8,6 +8,7 @@ class SubscriptionsController extends GetxController {
 
   final Rx<List<SubscriptionPlan>> subscriptionPlans = Rx([]);
   final RxString activePlanId = RxString('');
+  final RxString selectedPlanId = RxString('');
   final RxBool isLoading = true.obs;
   final RxBool isCheckingOut = false.obs;
   final RxString errorMessage = ''.obs;
@@ -16,6 +17,22 @@ class SubscriptionsController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeData();
+  }
+
+  void selectPlan(String planId) {
+    selectedPlanId.value = planId;
+  }
+
+  Future<void> subscribeSelectedPlan() async {
+    if (selectedPlanId.value.isEmpty) return;
+    if (selectedPlanId.value == activePlanId.value) return;
+
+    final plan = subscriptionPlans.value.firstWhereOrNull(
+      (p) => p.id == selectedPlanId.value,
+    );
+    if (plan != null) {
+      await handleSubscription(plan);
+    }
   }
 
   Future<void> _initializeData() async {
@@ -37,6 +54,19 @@ class SubscriptionsController extends GetxController {
         // Get the active plan ID from user's current subscription
         if (userResponse.data.subscriptions?.plan != null) {
           activePlanId.value = userResponse.data.subscriptions!.plan!.id;
+        }
+      }
+
+      // Default selection: if user has an active plan, select it;
+      // otherwise select the first premium plan (non-free)
+      if (activePlanId.value.isNotEmpty) {
+        selectedPlanId.value = activePlanId.value;
+      } else if (subscriptionPlans.value.isNotEmpty) {
+        final premiumPlan = subscriptionPlans.value.firstWhereOrNull(
+          (p) => p.price > 0,
+        );
+        if (premiumPlan != null) {
+          selectedPlanId.value = premiumPlan.id;
         }
       }
     } catch (e) {

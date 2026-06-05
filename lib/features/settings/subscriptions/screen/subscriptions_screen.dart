@@ -1,5 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/settings/subscriptions/controller/subscriptions_controller.dart';
 import 'package:chrisimhof/features/settings/subscriptions/widget/subscription_plan_widget.dart';
 import 'package:flutter/material.dart';
@@ -15,89 +17,127 @@ class SubscriptionsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 78,
-            left: 16,
-            right: 16,
-            bottom: 32,
-          ),
-          child: Column(
-            children: [
-              CustomAppBar(title: 'Subscriptions'.tr, showBackButton: true),
-              const SizedBox(height: 24),
-              Obx(() {
-                if (controller.isLoading.value) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryButtonColor,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+            child: Column(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomAppBar(
+                      title: 'Subscription'.tr,
+                      showBackButton: true,
+                    ),
+                    const SizedBox(height: 28),
+                    Text(
+                      'Choose your plan'.tr,
+                      style: getTextStyle2(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTextColor,
                       ),
                     ),
-                  );
-                }
-
-                if (controller.errorMessage.value.isNotEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Text(
-                        controller.errorMessage.value,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Start simple. Premium unlocks deeper rhythm support and history.'
+                          .tr,
+                      style: getTextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textMid,
                       ),
                     ),
-                  );
-                }
+                    const SizedBox(height: 30),
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: CircularProgressIndicator(
+                              color: AppColors.primaryButtonColor,
+                            ),
+                          ),
+                        );
+                      }
 
-                if (controller.subscriptionPlans.value.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Text('No subscription plans available'.tr),
-                    ),
-                  );
-                }
+                      if (controller.errorMessage.value.isNotEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: Text(
+                              controller.errorMessage.value,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        );
+                      }
 
-                return Column(
-                  children: List.generate(
-                    controller.subscriptionPlans.value.length,
-                    (index) {
-                      final plan = controller.subscriptionPlans.value[index];
-                      // Check if this is the active plan
-                      final isActive = plan.id == controller.activePlanId.value;
-                      // Highlight the most popular plan (Monthly)
-                      final isPremium =
-                          plan.name.toLowerCase() == 'weekly' ||
-                          plan.name.toLowerCase() == 'monthly' ||
-                          plan.name.toLowerCase() == 'yearly';
+                      if (controller.subscriptionPlans.value.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: Text('No subscription plans available'.tr),
+                          ),
+                        );
+                      }
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: SubscriptionPlanWidget(
-                          planName: plan.name.tr,
-                          planPrice: plan.formattedPrice,
-                          buttonText: isActive ? 'Current'.tr : 'Subscribe'.tr,
-                          buttonColor: isActive
-                              ? const Color(0xFFE9EAEB)
-                              : Colors.white,
-                          features: plan.features,
-                          onTap: isActive
-                              ? null
-                              : () {
-                                  controller.handleSubscription(plan);
+                      return Column(
+                        children: List.generate(
+                          controller.subscriptionPlans.value.length,
+                          (index) {
+                            final plan =
+                                controller.subscriptionPlans.value[index];
+                            final isSelected =
+                                plan.id == controller.selectedPlanId.value;
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: SubscriptionPlanWidget(
+                                planName: plan.name.tr,
+                                planPrice: plan.formattedPrice,
+                                features: plan.features,
+                                isSelected: isSelected,
+                                description: plan.description,
+
+                                onTap: () {
+                                  controller.selectPlan(plan.id);
                                 },
-                          widgetColor: isPremium
-                              ? AppColors.primaryButtonColor
-                              : Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       );
-                    },
-                  ),
-                );
-              }),
-            ],
+                    }),
+                    Obx(() {
+                      if (controller.isLoading.value ||
+                          controller.subscriptionPlans.value.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+
+                      final isCurrentPlan =
+                          controller.selectedPlanId.value ==
+                          controller.activePlanId.value;
+
+                      return CustomButton(
+                        text: isCurrentPlan ? 'Current Plan' : 'Subscribe',
+                        icon: null,
+                        onTap: isCurrentPlan
+                            ? null
+                            : () {
+                                controller.subscribeSelectedPlan();
+                              },
+                        backgroundColor: isCurrentPlan
+                            ? const Color(0xFFE9EAEB)
+                            : null,
+                        textColor: isCurrentPlan ? AppColors.textMid : null,
+                      );
+                    }),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
