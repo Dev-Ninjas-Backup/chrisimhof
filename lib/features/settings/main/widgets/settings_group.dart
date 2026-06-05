@@ -25,6 +25,7 @@ class SettingsGroup extends StatelessWidget {
             data: rows[index],
             accent: accent,
             showDivider: index < rows.length - 1,
+            iconpath: rows[index].iconpath,
           );
         }),
       ),
@@ -38,11 +39,13 @@ class SettingsRow extends StatelessWidget {
     required this.data,
     required this.accent,
     required this.showDivider,
+    required this.iconpath,
   });
 
   final SettingsRowData data;
   final bool accent;
   final bool showDivider;
+  final String iconpath;
 
   @override
   Widget build(BuildContext context) {
@@ -60,18 +63,18 @@ class SettingsRow extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 28,
-                height: 28,
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: accent ? AppColors.mintSoft : AppColors.subtle,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  data.icon,
+                child: Image.asset(
+                  data.iconpath,
                   color: accent
                       ? AppColors.secondaryButtonColor
                       : AppColors.primaryTextColor,
-                  size: 15,
+                  width: 20,
+                  height: 20,
                 ),
               ),
               const SizedBox(width: 10),
@@ -121,16 +124,16 @@ class SettingsRow extends StatelessWidget {
 
 class SettingsRowData {
   const SettingsRowData({
-    required this.icon,
     required this.label,
     this.trailing,
     this.highlightTrailing = false,
     this.onTap,
+    required this.iconpath,
   });
 
-  final IconData icon;
   final String label;
   final String? trailing;
   final bool highlightTrailing;
   final VoidCallback? onTap;
+  final String iconpath;
 }

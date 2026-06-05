@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -84,23 +85,18 @@ class ProfileCard extends StatelessWidget {
                   const SizedBox(height: 7),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: 12,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryButtonColor.withValues(
-                        alpha: 0.18,
-                      ),
+                      color: AppColors.mint3.withValues(alpha: 0.5),
+                      border: Border.all(color: AppColors.mint3, width: 1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.workspace_premium_outlined,
-                          size: 12,
-                          color: AppColors.mint,
-                        ),
+                        Image.asset(IconPath.premium, width: 14, height: 14),
                         const SizedBox(width: 4),
                         Text(
                           'Premium'.tr,
