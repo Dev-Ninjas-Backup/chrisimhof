@@ -27,6 +27,9 @@ class IconPath {
   static const String chronotype = 'assets/icons/chronotype.png';
   static const String caffeine = 'assets/icons/caffeine.png';
   static const String sport = 'assets/icons/sport.png';
+  static const String caffeine_sensitivity =
+      'assets/icons/caffeine_sensitivity.png';
+  static const String sport_profile = 'assets/icons/sport_profile.png';
   static const String dataControls = 'assets/icons/data_controls.png';
   static const String legalData = 'assets/icons/legal_and_data.png';
   static const String language = 'assets/icons/language.png';
