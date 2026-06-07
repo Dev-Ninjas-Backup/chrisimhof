@@ -198,8 +198,20 @@ class AppTranslations extends Translations {
           'Don’t worry it happens. Please enter the e-mail address.',
       'Full Name': 'Full Name',
       'Enter your full name': 'Enter your full name',
-      'Create Your Account': 'Create Your Account',
       'Do you have an account?': 'Do you have an account?',
+      'Before you continue': 'Before you continue',
+      'Confirm the key limits so recommendations stay in the right context.':
+          'Confirm the key limits so recommendations stay in the right context.',
+      'RYVENZA is a lifestyle and wellbeing app, not a medical service.':
+          'RYVENZA is a lifestyle and wellbeing app, not a medical service.',
+      'I will not use it for emergencies or safety-critical decisions.':
+          'I will not use it for emergencies or safety-critical decisions.',
+      'Professional medical advice and employer safety rules always come':
+          'Professional medical advice and employer safety rules always come',
+      'Recommendations depend on the information I choose to enter.':
+          'Recommendations depend on the information I choose to enter.',
+      'Please confirm all safety limits before continuing.':
+          'Please confirm all safety limits before continuing.',
       'Work Begins': 'Work Begins',
       'Work Complete': 'Work Complete',
       'Days Worked': 'Days Worked',
@@ -568,8 +580,20 @@ class AppTranslations extends Translations {
           'Ne vous inquiétez pas, cela arrive. Veuillez saisir l\'adresse e-mail.',
       'Full Name': 'Nom complet',
       'Enter your full name': 'Entrez votre nom complet',
-      'Create Your Account': 'Créez votre compte',
       'Do you have an account?': 'Avez-vous un compte ?',
+      'Before you continue': 'Avant de continuer',
+      'Confirm the key limits so recommendations stay in the right context.':
+          'Confirmez les limites clés afin que les recommandations restent dans le bon contexte.',
+      'RYVENZA is a lifestyle and wellbeing app, not a medical service.':
+          'RYVENZA est une application de style de vie et de bien-être, pas un service médical.',
+      'I will not use it for emergencies or safety-critical decisions.':
+          'Je ne l\'utiliserai pas pour des urgences ou des décisions critiques pour la sécurité.',
+      'Professional medical advice and employer safety rules always come':
+          'Les conseils médicaux professionnels et les règles de sécurité de l\'employeur passent toujours',
+      'Recommendations depend on the information I choose to enter.':
+          'Les recommandations dépendent des informations que je choisis de saisir.',
+      'Please confirm all safety limits before continuing.':
+          'Veuillez confirmer toutes les limites de sécurité avant de continuer.',
       'Work Begins': 'Début du travail',
       'Work Complete': 'Fin du travail',
       'Days Worked': 'Jours travaillés',

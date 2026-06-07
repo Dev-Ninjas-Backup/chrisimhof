@@ -1,5 +1,6 @@
 import 'package:chrisimhof/features/auth/create_account/screen/create_account_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_email_screen.dart';
+import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
 import 'package:chrisimhof/features/history_details/screen/history_details_screen.dart';
@@ -31,6 +32,7 @@ class AppRoutes {
   static String consentSettingsScreen = '/consentSettingsScreen';
   static String deleteAccountScreen = '/deleteAccountScreen';
   static String dataControlsScreen = '/dataControlsScreen';
+  static String safetyScreen = '/safetyScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -47,6 +49,7 @@ class AppRoutes {
   static String getConsentSettingsScreen() => consentSettingsScreen;
   static String getDeleteAccountScreen() => deleteAccountScreen;
   static String getDataControlsScreen() => dataControlsScreen;
+  static String getSafetyScreen() => safetyScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -73,5 +76,6 @@ class AppRoutes {
     GetPage(name: consentSettingsScreen, page: () => ConsentSettingsScreen()),
     GetPage(name: deleteAccountScreen, page: () => DeleteAccountScreen()),
     GetPage(name: dataControlsScreen, page: () => const DataControlsScreen()),
+    GetPage(name: safetyScreen, page: () => const SafetyScreen()),
   ];
 }

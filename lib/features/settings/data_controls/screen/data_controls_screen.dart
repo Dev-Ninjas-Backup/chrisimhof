@@ -1,5 +1,4 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
-import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
@@ -82,8 +81,6 @@ class DataControlsScreen extends StatelessWidget {
                     Get.toNamed('/deleteAccountScreen');
                   },
                 ),
-                const SizedBox(height: 30),
-                CustomButton(text: 'Continue', onTap: () {}, icon: null),
               ],
             ),
           ),
