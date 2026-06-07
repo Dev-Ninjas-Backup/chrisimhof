@@ -132,7 +132,7 @@ class CreateAccountController extends GetxController {
         //     purpose: 'register',
         //   ),
         // );
-        Get.offNamed(AppRoutes.signInScreen);
+        Get.offNamed(AppRoutes.safetyScreen);
       } else {
         EasyLoading.dismiss();
         EasyLoading.showError(response.message);

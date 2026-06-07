@@ -198,8 +198,49 @@ class AppTranslations extends Translations {
           'Don’t worry it happens. Please enter the e-mail address.',
       'Full Name': 'Full Name',
       'Enter your full name': 'Enter your full name',
-      'Create Your Account': 'Create Your Account',
       'Do you have an account?': 'Do you have an account?',
+      'Before you continue': 'Before you continue',
+      'Confirm the key limits so recommendations stay in the right context.':
+          'Confirm the key limits so recommendations stay in the right context.',
+      'RYVENZA is a lifestyle and wellbeing app, not a medical service.':
+          'RYVENZA is a lifestyle and wellbeing app, not a medical service.',
+      'I will not use it for emergencies or safety-critical decisions.':
+          'I will not use it for emergencies or safety-critical decisions.',
+      'Professional medical advice and employer safety rules always come':
+          'Professional medical advice and employer safety rules always come',
+      'Recommendations depend on the information I choose to enter.':
+          'Recommendations depend on the information I choose to enter.',
+      'Please confirm all safety limits before continuing.':
+          'Please confirm all safety limits before continuing.',
+      'Setup': 'Setup',
+      'Build your baseline': 'Build your baseline',
+      'Stable profile inputs only. Water is calculated automatically, and work rhythm stays editable day by day.':
+          'Stable profile inputs only. Water is calculated automatically, and work rhythm stays editable day by day.',
+      'Sleep target': 'Sleep target',
+      '7h 45m': '7h 45m',
+      'Chronotype': 'Chronotype',
+      'Evening leaning': 'Evening leaning',
+      'Caffeine sensitivity': 'Caffeine sensitivity',
+      'Moderate': 'Moderate',
+      'Sport profile': 'Sport profile',
+      '3x per week': '3x per week',
+      'Auto: hydration goal adapts from activity sleep debt and the current day. Work schedule is edited from its own page whenever shifts change.':
+          'Auto: hydration goal adapts from activity sleep debt and the current day. Work schedule is edited from its own page whenever shifts change.',
+      'Continue setup': 'Continue setup',
+      'Connected sources': 'Connected sources',
+      'Connect your rhythm': 'Connect your rhythm',
+      'RYVENZA works with manual inputs first. Optional sources can reduce friction later.':
+          'RYVENZA works with manual inputs first. Optional sources can reduce friction later.',
+      'Manual logging': 'Manual logging',
+      'Always available': 'Always available',
+      'Work schedule': 'Work schedule',
+      'Editable day by day': 'Editable day by day',
+      'Apple Health': 'Apple Health',
+      'Google Health Connect': 'Google Health Connect',
+      'Coming later': 'Coming later',
+      'Enabled': 'Enabled',
+      'Not linked': 'Not linked',
+      'Save sources': 'Save sources',
       'Work Begins': 'Work Begins',
       'Work Complete': 'Work Complete',
       'Days Worked': 'Days Worked',
@@ -568,8 +609,48 @@ class AppTranslations extends Translations {
           'Ne vous inquiétez pas, cela arrive. Veuillez saisir l\'adresse e-mail.',
       'Full Name': 'Nom complet',
       'Enter your full name': 'Entrez votre nom complet',
-      'Create Your Account': 'Créez votre compte',
       'Do you have an account?': 'Avez-vous un compte ?',
+      'Before you continue': 'Avant de continuer',
+      'Confirm the key limits so recommendations stay in the right context.':
+          'Confirmez les limites clés afin que les recommandations restent dans le bon contexte.',
+      'RYVENZA is a lifestyle and wellbeing app, not a medical service.':
+          'RYVENZA est une application de style de vie et de bien-être, pas un service médical.',
+      'I will not use it for emergencies or safety-critical decisions.':
+          'Je ne l\'utiliserai pas pour des urgences ou des décisions critiques pour la sécurité.',
+      'Professional medical advice and employer safety rules always come':
+          'Les conseils médicaux professionnels et les règles de sécurité de l\'employeur passent toujours',
+      'Recommendations depend on the information I choose to enter.':
+          'Les recommandations dépendent des informations que je choisis de saisir.',
+      'Please confirm all safety limits before continuing.':
+          'Veuillez confirmer toutes les limites de sécurité avant de continuer.',
+      'Setup': 'Configuration',
+      'Build your baseline': 'Construisez votre base',
+      'Stable profile inputs only. Water is calculated automatically, and work rhythm stays editable day by day.':
+          'Entrées de profil stables uniquement. L\'eau est calculée automatiquement et le rythme de travail reste modifiable jour après jour.',
+      'Sleep target': 'Objectif de sommeil',
+      '7h 45m': '7h 45m',
+      'Chronotype': 'Chronotype',
+      'Evening leaning': 'Profil du soir',
+      'Caffeine sensitivity': 'Sensibilité à la caféine',
+      'Moderate': 'Modérée',
+      'Sport profile': 'Profil sportif',
+      '3x per week': '3 fois par semaine',
+      'Auto: hydration goal adapts from activity sleep debt and the current day. Work schedule is edited from its own page whenever shifts change.':
+          'Auto : l\'objectif d\'hydratation s\'adapte à la dette de sommeil de l\'activité et au jour en cours. Le planning de travail se modifie depuis sa propre page à chaque changement de poste.',
+      'Continue setup': 'Continuer la configuration',
+      'Connect your rhythm': 'Connectez votre rythme',
+      'RYVENZA works with manual inputs first. Optional sources can reduce friction later.':
+          'RYVENZA fonctionne d\'abord avec des entrées manuelles. Des sources facultatives peuvent réduire la friction plus tard.',
+      'Manual logging': 'Saisie manuelle',
+      'Always available': 'Toujours disponible',
+      'Work schedule': 'Planning de travail',
+      'Editable day by day': 'Modifiable jour après jour',
+      'Apple Health': 'Apple Health',
+      'Google Health Connect': 'Google Health Connect',
+      'Coming later': 'Bientôt disponible',
+      'Enabled': 'Activé',
+      'Not linked': 'Non lié',
+      'Save sources': 'Enregistrer les sources',
       'Work Begins': 'Début du travail',
       'Work Complete': 'Fin du travail',
       'Days Worked': 'Jours travaillés',
