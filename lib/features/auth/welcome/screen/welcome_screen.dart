@@ -90,7 +90,7 @@ class WelcomeScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     CustomButton(
                       text: 'Log in'.tr,
-                      onTap: () => Get.toNamed(AppRoutes.safetyScreen),
+                      onTap: () => Get.toNamed(AppRoutes.signInScreen),
                       borderWidth: 1,
                       backgroundColor: Colors.white,
                       icon: null,

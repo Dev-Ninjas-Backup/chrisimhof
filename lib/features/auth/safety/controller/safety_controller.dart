@@ -1,5 +1,4 @@
-import 'package:chrisimhof/features/auth/create_account/controller/create_account_controller.dart';
-import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_screen.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
@@ -28,14 +27,6 @@ class SafetyController extends GetxController {
       return;
     }
 
-    String email = "";
-    if (Get.isRegistered<CreateAccountController>()) {
-      email = Get.find<CreateAccountController>().emailController.text.trim();
-    }
-
-    Get.to(() => VerifyCodeScreen(
-          email: email,
-          purpose: 'register',
-        ));
+    Get.toNamed(AppRoutes.baselineSetupScreen);
   }
 }
