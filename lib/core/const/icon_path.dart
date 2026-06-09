@@ -36,4 +36,5 @@ class IconPath {
   static const String watch = 'assets/icons/watch.png';
   static const String work = 'assets/icons/work.png';
   static const String rectangle = 'assets/icons/rectangle.png';
+  static const String dashboardAppLogo = 'assets/icons/dashboard_app_logo.png';
 }

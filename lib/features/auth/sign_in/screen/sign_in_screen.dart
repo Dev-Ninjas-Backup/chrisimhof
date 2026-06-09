@@ -1,9 +1,9 @@
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/auth/sign_in/controller/sign_in_controller.dart';
 import 'package:chrisimhof/features/auth/widgets/custom_text_field.dart';
-import 'package:chrisimhof/features/auth/widgets/custom_top_bar.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,6 @@ class SignInScreen extends StatelessWidget {
   final SignInController controller = Get.put(SignInController());
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final String title = 'Log in';
-  final bool showBackButton = true;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +25,11 @@ class SignInScreen extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
           child: Column(
             children: [
-              CustomTopBar(title: title, showBackButton: showBackButton),
+              CustomAppBar(
+                title: title,
+                showBackButton: true,
+                showSettingsButton: true,
+              ),
               const SizedBox(height: 45),
               Text(
                 "Welcome Back".tr,
