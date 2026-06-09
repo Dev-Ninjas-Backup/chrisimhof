@@ -15,10 +15,12 @@ class CustomTextField extends StatelessWidget {
     this.textInputAction,
     this.keyboardType,
     this.prefixIcon,
+    this.isRequired = false,
     this.suffixIcon,
   });
 
   final String label;
+  final bool? isRequired;
   final String? hintText;
   final TextEditingController? controller;
   final String? Function(String?)? validator;

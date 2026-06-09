@@ -1,8 +1,8 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/auth/forget_password/controller/forget_password_controller.dart';
+import 'package:chrisimhof/features/auth/widgets/custom_text_field.dart';
 import 'package:chrisimhof/features/auth/widgets/custom_top_bar.dart';
 import 'package:chrisimhof/features/auth/forget_password/widgets/password_validation_row.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +50,7 @@ class ForgetPasswordScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 Obx(
-                  () => CustomTextFormField(
+                  () => CustomTextField(
                     label: 'New Password'.tr,
                     isRequired: true,
                     hintText: 'Enter your new password'.tr,
@@ -71,7 +71,7 @@ class ForgetPasswordScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 24),
                 Obx(
-                  () => CustomTextFormField(
+                  () => CustomTextField(
                     label: 'Confirm Password'.tr,
                     isRequired: true,
                     hintText: 'Enter your confirm password'.tr,
@@ -92,34 +92,32 @@ class ForgetPasswordScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-                Obx(
-                  () {
-                    final password = controller.password.value;
-                    final hasMinLength = password.length >= 8;
-                    final hasNumber = RegExp(r'\d').hasMatch(password);
-                    final hasUppercase = RegExp(r'[A-Z]').hasMatch(password);
+                Obx(() {
+                  final password = controller.password.value;
+                  final hasMinLength = password.length >= 8;
+                  final hasNumber = RegExp(r'\d').hasMatch(password);
+                  final hasUppercase = RegExp(r'[A-Z]').hasMatch(password);
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PasswordValidationRow(
-                          text: '8+ characters',
-                          isMet: hasMinLength,
-                        ),
-                        SizedBox(height: 6),
-                        PasswordValidationRow(
-                          text: 'One number',
-                          isMet: hasNumber,
-                        ),
-                        SizedBox(height: 6),
-                        PasswordValidationRow(
-                          text: 'One uppercase letter',
-                          isMet: hasUppercase,
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PasswordValidationRow(
+                        text: '8+ characters',
+                        isMet: hasMinLength,
+                      ),
+                      SizedBox(height: 6),
+                      PasswordValidationRow(
+                        text: 'One number',
+                        isMet: hasNumber,
+                      ),
+                      SizedBox(height: 6),
+                      PasswordValidationRow(
+                        text: 'One uppercase letter',
+                        isMet: hasUppercase,
+                      ),
+                    ],
+                  );
+                }),
                 SizedBox(height: 30),
                 Obx(
                   () => CustomButton(
