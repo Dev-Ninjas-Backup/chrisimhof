@@ -37,4 +37,7 @@ class IconPath {
   static const String work = 'assets/icons/work.png';
   static const String rectangle = 'assets/icons/rectangle.png';
   static const String dashboardAppLogo = 'assets/icons/dashboard_app_logo.png';
+  static const String hydration = 'assets/icons/hydration.png';
+  static const String nutrition = 'assets/icons/nutrition.png';
+  static const String fatigue = 'assets/icons/fatigue.png';
 }
