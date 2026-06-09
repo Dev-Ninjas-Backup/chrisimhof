@@ -1,6 +1,5 @@
 import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/success_screen.dart';
-import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/service/verify_otp_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +14,21 @@ class ForgetPasswordController extends GetxController {
   final isNewPasswordHidden = true.obs;
   final isConfirmPasswordHidden = true.obs;
   final isLoading = false.obs;
+  final password = ''.obs;
 
   final VerifyOtpService _verifyOtpService = VerifyOtpService();
 
   String? _email;
   String? _purpose;
+  String? userId;
+
+  @override
+  void onInit() {
+    super.onInit();
+    newPasswordController.addListener(() {
+      password.value = newPasswordController.text;
+    });
+  }
 
   void toggleNewPasswordVisibility() {
     isNewPasswordHidden.value = !isNewPasswordHidden.value;
@@ -50,10 +59,20 @@ class ForgetPasswordController extends GetxController {
     isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      Get.to(VerifyCodeScreen());
+      await _verifyOtpService.sendOtp(
+        email: emailController.text.trim(),
+      );
+
+      Get.toNamed(
+        AppRoutes.verifyCodeScreen,
+        arguments: {
+          'email': emailController.text.trim(),
+          'purpose': 'reset_pass',
+        },
+      );
       EasyLoading.showSuccess('Code sent successfully'.tr);
     } catch (e) {
+      print('Error sending OTP: $e');
       EasyLoading.showError('${'Failed to send code'.tr}: ${e.toString()}');
     } finally {
       isLoading.value = false;
@@ -115,9 +134,10 @@ class ForgetPasswordController extends GetxController {
           Future.delayed(const Duration(milliseconds: 500), () {
             Get.offAllNamed(AppRoutes.signInScreen);
           });
-        } else if (_purpose == 'forget_password') {
+        } else if (_purpose == 'reset_pass') {
           // Navigate to reset password screen
-          Get.off(ForgetPasswordScreen());
+          userId = response.data?.user?.id;
+          Get.off(ForgetPasswordScreen(), arguments: {'userId': userId});
         }
       } else {
         EasyLoading.dismiss();
@@ -135,8 +155,15 @@ class ForgetPasswordController extends GetxController {
     if (value == null || value.trim().isEmpty) {
       return 'New password is required'.tr;
     }
-    if (value.trim().length < 6) {
-      return 'New password must be at least 6 characters'.tr;
+    final val = value.trim();
+    if (val.length < 8) {
+      return 'Password must be at least 8 characters'.tr;
+    }
+    if (!RegExp(r'\d').hasMatch(val)) {
+      return 'Password must contain at least one number'.tr;
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(val)) {
+      return 'Password must contain at least one uppercase letter'.tr;
     }
     return null;
   }
@@ -154,19 +181,47 @@ class ForgetPasswordController extends GetxController {
   Future<void> savePassword() async {
     if (!formKey.currentState!.validate()) return;
 
+    if (userId == null || userId!.isEmpty) {
+      EasyLoading.showError('User identification not found. Please try verifying OTP again.'.tr);
+      return;
+    }
+
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      Get.to(SuccessScreen());
-      EasyLoading.showSuccess('Update password successfully'.tr);
+      isLoading.value = true;
+      EasyLoading.show(status: 'Updating password...'.tr);
+
+      final success = await _verifyOtpService.resetPassword(
+        userId: userId!,
+        newPassword: newPasswordController.text.trim(),
+      );
+
+      if (success) {
+        EasyLoading.dismiss();
+        EasyLoading.showSuccess('Update password successfully'.tr);
+        // Clear password fields
+        newPasswordController.clear();
+        confirmPasswordController.clear();
+        password.value = '';
+        
+        Get.to(SuccessScreen());
+      } else {
+        EasyLoading.dismiss();
+        EasyLoading.showError('Failed to update password'.tr);
+      }
     } catch (e) {
+      EasyLoading.dismiss();
       EasyLoading.showError('${'Update password failed'.tr}: ${e.toString()}');
-    } finally {}
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
   void onClose() {
     emailController.dispose();
     otpController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
     super.onClose();
   }
 }

@@ -1,3 +1,52 @@
+class ForgotPasswordResponse {
+  final bool success;
+  final String message;
+  final ForgotPasswordData data;
+
+  ForgotPasswordResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory ForgotPasswordResponse.fromJson(Map<String, dynamic> json) {
+    return ForgotPasswordResponse(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      data: ForgotPasswordData.fromJson(
+        json['data'] ?? {},
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+      'data': data.toJson(),
+    };
+  }
+}
+
+class ForgotPasswordData {
+  final String message;
+
+  ForgotPasswordData({
+    required this.message,
+  });
+
+  factory ForgotPasswordData.fromJson(Map<String, dynamic> json) {
+    return ForgotPasswordData(
+      message: json['message'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+    };
+  }
+}
 class VerifyOtpResponseModel {
   final bool success;
   final String message;

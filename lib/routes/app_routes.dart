@@ -2,6 +2,7 @@ import 'package:chrisimhof/features/auth/baseline_setup/screen/baseline_setup_sc
 import 'package:chrisimhof/features/auth/connected_sources/screen/connected_sources_screen.dart';
 import 'package:chrisimhof/features/auth/create_account/screen/create_account_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_email_screen.dart';
+import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_screen.dart';
 import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
@@ -24,6 +25,7 @@ class AppRoutes {
   static String signInScreen = '/signInScreen';
   static String createAccountScreen = '/createAccountScreen';
   static String changePasswordScreen = '/changePasswordScreen';
+  static String verifyCodeScreen = '/verifyCodeScreen';
   static String forgetPasswordEmailScreen = '/forgetPasswordEmailScreen';
   static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
   static String historyDetailsScreen = '/historyDetailsScreen';
@@ -56,6 +58,7 @@ class AppRoutes {
   static String getSafetyScreen() => safetyScreen;
   static String getBaselineSetupScreen() => baselineSetupScreen;
   static String getConnectedSourcesScreen() => connectedSourcesScreen;
+  static String getVerifyCodeScreen() => verifyCodeScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -85,5 +88,6 @@ class AppRoutes {
     GetPage(name: safetyScreen, page: () => const SafetyScreen()),
     GetPage(name: baselineSetupScreen, page: () => const BaselineSetupScreen()),
     GetPage(name: connectedSourcesScreen, page: () => const ConnectedSourcesScreen()),
+    GetPage(name: verifyCodeScreen, page: () => const VerifyCodeScreen()),
   ];
 }
