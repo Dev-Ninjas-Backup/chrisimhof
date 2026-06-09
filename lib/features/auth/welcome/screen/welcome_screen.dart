@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/common/widgets/circadian_avatar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -27,39 +28,62 @@ class WelcomeScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 64, left: 16, bottom: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          Image.asset(
-                            IconPath.welcomeLogo,
-                            width: 87,
-                            height: 34,
-                          ),
-                          Text(
-                            'RYVENZA'.tr,
-                            style: getTextStyle2(
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                child: Stack(
+                  children: [
+                    Center(
+                      child: CircadianAvatar(
+                        imagePath: ImagePath.circadianAvatar,
+                        avatarSize: 280,
+                        imageShiftFactor: 0.42,
                       ),
-                      Text(
-                        'Your rhythm, rebuilt around real life.',
-                        style: getTextStyle2(
-                          color: Colors.white,
-                          fontSize: 36,
-                          fontWeight: FontWeight.w600,
+                    ),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: 64,
+                          left: 16,
+                          bottom: 16,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                Image.asset(
+                                  IconPath.welcomeLogo,
+                                  width: 87,
+                                  height: 34,
+                                ),
+                                Text(
+                                  'RYVENZA'.tr,
+                                  style: getTextStyle2(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 280),
+                            SizedBox(
+                              width: context.width * 0.9,
+                              child: Text(
+                                'Your rhythm, rebuilt around real life.',
+                                style: getTextStyle2(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               Container(
