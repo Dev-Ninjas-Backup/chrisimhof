@@ -58,4 +58,6 @@ class Urls {
       '$baseUrl/api/v1/calculator/session/$sessionId/update';
   static const String optimalBedtime =
       '$baseUrl/api/v1/calculator/optimal-bedtime';
+  static const String forgotPassword = '$baseUrl/api/v1/auth/forgot-password';
+  static const String resetPassword = '$baseUrl/api/v1/auth/reset-password';
 }

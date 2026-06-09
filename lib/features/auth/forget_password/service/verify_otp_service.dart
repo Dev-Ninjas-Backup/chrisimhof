@@ -4,6 +4,33 @@ import 'package:chrisimhof/features/auth/forget_password/model/verify_otp_respon
 import 'package:http/http.dart' as http;
 
 class VerifyOtpService {
+  Future<ForgotPasswordResponse> sendOtp({required String email}) async {
+    final uri = Uri.parse(Urls.forgotPassword);
+
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ForgotPasswordResponse.fromJson(jsonData);
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to send OTP');
+      }
+    } catch (e) {
+      throw Exception('Error sending OTP: $e');
+    }
+  }
+
   Future<VerifyOtpResponseModel> verifyOtp({
     required String email,
     required String otp,
@@ -32,6 +59,39 @@ class VerifyOtpService {
       }
     } catch (e) {
       throw Exception('Error verifying OTP: $e');
+    }
+  }
+
+  Future<bool> resetPassword({
+    required String userId,
+    required String newPassword,
+  }) async {
+    final uri = Uri.parse(Urls.resetPassword);
+
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({
+              'userId': userId,
+              'newPassword': newPassword,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonData['success'] ?? false;
+      } else {
+        throw Exception(jsonData['message'] ?? 'Failed to reset password');
+      }
+    } catch (e) {
+      throw Exception('Error resetting password: $e');
     }
   }
 }

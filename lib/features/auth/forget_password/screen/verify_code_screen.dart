@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -7,16 +8,16 @@ import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
 class VerifyCodeScreen extends StatelessWidget {
-  final String? email;
-  final String? purpose; // "register" or "forget_password"
-
-  const VerifyCodeScreen({super.key, this.email, this.purpose = 'register'});
+  const VerifyCodeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ForgetPasswordController());
-    // Store email and purpose in controller for verification
-    controller.setEmailAndPurpose(email, purpose);
+    final controller = Get.find<ForgetPasswordController>();
+    final args = Get.arguments as Map<String, dynamic>?;
+
+    if (args != null) {
+      controller.setEmailAndPurpose(args['email'], args['purpose']);
+    }
 
     final defaultPinTheme = PinTheme(
       width: 64,
@@ -43,54 +44,61 @@ class VerifyCodeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 176, left: 16, right: 16),
-        child: Column(
-          children: [
-            Text(
-              'Enter The Code',
-              style: getTextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryTextColor,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+        child: SafeArea(
+          child: Column(
+            children: [
+              CustomAppBar(title: 'Verify OTP', showBackButton: true),
+
+              const SizedBox(height: 28),
+
+              Text(
+                'Enter The Code',
+                style: getTextStyle2(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTextColor,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Check your e-mail and enter the code bellow.',
-              style: getTextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: AppColors.secondaryTextColor,
+
+              const SizedBox(height: 12),
+
+              Text(
+                'Check your e-mail and enter the code below.',
+                style: getTextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.secondaryTextColor,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 48),
-            Pinput(
-              length: 6,
-              controller: controller.otpController,
-              defaultPinTheme: defaultPinTheme,
-              focusedPinTheme: focusedPinTheme,
-              submittedPinTheme: submittedPinTheme,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              showCursor: true,
-              onCompleted: (pin) {
-                debugPrint('OTP completed: $pin');
-              },
-              onChanged: (value) {
-                debugPrint('OTP changed: $value');
-              },
-            ),
-            const SizedBox(height: 60),
-            Obx(
-              () => CustomButton(
-                text: 'Verify'.tr,
-                onTap: controller.isLoading.value
-                    ? null
-                    : controller.verifyCode,
+
+              const SizedBox(height: 48),
+
+              Pinput(
+                length: 6,
+                controller: controller.otpController,
+                defaultPinTheme: defaultPinTheme,
+                focusedPinTheme: focusedPinTheme,
+                submittedPinTheme: submittedPinTheme,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                showCursor: true,
               ),
-            ),
-          ],
+
+              const SizedBox(height: 60),
+
+              Obx(
+                () => CustomButton(
+                  text: 'Verify'.tr,
+                  onTap: controller.isLoading.value
+                      ? null
+                      : controller.verifyCode,
+                  icon: null,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
