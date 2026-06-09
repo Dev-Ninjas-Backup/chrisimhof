@@ -1,14 +1,12 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
-import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+class StatisticsScreen extends StatelessWidget {
+  const StatisticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 50.0),
         child: SafeArea(
@@ -16,10 +14,11 @@ class DashboardScreen extends StatelessWidget {
             children: [
               CustomAppBar(
                 showBackButton: false,
-                showSettingsButton: true,
-                showLogo: true,
+                showSettingsButton: false,
+                showLogo: false,
+                title: 'Statistics',
+                showMoreButton: true,
               ),
-              // Replace with actual dashboard content
             ],
           ),
         ),

@@ -1,9 +1,9 @@
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/auth/forget_password/controller/forget_password_controller.dart';
-import 'package:chrisimhof/features/auth/widgets/custom_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,7 +26,11 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomTopBar(title: 'Reset password'.tr),
+                  CustomAppBar(
+                    title: 'Reset password'.tr,
+                    showBackButton: true,
+                    showSettingsButton: true,
+                  ),
                   const SizedBox(height: 78),
                   Container(
                     width: 75,

@@ -6,8 +6,8 @@ import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_scre
 import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
-import 'package:chrisimhof/features/history_details/screen/history_details_screen.dart';
 import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
+import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/data_controls/screen/data_controls_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/consent_settings/screen/consent_settings_screen.dart';
@@ -28,7 +28,7 @@ class AppRoutes {
   static String verifyCodeScreen = '/verifyCodeScreen';
   static String forgetPasswordEmailScreen = '/forgetPasswordEmailScreen';
   static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
-  static String historyDetailsScreen = '/historyDetailsScreen';
+  static String recomendationsScreen = '/recomendationsScreen';
   static String legalAndDataScreen = '/legalAndDataScreen';
   static String privacyPolicyScreen = '/privacyPolicyScreen';
   static String termsOfUseScreen = '/termsOfUseScreen';
@@ -47,7 +47,7 @@ class AppRoutes {
   static String getChangePasswordScreen() => changePasswordScreen;
   static String getForgetPasswordEmailScreen() => forgetPasswordEmailScreen;
   static String getMedicalDisclaimerScreen() => medicalDisclaimerScreen;
-  static String getHistoryDetailsScreen() => historyDetailsScreen;
+  static String getRecomendationsScreen() => recomendationsScreen;
   static String getLegalAndDataScreen() => legalAndDataScreen;
   static String getPrivacyPolicyScreen() => privacyPolicyScreen;
   static String getTermsOfUseScreen() => termsOfUseScreen;
@@ -74,7 +74,7 @@ class AppRoutes {
       name: medicalDisclaimerScreen,
       page: () => MedicalDisclaimerScreen(),
     ),
-    GetPage(name: historyDetailsScreen, page: () => HistoryDetailsScreen()),
+    GetPage(name: recomendationsScreen, page: () => RecomendationsScreen()),
     GetPage(name: legalAndDataScreen, page: () => LegalAndDataScreen()),
     GetPage(name: privacyPolicyScreen, page: () => const PrivacyPolicyScreen()),
     GetPage(name: termsOfUseScreen, page: () => const TermsOfUseScreen()),

@@ -1,9 +1,9 @@
+import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/auth/forget_password/controller/forget_password_controller.dart';
 import 'package:chrisimhof/features/auth/widgets/custom_text_field.dart';
-import 'package:chrisimhof/features/auth/widgets/custom_top_bar.dart';
 import 'package:chrisimhof/features/auth/forget_password/widgets/password_validation_row.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,7 +28,11 @@ class ForgetPasswordScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomTopBar(title: 'New Password'.tr, showBackButton: true),
+                CustomAppBar(
+                  title: 'New Password'.tr,
+                  showBackButton: true,
+                  showSettingsButton: true,
+                ),
                 SizedBox(height: 66),
                 Text(
                   'Choose a new password'.tr,
