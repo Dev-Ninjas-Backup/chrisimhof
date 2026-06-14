@@ -40,4 +40,7 @@ class IconPath {
   static const String hydration = 'assets/icons/hydration.png';
   static const String nutrition = 'assets/icons/nutrition.png';
   static const String fatigue = 'assets/icons/fatigue.png';
+  static const String lightMeal = 'assets/icons/light_meal.png';
+  static const String mediumMeal = 'assets/icons/medium_meal.png';
+  static const String heavyMeal = 'assets/icons/heavy_meal.png';
 }
