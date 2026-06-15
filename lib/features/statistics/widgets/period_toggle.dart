@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/statistics/controller/statistics_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class PeriodToggle extends StatelessWidget {
   const PeriodToggle({
@@ -14,7 +15,8 @@ class PeriodToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> periods = ['7d', '30d', '90d', '1y'];
-    return Container(
+    return Obx(() {
+      return Container(
       height: 44,
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
@@ -60,5 +62,6 @@ class PeriodToggle extends StatelessWidget {
         }).toList(),
       ),
     );
+    });
   }
 }
