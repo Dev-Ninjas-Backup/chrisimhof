@@ -88,6 +88,7 @@ class AppColors {
   static const Color yellowAccent = Colors.yellowAccent;
   static const Color grey = Colors.grey;
   static const Color greyShade200 = Color(0xFFEEEEEE);
+  static const Color lavenderSoft = Color(0xFFF5F3FF);
 
   static const Color gray100 = Color(0xFFF3F4F6);
   static const Color violet = Color(0xFF8B5CF6);
