@@ -35,7 +35,8 @@ class RhythmScoreCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(9999.0),
               ),
             ),
-            Positioned(
+          ),
+          Positioned(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -55,9 +56,8 @@ class RhythmScoreCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                   const SizedBox(height: 28.0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
