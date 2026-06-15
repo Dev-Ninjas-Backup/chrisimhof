@@ -35,24 +35,24 @@ class RhythmScoreCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(9999.0),
               ),
             ),
-          ),
-          Positioned(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      GlobalRhythmCircle(score: controller.globalScore.value),
-                      const SizedBox(width: 20.0),
-                      Expanded(
-                        child: Text(
-                          'GLOBAL RHYTHM\nSCORE'.tr,
-                          style: getTextStyle2(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryButtonColor,
+            Positioned(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        GlobalRhythmCircle(score: controller.globalScore.value),
+                        const SizedBox(width: 20.0),
+                        Expanded(
+                          child: Text(
+                            'GLOBAL RHYTHM SCORE'.tr,
+                            style: getTextStyle2(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryButtonColor,
+                            ),
                           ),
                         ),
                       ),
