@@ -31,7 +31,7 @@ class ProfileCard extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.authDark, Color(0xFF1B3D32)],
+            colors: [AppColors.authDark, AppColors.darkGreenAlt],
           ),
           borderRadius: BorderRadius.circular(20),
         ),
@@ -66,7 +66,7 @@ class ProfileCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: getTextStyle2(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -77,7 +77,7 @@ class ProfileCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: getTextStyle(
-                      color: const Color(0xFFB9C9C3),
+                      color: AppColors.sage,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -142,7 +142,7 @@ class _Initials extends StatelessWidget {
       child: Text(
         initials,
         style: getTextStyle2(
-          color: const Color(0xFF0A1410),
+          color: AppColors.darkGreen,
           fontSize: 18,
           fontWeight: FontWeight.w700,
         ),

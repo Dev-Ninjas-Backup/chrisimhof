@@ -22,9 +22,9 @@ class SafetyCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+          border: Border.all(color: AppColors.slate200, width: 1),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -33,7 +33,7 @@ class SafetyCard extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isChecked ? AppColors.primaryButtonColor : Colors.white,
+                color: isChecked ? AppColors.primaryButtonColor : AppColors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: AppColors.primaryButtonColor,
@@ -42,7 +42,7 @@ class SafetyCard extends StatelessWidget {
               ),
               child: isChecked
                   ? const Center(
-                      child: Icon(Icons.check, color: Colors.white, size: 16),
+                      child: Icon(Icons.check, color: AppColors.white, size: 16),
                     )
                   : null,
             ),

@@ -1,75 +1,23 @@
-import 'dart:async';
 import 'dart:math' as math;
+import 'package:chrisimhof/core/common/controller/circadian_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:get/get.dart';
-
-import '../../const/icon_path.dart';
-
-// ─────────────────────────────────────────────
-// Controller
-// ─────────────────────────────────────────────
-
-class CircadianController extends GetxController {
-  final DateTime? customTime;
-
-  CircadianController({this.customTime});
-
-  final Rx<DateTime> currentTime = DateTime.now().obs;
-  Timer? _timer;
-
-  @override
-  void onInit() {
-    super.onInit();
-    currentTime.value = customTime ?? DateTime.now();
-    if (customTime == null) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        currentTime.value = DateTime.now();
-      });
-    }
-  }
-
-  @override
-  void onClose() {
-    _timer?.cancel();
-    super.onClose();
-  }
-
-  double get _hours =>
-      currentTime.value.hour +
-      (currentTime.value.minute / 60.0) +
-      (currentTime.value.second / 3600.0);
-
-  double get sunAngle => (math.pi / 2) + (_hours / 24.0) * 2 * math.pi;
-
-  double get moonAngle => sunAngle + math.pi;
-}
-
-// ─────────────────────────────────────────────
-// Widget
-// ─────────────────────────────────────────────
 
 class CircadianAvatar extends StatelessWidget {
   final String imagePath;
   final double avatarSize;
   final DateTime? customTime;
   final String tag;
-
-  /// Ring radius in actual pixels (not a fraction).
-  /// Tune this directly: try 70–110 for avatarSize=350.
-  final double orbitRadius;
-
-  /// Vertical center of ring from top of widget, in pixels.
-  /// Tune this directly: try 60–110 for avatarSize=350.
-  final double orbitCenterY;
+  final double imageShiftFactor; // 0.0 = centered, 0.22 = shifted down by 22%
 
   const CircadianAvatar({
     super.key,
     required this.imagePath,
-    this.avatarSize = 350,
+    this.avatarSize = 250,
     this.customTime,
     this.tag = 'default',
-    this.orbitRadius = 90,
-    this.orbitCenterY = 85,
+    this.imageShiftFactor = 0.22,
   });
 
   @override
@@ -80,50 +28,67 @@ class CircadianAvatar extends StatelessWidget {
       permanent: false,
     );
 
-    final double r = orbitRadius;
+    // Update time if customTime changes on rebuild
+    if (customTime != null) {
+      controller.currentTime.value = customTime!;
+    }
+
+    final double r = avatarSize / 2;
+    final double imageShift = avatarSize * imageShiftFactor;
 
     return SizedBox(
       width: avatarSize,
-      height: avatarSize,
+      height: avatarSize + imageShift,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // ── PNG image: no clip, full image visible ───
-          Positioned.fill(
-            child: Image.asset(
-              imagePath,
-              width: avatarSize,
-              height: avatarSize,
-              fit: BoxFit.contain,
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: ClipOval(
+              child: SizedBox(
+                width: avatarSize,
+                height: avatarSize,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: imageShift,
+                      left: 0,
+                      right: 0,
+                      child: Image.asset(
+                        imagePath,
+                        width: avatarSize,
+                        height: avatarSize,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-
-          // ── Orbit ring + orbs ───────────────────────
           Positioned(
-            top: orbitCenterY - r,
-            left: (avatarSize / 2) - r,
+            top: 0,
+            left: 0,
             child: SizedBox(
-              width: r * 2,
-              height: r * 2,
+              width: avatarSize,
+              height: avatarSize,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // orbit ring
                   DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFFE9F7E7).withValues(alpha: .18),
-                        width: 2.5,
+                        color: AppColors.tealBright.withValues(alpha: .18),
+                        width: 1.5,
                       ),
                     ),
-                    child: SizedBox(width: r * 2, height: r * 2),
+                    child: SizedBox(width: avatarSize, height: avatarSize),
                   ),
-
-                  // orbs
                   Obx(() {
                     final _ = controller.currentTime.value;
-
                     final sunX = r * math.cos(controller.sunAngle);
                     final sunY = r * math.sin(controller.sunAngle);
                     final moonX = r * math.cos(controller.moonAngle);
@@ -135,19 +100,17 @@ class CircadianAvatar extends StatelessWidget {
                         Transform.translate(
                           offset: Offset(sunX, sunY),
                           child: _buildOrb(
-                            icon: IconPath.sun,
-                            color: Colors.white,
-                            glowColor:
-                                Colors.yellowAccent.withValues(alpha: .65),
+                            icon: Icons.wb_sunny,
+                            color: AppColors.white,
+                            glowColor: AppColors.yellowAccent.withValues(alpha: .65),
                           ),
                         ),
                         Transform.translate(
                           offset: Offset(moonX, moonY),
                           child: _buildOrb(
-                            icon: IconPath.moon1,
-                            color: const Color(0xFF00E5BF),
-                            glowColor:
-                                const Color(0xFF00E5BF).withValues(alpha: .35),
+                            icon: Icons.nightlight_round,
+                            color: AppColors.tealBright,
+                            glowColor: AppColors.tealBright.withValues(alpha: .35),
                           ),
                         ),
                       ],
@@ -163,7 +126,7 @@ class CircadianAvatar extends StatelessWidget {
   }
 
   Widget _buildOrb({
-    required String icon,
+    required IconData icon,
     required Color color,
     required Color glowColor,
   }) {
@@ -172,18 +135,13 @@ class CircadianAvatar extends StatelessWidget {
       height: 32,
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: AppColors.darkNavy,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(color: glowColor, blurRadius: 12, spreadRadius: 2),
         ],
       ),
-      child: Image.asset(
-        icon,
-        color: color,
-        width: 30,
-        height: 30,
-      ),
+      child: Icon(icon, color: color, size: 16),
     );
   }
 }

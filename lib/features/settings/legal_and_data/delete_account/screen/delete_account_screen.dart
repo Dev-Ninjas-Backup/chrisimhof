@@ -73,7 +73,7 @@ class DeleteAccountScreen extends StatelessWidget {
                     onTap: enabled ? controller.deleteAccount : null,
                     backgroundColor: enabled
                         ? AppColors.red
-                        : const Color(0xFFECEFF0),
+                        : AppColors.gray100Alt2,
                     icon: null,
                   );
                 }),

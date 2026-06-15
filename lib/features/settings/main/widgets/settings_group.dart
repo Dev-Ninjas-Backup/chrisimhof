@@ -14,7 +14,7 @@ class SettingsGroup extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 30),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         border: Border.all(color: AppColors.borderSoft),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -50,7 +50,7 @@ class SettingsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.white,
       child: InkWell(
         onTap: data.onTap,
         child: Container(
@@ -111,7 +111,7 @@ class SettingsRow extends StatelessWidget {
               const SizedBox(width: 8),
               const Icon(
                 Icons.chevron_right_rounded,
-                color: Color(0xFFD1D5DB),
+                color: AppColors.gray300,
                 size: 18,
               ),
             ],

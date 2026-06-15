@@ -108,7 +108,7 @@ class SignInScreen extends StatelessWidget {
                     Obx(
                       () => CustomButton(
                         text: 'Log in',
-                        textColor: Colors.white,
+                        textColor: AppColors.white,
                         onTap: controller.isLoading.value
                             ? null
                             : () {
@@ -116,7 +116,7 @@ class SignInScreen extends StatelessWidget {
                                   controller.login();
                                 }
                               },
-                        iconColor: Colors.white,
+                        iconColor: AppColors.white,
                         backgroundColor: AppColors.primaryTextColor,
                       ),
                     ),
@@ -146,9 +146,9 @@ class SignInScreen extends StatelessWidget {
               CustomButton(
                 text: 'Continue with Google',
                 onTap: controller.signInWithGoogle,
-                backgroundColor: Colors.white,
-                textColor: Colors.black,
-                iconColor: Colors.black,
+                backgroundColor: AppColors.white,
+                textColor: AppColors.black,
+                iconColor: AppColors.black,
                 borderWidth: 1,
                 icon: null,
               ),
@@ -156,9 +156,9 @@ class SignInScreen extends StatelessWidget {
               CustomButton(
                 text: 'Continue with Apple',
                 onTap: controller.signInWithApple,
-                backgroundColor: Colors.white,
-                textColor: Colors.black,
-                iconColor: Colors.black,
+                backgroundColor: AppColors.white,
+                textColor: AppColors.black,
+                iconColor: AppColors.black,
                 borderWidth: 1,
                 icon: null,
               ),
@@ -167,9 +167,9 @@ class SignInScreen extends StatelessWidget {
               CustomButton(
                 text: 'Continue with Microsoft',
                 onTap: controller.signInWithMicrosoft,
-                backgroundColor: Colors.white,
-                textColor: Colors.black,
-                iconColor: Colors.black,
+                backgroundColor: AppColors.white,
+                textColor: AppColors.black,
+                iconColor: AppColors.black,
                 borderWidth: 1,
                 icon: null,
               ),

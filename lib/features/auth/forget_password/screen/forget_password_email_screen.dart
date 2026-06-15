@@ -79,7 +79,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
                     controller: controller.emailController,
                     validator: (value) => controller.validateEmail(value),
                     keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.black,
+                    cursorColor: AppColors.black,
                     style: getTextStyle(
                       color: AppColors.secondaryTextColor,
                       fontSize: 15,
@@ -118,7 +118,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Colors.black,
+                          color: AppColors.black,
                           width: 1.5,
                         ),
                       ),
@@ -142,8 +142,8 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
                   Obx(
                     () => CustomButton(
                       text: 'Send reset link'.tr,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
+                      backgroundColor: AppColors.black,
+                      textColor: AppColors.white,
                       icon: null,
                       onTap: controller.isLoading.value
                           ? null

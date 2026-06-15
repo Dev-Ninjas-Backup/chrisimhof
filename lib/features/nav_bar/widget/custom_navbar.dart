@@ -20,7 +20,7 @@ class CustomNavBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.24),
+              color: AppColors.black.withValues(alpha: 0.24),
               blurRadius: 28,
               offset: const Offset(0, 14),
             ),
@@ -81,7 +81,7 @@ class _NavItem extends StatelessWidget {
             vertical: 8,
           ),
           decoration: BoxDecoration(
-            color: isActive ? AppColors.primaryButtonColor : Colors.transparent,
+            color: isActive ? AppColors.primaryButtonColor : AppColors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -92,8 +92,8 @@ class _NavItem extends StatelessWidget {
                 item.icon,
                 size: 18,
                 color: isActive
-                    ? const Color(0xFF0A1410)
-                    : const Color(0xFF7A8A85),
+                    ? AppColors.darkGreen
+                    : AppColors.sageMuted,
               ),
               AnimatedSize(
                 duration: const Duration(milliseconds: 180),
@@ -107,7 +107,7 @@ class _NavItem extends StatelessWidget {
                           overflow: TextOverflow.fade,
                           softWrap: false,
                           style: getTextStyle(
-                            color: const Color(0xFF0A1410),
+                            color: AppColors.darkGreen,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),

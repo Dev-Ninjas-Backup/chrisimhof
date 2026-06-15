@@ -43,10 +43,8 @@ class IconPath {
   static const String lightMeal = 'assets/icons/light_meal.png';
   static const String mediumMeal = 'assets/icons/medium_meal.png';
   static const String heavyMeal = 'assets/icons/heavy_meal.png';
-  static const String running = 'assets/icons/running.png';
-  static const String strength = 'assets/icons/strength.png';
-  static const String yoga = 'assets/icons/yoga.png';
-  static const String restDay = 'assets/icons/rest_day.png';
-  static const String moon1 = 'assets/icons/moon1.png';
-  static const String sun = 'assets/icons/sun.png';
+  static const String homeScreenWaterIcon = 'assets/icons/water_icon.png';
+  static const String homeScreenSportIcon = 'assets/icons/sport_icon.png';
+  static const String homeScreenMealIcon = 'assets/icons/meal_icon.png';
+  static const String homeScreenCaffeineIcon = 'assets/icons/caffein_icon.png';
 }
