@@ -29,7 +29,7 @@ class EditProfileScreen extends StatelessWidget {
                   Obx(
                     () => CircleAvatar(
                       radius: 40,
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: AppColors.greyShade200,
                       backgroundImage: controller.selectedImage.value != null
                           ? FileImage(controller.selectedImage.value!)
                                 as ImageProvider
@@ -44,7 +44,7 @@ class EditProfileScreen extends StatelessWidget {
                           ? const Icon(
                               Icons.person,
                               size: 28,
-                              color: Colors.grey,
+                              color: AppColors.grey,
                             )
                           : null,
                     ),

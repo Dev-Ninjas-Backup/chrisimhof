@@ -20,7 +20,7 @@ class DeleteCheckboxItem extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.borderSoft),
       ),
@@ -32,7 +32,7 @@ class DeleteCheckboxItem extends StatelessWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: value ? Colors.white : Colors.transparent,
+                color: value ? AppColors.white : AppColors.transparent,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: AppColors.rose, width: 2),
               ),

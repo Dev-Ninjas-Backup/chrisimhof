@@ -24,7 +24,7 @@ class CustomRangeSlider extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24.0),
       ),
       child: Column(
@@ -37,12 +37,12 @@ class CustomRangeSlider extends StatelessWidget {
               style: getTextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: AppColors.black,
               ),
               children: [
                 TextSpan(
                   text: required ? ' *' : '',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.red),
                 ),
               ],
             ),
@@ -54,9 +54,9 @@ class CustomRangeSlider extends StatelessWidget {
               trackHeight: 24.0,
               trackShape: const RoundedRectSliderTrackShape(),
               activeTrackColor: AppColors.primaryButtonColor,
-              inactiveTrackColor: const Color(0xFFF3F4F6),
+              inactiveTrackColor: AppColors.gray100,
 
-              thumbColor: const Color(0xFF1A1F26),
+              thumbColor: AppColors.darkCharcoal,
               thumbShape: const RoundSliderThumbShape(
                 enabledThumbRadius: 10.0,
                 elevation: 0,
@@ -103,7 +103,7 @@ class CustomRangeSlider extends StatelessWidget {
                                         : FontWeight.normal,
                                     color: isSelected
                                         ? AppColors.primaryButtonColor
-                                        : const Color(0xFF414651),
+                                        : AppColors.secondaryTextColor,
                                   ),
                                 );
                               });
@@ -147,7 +147,7 @@ class CustomRangeSlider extends StatelessWidget {
                                         : FontWeight.normal,
                                     color: isSelected
                                         ? AppColors.primaryButtonColor
-                                        : const Color(0xFF414651),
+                                        : AppColors.secondaryTextColor,
                                   ),
                                 );
                               });

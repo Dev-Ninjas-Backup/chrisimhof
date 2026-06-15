@@ -55,7 +55,7 @@ class LanguageToggleWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: finalController.isSelected('EN')
                         ? AppColors.primaryButtonColor
-                        : Colors.white,
+                        : AppColors.white,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(100),
                       bottomLeft: Radius.circular(100),
@@ -72,7 +72,7 @@ class LanguageToggleWidget extends StatelessWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: finalController.isSelected('EN')
-                              ? Colors.white
+                              ? AppColors.white
                               : AppColors.primaryTextColor,
                         ),
                       ),
@@ -91,7 +91,7 @@ class LanguageToggleWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: finalController.isSelected('FR')
                         ? AppColors.primaryButtonColor
-                        : Colors.white,
+                        : AppColors.white,
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(100),
                       bottomRight: Radius.circular(100),
@@ -108,7 +108,7 @@ class LanguageToggleWidget extends StatelessWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: finalController.isSelected('FR')
-                              ? Colors.white
+                              ? AppColors.white
                               : AppColors.primaryTextColor,
                         ),
                       ),

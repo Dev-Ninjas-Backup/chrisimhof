@@ -60,7 +60,7 @@ class WelcomeScreen extends StatelessWidget {
                                 Text(
                                   'RYVENZA'.tr,
                                   style: getTextStyle2(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontSize: 28,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -73,7 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                               child: Text(
                                 'Your rhythm, rebuilt around real life.',
                                 style: getTextStyle2(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   fontSize: 36,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -100,7 +100,7 @@ class WelcomeScreen extends StatelessWidget {
                       'Sleep, caffeine, hydration, meals and work shifts in one adaptive daily plan.'
                           .tr,
                       style: getTextStyle(
-                        color: const Color(0xFFB9C9C3),
+                        color: AppColors.sage,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -116,7 +116,7 @@ class WelcomeScreen extends StatelessWidget {
                       text: 'Log in'.tr,
                       onTap: () => Get.toNamed(AppRoutes.signInScreen),
                       borderWidth: 1,
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppColors.white,
                       icon: null,
                     ),
                     const SizedBox(height: 35),

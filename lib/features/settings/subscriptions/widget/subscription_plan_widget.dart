@@ -31,7 +31,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
         padding: const EdgeInsets.all(32),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryButtonColor : Colors.white,
+          color: isSelected ? AppColors.primaryButtonColor : AppColors.white,
           border: Border.all(
             color: isSelected
                 ? AppColors.primaryButtonColor
@@ -49,7 +49,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
               style: getTextStyle2(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: isSelected ? Colors.black : AppColors.primaryTextColor,
+                color: isSelected ? AppColors.black : AppColors.primaryTextColor,
               ),
             ),
             const SizedBox(height: 4),
@@ -59,7 +59,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
               style: getTextStyle2(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: isSelected ? Colors.black : AppColors.primaryButtonColor,
+                color: isSelected ? AppColors.black : AppColors.primaryButtonColor,
               ),
             ),
             const SizedBox(height: 16),
@@ -68,7 +68,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
               style: getTextStyle2(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: isSelected ? Colors.black : AppColors.textMid,
+                color: isSelected ? AppColors.black : AppColors.textMid,
               ),
             ),
             const SizedBox(height: 20),
@@ -88,7 +88,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: isSelected
-                                ? Colors.black
+                                ? AppColors.black
                                 : AppColors.primaryTextColor,
                           ),
                         ),

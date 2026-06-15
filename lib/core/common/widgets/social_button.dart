@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chrisimhof/core/const/app_colors.dart';
 
 class SocialButton extends StatelessWidget {
   final Color borderColor;
@@ -8,8 +9,8 @@ class SocialButton extends StatelessWidget {
 
   const SocialButton({
     super.key,
-    this.borderColor = const Color(0xFFD5D7DA),
-    this.backgroundColor = Colors.white,
+    this.borderColor = AppColors.borderColor,
+    this.backgroundColor = AppColors.white,
     required this.imagePath,
     this.onTap,
   });

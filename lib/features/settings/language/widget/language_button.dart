@@ -29,10 +29,10 @@ class LanguageButton extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         width: Get.width,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? AppColors.mint : const Color(0xFFD5D7DA),
+            color: isSelected ? AppColors.mint : AppColors.borderColor,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -71,10 +71,10 @@ class LanguageButton extends StatelessWidget {
               height: 20,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: isSelected ? AppColors.mint : const Color(0xFFD5D7DA),
+                  color: isSelected ? AppColors.mint : AppColors.borderColor,
                   width: isSelected ? 3 : 1,
                 ),
-                color: Colors.white,
+                color: AppColors.white,
                 shape: BoxShape.circle,
               ),
               child: isSelected

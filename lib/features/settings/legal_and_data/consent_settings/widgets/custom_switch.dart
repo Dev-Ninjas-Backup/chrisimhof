@@ -11,7 +11,7 @@ class CustomSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool disabled = onChanged == null;
     final Color activeColor = AppColors.primaryButtonColor;
-    final Color inactiveColor = const Color(0xFFE9EBEE);
+    final Color inactiveColor = AppColors.greySwitchBg;
     final double width = 56;
     final double height = 34;
     final double padding = 4;
@@ -31,13 +31,13 @@ class CustomSwitch extends StatelessWidget {
             borderRadius: BorderRadius.circular(height / 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: AppColors.black.withOpacity(0.04),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
             ],
             border: Border.all(
-              color: value ? activeColor : Colors.transparent,
+              color: value ? activeColor : AppColors.transparent,
               width: value ? 0 : 0,
             ),
           ),
@@ -51,11 +51,11 @@ class CustomSwitch extends StatelessWidget {
                   width: thumbSize,
                   height: thumbSize,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: AppColors.black.withOpacity(0.06),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),

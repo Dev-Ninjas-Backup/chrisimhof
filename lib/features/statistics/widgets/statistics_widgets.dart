@@ -36,7 +36,7 @@ class GlobalRhythmCircle extends StatelessWidget {
                     style: getTextStyle2(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -45,7 +45,7 @@ class GlobalRhythmCircle extends StatelessWidget {
                     style: getTextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF9CA3AF),
+                      color: AppColors.textSoft,
                     ),
                   ),
                 ],
@@ -71,7 +71,7 @@ class _GlobalRhythmRingPainter extends CustomPainter {
 
     final Paint trackPaint = Paint()
       ..color =
-          const Color(0xFF1B382D) // Dark green track background
+          AppColors.darkGreenTrack // Dark green track background
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6
       ..strokeCap = StrokeCap.round;

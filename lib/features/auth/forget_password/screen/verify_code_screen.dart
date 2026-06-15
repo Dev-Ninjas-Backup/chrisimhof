@@ -28,9 +28,9 @@ class VerifyCodeScreen extends StatelessWidget {
         color: AppColors.primaryButtonColor,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xff6CB485), width: 1),
+        border: Border.all(color: AppColors.mintMedium, width: 1),
       ),
     );
 
@@ -39,7 +39,7 @@ class VerifyCodeScreen extends StatelessWidget {
     );
 
     final submittedPinTheme = defaultPinTheme.copyDecorationWith(
-      border: Border.all(color: const Color(0xff6CB485), width: 1),
+      border: Border.all(color: AppColors.mintMedium, width: 1),
     );
 
     return Scaffold(

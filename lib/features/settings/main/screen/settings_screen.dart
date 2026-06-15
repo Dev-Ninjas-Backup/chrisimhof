@@ -138,7 +138,7 @@ class SettingsScreen extends StatelessWidget {
                       : 'Log out',
                   onTap: controller.isLoading.value ? null : controller.logout,
                   textColor: AppColors.rose,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: AppColors.transparent,
                   borderColor: AppColors.rose,
                   borderWidth: 1,
                   iconColor: AppColors.rose,

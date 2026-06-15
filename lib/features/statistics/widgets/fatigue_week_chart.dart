@@ -20,11 +20,11 @@ class FatigueWeekChart extends StatelessWidget {
         final barHeight = val * maxBarHeight;
 
         // Choose color based on height/value
-        Color barColor = const Color(0xFFFFA726); // Default orange
+        Color barColor = AppColors.orangeAccent; // Default orange
         if (val >= 0.7) {
           barColor = AppColors.primaryButtonColor; // Green/teal
         } else if (val < 0.3) {
-          barColor = const Color(0xFFEF4444); // Pink/red
+          barColor = AppColors.redBright; // Pink/red
         }
 
         return Column(

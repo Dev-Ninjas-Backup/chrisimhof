@@ -21,8 +21,8 @@ class FatiguePredictionCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFFFF2F3), // Soft pink/rose
-            Color(0xFFFFFDF2), // Soft warm yellow
+            AppColors.roseSoft3, // Soft pink/rose
+            AppColors.amberSoft2, // Soft warm yellow
           ],
         ),
       ),

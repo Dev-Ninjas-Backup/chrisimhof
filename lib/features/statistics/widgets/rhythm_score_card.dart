@@ -75,13 +75,13 @@ class RhythmScoreCard extends StatelessWidget {
                             MetricProgressRow(
                               label: 'Caffeine',
                               percentage: controller.caffeineMetric.value,
-                              barColor: const Color(0xFFFFA726), // Orange
+                              barColor: AppColors.orangeAccent, // Orange
                             ),
                             const SizedBox(height: 14.0),
                             MetricProgressRow(
                               label: 'Sport',
                               percentage: controller.sportMetric.value,
-                              barColor: const Color(0xFF8B5CF6), // Purple
+                              barColor: AppColors.violet, // Purple
                             ),
                           ],
                         ),

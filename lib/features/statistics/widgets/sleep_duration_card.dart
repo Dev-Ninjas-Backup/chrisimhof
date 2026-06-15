@@ -19,7 +19,7 @@ class SleepDurationCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24.0),
         border: Border.all(color: AppColors.borderSoft),
       ),
@@ -61,8 +61,8 @@ class SleepDurationCard extends StatelessWidget {
           const SizedBox(height: 16.0),
           SparklineCurve(
             data: controller.sleepDurationData,
-            lineColor: const Color(0xFF8B5CF6), // Purple
-            fillColor: const Color(0xFF8B5CF6),
+            lineColor: AppColors.violet, // Purple
+            fillColor: AppColors.violet,
           ),
         ],
       ),

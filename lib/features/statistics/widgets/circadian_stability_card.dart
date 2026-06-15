@@ -46,7 +46,7 @@ class CircadianStabilityCard extends StatelessWidget {
                       style: getTextStyle2(
                         fontSize: 48,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                     const SizedBox(width: 4.0),
@@ -74,7 +74,7 @@ class CircadianStabilityCard extends StatelessWidget {
                       style: getTextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFF9CA3AF),
+                        color: AppColors.textSoft,
                       ),
                     ),
                   ],

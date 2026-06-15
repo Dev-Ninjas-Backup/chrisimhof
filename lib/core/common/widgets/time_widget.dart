@@ -21,7 +21,7 @@ class TimeWidget extends StatelessWidget {
 
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -127,7 +127,7 @@ class _TimePartColumn extends StatelessWidget {
                   style: getTextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF9AA0A6),
+                    color: AppColors.greyAlt,
                   ),
                 ),
               ),
@@ -157,7 +157,7 @@ class _TimePartColumn extends StatelessWidget {
                   style: getTextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF9AA0A6),
+                    color: AppColors.greyAlt,
                   ),
                 ),
               ),

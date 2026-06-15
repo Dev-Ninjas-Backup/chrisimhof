@@ -18,7 +18,7 @@ class PeriodToggle extends StatelessWidget {
       height: 44,
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F2F6),
+        color: AppColors.greyToggleBg,
         borderRadius: BorderRadius.circular(14.0),
       ),
       child: Row(
@@ -32,12 +32,12 @@ class PeriodToggle extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.transparent,
+                  color: isSelected ? AppColors.white : AppColors.transparent,
                   borderRadius: BorderRadius.circular(10.0),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
+                            color: AppColors.black.withValues(alpha: 0.04),
                             blurRadius: 3.0,
                             offset: const Offset(0, 2),
                           ),

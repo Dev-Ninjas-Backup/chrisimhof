@@ -18,7 +18,7 @@ class SleepDebtCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24.0),
         border: Border.all(color: AppColors.borderSoft),
       ),
@@ -75,7 +75,7 @@ class SleepDebtCard extends StatelessWidget {
             width: double.infinity,
             height: 8,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: AppColors.gray100,
               borderRadius: BorderRadius.circular(4.0),
             ),
             child: Row(
@@ -87,8 +87,8 @@ class SleepDebtCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4.0),
                       gradient: const LinearGradient(
                         colors: [
-                          Color(0xFFFFA726), // Orange
-                          Color(0xFF34D399), // Mint green
+                          AppColors.orangeAccent, // Orange
+                          AppColors.primaryButtonColor, // Mint green
                         ],
                       ),
                     ),
