@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
+import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:chrisimhof/features/recomendations/widgets/recomendation_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,11 +33,7 @@ class RecomendationsScreen extends StatelessWidget {
           final recommendations = data?.recommendations ?? [];
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 120,
-            ),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 120),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -105,8 +102,34 @@ class RecomendationsScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = recommendations[index];
 
+                    List<RecommendationItem>? subRecommendations;
+                    final category = item.category?.toLowerCase();
+                    if (data?.grouped != null && category != null) {
+                      switch (category) {
+                        case 'sleep':
+                          subRecommendations = data!.grouped!.sleep;
+                          break;
+                        case 'caffeine':
+                          subRecommendations = data!.grouped!.caffeine;
+                          break;
+                        case 'hydration':
+                          subRecommendations = data!.grouped!.hydration;
+                          break;
+                        case 'sport':
+                          subRecommendations = data!.grouped!.sport;
+                          break;
+                        case 'nutrition':
+                          subRecommendations = data!.grouped!.nutrition;
+                          break;
+                        case 'fatigue':
+                          subRecommendations = data!.grouped!.fatigue;
+                          break;
+                      }
+                    }
+
                     return RecomendationCard(
                       recomendation: item,
+                      subRecommendations: subRecommendations,
                       onTap: () {
                         debugPrint('Tapped ${item.title}');
                       },
