@@ -55,6 +55,7 @@ class RhythmScoreCard extends StatelessWidget {
                             color: AppColors.primaryButtonColor,
                           ),
                         ),
+                      ),
                       ],
                     ),
                   const SizedBox(height: 28.0),
