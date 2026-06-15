@@ -86,7 +86,7 @@ class CircadianStabilityCard extends StatelessWidget {
             Positioned(
               top: 0,
               bottom: 0,
-              right: 7.5,
+              right: 14.5,
               child: Image.asset(
                 ImagePath.circadianStability,
                 width: 145,
