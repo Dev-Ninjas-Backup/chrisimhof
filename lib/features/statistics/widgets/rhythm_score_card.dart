@@ -49,7 +49,7 @@ class RhythmScoreCard extends StatelessWidget {
                         const SizedBox(width: 20.0),
                         Expanded(
                           child: Text(
-                            'GLOBAL RHYTHM\nSCORE'.tr,
+                            'GLOBAL RHYTHM SCORE'.tr,
                             style: getTextStyle2(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
