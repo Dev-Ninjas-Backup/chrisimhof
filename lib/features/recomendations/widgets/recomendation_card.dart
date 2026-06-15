@@ -1,10 +1,10 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/recomendations/model/recomendation_model.dart';
+import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:flutter/material.dart';
 
 class RecomendationCard extends StatelessWidget {
-  final RecomendationModel recomendation;
+  final RecommendationItem recomendation;
   final VoidCallback onTap;
 
   const RecomendationCard({
@@ -15,7 +15,7 @@ class RecomendationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = RecomendationStyleHelper.getStyle(recomendation.title);
+    final style = RecomendationStyleHelper.getStyle(recomendation.category);
 
     return GestureDetector(
       onTap: onTap,
@@ -63,7 +63,7 @@ class RecomendationCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          recomendation.title,
+                          recomendation.title ?? '',
                           style: getTextStyle2(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
@@ -71,31 +71,32 @@ class RecomendationCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 2.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: style.badgeBgColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            recomendation.count.toString(),
-                            style: getTextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: style.badgeTextColor,
+                      if (recomendation.priority != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 2.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: style.badgeBgColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              recomendation.priority.toString(),
+                              style: getTextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: style.badgeTextColor,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 2.0),
                   Text(
-                    recomendation.description,
+                    recomendation.body ?? '',
                     style: getTextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
