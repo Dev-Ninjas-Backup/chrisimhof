@@ -16,43 +16,43 @@ class RhythmScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.authDarkAlt, // Dark forest green: #143226
-        borderRadius: BorderRadius.circular(24.0),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -71,
-            top: -40,
-            child: Container(
-              width: 192,
-              height: 192,
-              decoration: BoxDecoration(
-                color: AppColors.primaryButtonColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(9999.0),
+    return Obx(() {
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.authDarkAlt, // Dark forest green: #143226
+          borderRadius: BorderRadius.circular(24.0),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -71,
+              top: -40,
+              child: Container(
+                width: 192,
+                height: 192,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryButtonColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(9999.0),
+                ),
               ),
             ),
-            Positioned(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        GlobalRhythmCircle(score: controller.globalScore.value),
-                        const SizedBox(width: 20.0),
-                        Expanded(
-                          child: Text(
-                            'GLOBAL RHYTHM SCORE'.tr,
-                            style: getTextStyle2(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryButtonColor,
-                            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      GlobalRhythmCircle(score: controller.globalScore.value),
+                      const SizedBox(width: 20.0),
+                      Expanded(
+                        child: Text(
+                          'GLOBAL RHYTHM SCORE'.tr,
+                          style: getTextStyle2(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryButtonColor,
                           ),
                         ),
                       ),
@@ -116,9 +116,9 @@ class RhythmScoreCard extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

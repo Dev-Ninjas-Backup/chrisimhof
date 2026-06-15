@@ -271,7 +271,7 @@ class PulsingRhythmBadge extends StatelessWidget {
     controller.updateState(isSleepPrep: isSleepPrep);
 
     final badge = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, ),
       decoration: BoxDecoration(
         color: AppColors.badgeFill,
         borderRadius: BorderRadius.circular(30),
