@@ -64,20 +64,41 @@
 
 import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:chrisimhof/features/recomendations/service/recomendation_service.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get/get.dart';
 
 class RecommendationController extends GetxController {
   final RecommendationService _service = RecommendationService();
 
   final isLoading = false.obs;
   final recommendationResponse = Rxn<RecommendationResponse>();
+  final expandedCategories = <String>[].obs;
+
+  void toggleCategoryExpansion(String? category) {
+    if (category == null) return;
+    final normalized = category.toLowerCase();
+    if (expandedCategories.contains(normalized)) {
+      expandedCategories.remove(normalized);
+    } else {
+      expandedCategories.add(normalized);
+    }
+  }
+
+  bool isCategoryExpanded(String? category) {
+    if (category == null) return false;
+    return expandedCategories.contains(category.toLowerCase());
+  }
 
   @override
   void onInit() {
     super.onInit();
 
-    getRecommendations(sessionId: 'cmqf6y0z1000h1wpbvxloyvbh', locale: 'en');
+    final currentLocale = Get.locale?.languageCode ?? 'en';
+    final localeCode = currentLocale.toLowerCase() == 'fr' ? 'fr' : 'en';
+
+    getRecommendations(
+      sessionId: 'cmqf6y0z1000h1wpbvxloyvbh',
+      locale: localeCode,
+    );
   }
 
   Future<void> getRecommendations({
