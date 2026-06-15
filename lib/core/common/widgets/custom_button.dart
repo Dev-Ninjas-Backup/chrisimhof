@@ -12,6 +12,8 @@ class CustomButton extends StatelessWidget {
   final Color? borderColor;
   final int? borderWidth;
   final IconData? icon;
+  final bool? plusIcon;
+  final IconData? showIcon;
 
   const CustomButton({
     super.key,
@@ -23,6 +25,8 @@ class CustomButton extends StatelessWidget {
     this.borderColor,
     this.borderWidth,
     this.icon = Icons.chevron_right_rounded,
+    this.plusIcon,
+    this.showIcon ,
   });
 
   @override
@@ -51,6 +55,9 @@ class CustomButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              if (plusIcon == true) const SizedBox(width: 4),
+              if (plusIcon == true)
+                Icon(showIcon, size: 20, color: iconColor ?? Colors.black),
               Text(
                 text.tr,
                 style: getTextStyle(
