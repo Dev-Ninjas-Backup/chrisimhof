@@ -31,10 +31,16 @@ class WelcomeScreen extends StatelessWidget {
                 child: Stack(
                   children: [
                     Center(
-                      child: CircadianAvatar(
-                        imagePath: ImagePath.circadianAvatar,
-                        avatarSize: 280,
-                        imageShiftFactor: 0.42,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 55),
+                        child: CircadianAvatar(
+                          imagePath: ImagePath.circadianAvatar,
+                          avatarSize: 300,
+                          orbitRadius:
+                              100, 
+                          orbitCenterY:
+                              55, 
+                        ),
                       ),
                     ),
                     Positioned(
@@ -67,9 +73,9 @@ class WelcomeScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 280),
+                            SizedBox(height: 230),
                             SizedBox(
-                              width: context.width * 0.9,
+                              width: context.width * 0.75,
                               child: Text(
                                 'Your rhythm, rebuilt around real life.',
                                 style: getTextStyle2(
