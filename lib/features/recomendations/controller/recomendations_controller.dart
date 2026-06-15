@@ -64,7 +64,6 @@
 
 import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:chrisimhof/features/recomendations/service/recomendation_service.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
@@ -91,9 +90,6 @@ class RecommendationController extends GetxController {
       recommendationResponse.value = await _service.getRecommendations(
         sessionId: sessionId,
         locale: locale,
-      );
-      debugPrint(
-        "recomnedation response: ${recommendationResponse.value.toString()}",
       );
     } finally {
       isLoading.value = false;
