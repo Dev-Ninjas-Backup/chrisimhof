@@ -94,7 +94,7 @@ class SleepOrbitPainter extends CustomPainter {
   // ── 1. Full orbit background track ──────────────────────────────────────────
   void _drawFullOrbitTrack(Canvas canvas, Offset center, double radius) {
     _arcPaint
-      ..color = AppColors.primaryButtonColor.withValues(alpha: 0.18)
+      ..color = AppColors.white.withValues(alpha: 0.18)
       ..strokeWidth = 0.8;
     canvas.drawCircle(center, radius, _arcPaint);
   }
@@ -108,12 +108,7 @@ class SleepOrbitPainter extends CustomPainter {
   ) {
     final rect = Rect.fromCircle(center: center, radius: radius);
 
-    Color arcColor;
-    if (isMissedBedtime) {
-      arcColor = _missedBeaconColor(missedOverdueRatio);
-    } else {
-      arcColor = AppColors.secondaryButtonColor;
-    }
+    const Color arcColor = AppColors.white;
 
     // Outer glow layer
     _arcPaint
@@ -285,45 +280,30 @@ class SleepOrbitPainter extends CustomPainter {
       1.0,
     );
 
-    Color iconColor;
-    Color glowColor;
-    double glowRadius;
-
-    if (isSleepLogged) {
-      iconColor = AppColors.tealBright;
-      glowColor = AppColors.tealBright;
-      glowRadius = 14.0;
-    } else if (isMissedBedtime) {
-      final double drift = (missedOverdueRatio * 0.65).clamp(0.0, 1.0);
-      iconColor = Color.lerp(AppColors.tealBright, AppColors.mintLight, drift)!;
-      glowColor = iconColor;
-      glowRadius = 15.0;
-    } else {
-      iconColor = Color.lerp(AppColors.white, AppColors.tealBright, t)!;
-      glowColor = iconColor;
-      glowRadius = 16.0 + t * 4.0;
-    }
+    const Color iconColor = AppColors.white;
+    const Color glowColor = AppColors.white;
+    final double glowRadius = 18.0 + t * 4.0;
 
     // Glow disc
     _glowPaint.shader = RadialGradient(
-      colors: [glowColor.withValues(alpha: 0.35), AppColors.transparent],
+      colors: [glowColor.withValues(alpha: 0.25), AppColors.transparent],
     ).createShader(Rect.fromCircle(center: pos, radius: glowRadius));
     canvas.drawCircle(pos, glowRadius, _glowPaint);
 
     if (t < 0.25 && !isSleepLogged && !isMissedBedtime) {
       // ── Full sun — Figma: prominent glowing dot ───────────────────────────────
       _fillPaint.color = iconColor;
-      canvas.drawCircle(pos, 6.5, _fillPaint); // larger core dot
+      canvas.drawCircle(pos, 9.0, _fillPaint); // larger core dot
 
       final double rayAlpha = (0.60 * (1.0 - t / 0.25)).clamp(0.0, 0.60);
       _strokePaint
         ..color = iconColor.withValues(alpha: rayAlpha)
-        ..strokeWidth = 1.1;
+        ..strokeWidth = 1.5;
       for (int i = 0; i < 8; i++) {
         final double a = i * math.pi / 4;
         canvas.drawLine(
-          Offset(pos.dx + 9.0 * math.cos(a), pos.dy + 9.0 * math.sin(a)),
           Offset(pos.dx + 12.5 * math.cos(a), pos.dy + 12.5 * math.sin(a)),
+          Offset(pos.dx + 17.5 * math.cos(a), pos.dy + 17.5 * math.sin(a)),
           _strokePaint,
         );
       }
@@ -334,16 +314,16 @@ class SleepOrbitPainter extends CustomPainter {
           : (t >= 0.25 ? 1.0 : (t / 0.25));
       _fillPaint.color = iconColor.withValues(alpha: moonAlpha.clamp(0.0, 1.0));
       final moonPath = Path()
-        ..moveTo(pos.dx - 4, pos.dy - 6)
-        ..quadraticBezierTo(pos.dx + 6, pos.dy, pos.dx - 4, pos.dy + 6)
-        ..quadraticBezierTo(pos.dx + 2, pos.dy, pos.dx - 4, pos.dy - 6);
+        ..moveTo(pos.dx - 5.6, pos.dy - 8.4)
+        ..quadraticBezierTo(pos.dx + 8.4, pos.dy, pos.dx - 5.6, pos.dy + 8.4)
+        ..quadraticBezierTo(pos.dx + 2.8, pos.dy, pos.dx - 5.6, pos.dy - 8.4);
       canvas.drawPath(moonPath, _fillPaint);
 
       // Tiny star when fully moon (t > 0.70)
       if (t > 0.70 && !isSleepLogged) {
         final double starAlpha = ((t - 0.70) / 0.30).clamp(0.0, 1.0) * 0.80;
         _fillPaint.color = iconColor.withValues(alpha: starAlpha);
-        canvas.drawCircle(Offset(pos.dx + 6.0, pos.dy - 5.0), 1.3, _fillPaint);
+        canvas.drawCircle(Offset(pos.dx + 8.0, pos.dy - 7.0), 1.8, _fillPaint);
       }
     }
   }

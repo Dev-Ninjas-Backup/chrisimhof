@@ -34,8 +34,7 @@ class SleepDebtCard extends StatelessWidget {
                 color: AppColors.textSoft,
               ),
             ),
-          ),
-          const SizedBox(height: 6.0),
+            const SizedBox(height: 6.0),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
@@ -107,5 +106,6 @@ class SleepDebtCard extends StatelessWidget {
         ],
       ),
     );
+  });
   }
 }

@@ -46,14 +46,14 @@ class BedtimeCard extends StatelessWidget {
           children: [
             // ── Main content row ──────────────────────────────────────────────
             SizedBox(
-              height: 210,
+              height: 220,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // ── Left text column ─────────────────────────────────────────
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 22, 0, 20),
+                      padding: const EdgeInsets.fromLTRB(20, 20, 0, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -90,7 +90,9 @@ class BedtimeCard extends StatelessWidget {
                               style: getTextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.mintLight.withValues(alpha: 0.65),
+                                color: AppColors.mintLight.withValues(
+                                  alpha: 0.65,
+                                ),
                               ),
                             ),
                           ],
