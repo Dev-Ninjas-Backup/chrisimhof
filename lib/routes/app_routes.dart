@@ -18,6 +18,7 @@ import 'package:chrisimhof/features/settings/legal_and_data/main_screen/legal_an
 import 'package:chrisimhof/features/settings/legal_and_data/privacy_policy/screen/privacy_policy_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/terms_of_use/screen/terms_of_use_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
+import 'package:chrisimhof/features/sports/screen/sports_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -41,6 +42,7 @@ class AppRoutes {
   static String baselineSetupScreen = '/baselineSetupScreen';
   static String connectedSourcesScreen = '/connectedSourcesScreen';
   static String nutritionScreen = '/nutritionScreen';
+  static String sportsScreen = '/sportsScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -62,6 +64,7 @@ class AppRoutes {
   static String getConnectedSourcesScreen() => connectedSourcesScreen;
   static String getVerifyCodeScreen() => verifyCodeScreen;
   static String getNutritionScreen() => nutritionScreen;
+  static String getSportsScreen() => sportsScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -93,5 +96,6 @@ class AppRoutes {
     GetPage(name: connectedSourcesScreen, page: () => const ConnectedSourcesScreen()),
     GetPage(name: verifyCodeScreen, page: () => const VerifyCodeScreen()),
     GetPage(name: nutritionScreen, page: () => const NutritionScreen()),
+    GetPage(name: sportsScreen, page: () => const SportsScreen()),
   ];
 }
