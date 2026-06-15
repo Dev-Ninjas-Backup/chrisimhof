@@ -37,38 +37,36 @@ class StatisticsScreen extends StatelessWidget {
               const SizedBox(height: 18.0),
 
               // Period Toggle Bar
-              Obx(() => PeriodToggle(controller: controller)),
+              PeriodToggle(controller: controller),
               const SizedBox(height: 20.0),
 
-              // Obx-wrapped container containing all cards
-              Obx(() {
-                return Column(
-                  children: [
-                    // Card 1: Global Rhythm Score
-                    RhythmScoreCard(controller: controller),
-                    const SizedBox(height: 16.0),
+              // Cards
+              Column(
+                children: [
+                  // Card 1: Global Rhythm Score
+                  RhythmScoreCard(controller: controller),
+                  const SizedBox(height: 16.0),
 
-                    // Card 2: Circadian Stability
-                    CircadianStabilityCard(controller: controller),
-                    const SizedBox(height: 16.0),
+                  // Card 2: Circadian Stability
+                  CircadianStabilityCard(controller: controller),
+                  const SizedBox(height: 16.0),
 
-                    // Card 3: Sleep Duration
-                    SleepDurationCard(controller: controller),
-                    const SizedBox(height: 16.0),
+                  // Card 3: Sleep Duration
+                  SleepDurationCard(controller: controller),
+                  const SizedBox(height: 16.0),
 
-                    // Card 4: Recovery
-                    RecoveryCard(controller: controller),
-                    const SizedBox(height: 16.0),
+                  // Card 4: Recovery
+                  RecoveryCard(controller: controller),
+                  const SizedBox(height: 16.0),
 
-                    // Card 5: Fatigue Prediction
-                    FatiguePredictionCard(controller: controller),
-                    const SizedBox(height: 16.0),
+                  // Card 5: Fatigue Prediction
+                  FatiguePredictionCard(controller: controller),
+                  const SizedBox(height: 16.0),
 
-                    // Card 6: Sleep Debt
-                    SleepDebtCard(controller: controller),
-                  ],
-                );
-              }),
+                  // Card 6: Sleep Debt
+                  SleepDebtCard(controller: controller),
+                ],
+              ),
             ],
           ),
         ),
