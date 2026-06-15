@@ -30,8 +30,10 @@ class AppColors {
   static const Color rose = Color(0xFFF43F5E);
   static const Color roseSoft = Color(0xFFFFE4E6);
   static const Color roseSoft2 = Color(0xFFFEF2F2);
+  static const Color lavenderSoft = Color(0xFFE8E4FF);
   static const Color orangeSoft = Color(0xFFFFF7ED);
   static const Color authDark = Color(0xFF0F1A16);
   static const Color authDarkAlt = Color(0xFF143226);
   static const Color logoutBorderColor = Color(0xFFC82323);
+
 }
