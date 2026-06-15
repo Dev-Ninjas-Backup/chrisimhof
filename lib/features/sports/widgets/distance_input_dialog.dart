@@ -5,8 +5,13 @@ import 'package:get/get.dart';
 
 class DistanceInputDialog extends StatelessWidget {
   final TextEditingController distanceController;
+  final VoidCallback? onSave;
 
-  const DistanceInputDialog({super.key, required this.distanceController});
+  const DistanceInputDialog({
+    super.key,
+    required this.distanceController,
+    this.onSave,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,9 @@ class DistanceInputDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             distanceController.text = textController.text;
+            if (onSave != null) {
+              onSave!();
+            }
             Get.back();
           },
           child: const Text(

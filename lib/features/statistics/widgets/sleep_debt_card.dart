@@ -35,77 +35,77 @@ class SleepDebtCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6.0),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                controller.sleepDebtValue.value,
-                style: getTextStyle2(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryTextColor,
-                ),
-              ),
-              const SizedBox(width: 8.0),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.arrow_downward,
-                    color: AppColors.primaryButtonColor,
-                    size: 12,
-                  ),
-                  const SizedBox(width: 2.0),
-                  Text(
-                    controller.sleepDebtChange.value,
-                    style: getTextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryButtonColor,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 18.0),
-
-          // Progress bar with orange-to-green gradient
-          Container(
-            width: double.infinity,
-            height: 8,
-            decoration: BoxDecoration(
-              color: AppColors.gray100,
-              borderRadius: BorderRadius.circular(4.0),
-            ),
-            child: Row(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
-                Expanded(
-                  flex: (controller.sleepDebtProgress.value * 100).round(),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4.0),
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppColors.orangeAccent, // Orange
-                          AppColors.primaryButtonColor, // Mint green
-                        ],
+                Text(
+                  controller.sleepDebtValue.value,
+                  style: getTextStyle2(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryTextColor,
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.arrow_downward,
+                      color: AppColors.primaryButtonColor,
+                      size: 12,
+                    ),
+                    const SizedBox(width: 2.0),
+                    Text(
+                      controller.sleepDebtChange.value,
+                      style: getTextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryButtonColor,
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  flex: ((1.0 - controller.sleepDebtProgress.value) * 100)
-                      .round(),
-                  child: const SizedBox.shrink(),
+                  ],
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  });
+            const SizedBox(height: 18.0),
+
+            // Progress bar with orange-to-green gradient
+            Container(
+              width: double.infinity,
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppColors.gray100,
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: (controller.sleepDebtProgress.value * 100).round(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4.0),
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.orangeAccent, // Orange
+                            AppColors.primaryButtonColor, // Mint green
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: ((1.0 - controller.sleepDebtProgress.value) * 100)
+                        .round(),
+                    child: const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

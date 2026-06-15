@@ -1,10 +1,10 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
-import 'package:chrisimhof/features/sports/widgets/distance_input_dialog.dart';
-import 'package:chrisimhof/features/sports/widgets/effort_selection_bottomsheet.dart';
-import 'package:chrisimhof/features/sports/widgets/type_selection_bottomsheet.dart';
+import 'package:chrisimhof/features/sports/widgets/activity_type_selector.dart';
+import 'package:chrisimhof/features/sports/widgets/distance_card.dart';
+import 'package:chrisimhof/features/sports/widgets/effort_and_type_row.dart';
+import 'package:chrisimhof/features/sports/widgets/time_range_selector.dart';
 import 'package:chrisimhof/features/sports/widgets/zone_selection_bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -107,273 +107,36 @@ class AddSportSessionBottomsheet extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Time range row
-            Obx(() => Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _pickTime(context, startTime),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'START',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF8B5CF6),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            startTime.value,
-                            style: getTextStyle2(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF4C1D95),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: Color(0xFF8B5CF6),
-                    size: 16,
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _pickTime(context, endTime),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'END',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF8B5CF6),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            endTime.value,
-                            style: getTextStyle2(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF4C1D95),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            )),
+            TimeRangeSelector(
+              startTime: startTime,
+              endTime: endTime,
+              onTimeChanged: _updateDuration,
+            ),
             const SizedBox(height: 24),
 
             // Activity Type Section
-            const Text(
-              'ACTIVITY TYPE',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF8B5CF6),
-              ),
+            ActivityTypeSelector(
+              activity: activity,
+              type: type,
+              zone: zone,
+              duration: duration,
+              onActivityChanged: _updateDuration,
             ),
-            const SizedBox(height: 10),
-            Obx(() => SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: ['Running', 'Cycling', 'Swimming', 'Walking', 'Rest day'].map((act) {
-                  final isSelected = activity.value == act;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ChoiceChip(
-                      label: Text(act.tr),
-                      selected: isSelected,
-                      onSelected: (val) {
-                        if (val) {
-                          activity.value = act;
-                          if (act == 'Rest day') {
-                            type.value = 'Rest';
-                            zone.value = '';
-                            duration.value = 0;
-                          } else if (act == 'Cycling') {
-                            type.value = 'Cardio';
-                            zone.value = 'Z2';
-                            _updateDuration();
-                          } else if (act == 'Swimming') {
-                            type.value = 'Cardio';
-                            zone.value = 'Z3';
-                            _updateDuration();
-                          } else if (act == 'Walking') {
-                            type.value = 'Cardio';
-                            zone.value = 'Z1';
-                            _updateDuration();
-                          } else {
-                            type.value = 'Cardio';
-                            zone.value = 'Z3';
-                            _updateDuration();
-                          }
-                        }
-                      },
-                      selectedColor: const Color(0xFF4C1D95),
-                      backgroundColor: Colors.white.withValues(alpha: 0.6),
-                      showCheckmark: false,
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide.none,
-                      ),
-                      labelStyle: getTextStyle(
-                        fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                        color: isSelected ? Colors.white : const Color(0xFF4C1D95),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            )),
             const SizedBox(height: 24),
 
             // Distance Section
-            Obx(() {
-              if (activity.value == 'Rest day') return const SizedBox.shrink();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () => Get.dialog(DistanceInputDialog(distanceController: distanceController)),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'DISTANCE',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF8B5CF6),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            distanceController.text.isEmpty ? '—' : distanceController.text,
-                            style: getTextStyle2(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF4C1D95),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              );
-            }),
+            DistanceCard(
+              activity: activity,
+              distanceController: distanceController,
+              onDistanceChanged: () => activity.refresh(),
+            ),
 
             // Effort and Type dropdowns
-            Obx(() {
-              if (activity.value == 'Rest day') return const SizedBox.shrink();
-              return Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Get.bottomSheet(EffortSelectionBottomsheet(effort: effort)),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'EFFORT',
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF8B5CF6)),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              effort.value,
-                              style: getTextStyle2(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF4C1D95),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12.0),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Get.bottomSheet(TypeSelectionBottomsheet(type: type)),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'TYPE',
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF8B5CF6)),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              type.value,
-                              style: getTextStyle2(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF4C1D95),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }),
+            EffortAndTypeRow(
+              activity: activity,
+              effort: effort,
+              type: type,
+            ),
             const SizedBox(height: 32),
 
             // Save Session Button
@@ -401,24 +164,6 @@ class AddSportSessionBottomsheet extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // Time Picker Helper
-  Future<void> _pickTime(BuildContext context, RxString timeField) async {
-    final currentParts = timeField.value.split(':');
-    final currentHour = currentParts.isNotEmpty ? int.tryParse(currentParts[0]) ?? 12 : 12;
-    final currentMinute = currentParts.length > 1 ? int.tryParse(currentParts[1]) ?? 0 : 0;
-
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: currentHour, minute: currentMinute),
-    );
-    if (picked != null) {
-      final formattedHour = picked.hour.toString().padLeft(2, '0');
-      final formattedMinute = picked.minute.toString().padLeft(2, '0');
-      timeField.value = '$formattedHour:$formattedMinute';
-      _updateDuration();
-    }
   }
 
   // Calculate duration automatically based on start and end time
