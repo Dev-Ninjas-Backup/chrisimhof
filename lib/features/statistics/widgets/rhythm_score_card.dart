@@ -16,25 +16,23 @@ class RhythmScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.authDarkAlt, // Dark forest green: #143226
-          borderRadius: BorderRadius.circular(24.0),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -71,
-              top: -40,
-              child: Container(
-                width: 192,
-                height: 192,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryButtonColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(9999.0),
-                ),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.authDarkAlt, // Dark forest green: #143226
+        borderRadius: BorderRadius.circular(24.0),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -71,
+            top: -40,
+            child: Container(
+              width: 192,
+              height: 192,
+              decoration: BoxDecoration(
+                color: AppColors.primaryButtonColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(9999.0),
               ),
             ),
             Positioned(
@@ -57,70 +55,70 @@ class RhythmScoreCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 28.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Left Column
-                        Expanded(
-                          child: Column(
-                            children: [
-                              MetricProgressRow(
-                                label: 'Sleep',
-                                percentage: controller.sleepMetric.value,
-                                barColor: AppColors.primaryButtonColor,
-                              ),
-                              const SizedBox(height: 14.0),
-                              MetricProgressRow(
-                                label: 'Caffeine',
-                                percentage: controller.caffeineMetric.value,
-                                barColor: const Color(0xFFFFA726), // Orange
-                              ),
-                              const SizedBox(height: 14.0),
-                              MetricProgressRow(
-                                label: 'Sport',
-                                percentage: controller.sportMetric.value,
-                                barColor: const Color(0xFF8B5CF6), // Purple
-                              ),
-                            ],
-                          ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28.0),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left Column
+                      Expanded(
+                        child: Column(
+                          children: [
+                            MetricProgressRow(
+                              label: 'Sleep',
+                              percentage: controller.sleepMetric.value,
+                              barColor: AppColors.primaryButtonColor,
+                            ),
+                            const SizedBox(height: 14.0),
+                            MetricProgressRow(
+                              label: 'Caffeine',
+                              percentage: controller.caffeineMetric.value,
+                              barColor: AppColors.orangeAccent, // Orange
+                            ),
+                            const SizedBox(height: 14.0),
+                            MetricProgressRow(
+                              label: 'Sport',
+                              percentage: controller.sportMetric.value,
+                              barColor: AppColors.violet, // Purple
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 24.0),
-                        // Right Column
-                        Expanded(
-                          child: Column(
-                            children: [
-                              MetricProgressRow(
-                                label: 'Hydration',
-                                percentage: controller.hydrationMetric.value,
-                                barColor: AppColors.blue,
-                              ),
-                              const SizedBox(height: 14.0),
-                              MetricProgressRow(
-                                label: 'Nutrition',
-                                percentage: controller.nutritionMetric.value,
-                                barColor: AppColors.rose,
-                              ),
-                              const SizedBox(height: 14.0),
-                              MetricProgressRow(
-                                label: 'Work fit',
-                                percentage: controller.workFitMetric.value,
-                                barColor: AppColors.primaryButtonColor,
-                              ),
-                            ],
-                          ),
+                      ),
+                      const SizedBox(width: 24.0),
+                      // Right Column
+                      Expanded(
+                        child: Column(
+                          children: [
+                            MetricProgressRow(
+                              label: 'Hydration',
+                              percentage: controller.hydrationMetric.value,
+                              barColor: AppColors.blue,
+                            ),
+                            const SizedBox(height: 14.0),
+                            MetricProgressRow(
+                              label: 'Nutrition',
+                              percentage: controller.nutritionMetric.value,
+                              barColor: AppColors.rose,
+                            ),
+                            const SizedBox(height: 14.0),
+                            MetricProgressRow(
+                              label: 'Work fit',
+                              percentage: controller.workFitMetric.value,
+                              barColor: AppColors.primaryButtonColor,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      );
-    });
+          ),
+        ],
+      ),
+    );
   }
 }

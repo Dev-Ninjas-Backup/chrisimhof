@@ -1,52 +1,9 @@
-import 'dart:async';
 import 'dart:math' as math;
+import 'package:chrisimhof/core/common/controller/circadian_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:get/get.dart';
-
-import '../../const/icon_path.dart';
-
-// ─────────────────────────────────────────────
-// Controller
-// ─────────────────────────────────────────────
-
-class CircadianController extends GetxController {
-  final DateTime? customTime;
-
-  CircadianController({this.customTime});
-
-  final Rx<DateTime> currentTime = DateTime.now().obs;
-  Timer? _timer;
-
-  @override
-  void onInit() {
-    super.onInit();
-    currentTime.value = customTime ?? DateTime.now();
-    if (customTime == null) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        currentTime.value = DateTime.now();
-      });
-    }
-  }
-
-  @override
-  void onClose() {
-    _timer?.cancel();
-    super.onClose();
-  }
-
-  double get _hours =>
-      currentTime.value.hour +
-      (currentTime.value.minute / 60.0) +
-      (currentTime.value.second / 3600.0);
-
-  double get sunAngle => (math.pi / 2) + (_hours / 24.0) * 2 * math.pi;
-
-  double get moonAngle => sunAngle + math.pi;
-}
-
-// ─────────────────────────────────────────────
-// Widget
-// ─────────────────────────────────────────────
 
 class CircadianAvatar extends StatelessWidget {
   final String imagePath;
@@ -79,6 +36,11 @@ class CircadianAvatar extends StatelessWidget {
       tag: tag,
       permanent: false,
     );
+
+    // Update time if customTime changes on rebuild
+    if (customTime != null) {
+      controller.currentTime.value = customTime!;
+    }
 
     final double r = orbitRadius;
 
@@ -136,9 +98,9 @@ class CircadianAvatar extends StatelessWidget {
                           offset: Offset(sunX, sunY),
                           child: _buildOrb(
                             icon: IconPath.sun,
-                            color: Colors.white,
+                            color: AppColors.white,
                             glowColor:
-                                Colors.yellowAccent.withValues(alpha: .65),
+                                AppColors.yellowAccent.withValues(alpha: .65),
                           ),
                         ),
                         Transform.translate(

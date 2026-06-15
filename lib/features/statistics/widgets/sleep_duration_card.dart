@@ -15,59 +15,57 @@ class SleepDurationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24.0),
-          border: Border.all(color: AppColors.borderSoft),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'SLEEP DURATION'.tr,
-              style: getTextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSoft,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(24.0),
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'SLEEP DURATION'.tr,
+            style: getTextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSoft,
+            ),
+          ),
+          const SizedBox(height: 6.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                controller.sleepDurationValue.value,
+                style: getTextStyle2(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryTextColor,
+                ),
               ),
-            ),
-            const SizedBox(height: 6.0),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  controller.sleepDurationValue.value,
-                  style: getTextStyle2(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryTextColor,
-                  ),
+              const SizedBox(width: 4.0),
+              Text(
+                'avg'.tr,
+                style: getTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryButtonColor,
                 ),
-                const SizedBox(width: 4.0),
-                Text(
-                  'avg'.tr,
-                  style: getTextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryButtonColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            SparklineCurve(
-              data: controller.sleepDurationData,
-              lineColor: const Color(0xFF8B5CF6), // Purple
-              fillColor: const Color(0xFF8B5CF6),
-            ),
-          ],
-        ),
-      );
-    });
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          SparklineCurve(
+            data: controller.sleepDurationData,
+            lineColor: AppColors.violet, // Purple
+            fillColor: AppColors.violet,
+          ),
+        ],
+      ),
+    );
   }
 }

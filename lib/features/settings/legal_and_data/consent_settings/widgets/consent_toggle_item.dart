@@ -29,12 +29,12 @@ class ConsentToggleItem extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderSoft, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: AppColors.black.withOpacity(0.03),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

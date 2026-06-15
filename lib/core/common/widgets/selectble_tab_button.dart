@@ -24,7 +24,7 @@ class SelectableTabButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primaryButtonColor
-              : const Color(0xFFF3F4F6),
+              : AppColors.gray100,
           borderRadius: BorderRadius.circular(10000),
         ),
         child: Text(
@@ -32,7 +32,7 @@ class SelectableTabButton extends StatelessWidget {
           style: getTextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : AppColors.primaryTextColor,
+            color: isSelected ? AppColors.white : AppColors.primaryTextColor,
           ),
         ),
       ),

@@ -18,7 +18,7 @@ class BuildCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderSoft, width: 1),
       ),

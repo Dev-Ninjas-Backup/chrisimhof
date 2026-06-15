@@ -18,7 +18,7 @@ class WearablesGroup extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 30),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         border: Border.all(
           color: AppColors.borderColor,
           style: BorderStyle.solid,

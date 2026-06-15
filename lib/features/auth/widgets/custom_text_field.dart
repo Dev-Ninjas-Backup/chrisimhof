@@ -70,7 +70,7 @@ class CustomTextField extends StatelessWidget {
                   : Icon(prefixIcon, size: 18, color: AppColors.textSoft),
               suffixIcon: suffixIcon,
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.white,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 14,
                 vertical: 14,

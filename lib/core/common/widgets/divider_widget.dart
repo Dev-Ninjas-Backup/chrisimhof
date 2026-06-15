@@ -9,7 +9,7 @@ class DividerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: Color(0xFFD5D7DA), thickness: 1)),
+        Expanded(child: Divider(color: AppColors.borderColor, thickness: 1)),
         const SizedBox(width: 8),
         Text(
           'Or',
@@ -20,7 +20,7 @@ class DividerWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Expanded(child: Divider(color: Color(0xFFD5D7DA), thickness: 1)),
+        Expanded(child: Divider(color: AppColors.borderColor, thickness: 1)),
       ],
     );
   }

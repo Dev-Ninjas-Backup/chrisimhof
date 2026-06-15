@@ -38,7 +38,7 @@ class CustomButton extends StatelessWidget {
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primaryButtonColor,
-          foregroundColor: textColor ?? Colors.white,
+          foregroundColor: textColor ?? AppColors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
@@ -46,7 +46,7 @@ class CustomButton extends StatelessWidget {
             side: borderWidth != null
                 ? BorderSide(
                     width: borderWidth!.toDouble(),
-                    color: borderColor ?? Color(0xFFE5E5E5),
+                    color: borderColor ?? AppColors.greyBorderAlt,
                   )
                 : BorderSide.none,
           ),
@@ -63,12 +63,12 @@ class CustomButton extends StatelessWidget {
                 style: getTextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: textColor ?? Colors.black,
+                  color: textColor ?? AppColors.black,
                 ),
               ),
               if (icon != null) const SizedBox(width: 4),
               if (icon != null)
-                Icon(icon, size: 20, color: iconColor ?? Colors.black),
+                Icon(icon, size: 20, color: iconColor ?? AppColors.black),
             ],
           ),
         ),

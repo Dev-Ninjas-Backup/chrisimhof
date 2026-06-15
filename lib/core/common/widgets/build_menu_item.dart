@@ -34,7 +34,7 @@ class BuildMenuItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
           border: Border.all(color: AppColors.borderSoft, width: 1),
         ),

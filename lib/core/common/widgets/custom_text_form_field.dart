@@ -54,7 +54,7 @@ class CustomTextFormField extends StatelessWidget {
                 const TextSpan(
                   text: ' *',
                   style: TextStyle(
-                    color: Colors.red,
+                    color: AppColors.red,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -73,7 +73,7 @@ class CustomTextFormField extends StatelessWidget {
             textInputAction: textInputAction,
             onChanged: onChanged,
             validator: validator,
-            cursorColor: Colors.black,
+            cursorColor: AppColors.black,
             style: const TextStyle(
               color: AppColors.secondaryTextColor,
               fontSize: 16,
@@ -103,19 +103,19 @@ class CustomTextFormField extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(1000),
-                borderSide: BorderSide(color: Color(0xFF6B7280), width: 1),
+                borderSide: BorderSide(color: AppColors.greyMedium, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(1000),
-                borderSide: BorderSide(color: Colors.black, width: 1.5),
+                borderSide: BorderSide(color: AppColors.black, width: 1.5),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(1000),
-                borderSide: BorderSide(color: Colors.red, width: 1.2),
+                borderSide: BorderSide(color: AppColors.red, width: 1.2),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(1000),
-                borderSide: BorderSide(color: Colors.red, width: 1.5),
+                borderSide: BorderSide(color: AppColors.red, width: 1.5),
               ),
               isDense: true,
               filled: false,

@@ -11,95 +11,112 @@ class RecomendationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RecomendationsController controller = Get.put(
-      RecomendationsController(),
+    final RecommendationController controller = Get.put(
+      RecommendationController(),
     );
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 120.0),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const CustomAppBar(
-                showBackButton: true,
-                showSettingsButton: false,
-                showLogo: false,
-                title: 'Recommendations',
-                showMoreButton: true,
+      body: SafeArea(
+        bottom: false,
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primaryButtonColor,
               ),
-              const SizedBox(height: 28),
+            );
+          }
 
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24.0),
-                decoration: BoxDecoration(
-                  color: AppColors.mintSoft, // #E8FBF3
-                  borderRadius: BorderRadius.circular(24.0),
+          final data = controller.recommendationResponse.value?.data;
+          final recommendations = data?.recommendations ?? [];
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 120,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomAppBar(
+                  showBackButton: true,
+                  showSettingsButton: false,
+                  showLogo: false,
+                  title: 'Recommendations',
+                  showMoreButton: true,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.auto_awesome, // Sparkle icon
-                          color: AppColors.primaryButtonColor,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          '13 ACTIONS FOR TODAY',
-                          style: getTextStyle2(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+
+                const SizedBox(height: 28),
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.mintSoft,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome,
                             color: AppColors.primaryButtonColor,
+                            size: 18,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6.0),
-                    Text(
-                      'Your night-shift rhythm is mostly stable — focus on caffeine timing & sleep window.',
-                      style: getTextStyle2(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.mint3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 28.0),
+                          const SizedBox(width: 8),
 
-              Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40.0),
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryButtonColor,
+                          Expanded(
+                            child: Text(
+                              data?.actionsLabel ?? '',
+                              style: getTextStyle2(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryButtonColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  );
-                }
-                return Column(
-                  children: controller.recomendationsList.map((item) {
+
+                      const SizedBox(height: 6),
+
+                      Text(
+                        data?.contextNote ?? '',
+                        style: getTextStyle2(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.mint3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: recommendations.length,
+                  itemBuilder: (context, index) {
+                    final item = recommendations[index];
+
                     return RecomendationCard(
                       recomendation: item,
                       onTap: () {
                         debugPrint('Tapped ${item.title}');
                       },
                     );
-                  }).toList(),
-                );
-              }),
-            ],
-          ),
-        ),
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

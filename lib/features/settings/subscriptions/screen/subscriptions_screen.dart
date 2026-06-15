@@ -68,7 +68,7 @@ class SubscriptionsScreen extends StatelessWidget {
                             child: Text(
                               controller.errorMessage.value,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.red),
+                              style: const TextStyle(color: AppColors.red),
                             ),
                           ),
                         );
@@ -129,7 +129,7 @@ class SubscriptionsScreen extends StatelessWidget {
                                 controller.subscribeSelectedPlan();
                               },
                         backgroundColor: isCurrentPlan
-                            ? const Color(0xFFE9EAEB)
+                            ? AppColors.gray100Alt
                             : null,
                         textColor: isCurrentPlan ? AppColors.textMid : null,
                       );

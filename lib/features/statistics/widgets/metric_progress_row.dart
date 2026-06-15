@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:get/get.dart';
 
 /// A linear progress indicator row with name and value
@@ -28,7 +29,7 @@ class MetricProgressRow extends StatelessWidget {
               style: getTextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: AppColors.white.withValues(alpha: 0.7),
               ),
             ),
             Text(
@@ -36,7 +37,7 @@ class MetricProgressRow extends StatelessWidget {
               style: getTextStyle2(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.white,
               ),
             ),
           ],
@@ -46,7 +47,7 @@ class MetricProgressRow extends StatelessWidget {
           width: double.infinity,
           height: 5,
           decoration: BoxDecoration(
-            color: const Color(0xFF1B382D), // Dark track inside dark card
+            color: AppColors.darkGreenTrack, // Dark track inside dark card
             borderRadius: BorderRadius.circular(2.5),
           ),
           child: FractionallySizedBox(

@@ -13,7 +13,7 @@ class ChangePasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(ChangePasswordController());
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
