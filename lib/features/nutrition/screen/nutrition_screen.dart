@@ -13,6 +13,8 @@ import 'package:get/get.dart';
 class NutritionScreen extends StatelessWidget {
   const NutritionScreen({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
     final NutritionController controller = Get.put(NutritionController());
