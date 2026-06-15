@@ -2,6 +2,10 @@ import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
+import 'package:chrisimhof/features/sports/widgets/distance_input_dialog.dart';
+import 'package:chrisimhof/features/sports/widgets/effort_selection_bottomsheet.dart';
+import 'package:chrisimhof/features/sports/widgets/type_selection_bottomsheet.dart';
+import 'package:chrisimhof/features/sports/widgets/zone_selection_bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -32,58 +36,177 @@ class AddSportSessionBottomsheet extends StatelessWidget {
     final SportsController controller = Get.find<SportsController>();
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28.0)),
+        color: Color(0xFFEDE9FE), // Soft purple background matching figma
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32.0)),
       ),
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5E7EB),
-                  borderRadius: BorderRadius.circular(2.0),
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
+            // Top Bar with title and close button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Log Sport Session'.tr,
-                  style: getTextStyle2(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryTextColor,
+                  'LOG NEW SESSION',
+                  style: getTextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF4C1D95),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  onPressed: () => Get.back(),
+                GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      size: 14,
+                      color: Color(0xFF4C1D95),
+                    ),
+                  ),
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+
+            // Large Duration and Zone Selector (Interactive)
+            Obx(() => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => Get.bottomSheet(ZoneSelectionBottomsheet(zone: zone)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    '${duration.value}',
+                    style: getTextStyle2(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF4C1D95),
+                    ),
+                  ),
+                  const SizedBox(width: 4.0),
+                  Text(
+                    'min · ${zone.value}',
+                    style: getTextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF4C1D95),
+                    ),
+                  ),
+                ],
+              ),
+            )),
             const SizedBox(height: 16),
-    
-            // Activity Chip Selector
-            Text('Activity'.tr,
-                style: getTextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.secondaryTextColor)),
-            const SizedBox(height: 8),
+
+            // Time range row
             Obx(() => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:
-                      ['Running', 'Strength', 'Yoga', 'Rest day'].map((act) {
-                    final isSelected = activity.value == act;
-                    return ChoiceChip(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _pickTime(context, startTime),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'START',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF8B5CF6),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            startTime.value,
+                            style: getTextStyle2(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF4C1D95),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Color(0xFF8B5CF6),
+                    size: 16,
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _pickTime(context, endTime),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'END',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF8B5CF6),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            endTime.value,
+                            style: getTextStyle2(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF4C1D95),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )),
+            const SizedBox(height: 24),
+
+            // Activity Type Section
+            const Text(
+              'ACTIVITY TYPE',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF8B5CF6),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Obx(() => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: ['Running', 'Cycling', 'Swimming', 'Walking', 'Rest day'].map((act) {
+                  final isSelected = activity.value == act;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
                       label: Text(act.tr),
                       selected: isSelected,
                       onSelected: (val) {
@@ -92,191 +215,172 @@ class AddSportSessionBottomsheet extends StatelessWidget {
                           if (act == 'Rest day') {
                             type.value = 'Rest';
                             zone.value = '';
-                          } else if (act == 'Strength') {
-                            type.value = 'Strength';
+                            duration.value = 0;
+                          } else if (act == 'Cycling') {
+                            type.value = 'Cardio';
                             zone.value = 'Z2';
-                          } else if (act == 'Yoga') {
-                            type.value = 'Flexibility';
+                            _updateDuration();
+                          } else if (act == 'Swimming') {
+                            type.value = 'Cardio';
+                            zone.value = 'Z3';
+                            _updateDuration();
+                          } else if (act == 'Walking') {
+                            type.value = 'Cardio';
                             zone.value = 'Z1';
+                            _updateDuration();
                           } else {
                             type.value = 'Cardio';
                             zone.value = 'Z3';
+                            _updateDuration();
                           }
                         }
                       },
-                      selectedColor:
-                          AppColors.primaryButtonColor.withValues(alpha: 0.15),
-                      labelStyle: getTextStyle(
-                        fontSize: 12,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected
-                            ? AppColors.mintSoftText
-                            : AppColors.primaryTextColor,
+                      selectedColor: const Color(0xFF4C1D95),
+                      backgroundColor: Colors.white.withValues(alpha: 0.6),
+                      showCheckmark: false,
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide.none,
                       ),
-                    );
-                  }).toList(),
-                )),
-            const SizedBox(height: 16),
-    
+                      labelStyle: getTextStyle(
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        color: isSelected ? Colors.white : const Color(0xFF4C1D95),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            )),
+            const SizedBox(height: 24),
+
+            // Distance Section
             Obx(() {
               if (activity.value == 'Rest day') return const SizedBox.shrink();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Duration Slider & Quick select
-                  Text('Duration'.tr,
-                      style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondaryTextColor)),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Slider(
-                          value: duration.value.toDouble(),
-                          min: 5,
-                          max: 180,
-                          divisions: 35,
-                          activeColor: AppColors.primaryButtonColor,
-                          label: '${duration.value} min',
-                          onChanged: (val) {
-                            duration.value = val.round();
-                          },
-                        ),
+                  GestureDetector(
+                    onTap: () => Get.dialog(DistanceInputDialog(distanceController: distanceController)),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
-                      Text('${duration.value} min'.tr,
-                          style: getTextStyle(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'DISTANCE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF8B5CF6),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            distanceController.text.isEmpty ? '—' : distanceController.text,
+                            style: getTextStyle2(
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.primaryTextColor)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-    
-                  // Zone Selection
-                  Text('Heart Rate Zone'.tr,
-                      style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondaryTextColor)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: ['Z1', 'Z2', 'Z3', 'Z4', 'Z5'].map((z) {
-                      final isSelected = zone.value == z;
-                      return ChoiceChip(
-                        label: Text(z),
-                        selected: isSelected,
-                        onSelected: (val) {
-                          if (val) zone.value = z;
-                        },
-                        selectedColor: AppColors.primaryButtonColor
-                            .withValues(alpha: 0.15),
-                        labelStyle: getTextStyle(
-                          fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected
-                              ? AppColors.mintSoftText
-                              : AppColors.primaryTextColor,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-    
-                  // Effort Selection
-                  Text('Effort'.tr,
-                      style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondaryTextColor)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: ['Light', 'Medium', 'High'].map((ef) {
-                      final isSelected = effort.value == ef;
-                      return ChoiceChip(
-                        label: Text(ef.tr),
-                        selected: isSelected,
-                        onSelected: (val) {
-                          if (val) effort.value = ef;
-                        },
-                        selectedColor: AppColors.primaryButtonColor
-                            .withValues(alpha: 0.15),
-                        labelStyle: getTextStyle(
-                          fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected
-                              ? AppColors.mintSoftText
-                              : AppColors.primaryTextColor,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-    
-                  // Type Selection
-                  Text('Type'.tr,
-                      style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.secondaryTextColor)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: ['Cardio', 'Strength', 'Flexibility'].map((t) {
-                      final isSelected = type.value == t;
-                      return ChoiceChip(
-                        label: Text(t.tr),
-                        selected: isSelected,
-                        onSelected: (val) {
-                          if (val) type.value = t;
-                        },
-                        selectedColor: AppColors.primaryButtonColor
-                            .withValues(alpha: 0.15),
-                        labelStyle: getTextStyle(
-                          fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected
-                              ? AppColors.mintSoftText
-                              : AppColors.primaryTextColor,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-    
-                  if (activity.value == 'Running') ...[
-                    // Distance
-                    Text('Distance'.tr,
-                        style: getTextStyle2(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.secondaryTextColor)),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: distanceController,
-                      decoration: InputDecoration(
-                        hintText: 'e.g. 5.0 km',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                              color: const Color(0xFF4C1D95),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
+                  const SizedBox(height: 24),
                 ],
               );
             }),
-    
-            const SizedBox(height: 16),
+
+            // Effort and Type dropdowns
+            Obx(() {
+              if (activity.value == 'Rest day') return const SizedBox.shrink();
+              return Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Get.bottomSheet(EffortSelectionBottomsheet(effort: effort)),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'EFFORT',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF8B5CF6)),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              effort.value,
+                              style: getTextStyle2(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF4C1D95),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Get.bottomSheet(TypeSelectionBottomsheet(type: type)),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'TYPE',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF8B5CF6)),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              type.value,
+                              style: getTextStyle2(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF4C1D95),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+            const SizedBox(height: 32),
+
+            // Save Session Button
             CustomButton(
-              text: 'Save Session',
+              text: 'SAVE SESSION',
               icon: null,
-              backgroundColor: AppColors.primaryTextColor,
+              backgroundColor: const Color(0xFF4C1D95), // Deep purple matching Figma
               textColor: Colors.white,
               onTap: () {
                 controller.addSession(
@@ -287,16 +391,57 @@ class AddSportSessionBottomsheet extends StatelessWidget {
                   endTime: endTime.value,
                   effort: effort.value,
                   type: type.value,
-                  distance: activity.value == 'Running'
-                      ? distanceController.text
-                      : null,
+                  distance: activity.value == 'Rest day' ? null : distanceController.text,
                 );
                 Get.back();
               },
             ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
     );
+  }
+
+  // Time Picker Helper
+  Future<void> _pickTime(BuildContext context, RxString timeField) async {
+    final currentParts = timeField.value.split(':');
+    final currentHour = currentParts.isNotEmpty ? int.tryParse(currentParts[0]) ?? 12 : 12;
+    final currentMinute = currentParts.length > 1 ? int.tryParse(currentParts[1]) ?? 0 : 0;
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: currentHour, minute: currentMinute),
+    );
+    if (picked != null) {
+      final formattedHour = picked.hour.toString().padLeft(2, '0');
+      final formattedMinute = picked.minute.toString().padLeft(2, '0');
+      timeField.value = '$formattedHour:$formattedMinute';
+      _updateDuration();
+    }
+  }
+
+  // Calculate duration automatically based on start and end time
+  void _updateDuration() {
+    try {
+      final startParts = startTime.value.split(':');
+      final endParts = endTime.value.split(':');
+      if (startParts.length == 2 && endParts.length == 2) {
+        final sh = int.tryParse(startParts[0]) ?? 0;
+        final sm = int.tryParse(startParts[1]) ?? 0;
+        final eh = int.tryParse(endParts[0]) ?? 0;
+        final em = int.tryParse(endParts[1]) ?? 0;
+
+        int startMins = sh * 60 + sm;
+        int endMins = eh * 60 + em;
+        int diff = endMins - startMins;
+        if (diff < 0) {
+          diff += 24 * 60; // handle overnight sessions
+        }
+        duration.value = diff;
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 }

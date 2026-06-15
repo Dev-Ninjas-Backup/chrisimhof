@@ -477,6 +477,12 @@ class AppTranslations extends Translations {
       'Basic': 'Basique',
       'Free': 'Gratuit',
       'Current Plan': 'Plan actuel',
+      'GLOBAL RHYTHM SCORE': 'SCORE DE RYTHME GLOBAL',
+      'Work fit': 'Aptitude au travail',
+      'SLEEP DURATION': 'DURÉE DE SOMMEIL',
+      'CIRCADIAN STABILITY': 'STABILITÉ CIRCADIENNE',
+      'RECOVERY': 'RÉCUPÉRATION',
+       'FATIGUE PREDICTION': 'PRÉDICTION DE LA FATIGUE',
       'Subscribe': 'S\'abonner',
       'Basic daily score': 'Score quotidien de base',
       'Access to the core calculator (inputs+basic analysis)':
