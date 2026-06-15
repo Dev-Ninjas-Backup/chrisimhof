@@ -75,16 +75,25 @@ class SportsScreen extends StatelessWidget {
   void showLogSessionBottomSheet(
       BuildContext context, SportsController controller) {
     final activity = 'Running'.obs;
-    final duration = 30.obs;
+    final duration = 45.obs;
     final zone = 'Z3'.obs;
     final effort = 'Medium'.obs;
     final type = 'Cardio'.obs;
-    final distanceController = TextEditingController(text: '5.0 km');
-    final startTime = '08:00'.obs;
-    final endTime = '08:30'.obs;
+    final distanceController = TextEditingController(text: '6.8 km');
+    final startTime = '12:40'.obs;
+    final endTime = '13:25'.obs;
 
     Get.bottomSheet(
-      AddSportSessionBottomsheet(activity: activity, type: type, zone: zone, duration: duration, effort: effort, distanceController: distanceController, startTime: startTime, endTime: endTime),
+      AddSportSessionBottomsheet(
+        activity: activity,
+        type: type,
+        zone: zone,
+        duration: duration,
+        effort: effort,
+        distanceController: distanceController,
+        startTime: startTime,
+        endTime: endTime,
+      ),
       isScrollControlled: true,
     );
   }
