@@ -5,6 +5,7 @@ class AppColors {
 
   static const Color primaryButtonColor = Color(0xFF34D399);
   static const Color secondaryButtonColor = Color(0xFF10B981);
+  static const Color addButtonColor = Color(0XFF006C4B);
   static const Color mint = Color(0xFF83EDBA);
   static const Color mint2 = Color(0xFFF0FDF4);
   static const Color mint3 = Color(0xFF1E3A31);
@@ -19,7 +20,7 @@ class AppColors {
   static const Color primaryTextColor = Color(0xFF111827);
   static const Color secondaryTextColor = Color(0xFF414651);
   static const Color textMid = Color(0xFF4B5563);
-  static const Color textSoft = Color(0xFF9CA3AF);
+  static const Color textSoft = Color(0xFF6C7A71);
   static const Color subtle = Color(0xFFF3F6F4);
   static const Color borderColor = Color(0xFFD5D7DA);
   static const Color borderSoft = Color(0xFFEEF2F0);
@@ -100,4 +101,11 @@ class AppColors {
   static const Color roseDark = Color(0xFFBE123C);
   static const Color roseDarkest = Color(0xFF9F1239);
   static const Color emeraldMedium = Color(0xFF059669);
+
+  // ── Caffeine-card palette ──────────────────────────────────────────────────
+  static const Color caffeineBgStart = Color(0xFFFDE99A);
+  static const Color caffeineBgEnd = Color(0xFFFDEFB3);
+  static const Color caffeineBorder = Color(0xFF6CF8BB);
+  static const Color caffeineTextDark = Color(0xFFB45309);
+  static const Color caffeineAccent = Color(0xFFEDD083);
 }
