@@ -10,6 +10,8 @@ import 'package:chrisimhof/features/auth/microsoft_signin/service/api_service.da
 import 'package:chrisimhof/features/auth/microsoft_signin/service/microsoft_auth_service.dart';
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
+import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -72,7 +74,7 @@ class SignInController extends GetxController {
         debugPrint('Refresh Token: $refreshToken');
 
         EasyLoading.showSuccess(response.message);
-        Get.offAllNamed('/medicalDisclaimerScreen');
+        Get.offAll(NavbarScreen());
       } else {
         EasyLoading.showError(response.message);
       }

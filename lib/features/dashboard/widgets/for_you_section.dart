@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,7 +27,7 @@ class ForYouSection extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 // Navigate to RecommendationsScreen
-                Get.toNamed('/recomendationsScreen');
+                Get.toNamed(AppRoutes.recomendationsScreen);
               },
               child: Row(
                 children: [

@@ -6,7 +6,7 @@ import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_scre
 import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
-import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
+//import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/nutrition/screen/nutrition_screen.dart';
 import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
@@ -29,7 +29,7 @@ class AppRoutes {
   static String changePasswordScreen = '/changePasswordScreen';
   static String verifyCodeScreen = '/verifyCodeScreen';
   static String forgetPasswordEmailScreen = '/forgetPasswordEmailScreen';
-  static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
+  // static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
   static String recomendationsScreen = '/recomendationsScreen';
   static String legalAndDataScreen = '/legalAndDataScreen';
   static String privacyPolicyScreen = '/privacyPolicyScreen';
@@ -50,7 +50,7 @@ class AppRoutes {
   static String getCreateAccountScreen() => createAccountScreen;
   static String getChangePasswordScreen() => changePasswordScreen;
   static String getForgetPasswordEmailScreen() => forgetPasswordEmailScreen;
-  static String getMedicalDisclaimerScreen() => medicalDisclaimerScreen;
+  // static String getMedicalDisclaimerScreen() => medicalDisclaimerScreen;
   static String getRecomendationsScreen() => recomendationsScreen;
   static String getLegalAndDataScreen() => legalAndDataScreen;
   static String getPrivacyPolicyScreen() => privacyPolicyScreen;
@@ -76,10 +76,10 @@ class AppRoutes {
       name: forgetPasswordEmailScreen,
       page: () => ForgetPasswordEmailScreen(),
     ),
-    GetPage(
-      name: medicalDisclaimerScreen,
-      page: () => MedicalDisclaimerScreen(),
-    ),
+    // GetPage(
+    //   name: medicalDisclaimerScreen,
+    //   page: () => MedicalDisclaimerScreen(),
+    // ),
     GetPage(name: recomendationsScreen, page: () => RecomendationsScreen()),
     GetPage(name: legalAndDataScreen, page: () => LegalAndDataScreen()),
     GetPage(name: privacyPolicyScreen, page: () => const PrivacyPolicyScreen()),

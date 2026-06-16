@@ -49,37 +49,10 @@ class AppColors {
     0xFFFB7185,
   ); // late missed-bedtime accent
 
-  // Card background gradients
-  static const Color cardGreenStart = Color(
-    0xFF147A54,
-  ); // active day  (top-left)
-  static const Color cardGreenEnd = Color(
-    0xFF09402A,
-  ); // active day  (bottom-right)
-  static const Color cardLoggedStart = Color(
-    0xFF107C66,
-  ); // sleep logged (top-left)
-  static const Color cardLoggedEnd = Color(
-    0xFF074034,
-  ); // sleep logged (bottom-right)
-  static const Color cardMissedStart = Color(
-    0xFF65A30D,
-  ); // missed       (top-left)
-  static const Color cardMissedEnd = Color(
-    0xFF3F6212,
-  ); // missed       (bottom-right)
-  static const Color cardPrepStart = Color(
-    0xFF065F46,
-  ); // sleep prep   (top-left)
-  static const Color cardPrepEnd = Color(
-    0xFF022C22,
-  ); // sleep prep   (bottom-right)
 
   // Card chrome
   static const Color cardDivider = Color(0xFF17422E); // CTA top border
-  static const Color badgeFill = Color(
-    0xFF0D3D28,
-  ); // rhythm score pill background
+
 
   // Consolidated global colors
   static const Color white = Colors.white;

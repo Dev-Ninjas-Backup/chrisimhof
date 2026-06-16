@@ -98,7 +98,7 @@ class QuickAddSection extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 22),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -108,8 +108,8 @@ class QuickAddSection extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 38,
-                    height: 38,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: bgColor,
                       shape: BoxShape.circle,
@@ -148,11 +148,11 @@ class QuickAddSection extends StatelessWidget {
             ),
 
             Positioned(
-              top: -2,
-              right: 6,
+              top: -3,
+              right: -4,
               child: Container(
-                width: 18,
-                height: 18,
+                width: 20,
+                height: 20,
                 decoration: BoxDecoration(
                   color: AppColors.primaryButtonColor,
                   shape: BoxShape.circle,

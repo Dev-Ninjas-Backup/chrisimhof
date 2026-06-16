@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/widgets/sleep_orbit_widget.dart';
@@ -16,16 +17,7 @@ class BedtimeCard extends StatelessWidget {
       final data = controller.dashboardData.value;
 
       // ── Card gradient — 4 states ──────────────────────────────────────────────
-      final List<Color> gradientColors;
-      if (data.isSleepLogged) {
-        gradientColors = [AppColors.cardLoggedStart, AppColors.cardLoggedEnd];
-      } else if (data.isMissedBedtime) {
-        gradientColors = [AppColors.cardMissedStart, AppColors.cardMissedEnd];
-      } else if (data.isSleepPrep) {
-        gradientColors = [AppColors.cardPrepStart, AppColors.cardPrepEnd];
-      } else {
-        gradientColors = [AppColors.cardGreenStart, AppColors.cardGreenEnd];
-      }
+      
 
       final Color timeColor = data.isMissedBedtime
           ? AppColors.mintLight
@@ -34,11 +26,11 @@ class BedtimeCard extends StatelessWidget {
       return Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradientColors,
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+            colors:[ Color(0xFF062A20), Color(0xFF0E3626),Color(0xFF0A2E22)],
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -153,9 +145,6 @@ class BedtimeCard extends StatelessWidget {
         ? "Log sleep — it's not too late"
         : "Log tonight's sleep";
 
-    final Color iconColor = isMissed && !isLogged
-        ? AppColors.mintLight
-        : AppColors.primaryButtonColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -176,13 +165,7 @@ class BedtimeCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      isLogged
-                          ? Icons.check_circle_outline
-                          : Icons.nightlight_round,
-                      color: iconColor,
-                      size: 20,
-                    ),
+                    Image.asset(IconPath.sleep,height: 20,width: 20,),
                     const SizedBox(width: 12),
                     Text(
                       label,
@@ -273,10 +256,10 @@ class PulsingRhythmBadge extends StatelessWidget {
     controller.updateState(isSleepPrep: isSleepPrep);
 
     final badge = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.badgeFill,
-        borderRadius: BorderRadius.circular(30),
+        color: AppColors.primaryButtonColor.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.secondaryButtonColor.withValues(alpha: 0.18),
           width: 1,
