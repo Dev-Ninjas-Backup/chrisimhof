@@ -20,6 +20,7 @@ import 'package:chrisimhof/features/settings/legal_and_data/privacy_policy/scree
 import 'package:chrisimhof/features/settings/legal_and_data/terms_of_use/screen/terms_of_use_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
 import 'package:chrisimhof/features/sports/screen/sports_screen.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/screen/caffeine_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -45,6 +46,7 @@ class AppRoutes {
   static String nutritionScreen = '/nutritionScreen';
   static String sportsScreen = '/sportsScreen';
   static String hydrationScreen = '/hydrationScreen';
+  static String caffeineScreen = '/caffeineScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -69,6 +71,8 @@ class AppRoutes {
   static String getSportsScreen() => sportsScreen;
   static String getHydrationScreen() => hydrationScreen;
   
+  static String getCaffeineScreen() => caffeineScreen;
+
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
     GetPage(name: welcomeScreen, page: () => const WelcomeScreen()),
@@ -101,5 +105,6 @@ class AppRoutes {
     GetPage(name: nutritionScreen, page: () => const NutritionScreen()),
     GetPage(name: sportsScreen, page: () => const SportsScreen()),
     GetPage(name: hydrationScreen, page: () => const HydrationScreen()),
+    GetPage(name: caffeineScreen, page: () => const CaffeineScreen()),
   ];
 }
