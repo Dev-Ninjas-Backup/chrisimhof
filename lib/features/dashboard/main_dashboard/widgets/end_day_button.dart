@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
