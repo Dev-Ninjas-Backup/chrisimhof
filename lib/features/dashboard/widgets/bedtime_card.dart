@@ -61,8 +61,8 @@ class BedtimeCard extends StatelessWidget {
                           Text(
                             data.optimalBedtime,
                             style: getTextStyle2(
-                              fontSize: 52,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 50,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.white,
                             ),
                           ),

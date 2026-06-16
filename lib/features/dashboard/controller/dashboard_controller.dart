@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:chrisimhof/features/dashboard/model/dashboard_model.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
@@ -119,13 +118,7 @@ class DashboardController extends GetxController {
   }
 
   void addWater() {
-    final current = dashboardData.value;
-    final w = current.waterLiters + 0.25;
-    dashboardData.value = current.copyWith(
-      waterLiters: double.parse(w.toStringAsFixed(2)),
-      hydrationProgress: (w / 2.0).clamp(0.0, 1.0),
-    );
-    EasyLoading.showToast('Water logged: +250ml');
+    Get.toNamed(AppRoutes.hydrationScreen);
   }
 
   void addCaffeine() {
