@@ -4,6 +4,7 @@ class SharedPreferencesHelper {
   static const String _accessTokenKey = 'accessToken';
   static const String _refreshTokenKey = 'refreshToken';
   static const String _isLoggedInKey = 'isLoggedIn';
+  static const String _sessionIdKey = 'sessionId';
 
   // Save access token
   static Future<void> saveAccessToken(String token) async {
@@ -29,6 +30,18 @@ class SharedPreferencesHelper {
     return prefs.getString(_refreshTokenKey);
   }
 
+  // Save session id
+  static Future<void> saveSessionId(String sessionId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_sessionIdKey, sessionId);
+  }
+
+  // Get session id
+  static Future<String?> getSessionId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_sessionIdKey);
+  }
+
   // Save login status
   static Future<void> setLoginStatus(bool value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -47,5 +60,6 @@ class SharedPreferencesHelper {
     await prefs.remove(_accessTokenKey);
     await prefs.remove(_refreshTokenKey);
     await prefs.remove(_isLoggedInKey);
+    await prefs.remove(_sessionIdKey);
   }
 }
