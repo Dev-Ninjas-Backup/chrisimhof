@@ -1,7 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/caffeine/controller/caffeine_controller.dart';
-import 'package:chrisimhof/features/caffeine/widgets/caffeine_entry_dialog.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_dialog.dart';
 import 'package:flutter/material.dart';
 
 class QuickAddChipsSection extends StatelessWidget {

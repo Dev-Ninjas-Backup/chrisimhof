@@ -19,7 +19,7 @@ import 'package:chrisimhof/features/settings/legal_and_data/privacy_policy/scree
 import 'package:chrisimhof/features/settings/legal_and_data/terms_of_use/screen/terms_of_use_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
 import 'package:chrisimhof/features/sports/screen/sports_screen.dart';
-import 'package:chrisimhof/features/caffeine/screen/caffeine_screen.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/screen/caffeine_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {

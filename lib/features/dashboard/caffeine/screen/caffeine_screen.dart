@@ -1,12 +1,12 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/caffeine/controller/caffeine_controller.dart';
-import 'package:chrisimhof/features/caffeine/widgets/active_in_body_card.dart';
-import 'package:chrisimhof/features/caffeine/widgets/caffeine_cut_off_card.dart';
-import 'package:chrisimhof/features/caffeine/widgets/caffeine_entry_card.dart';
-import 'package:chrisimhof/features/caffeine/widgets/caffeine_entry_dialog.dart';
-import 'package:chrisimhof/features/caffeine/widgets/quick_add_chips_section.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/active_in_body_card.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_cut_off_card.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_card.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_dialog.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/quick_add_chips_section.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

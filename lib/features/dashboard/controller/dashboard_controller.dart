@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:chrisimhof/features/dashboard/model/dashboard_model.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 

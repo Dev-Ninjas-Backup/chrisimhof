@@ -1,6 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/caffeine/model/caffeine_entry.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:flutter/material.dart';
 
 class CaffeineEntryCard extends StatelessWidget {

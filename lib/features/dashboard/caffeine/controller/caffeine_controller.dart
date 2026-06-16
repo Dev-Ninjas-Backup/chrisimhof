@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:chrisimhof/features/caffeine/model/caffeine_entry.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:chrisimhof/features/dashboard/controller/dashboard_controller.dart';
 import 'package:get/get.dart';
 
