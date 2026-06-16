@@ -6,6 +6,7 @@ import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_scre
 import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
+import 'package:chrisimhof/features/hydration/screen/hydration_screen.dart';
 //import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/nutrition/screen/nutrition_screen.dart';
 import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';
@@ -44,6 +45,7 @@ class AppRoutes {
   static String connectedSourcesScreen = '/connectedSourcesScreen';
   static String nutritionScreen = '/nutritionScreen';
   static String sportsScreen = '/sportsScreen';
+  static String hydrationScreen = '/hydrationScreen';
   static String caffeineScreen = '/caffeineScreen';
 
   static String getSplashScreen() => splashScreen;
@@ -67,6 +69,8 @@ class AppRoutes {
   static String getVerifyCodeScreen() => verifyCodeScreen;
   static String getNutritionScreen() => nutritionScreen;
   static String getSportsScreen() => sportsScreen;
+  static String getHydrationScreen() => hydrationScreen;
+  
   static String getCaffeineScreen() => caffeineScreen;
 
   static List<GetPage> routes = [
@@ -100,6 +104,7 @@ class AppRoutes {
     GetPage(name: verifyCodeScreen, page: () => const VerifyCodeScreen()),
     GetPage(name: nutritionScreen, page: () => const NutritionScreen()),
     GetPage(name: sportsScreen, page: () => const SportsScreen()),
+    GetPage(name: hydrationScreen, page: () => const HydrationScreen()),
     GetPage(name: caffeineScreen, page: () => const CaffeineScreen()),
   ];
 }

@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+import 'package:chrisimhof/core/common/widgets/global_rhythm_ring_painter.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/statistics/widgets/sparkline_painter.dart';
@@ -26,7 +26,14 @@ class GlobalRhythmCircle extends StatelessWidget {
             children: [
               CustomPaint(
                 size: const Size(110, 110),
-                painter: _GlobalRhythmRingPainter(progress: animatedProgress),
+                painter: GlobalRhythmRingPainter(
+                  progress: animatedProgress,
+                  trackColor: AppColors.darkGreenTrack,
+                  progressColor: AppColors.primaryButtonColor,
+                  trackStrokeWidth: 6.0,
+                  progressStrokeWidth: 10.0,
+                  offset: 8.0,
+                ),
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -59,50 +66,7 @@ class GlobalRhythmCircle extends StatelessWidget {
   }
 }
 
-class _GlobalRhythmRingPainter extends CustomPainter {
-  final double progress;
 
-  const _GlobalRhythmRingPainter({required this.progress});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Offset center = size.center(Offset.zero);
-    final double radius = math.min(size.width, size.height) / 2 - 8;
-
-    final Paint trackPaint = Paint()
-      ..color =
-          AppColors.darkGreenTrack // Dark green track background
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
-      ..strokeCap = StrokeCap.round;
-
-    final Paint progressPaint = Paint()
-      ..color = AppColors
-          .primaryButtonColor // Mint green progress
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawCircle(center, radius, trackPaint);
-
-    const double startAngle = -math.pi / 2; // Start from top
-    final double maxSweepAngle = math.pi * 2; // Full circle
-    final double sweepAngle = maxSweepAngle * progress.clamp(0.0, 1.0);
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      sweepAngle,
-      false,
-      progressPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _GlobalRhythmRingPainter oldDelegate) {
-    return oldDelegate.progress != progress;
-  }
-}
 
 /// Custom sparkline painter for smooth wave charts
 class SparklineCurve extends StatelessWidget {
