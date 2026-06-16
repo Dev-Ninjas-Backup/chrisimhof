@@ -32,7 +32,7 @@ class StatisticsScreen extends StatelessWidget {
                 showSettingsButton: false,
                 showLogo: false,
                 title: 'Statistics',
-                showMoreButton: true,
+                showMoreButton: false,
               ),
               const SizedBox(height: 18.0),
 

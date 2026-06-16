@@ -38,7 +38,7 @@ class RecomendationsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CustomAppBar(
-                  showBackButton: false,
+                  showBackButton: true,
                   showSettingsButton: false,
                   showLogo: false,
                   title: 'Recommendations',

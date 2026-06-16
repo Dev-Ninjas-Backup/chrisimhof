@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SleepDurationCard extends StatelessWidget {
-  const SleepDurationCard({
-    super.key,
-    required this.controller,
-  });
+  const SleepDurationCard({super.key, required this.controller});
 
   final StatisticsController controller;
 
