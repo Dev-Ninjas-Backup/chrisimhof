@@ -62,6 +62,7 @@
 //   }
 // }
 
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:chrisimhof/features/recomendations/service/recomendation_service.dart';
 import 'package:get/get.dart';
@@ -91,12 +92,16 @@ class RecommendationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadRecommendations();
+  }
 
+  Future<void> _loadRecommendations() async {
     final currentLocale = Get.locale?.languageCode ?? 'en';
     final localeCode = currentLocale.toLowerCase() == 'fr' ? 'fr' : 'en';
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
 
     getRecommendations(
-      sessionId: 'cmqf6y0z1000h1wpbvxloyvbh',
+      sessionId: sessionId,
       locale: localeCode,
     );
   }
