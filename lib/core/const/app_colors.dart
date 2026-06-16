@@ -56,6 +56,11 @@ class AppColors {
   // Card chrome
   static const Color cardDivider = Color(0xFF17422E); // CTA top border
 
+  // Sleep details screen colors
+  static const Color sleepCardBg = Color(0xFF09201A);
+  static const Color selectionGray = Color(0xFF9CA3AF);
+  static const Color sleepIndicatorFaint = Color(0x2634D399); // #34D399 with 15% opacity
+  static const Color sleepHistoryCircle = Color(0xFFEFF6FF);
 
   // Consolidated global colors
   static const Color white = Colors.white;

@@ -6,6 +6,7 @@ import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_scre
 import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
+// import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/hydration/screen/hydration_screen.dart';
 //import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/nutrition/screen/nutrition_screen.dart';
@@ -21,6 +22,7 @@ import 'package:chrisimhof/features/settings/legal_and_data/terms_of_use/screen/
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
 import 'package:chrisimhof/features/sports/screen/sports_screen.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/screen/caffeine_screen.dart';
+import 'package:chrisimhof/features/dashboard/sleep/screen/sleep_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -47,6 +49,7 @@ class AppRoutes {
   static String sportsScreen = '/sportsScreen';
   static String hydrationScreen = '/hydrationScreen';
   static String caffeineScreen = '/caffeineScreen';
+  static String sleepScreen = '/sleepScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -72,6 +75,7 @@ class AppRoutes {
   static String getHydrationScreen() => hydrationScreen;
   
   static String getCaffeineScreen() => caffeineScreen;
+  static String getSleepScreen() => sleepScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -106,5 +110,6 @@ class AppRoutes {
     GetPage(name: sportsScreen, page: () => const SportsScreen()),
     GetPage(name: hydrationScreen, page: () => const HydrationScreen()),
     GetPage(name: caffeineScreen, page: () => const CaffeineScreen()),
+    GetPage(name: sleepScreen, page: () => const SleepScreen()),
   ];
 }

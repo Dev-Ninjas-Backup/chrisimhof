@@ -1,5 +1,5 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
-import 'package:chrisimhof/features/dashboard/screen/dashboard_screen.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/screen/dashboard_screen.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
 import 'package:chrisimhof/features/nav_bar/widget/custom_navbar.dart';
 import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';

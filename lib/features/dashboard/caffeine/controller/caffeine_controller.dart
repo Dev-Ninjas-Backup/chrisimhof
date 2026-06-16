@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
-import 'package:chrisimhof/features/dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:get/get.dart';
 
 class CaffeineController extends GetxController {
