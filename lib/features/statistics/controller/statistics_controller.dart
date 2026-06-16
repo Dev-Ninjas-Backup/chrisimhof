@@ -99,7 +99,7 @@ class StatisticsController extends GetxController {
       final trendList = analytics.sleepDuration!.trend!;
       final List<double> normalized = trendList.map((t) {
         final mins = t.durationMinutes ?? 0;
-        return (mins / 720.0) * 1.5;
+        return (mins / 720.0) * 1.5.clamp(0.0, 1.5);
       }).toList();
       sleepDurationData.assignAll(normalized);
       debugPrint(
@@ -114,10 +114,11 @@ class StatisticsController extends GetxController {
     // Map recoveryData from scoreTrend list using globalRhythmScore values normalized
     if (analytics.scoreTrend != null && analytics.scoreTrend!.isNotEmpty) {
       final List<double> trends = analytics.scoreTrend!.map((t) {
-        final score = t.globalRhythmScore ?? 0;
-        return (score / 100.0).clamp(0.0, 1.0);
+        final score = t.recoveryScore ?? 0;
+        return (score / 15.0).clamp(0.0, 2.0);
       }).toList();
       recoveryData.assignAll(trends);
+      debugPrint(" recoveryData: $trends");
     }
 
     sleepDebtValue.value = analytics.sleepDebt7d?.display ?? '';
@@ -127,6 +128,8 @@ class StatisticsController extends GetxController {
         0.0,
         1.0,
       );
+      print("sleep debt: ${analytics.sleepDebt7d!.minutes!.toString()}");
+      print("sleep debt progress: ${sleepDebtProgress.value.toString()}");
     }
 
     fatigueExpectedTime.value = analytics.fatiguePrediction?.expectedAt ?? '';
