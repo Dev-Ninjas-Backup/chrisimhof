@@ -10,6 +10,7 @@ import 'package:chrisimhof/features/auth/microsoft_signin/service/api_service.da
 import 'package:chrisimhof/features/auth/microsoft_signin/service/microsoft_auth_service.dart';
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
+import 'package:chrisimhof/features/auth/session/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -68,6 +69,8 @@ class SignInController extends GetxController {
         await SharedPreferencesHelper.saveRefreshToken(refreshToken);
         await SharedPreferencesHelper.setLoginStatus(true);
 
+        await SessionService().fetchAndStoreSessionId();
+
         debugPrint('Access Token: $accessToken');
         debugPrint('Refresh Token: $refreshToken');
 
@@ -112,6 +115,8 @@ class SignInController extends GetxController {
             );
           }
           await SharedPreferencesHelper.setLoginStatus(true);
+
+          await SessionService().fetchAndStoreSessionId();
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
@@ -173,6 +178,8 @@ class SignInController extends GetxController {
             );
           }
           await SharedPreferencesHelper.setLoginStatus(true);
+
+          await SessionService().fetchAndStoreSessionId();
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
