@@ -23,10 +23,7 @@ class RecomendationCard extends StatelessWidget {
     final controller = Get.find<RecommendationController>();
 
     final hasGroup =
-        recomendation.priority != null &&
-        recomendation.priority! > 1 &&
-        subRecommendations != null &&
-        subRecommendations!.isNotEmpty;
+        subRecommendations != null && subRecommendations!.isNotEmpty;
 
     return Obx(() {
       final isExpanded = controller.isCategoryExpanded(recomendation.category);
@@ -84,7 +81,7 @@ class RecomendationCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                recomendation.title ?? '',
+                                recomendation.category ?? '',
                                 style: getTextStyle2(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,
@@ -92,7 +89,8 @@ class RecomendationCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            if (recomendation.priority != null)
+                            if (subRecommendations != null &&
+                                subRecommendations!.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
@@ -104,7 +102,7 @@ class RecomendationCard extends StatelessWidget {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    recomendation.priority.toString(),
+                                    subRecommendations!.length.toString(),
                                     style: getTextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
