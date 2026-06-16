@@ -20,65 +20,56 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: CustomAppBar(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomAppBar(
                 showBackButton: false,
                 showSettingsButton: true,
                 showLogo: true,
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 100.0),
-                child: Column(
+              Obx(() {
+                final data = controller.dashboardData.value;
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Obx(() {
-                      final data = controller.dashboardData.value;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _formatDate(data.date),
-                            style: getTextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textSoft,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            _getGreeting(data.userName),
-                            style: getTextStyle2(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryTextColor,
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
-                    const SizedBox(height: 20),
-                    const BedtimeCard(),
-                    const SizedBox(height: 24),
-                    const QuickAddSection(),
-                    const SizedBox(height: 24),
-                    const TodayProgressSection(),
-                    const SizedBox(height: 24),
-                    const SplitStatusSection(),
-                    const SizedBox(height: 24),
-                    const ForYouSection(),
-                    const SizedBox(height: 28),
-                    const EndDayButton(),
+                    Text(
+                      _formatDate(data.date),
+                      style: getTextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textSoft,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _getGreeting(data.userName),
+                      style: getTextStyle2(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
                   ],
-                ),
-              ),
-            ),
-          ],
+                );
+              }),
+              const SizedBox(height: 20),
+              const BedtimeCard(),
+              const SizedBox(height: 24),
+              const QuickAddSection(),
+              const SizedBox(height: 24),
+              const TodayProgressSection(),
+              const SizedBox(height: 24),
+              const SplitStatusSection(),
+              const SizedBox(height: 24),
+              const ForYouSection(),
+              const SizedBox(height: 28),
+              const EndDayButton(),
+            ],
+          ),
         ),
       ),
     );
