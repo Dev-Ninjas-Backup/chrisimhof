@@ -1,5 +1,3 @@
-import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_screen.dart';
-import 'package:chrisimhof/features/auth/forget_password/screen/success_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/service/verify_otp_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -137,7 +135,7 @@ class ForgetPasswordController extends GetxController {
         } else if (_purpose == 'reset_pass') {
           // Navigate to reset password screen
           userId = response.data?.user?.id;
-          Get.off(ForgetPasswordScreen(), arguments: {'userId': userId});
+          Get.offNamed(AppRoutes.forgetPasswordScreen, arguments: {'userId': userId});
         }
       } else {
         EasyLoading.dismiss();
@@ -203,7 +201,7 @@ class ForgetPasswordController extends GetxController {
         confirmPasswordController.clear();
         password.value = '';
         
-        Get.to(SuccessScreen());
+        Get.toNamed(AppRoutes.successScreen);
       } else {
         EasyLoading.dismiss();
         EasyLoading.showError('Failed to update password'.tr);

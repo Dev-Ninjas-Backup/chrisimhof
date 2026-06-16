@@ -62,7 +62,7 @@ class LanguageScreen extends StatelessWidget {
                   LanguageButton(
                     languageCode: 'FR',
                     label: 'Français',
-                    subtitle: 'Disponible pour l\'app',
+                    subtitle: 'Available for the app',
                     iconPath: IconPath.freLogo,
                     isSelected: controller.isSelected('FR'),
                     onTap: () => controller.selectedLanguage.value = 'FR',

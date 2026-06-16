@@ -68,6 +68,7 @@ class DashboardScreen extends StatelessWidget {
               const ForYouSection(),
               const SizedBox(height: 28),
               const EndDayButton(),
+              SizedBox(height: 90),
             ],
           ),
         ),

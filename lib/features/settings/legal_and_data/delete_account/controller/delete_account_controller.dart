@@ -1,8 +1,8 @@
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/delete_account/service/delete_account_service.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -34,7 +34,7 @@ class DeleteAccountController extends GetxController {
       if (accessToken == null || accessToken.trim().isEmpty) {
         await SharedPreferencesHelper.clearAuthData();
         EasyLoading.showInfo('Session expired. Please sign in again.');
-        Get.offAllNamed('/signInScreen');
+        Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
 
@@ -63,7 +63,7 @@ class DeleteAccountController extends GetxController {
       if (isSuccess) {
         await SharedPreferencesHelper.clearAuthData();
         EasyLoading.showSuccess('Account deleted successfully');
-        Get.offAll(SignInScreen());
+        Get.offAllNamed(AppRoutes.signInScreen);
       }
     } catch (e) {
       final String errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -73,7 +73,7 @@ class DeleteAccountController extends GetxController {
           errorMessage.toLowerCase().contains('unauthorized')) {
         await SharedPreferencesHelper.clearAuthData();
         EasyLoading.showInfo('Session expired. Please sign in again.');
-        Get.offAllNamed('/signInScreen');
+        Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
 

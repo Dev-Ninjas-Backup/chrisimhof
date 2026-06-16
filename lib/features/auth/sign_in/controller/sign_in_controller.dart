@@ -11,7 +11,7 @@ import 'package:chrisimhof/features/auth/microsoft_signin/service/microsoft_auth
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:chrisimhof/features/auth/session/session.dart';
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -76,7 +76,7 @@ class SignInController extends GetxController {
         debugPrint('Refresh Token: $refreshToken');
 
         EasyLoading.showSuccess(response.message);
-        Get.offAll(NavbarScreen());
+        Get.offAllNamed(AppRoutes.navbarScreen);
       } else {
         EasyLoading.showError(response.message);
       }
@@ -121,7 +121,7 @@ class SignInController extends GetxController {
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
-          Get.offAllNamed('/medicalDisclaimerScreen');
+          Get.offAllNamed(AppRoutes.navbarScreen);
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(apiResponse.message ?? 'API login failed');
@@ -184,7 +184,7 @@ class SignInController extends GetxController {
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
-          Get.offAllNamed('/medicalDisclaimerScreen');
+          Get.offAllNamed(AppRoutes.navbarScreen);
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(
