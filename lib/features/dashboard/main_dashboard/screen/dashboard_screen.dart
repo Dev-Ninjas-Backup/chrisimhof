@@ -63,7 +63,7 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 24),
               const TodayProgressSection(),
               const SizedBox(height: 24),
-              const SplitStatusSection(),
+              SplitStatusSection(),
               const SizedBox(height: 24),
               const ForYouSection(),
               const SizedBox(height: 28),

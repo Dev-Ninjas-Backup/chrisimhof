@@ -53,14 +53,17 @@ class SplitStatusSection extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: List.generate(data.lastSleepWeekBars.length, (index) {
+                  children: List.generate(data.lastSleepWeekBars.length, (
+                    index,
+                  ) {
                     final val = data.lastSleepWeekBars[index];
                     return Container(
                       width: 10,
                       height: 24 * val,
                       decoration: BoxDecoration(
                         color: index == data.lastSleepWeekBars.length - 1
-                            ? AppColors.secondaryButtonColor // highlight last bar
+                            ? AppColors
+                                  .secondaryButtonColor // highlight last bar
                             : AppColors.mint,
                         borderRadius: BorderRadius.circular(2),
                       ),
@@ -90,21 +93,14 @@ class SplitStatusSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: AppColors.borderSoft,
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.borderSoft, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(
-                  headerIcon,
-                  size: 14,
-                  color: AppColors.textSoft,
-                ),
+                Icon(headerIcon, size: 14, color: AppColors.textSoft),
                 const SizedBox(width: 4),
                 Text(
                   headerLabel,

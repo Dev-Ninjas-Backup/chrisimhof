@@ -4,6 +4,7 @@ import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/sleep_orbit_widget.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/pulsing_rhythm_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,9 +17,6 @@ class BedtimeCard extends StatelessWidget {
     return Obx(() {
       final data = controller.dashboardData.value;
 
-      // ── Card gradient — 4 states ──────────────────────────────────────────────
-      
-
       final Color timeColor = data.isMissedBedtime
           ? AppColors.mintLight
           : AppColors.mintFaded;
@@ -27,10 +25,10 @@ class BedtimeCard extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.bottomLeft,
             end: Alignment.topRight,
-            colors:[ Color(0xFF062A20), Color(0xFF0E3626),Color(0xFF0A2E22)],
+            colors: [Color(0xFF062A20), Color(0xFF0E3626), Color(0xFF0A2E22)],
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -142,12 +140,11 @@ class BedtimeCard extends StatelessWidget {
     final String label = isLogged
         ? "Logged tonight's sleep"
         : isMissed
-        ? "Log sleep — it's not too late"
-        : "Log tonight's sleep";
-
+            ? "Log sleep — it's not too late"
+            : "Log tonight's sleep";
 
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: AppColors.cardDivider, width: 1)),
       ),
       child: Material(
@@ -165,7 +162,11 @@ class BedtimeCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Image.asset(IconPath.sleep,height: 20,width: 20,),
+                    Image.asset(
+                      IconPath.sleep,
+                      height: 20,
+                      width: 20,
+                    ),
                     const SizedBox(width: 12),
                     Text(
                       label,
@@ -177,7 +178,7 @@ class BedtimeCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Icon(
+                const Icon(
                   Icons.chevron_right,
                   color: AppColors.primaryButtonColor,
                   size: 20,
@@ -188,112 +189,5 @@ class BedtimeCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-// ── Pulsing Rhythm Score Badge ──────────────────────────────────────────────────
-
-class PulsingRhythmBadgeController extends GetxController
-    with GetSingleTickerProviderStateMixin {
-  late final AnimationController ctrl;
-  late final Animation<double> anim;
-  bool _initialized = false;
-  bool _isSleepPrep = false;
-
-  @override
-  void onInit() {
-    super.onInit();
-    ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
-    anim = Tween<double>(
-      begin: 0.9,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: ctrl, curve: Curves.easeInOut));
-  }
-
-  void updateState({required bool isSleepPrep}) {
-    if (!_initialized) {
-      _initialized = true;
-      _isSleepPrep = isSleepPrep;
-      if (isSleepPrep) {
-        ctrl.repeat(reverse: true);
-      }
-      return;
-    }
-    if (isSleepPrep != _isSleepPrep) {
-      _isSleepPrep = isSleepPrep;
-      if (isSleepPrep) {
-        ctrl.repeat(reverse: true);
-      } else {
-        ctrl.stop();
-        ctrl.value = 1.0;
-      }
-    }
-  }
-
-  @override
-  void onClose() {
-    ctrl.dispose();
-    super.onClose();
-  }
-}
-
-class PulsingRhythmBadge extends StatelessWidget {
-  final int score;
-  final bool isSleepPrep;
-
-  const PulsingRhythmBadge({
-    super.key,
-    required this.score,
-    required this.isSleepPrep,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(PulsingRhythmBadgeController());
-    controller.updateState(isSleepPrep: isSleepPrep);
-
-    final badge = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.primaryButtonColor.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.secondaryButtonColor.withValues(alpha: 0.18),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.auto_awesome,
-            color: AppColors.primaryButtonColor,
-            size: 15,
-          ),
-          const SizedBox(width: 7),
-          Text(
-            'Rhythm score $score',
-            style: getTextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primaryButtonColor,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    return !isSleepPrep
-        ? badge
-        : AnimatedBuilder(
-            animation: controller.anim,
-            builder: (_, child) => Transform.scale(
-              scale: controller.anim.value,
-              child: Opacity(opacity: controller.anim.value, child: badge),
-            ),
-          );
   }
 }
