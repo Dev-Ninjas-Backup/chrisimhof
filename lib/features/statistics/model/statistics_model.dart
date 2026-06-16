@@ -257,6 +257,7 @@ class ScoreTrend {
   int? hydrationScore;
   int? caffeineScore;
   int? nutritionScore;
+  int? recoveryScore;
   int? sportScore;
   int? workFitScore;
 
@@ -267,6 +268,7 @@ class ScoreTrend {
     this.hydrationScore,
     this.caffeineScore,
     this.nutritionScore,
+    this.recoveryScore,
     this.sportScore,
     this.workFitScore,
   });
@@ -279,6 +281,7 @@ class ScoreTrend {
       hydrationScore: json['hydrationScore'],
       caffeineScore: json['caffeineScore'],
       nutritionScore: json['nutritionScore'],
+      recoveryScore: json['recoveryScore'],
       sportScore: json['sportScore'],
       workFitScore: json['workFitScore'],
     );
