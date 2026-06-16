@@ -42,7 +42,7 @@ class RecomendationsScreen extends StatelessWidget {
                   showSettingsButton: false,
                   showLogo: false,
                   title: 'Recommendations',
-                  showMoreButton: true,
+                  showMoreButton: false,
                 ),
 
                 const SizedBox(height: 28),
