@@ -40,7 +40,10 @@ class CaffeineController extends GetxController {
   }
 
   void recalculateCaffeine() {
-    todayTotalCaffeine.value = entriesList.fold(0, (sum, entry) => sum + entry.amountMg);
+    todayTotalCaffeine.value = entriesList.fold(
+      0,
+      (sum, entry) => sum + entry.amountMg,
+    );
 
     activeCaffeine.value = _calculateDecayedCaffeine();
 
@@ -91,7 +94,12 @@ class CaffeineController extends GetxController {
     addCaffeineEntry(title, amountMg, DateTime.now());
   }
 
-  void editCaffeineEntry(String id, String title, int amountMg, DateTime timestamp) {
+  void editCaffeineEntry(
+    String id,
+    String title,
+    int amountMg,
+    DateTime timestamp,
+  ) {
     final index = entriesList.indexWhere((e) => e.id == id);
     if (index != -1) {
       entriesList[index] = CaffeineEntry(
@@ -101,7 +109,7 @@ class CaffeineController extends GetxController {
         amountMg: amountMg,
       );
       entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      
+
       recalculateCaffeine();
     }
   }
