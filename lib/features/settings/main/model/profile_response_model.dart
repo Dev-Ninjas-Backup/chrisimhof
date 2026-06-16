@@ -34,6 +34,9 @@ class ProfileData {
   final String accountStatus;
   final String role;
   final String? language;
+  final String? safetyAcknowledgedAt;
+  final dynamic consentSettings;
+  final dynamic connectedSources;
 
   ProfileData({
     required this.id,
@@ -51,6 +54,9 @@ class ProfileData {
     required this.accountStatus,
     required this.role,
     required this.language,
+    required this.safetyAcknowledgedAt,
+    required this.consentSettings,
+    required this.connectedSources,
   });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
@@ -76,6 +82,9 @@ class ProfileData {
       role: role['name'] ?? json['role'] ?? '',
       language:
           (json['language'] as String?) ?? (profile['language'] as String?),
+      safetyAcknowledgedAt: profile['safetyAcknowledgedAt'] as String?,
+      consentSettings: profile['consentSettings'],
+      connectedSources: profile['connectedSources'],
     );
   }
 }

@@ -12,7 +12,7 @@ class VerifyCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ForgetPasswordController>();
+    final controller = Get.put(ForgetPasswordController());
     final args = Get.arguments as Map<String, dynamic>?;
 
     if (args != null) {

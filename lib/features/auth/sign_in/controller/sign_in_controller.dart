@@ -12,6 +12,8 @@ import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:chrisimhof/features/auth/session/session.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -75,8 +77,34 @@ class SignInController extends GetxController {
         debugPrint('Access Token: $accessToken');
         debugPrint('Refresh Token: $refreshToken');
 
-        EasyLoading.showSuccess(response.message);
-        Get.offAll(NavbarScreen());
+        // Check onboarding status and route accordingly
+        EasyLoading.show(status: 'Checking onboarding status...'.tr);
+        try {
+          final profileService = ProfileService();
+          final profileResp = await profileService.getProfile(accessToken: accessToken);
+          final profile = profileResp.data;
+
+          EasyLoading.dismiss();
+          EasyLoading.showSuccess(response.message);
+
+          if (profile != null) {
+            if (profile.safetyAcknowledgedAt == null) {
+              Get.offAllNamed(AppRoutes.safetyScreen);
+            } else if (profile.consentSettings == null) {
+              Get.offAllNamed(AppRoutes.baselineSetupScreen);
+            } else if (profile.connectedSources == null) {
+              Get.offAllNamed(AppRoutes.connectedSourcesScreen);
+            } else {
+              Get.offAll(() => const NavbarScreen());
+            }
+          } else {
+            Get.offAll(() => const NavbarScreen());
+          }
+        } catch (e) {
+          EasyLoading.dismiss();
+          debugPrint('Error getting profile during login onboarding check: $e');
+          Get.offAll(() => const NavbarScreen());
+        }
       } else {
         EasyLoading.showError(response.message);
       }

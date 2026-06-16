@@ -1,32 +1,94 @@
+import 'package:chrisimhof/core/common/controller/language_controller.dart';
+import 'package:chrisimhof/features/auth/safety/model/safety_model.dart';
+import 'package:chrisimhof/features/auth/safety/service/safety_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class SafetyController extends GetxController {
-  final isLimit1Checked = false.obs;
-  final isLimit2Checked = false.obs;
-  final isLimit3Checked = false.obs;
-  final isLimit4Checked = false.obs;
+  final SafetyService _safetyService = SafetyService();
 
-  void toggleLimit1() => isLimit1Checked.value = !isLimit1Checked.value;
-  void toggleLimit2() => isLimit2Checked.value = !isLimit2Checked.value;
-  void toggleLimit3() => isLimit3Checked.value = !isLimit3Checked.value;
-  void toggleLimit4() => isLimit4Checked.value = !isLimit4Checked.value;
+  final RxBool isLoading = true.obs;
+  final Rxn<SafetyData> safetyData = Rxn<SafetyData>();
+  
+  // Stores indices of checked safety items
+  final RxList<int> checkedIndices = <int>[].obs;
 
-  bool get isAllChecked =>
-      isLimit1Checked.value &&
-      isLimit2Checked.value &&
-      isLimit3Checked.value &&
-      isLimit4Checked.value;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchSafetyData();
+  }
 
-  void handleContinue() {
-    if (!isAllChecked) {
+  // Fetch onboarding safety configurations
+  Future<void> fetchSafetyData() async {
+    try {
+      isLoading.value = true;
+      
+      // Determine the locale, default to EN
+      String locale = 'en';
+      try {
+        final langController = Get.find<LanguageController>();
+        locale = langController.selectedLanguage.value.toLowerCase();
+      } catch (_) {
+        locale = Get.locale?.languageCode ?? 'en';
+      }
+
+      final response = await _safetyService.getSafetyData(locale: locale);
+      if (response.success) {
+        safetyData.value = response.data;
+        checkedIndices.clear();
+      }
+    } catch (e) {
+      EasyLoading.showError('Failed to load safety requirements: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Toggle checkout status of an item by its index
+  void toggleItem(int index) {
+    if (checkedIndices.contains(index)) {
+      checkedIndices.remove(index);
+    } else {
+      checkedIndices.add(index);
+    }
+  }
+
+  // Check if an item index is checked
+  bool isItemChecked(int index) => checkedIndices.contains(index);
+
+  // User can proceed only if all items marked 'required: true' in response are checked
+  bool get canProceed {
+    if (safetyData.value == null) return false;
+    final requiredItems = safetyData.value!.items.where((item) => item.required);
+    return requiredItems.every((item) => checkedIndices.contains(item.index));
+  }
+
+  // Submit acknowledgments and navigate
+  Future<void> handleContinue() async {
+    if (!canProceed) {
       EasyLoading.showInfo(
-        'Please confirm all safety limits before continuing.'.tr,
+        'Please confirm all required safety limits before continuing.'.tr,
       );
       return;
     }
 
-    Get.toNamed(AppRoutes.baselineSetupScreen);
+    try {
+      EasyLoading.show(status: 'Saving...'.tr);
+      
+      final response = await _safetyService.acknowledgeSafety(
+        acknowledgedItems: checkedIndices.toList(),
+      );
+
+      if (response.success && response.data.canProceed) {
+        EasyLoading.dismiss();
+        Get.toNamed(AppRoutes.baselineSetupScreen);
+      } else {
+        EasyLoading.showError('Could not proceed with safety acknowledgment.');
+      }
+    } catch (e) {
+      EasyLoading.showError('Failed to acknowledge safety requirements: $e');
+    }
   }
 }

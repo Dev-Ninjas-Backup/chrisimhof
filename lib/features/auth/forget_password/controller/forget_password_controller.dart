@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/success_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/service/verify_otp_service.dart';
@@ -124,6 +125,19 @@ class ForgetPasswordController extends GetxController {
       if (response.success) {
         EasyLoading.dismiss();
         EasyLoading.showSuccess('Code verified successfully'.tr);
+
+        if (response.data != null) {
+          final accessToken = response.data!.accessToken;
+          final refreshToken = response.data!.refreshToken;
+          if (accessToken != null && accessToken.isNotEmpty) {
+            await SharedPreferencesHelper.saveAccessToken(accessToken);
+            if (refreshToken != null) {
+              await SharedPreferencesHelper.saveRefreshToken(refreshToken);
+            }
+            await SharedPreferencesHelper.setLoginStatus(true);
+            debugPrint('Auto-logged in on OTP verify. Access Token saved: $accessToken');
+          }
+        }
 
         // Clear OTP fields
         otpController.clear();

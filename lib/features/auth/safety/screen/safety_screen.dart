@@ -12,89 +12,118 @@ class SafetyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Instantiate/Find the SafetyController using GetX
     final controller = Get.put(SafetyController());
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              CustomAppBar(
-                title: 'Safety'.tr,
-                showBackButton: true,
-                showMoreButton: true,
+      body: SafeArea(
+        child: Obx(() {
+          // 1. LOADING STATE
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryButtonColor),
               ),
-              const SizedBox(height: 28),
-              Text(
-                'Before you continue'.tr,
-                style: getTextStyle2(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTextColor,
+            );
+          }
+
+          // 2. ERROR/EMPTY STATE
+          final data = controller.safetyData.value;
+          if (data == null) {
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    color: AppColors.red,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load safety requirements.'.tr,
+                    textAlign: TextAlign.center,
+                    style: getTextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  CustomButton(
+                    text: 'Retry'.tr,
+                    onTap: controller.fetchSafetyData,
+                  ),
+                ],
+              ),
+            );
+          }
+
+          // 3. SUCCESS STATE (Dynamic content rendering)
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
+                CustomAppBar(
+                  title: 'Safety'.tr,
+                  showBackButton: true,
+                  showMoreButton: true,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Confirm the key limits so recommendations stay in the right context.'
-                    .tr,
-                style: getTextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.secondaryTextColor,
+                const SizedBox(height: 28),
+                Text(
+                  data.title.tr,
+                  style: getTextStyle2(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTextColor,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Obx(
-                () => Column(
-                  children: [
-                    SafetyCard(
-                      text:
-                          'RYVENZA is a lifestyle and wellbeing app, not a medical service.',
-                      isChecked: controller.isLimit1Checked.value,
-                      onTap: controller.toggleLimit1,
-                    ),
-                    const SizedBox(height: 16),
-                    SafetyCard(
-                      text:
-                          'I will not use it for emergencies or safety-critical decisions.',
-                      isChecked: controller.isLimit2Checked.value,
-                      onTap: controller.toggleLimit2,
-                    ),
-                    const SizedBox(height: 16),
-                    SafetyCard(
-                      text:
-                          'Professional medical advice and employer safety rules always come',
-                      isChecked: controller.isLimit3Checked.value,
-                      onTap: controller.toggleLimit3,
-                    ),
-                    const SizedBox(height: 16),
-                    SafetyCard(
-                      text:
-                          'Recommendations depend on the information I choose to enter.',
-                      isChecked: controller.isLimit4Checked.value,
-                      onTap: controller.toggleLimit4,
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                Text(
+                  data.subtitle.tr,
+                  style: getTextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.secondaryTextColor,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Obx(
-                () => CustomButton(
-                  text: 'Continue'.tr,
+                const SizedBox(height: 30),
+                Column(
+                  children: data.items.map((item) {
+                    final isChecked = controller.isItemChecked(item.index);
+                    // Append '*' or similar suffix if required
+                    final String displayLabel = item.required 
+                        ? '${item.text} *' 
+                        : item.text;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: SafetyCard(
+                        text: displayLabel,
+                        isChecked: isChecked,
+                        onTap: () => controller.toggleItem(item.index),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 30),
+                CustomButton(
+                  text: data.cta.tr,
                   icon: null,
-                  backgroundColor: controller.isAllChecked
+                  backgroundColor: controller.canProceed
                       ? AppColors.primaryButtonColor
-                      : AppColors.primaryButtonColor.withAlpha(128),
+                      : AppColors.primaryButtonColor.withValues(alpha: 0.5),
                   onTap: controller.handleContinue,
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

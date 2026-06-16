@@ -5,12 +5,16 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 //import 'package:chrisimhof/features/auth/connected_sources/controller/connected_sources_controller.dart';
 import 'package:chrisimhof/features/auth/connected_sources/widgets/source_card.dart';
-import 'package:chrisimhof/routes/app_routes.dart';
+import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ConnectedSourcesScreen extends StatelessWidget {
   const ConnectedSourcesScreen({super.key});
+
+  Future<void> _handleSaveSources() async {
+      Get.offAll(() => const NavbarScreen());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +100,7 @@ class ConnectedSourcesScreen extends StatelessWidget {
               CustomButton(
                 text: 'Save sources'.tr,
                 icon: null,
-                //onTap: controller.handleSaveSources,
-                onTap: () {Get.offAllNamed(AppRoutes.signInScreen);},
+                onTap: _handleSaveSources,
               ),
             ],
           ),
