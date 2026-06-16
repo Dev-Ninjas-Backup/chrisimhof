@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:chrisimhof/features/dashboard/model/dashboard_model.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -115,19 +116,6 @@ class DashboardController extends GetxController {
   }
 
   void logSleep() {
-    final current = dashboardData.value;
-    final logged = !current.isSleepLogged;
-    dashboardData.value = current.copyWith(
-      isSleepLogged: logged,
-      isMissedBedtime: logged ? false : current.isMissedBedtime,
-      sleepProgress: logged ? 1.0 : 0.88,
-    );
-    if (logged) {
-      HapticFeedback.mediumImpact();
-      EasyLoading.showSuccess('Sleep logged! Rest well.');
-    } else {
-      EasyLoading.showToast('Sleep log cleared.');
-    }
   }
 
   void addWater() {
@@ -151,21 +139,11 @@ class DashboardController extends GetxController {
   }
 
   void addMeal() {
-    final current = dashboardData.value;
-    if (current.mealsLogged < current.mealsTarget) {
-      final m = current.mealsLogged + 1;
-      dashboardData.value = current.copyWith(mealsLogged: m);
-      EasyLoading.showToast('Meal logged: $m/${current.mealsTarget}');
-    } else {
-      EasyLoading.showToast('All planned meals logged!');
-    }
+    Get.toNamed(AppRoutes.nutritionScreen);
   }
 
   void addSport() {
-    final current = dashboardData.value;
-    final s = current.sportMinutes + 15;
-    dashboardData.value = current.copyWith(sportMinutes: s);
-    EasyLoading.showToast('Sport logged: +15 min');
+    Get.toNamed(AppRoutes.sportsScreen);
   }
 
   void endMyDay() {
