@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:get/get.dart';
@@ -11,10 +14,50 @@ class CaffeineController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initializeMockEntries();
+    loadEntries();
   }
 
-  void _initializeMockEntries() {
+  Future<void> loadEntries() async {
+    try {
+      final jsonStr = await SharedPreferencesHelper.getCaffeineLogs();
+      if (jsonStr != null) {
+        final decoded = jsonDecode(jsonStr) as List;
+        entriesList.assignAll(decoded.map((item) => CaffeineEntry(
+          id: item['id'],
+          title: item['title'],
+          timestamp: DateTime.parse(item['timestamp']),
+          amountMg: item['amountMg'],
+        )).toList());
+        recalculateCaffeine();
+      } else {
+        _initializeMockEntries();
+      }
+    } catch (e) {
+      debugPrint('Error loading caffeine entries: $e');
+      _initializeMockEntries();
+    }
+  }
+
+  Future<void> saveEntriesToPrefs() async {
+    try {
+      final listToSave = entriesList.map((entry) => {
+        'id': entry.id,
+        'title': entry.title,
+        'timestamp': entry.timestamp.toIso8601String(),
+        'amountMg': entry.amountMg,
+      }).toList();
+      await SharedPreferencesHelper.saveCaffeineLogs(jsonEncode(listToSave));
+      
+      try {
+        final dashboardController = Get.find<DashboardController>();
+        await dashboardController.fetchDashboardData();
+      } catch (_) {}
+    } catch (e) {
+      debugPrint('Error saving caffeine entries: $e');
+    }
+  }
+
+  void _initializeMockEntries() async {
     final now = DateTime.now();
     entriesList.assignAll([
       CaffeineEntry(
@@ -37,6 +80,7 @@ class CaffeineController extends GetxController {
       ),
     ]);
     recalculateCaffeine();
+    await saveEntriesToPrefs();
   }
 
   void recalculateCaffeine() {
@@ -78,7 +122,7 @@ class CaffeineController extends GetxController {
     }
   }
 
-  void addCaffeineEntry(String title, int amountMg, DateTime timestamp) {
+  void addCaffeineEntry(String title, int amountMg, DateTime timestamp) async {
     final newEntry = CaffeineEntry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
@@ -88,6 +132,7 @@ class CaffeineController extends GetxController {
     entriesList.add(newEntry);
     entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     recalculateCaffeine();
+    await saveEntriesToPrefs();
   }
 
   void quickAdd(String title, int amountMg) {
@@ -99,7 +144,7 @@ class CaffeineController extends GetxController {
     String title,
     int amountMg,
     DateTime timestamp,
-  ) {
+  ) async {
     final index = entriesList.indexWhere((e) => e.id == id);
     if (index != -1) {
       entriesList[index] = CaffeineEntry(
@@ -111,11 +156,13 @@ class CaffeineController extends GetxController {
       entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
       recalculateCaffeine();
+      await saveEntriesToPrefs();
     }
   }
 
-  void deleteCaffeineEntry(String id) {
+  void deleteCaffeineEntry(String id) async {
     entriesList.removeWhere((e) => e.id == id);
     recalculateCaffeine();
+    await saveEntriesToPrefs();
   }
 }

@@ -1,5 +1,6 @@
 class Urls {
   static const String baseUrl = 'https://api.ryvenza.app';
+  static const String realtimeSocket = '$baseUrl/realtime';
 
   static const String register = '$baseUrl/api/v1/auth/register';
   static const String verifyOtp = '$baseUrl/api/v1/auth/verify';

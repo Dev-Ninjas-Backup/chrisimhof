@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 
 class HydrationLog {
   final String id;
@@ -110,6 +114,55 @@ class HydrationController extends GetxController {
     QuickOption(amountMl: 750, label: 'Large ml', typeName: 'Large'),
   ];
 
+  @override
+  void onInit() {
+    super.onInit();
+    loadLogs();
+  }
+
+  Future<void> loadLogs() async {
+    try {
+      final jsonStr = await SharedPreferencesHelper.getHydrationLogs();
+      if (jsonStr != null) {
+        final decoded = jsonDecode(jsonStr) as List;
+        for (int i = 0; i < 7 && i < decoded.length; i++) {
+          final dayList = decoded[i] as List;
+          weeklyLogs[i].assignAll(dayList.map((item) => HydrationLog(
+            id: item['id'],
+            time: item['time'],
+            type: item['type'],
+            amountMl: item['amountMl'],
+          )).toList());
+        }
+      } else {
+        await saveLogsToPrefs();
+      }
+    } catch (e) {
+      debugPrint('Error loading hydration logs: $e');
+    }
+  }
+
+  Future<void> saveLogsToPrefs() async {
+    try {
+      final listToSave = weeklyLogs.map((dayList) {
+        return dayList.map((log) => {
+          'id': log.id,
+          'time': log.time,
+          'type': log.type,
+          'amountMl': log.amountMl,
+        }).toList();
+      }).toList();
+      await SharedPreferencesHelper.saveHydrationLogs(jsonEncode(listToSave));
+      
+      try {
+        final dashboardController = Get.find<DashboardController>();
+        await dashboardController.fetchDashboardData();
+      } catch (_) {}
+    } catch (e) {
+      debugPrint('Error saving hydration logs: $e');
+    }
+  }
+
   // Getters for selected day
   RxList<HydrationLog> get selectedDayLogs => weeklyLogs[selectedDayIndex.value];
 
@@ -152,7 +205,7 @@ class HydrationController extends GetxController {
   }
 
   // Log water intake for the selected day
-  void addIntake(int amountMl, String type) {
+  void addIntake(int amountMl, String type) async {
     final now = DateTime.now();
     final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     
@@ -165,11 +218,13 @@ class HydrationController extends GetxController {
 
     weeklyLogs[selectedDayIndex.value].insert(0, newLog);
     weeklyLogs.refresh(); // Triggers reactive update in Obx
+    await saveLogsToPrefs();
   }
 
   // Remove water intake from the selected day
-  void deleteLog(String id) {
+  void deleteLog(String id) async {
     weeklyLogs[selectedDayIndex.value].removeWhere((log) => log.id == id);
     weeklyLogs.refresh(); // Triggers reactive update in Obx
+    await saveLogsToPrefs();
   }
 }

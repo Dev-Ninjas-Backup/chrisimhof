@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 
 class MealItem {
   final String name;
@@ -50,15 +54,72 @@ class NutritionController extends GetxController {
 
   int get loggedMealsCount => mealsList.where((m) => m.isLogged).length;
 
+  @override
+  void onInit() {
+    super.onInit();
+    loadNutritionData();
+  }
+
+  Future<void> loadNutritionData() async {
+    try {
+      final jsonStr = await SharedPreferencesHelper.getMeals();
+      if (jsonStr != null) {
+        final Map<String, dynamic> data = jsonDecode(jsonStr);
+        dailyTarget.value = data['dailyTarget'] ?? 5;
+        final List mealsJson = data['meals'] ?? [];
+        mealsList.assignAll(mealsJson.map((m) => MealItem(
+          name: m['name'] ?? '',
+          time: m['time'] ?? '',
+          type: m['type'] ?? 'Light',
+          isLogged: m['isLogged'] ?? false,
+          isPlanned: m['isPlanned'] ?? false,
+        )).toList());
+      } else {
+        await saveNutritionData();
+      }
+
+      final notes = await SharedPreferencesHelper.getNutritionNotes();
+      if (notes != null) {
+        notesList.assignAll(notes);
+      } else {
+        await SharedPreferencesHelper.saveNutritionNotes(notesList);
+      }
+    } catch (e) {
+      debugPrint('Error loading nutrition data: $e');
+    }
+  }
+
+  Future<void> saveNutritionData() async {
+    try {
+      final Map<String, dynamic> data = {
+        'dailyTarget': dailyTarget.value,
+        'meals': mealsList.map((m) => {
+          'name': m.name,
+          'time': m.time,
+          'type': m.type,
+          'isLogged': m.isLogged,
+          'isPlanned': m.isPlanned,
+        }).toList(),
+      };
+      await SharedPreferencesHelper.saveMeals(jsonEncode(data));
+      await SharedPreferencesHelper.saveNutritionNotes(notesList);
+
+      try {
+        final dashboardController = Get.find<DashboardController>();
+        await dashboardController.fetchDashboardData();
+      } catch (_) {}
+    } catch (e) {
+      debugPrint('Error saving nutrition data: $e');
+    }
+  }
+
   void selectMealType(String type) {
     selectedMealType.value = type;
   }
 
-  void incrementTarget() {
+  void incrementTarget() async {
     dailyTarget.value++;
-    // Add a planned meal for the new target slot
     final newIndex = mealsList.length + 1;
-    // Calculate a dummy planned time based on previous items or simple pattern
     String nextTime = '22:00';
     if (mealsList.isNotEmpty) {
       final lastTimeStr = mealsList.last.time.split(' ')[0];
@@ -79,27 +140,24 @@ class NutritionController extends GetxController {
         isPlanned: true,
       ),
     );
+    await saveNutritionData();
   }
 
-  void decrementTarget() {
+  void decrementTarget() async {
     if (dailyTarget.value > 1) {
       dailyTarget.value--;
-      // Try to remove the last unlogged meal
       int lastUnloggedIdx = mealsList.lastIndexWhere((m) => !m.isLogged);
       if (lastUnloggedIdx != -1) {
         mealsList.removeAt(lastUnloggedIdx);
       } else {
-        // If all are logged, remove the last one anyway
         mealsList.removeLast();
       }
+      await saveNutritionData();
     }
   }
 
-  void saveMeal() {
-    // Find the first unlogged planned meal
+  void saveMeal() async {
     int firstUnloggedIdx = mealsList.indexWhere((m) => !m.isLogged);
-    
-    // Get current time formatted as HH:mm
     final now = DateTime.now();
     final formattedTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
@@ -112,7 +170,6 @@ class NutritionController extends GetxController {
         time: formattedTime,
       );
     } else {
-      // If no unlogged meals exist, append a new one
       final newIndex = mealsList.length + 1;
       mealsList.add(
         MealItem(
@@ -124,11 +181,13 @@ class NutritionController extends GetxController {
         ),
       );
     }
+    await saveNutritionData();
   }
 
-  void addNote(String note) {
+  void addNote(String note) async {
     if (note.trim().isNotEmpty) {
       notesList.add(note.trim());
+      await saveNutritionData();
     }
   }
 }

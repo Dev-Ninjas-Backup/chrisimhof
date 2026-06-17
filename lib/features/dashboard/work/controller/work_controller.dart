@@ -1,4 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
+import 'package:chrisimhof/features/dashboard/work/service/work_service.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -84,58 +88,96 @@ class WorkController extends GetxController {
     }
   }
 
-  void saveShift() {
+  void saveShift() async {
+    EasyLoading.show(status: 'Saving work shift...');
     try {
-      final dashboardController = Get.find<DashboardController>();
-      final currentData = dashboardController.dashboardData.value;
-      String workShiftStr = '';
-      String countdownStr = '';
-      double progress = 0.35;
-
-      if (selectedShiftType.value == 'Off') {
-        workShiftStr = 'Off Today';
-        countdownStr = 'No shifts scheduled';
-        progress = 0.0;
-      } else {
+      final sessionId = await SharedPreferencesHelper.getSessionId();
+      if (sessionId != null && sessionId.isNotEmpty) {
+        final shiftType = selectedShiftType.value.toLowerCase();
+        
         final startHStr = startHour.value.toString().padLeft(2, '0');
         final startMStr = startMinute.value.toString().padLeft(2, '0');
         final endHStr = endHour.value.toString().padLeft(2, '0');
         final endMStr = endMinute.value.toString().padLeft(2, '0');
-        workShiftStr = '${selectedShiftType.value} · $startHStr:$startMStr→$endHStr:$endMStr';
 
-        final now = DateTime.now();
-        final currentMin = now.hour * 60 + now.minute;
-        final startMin = startHour.value * 60 + startMinute.value;
-        final endMin = endHour.value * 60 + endMinute.value;
+        final shiftStartTime = shiftType == 'off' ? null : '$startHStr:$startMStr';
+        final shiftEndTime = shiftType == 'off' ? null : '$endHStr:$endMStr';
 
-        int diffMin = (startMin - currentMin + 1440) % 1440;
-        final hoursUntil = diffMin ~/ 60;
-        countdownStr = hoursUntil > 0 ? 'shift starts in ${hoursUntil}h' : 'shift starts in ${diffMin}m';
+        // 1. Post to Work Service
+        await WorkService().saveWork(
+          sessionId: sessionId,
+          shiftType: shiftType,
+          shiftStartTime: shiftStartTime,
+          shiftEndTime: shiftEndTime,
+        );
 
-        bool inProgress = false;
-        if (startMin < endMin) {
-          inProgress = currentMin >= startMin && currentMin < endMin;
-          if (inProgress) progress = (currentMin - startMin) / (endMin - startMin);
-        } else {
-          inProgress = currentMin >= startMin || currentMin < endMin;
-          if (inProgress) {
-            int total = endMin - startMin + 1440;
-            int elapsed = currentMin >= startMin ? (currentMin - startMin) : (currentMin + 1440 - startMin);
-            progress = elapsed / total;
-          }
+        // 2. Central session calculations
+        await DashboardService().calculateResult(sessionId: sessionId);
+
+        // 3. Sync and refresh dashboard controller
+        try {
+          final dashboardController = Get.find<DashboardController>();
+          await dashboardController.fetchDashboardData();
+        } catch (_) {}
+
+        EasyLoading.showSuccess('Shift saved successfully!');
+        Get.back();
+      } else {
+        EasyLoading.showError('No active session found.');
+      }
+    } catch (e) {
+      debugPrint('Error saving work shift: $e');
+      EasyLoading.showError('Failed to save shift.');
+    }
+  }
+
+  void updateFromLiveScoresTab(Map<String, dynamic> tabData) {
+    try {
+      if (tabData['shiftType'] != null) {
+        final sType = tabData['shiftType'] as String;
+        if (sType.isNotEmpty) {
+          selectedShiftType.value = sType[0].toUpperCase() + sType.substring(1);
         }
-        if (inProgress) countdownStr = 'shift in progress';
-        progress = progress.clamp(0.0, 1.0);
+      }
+      if (tabData['shiftStartTime'] != null) {
+        final parts = (tabData['shiftStartTime'] as String).split(':');
+        if (parts.length == 2) {
+          startHour.value = int.tryParse(parts[0]) ?? 22;
+          startMinute.value = int.tryParse(parts[1]) ?? 0;
+        }
+      }
+      if (tabData['shiftEndTime'] != null) {
+        final parts = (tabData['shiftEndTime'] as String).split(':');
+        if (parts.length == 2) {
+          endHour.value = int.tryParse(parts[0]) ?? 6;
+          endMinute.value = int.tryParse(parts[1]) ?? 0;
+        }
       }
 
-      dashboardController.dashboardData.value = currentData.copyWith(
-        workShift: workShiftStr,
-        workShiftCountdown: countdownStr,
-        workProgress: progress == 0.0 ? 0.35 : progress,
-      );
-    } catch (_) {}
+      final List? patternList = tabData['weeklyPatternDisplay'] as List?;
+      if (patternList != null) {
+        weeklyPattern.assignAll(patternList.map((item) {
+          return {
+            'day': item['day'] as String? ?? '',
+            'shift': item['shiftCode'] as String? ?? 'Off',
+          };
+        }).toList());
+      }
 
-    EasyLoading.showSuccess('Shift saved successfully!');
-    Get.back();
+      final settings = tabData['settings'] as Map<String, dynamic>?;
+      if (settings != null) {
+        if (settings['defaultRotation'] != null) {
+          defaultRotation.value = settings['defaultRotation'] as String;
+        }
+        if (settings['shiftReminderDisplay'] != null) {
+          shiftReminders.value = settings['shiftReminderDisplay'] as String;
+        }
+        if (settings['timezoneDisplay'] != null) {
+          timeZone.value = settings['timezoneDisplay'] as String;
+        }
+      }
+    } catch (e) {
+      debugPrint('WorkController socket update error: $e');
+    }
   }
 }

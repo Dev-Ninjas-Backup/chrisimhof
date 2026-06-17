@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:get/get.dart';
 
 class SportSession {
@@ -30,28 +34,102 @@ class SportsController extends GetxController {
   final RxString recoveryText = 'Recovery is moderate — skip intense training tomorrow.'.obs;
 
   // This Week sessions list
-  final RxList<SportSession> sessionsList = <SportSession>[
-    SportSession(
-      title: 'Running',
-      subtitle: 'Today · 45m · Z3',
-      iconPath: IconPath.running,
-    ),
-    SportSession(
-      title: 'Strength',
-      subtitle: 'Yesterday · 60m · Z2',
-      iconPath: IconPath.strength,
-    ),
-    SportSession(
-      title: 'Yoga',
-      subtitle: 'Sat · 30m · Z1',
-      iconPath: IconPath.yoga,
-    ),
-    SportSession(
-      title: 'Rest day',
-      subtitle: 'Fri · —',
-      iconPath: IconPath.restDay,
-    ),
-  ].obs;
+  final RxList<SportSession> sessionsList = <SportSession>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadSportsData();
+  }
+
+  Future<void> loadSportsData() async {
+    try {
+      final todayMetrics = await SharedPreferencesHelper.getSportsTodayMetrics();
+      hasTodaySession.value = todayMetrics['hasTodaySession'] ?? true;
+      todayDuration.value = todayMetrics['duration'] ?? 45;
+      todayZone.value = todayMetrics['zone'] ?? 'Z3';
+      todaySport.value = todayMetrics['sport'] ?? 'Running';
+      todayDistance.value = todayMetrics['distance'] ?? '6.8 km';
+      todayStartTime.value = todayMetrics['startTime'] ?? '12:40';
+      todayEndTime.value = todayMetrics['endTime'] ?? '13:25';
+      todayEffort.value = todayMetrics['effort'] ?? 'Medium';
+      todayType.value = todayMetrics['type'] ?? 'Cardio';
+      recoveryScore.value = todayMetrics['recoveryScore'] ?? 64;
+      _updateRecoveryText();
+
+      final jsonStr = await SharedPreferencesHelper.getSportsSessions();
+      if (jsonStr != null) {
+        final List decoded = jsonDecode(jsonStr);
+        sessionsList.assignAll(decoded.map((s) => SportSession(
+          title: s['title'] ?? '',
+          subtitle: s['subtitle'] ?? '',
+          iconPath: s['iconPath'] ?? '',
+        )).toList());
+      } else {
+        _initializeMockSessions();
+      }
+    } catch (e) {
+      debugPrint('Error loading sports data: $e');
+      _initializeMockSessions();
+    }
+  }
+
+  Future<void> saveSportsData() async {
+    try {
+      await SharedPreferencesHelper.saveSportsTodayMetrics(
+        hasTodaySession: hasTodaySession.value,
+        duration: todayDuration.value,
+        zone: todayZone.value,
+        sport: todaySport.value,
+        distance: todayDistance.value,
+        startTime: todayStartTime.value,
+        endTime: todayEndTime.value,
+        effort: todayEffort.value,
+        type: todayType.value,
+        recoveryScore: recoveryScore.value,
+      );
+
+      final listToSave = sessionsList.map((s) => {
+        'title': s.title,
+        'subtitle': s.subtitle,
+        'iconPath': s.iconPath,
+      }).toList();
+      await SharedPreferencesHelper.saveSportsSessions(jsonEncode(listToSave));
+
+      try {
+        final dashboardController = Get.find<DashboardController>();
+        await dashboardController.fetchDashboardData();
+      } catch (_) {}
+    } catch (e) {
+      debugPrint('Error saving sports data: $e');
+    }
+  }
+
+  void _initializeMockSessions() async {
+    sessionsList.assignAll([
+      SportSession(
+        title: 'Running',
+        subtitle: 'Today · 45m · Z3',
+        iconPath: IconPath.running,
+      ),
+      SportSession(
+        title: 'Strength',
+        subtitle: 'Yesterday · 60m · Z2',
+        iconPath: IconPath.strength,
+      ),
+      SportSession(
+        title: 'Yoga',
+        subtitle: 'Sat · 30m · Z1',
+        iconPath: IconPath.yoga,
+      ),
+      SportSession(
+        title: 'Rest day',
+        subtitle: 'Fri · —',
+        iconPath: IconPath.restDay,
+      ),
+    ]);
+    await saveSportsData();
+  }
 
   void addSession({
     required String activity,
@@ -62,7 +140,7 @@ class SportsController extends GetxController {
     required String effort,
     required String type,
     String? distance,
-  }) {
+  }) async {
     String timeStr = '${duration}m';
     if (activity == 'Rest day') {
       timeStr = '—';
@@ -131,6 +209,8 @@ class SportsController extends GetxController {
       recoveryScore.value = (recoveryScore.value - impact).clamp(0, 100);
       _updateRecoveryText();
     }
+
+    await saveSportsData();
   }
 
   void _updateRecoveryText() {
