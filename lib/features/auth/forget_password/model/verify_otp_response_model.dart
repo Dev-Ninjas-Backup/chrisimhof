@@ -70,13 +70,32 @@ class VerifyOtpResponseModel {
 class VerifyOtpData {
   final VerifyOtpUser? user;
   final String? message;
+  final String? accessToken;
+  final String? refreshToken;
 
-  VerifyOtpData({required this.user, required this.message});
+  VerifyOtpData({
+    required this.user,
+    required this.message,
+    this.accessToken,
+    this.refreshToken,
+  });
 
   factory VerifyOtpData.fromJson(Map<String, dynamic> json) {
+    String? access;
+    String? refresh;
+    if (json['tokens'] != null) {
+      access = json['tokens']['accessToken'];
+      refresh = json['tokens']['refreshToken'];
+    } else {
+      access = json['accessToken'];
+      refresh = json['refreshToken'];
+    }
+
     return VerifyOtpData(
       user: json['user'] != null ? VerifyOtpUser.fromJson(json['user']) : null,
       message: json['massage'] ?? json['message'],
+      accessToken: access,
+      refreshToken: refresh,
     );
   }
 }

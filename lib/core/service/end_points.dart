@@ -60,4 +60,12 @@ class Urls {
       '$baseUrl/api/v1/calculator/optimal-bedtime';
   static const String forgotPassword = '$baseUrl/api/v1/auth/forgot-password';
   static const String resetPassword = '$baseUrl/api/v1/auth/reset-password';
+  static String getSafety(String locale) => '$baseUrl/api/v1/onboarding/safety?locale=$locale';
+  static const String acceptSafety = '$baseUrl/api/v1/onboarding/safety/acknowledge';
+  static const String baseline = '$baseUrl/api/v1/profile/baseline';
+  static  String getConnectedSources(String locale) => '$baseUrl/api/v1/onboarding/sources?locale=$locale';
+  static const String connectSource = '$baseUrl/api/v1/onboarding/sources';
+  static String getConsentSettings(String locale) => '$baseUrl/api/v1/onboarding/consent?locale=$locale';
+  static const String updateConsentSettings = '$baseUrl/api/v1/onboarding/consent';
+
 }

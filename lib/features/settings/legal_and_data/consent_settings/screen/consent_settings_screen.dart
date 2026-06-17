@@ -9,121 +9,173 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ConsentSettingsScreen extends StatelessWidget {
-  ConsentSettingsScreen({super.key});
-  final ConsentSettingsController controller = ConsentSettingsController();
+  const ConsentSettingsScreen({super.key});
+
+  String _getIconPath(String key) {
+    switch (key) {
+      case 'lifestyleRecommendations':
+        return IconPath.lifestyle;
+      case 'reminders':
+        return IconPath.reminder;
+      case 'connectedSources':
+        return IconPath.connectedSource;
+      case 'companyPilotInsights':
+        return IconPath.lifestyle;
+      case 'usageAnalytics':
+        return IconPath.usageAnalytics;
+      default:
+        return IconPath.consent;
+    }
+  }
+
+  Color _getIconBgColor(String key) {
+    switch (key) {
+      case 'lifestyleRecommendations':
+        return AppColors.mintSoft2;
+      case 'reminders':
+        return AppColors.indigoSoft2;
+      case 'connectedSources':
+        return AppColors.indigoSoft4;
+      case 'companyPilotInsights':
+        return AppColors.mintSoft2;
+      case 'usageAnalytics':
+        return AppColors.subtle;
+      default:
+        return AppColors.subtle;
+    }
+  }
+
+  RxBool? _getRxBool(ConsentSettingsController controller, String key) {
+    switch (key) {
+      case 'lifestyleRecommendations':
+        return controller.lifestyleRecommendations;
+      case 'reminders':
+        return controller.reminders;
+      case 'connectedSources':
+        return controller.connectedSources;
+      case 'companyPilotInsights':
+        return controller.companyPilotInsights;
+      case 'usageAnalytics':
+        return controller.usageAnalytics;
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ConsentSettingsController());
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomAppBar(
-                  title: 'Consent settings'.tr,
-                  showBackButton: true,
-                  showMoreButton: true,
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  'Consent settings'.tr,
-                  style: getTextStyle2(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryTextColor,
+      body: SafeArea(
+        child: Obx(() {
+          // 1. LOADING STATE
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryButtonColor),
+              ),
+            );
+          }
+
+          // 2. ERROR/EMPTY STATE
+          final data = controller.consentSettingsData.value;
+          if (data == null) {
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: AppColors.red,
+                    size: 48,
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Choose what RYVENZA can use to personalise your rhythm. You can change this later.'
-                      .tr,
-                  style: getTextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textMid,
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load consent settings.'.tr,
+                    textAlign: TextAlign.center,
+                    style: getTextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30),
-                Obx(
-                  () => ConsentToggleItem(
-                    iconPath: IconPath.lifestyle,
-                    iconBackgroundColor: AppColors.mintSoft2,
-                    title: 'Lifestyle recommendations'.tr,
-                    subtitle:
-                        'Use sleep, caffeine, hydration, meals, activity and work rhythm to calculate timing suggestions.'
-                            .tr,
-                    value: controller.lifestyleRecommendations.value,
-                    onChanged: (v) =>
-                        controller.lifestyleRecommendations.value = v,
+                  const SizedBox(height: 24),
+                  CustomButton(
+                    text: 'Retry'.tr,
+                    onTap: controller.fetchConsentSettings,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () => ConsentToggleItem(
-                    iconPath: IconPath.reminder,
-                    iconBackgroundColor: AppColors.indigoSoft2,
-                    title: 'Reminders'.tr,
-                    subtitle:
-                        'Allow gentle nudges for hydration, caffeine cut-off, sleep window and recovery.'
-                            .tr,
-                    value: controller.reminders.value,
-                    onChanged: (v) => controller.reminders.value = v,
+                ],
+              ),
+            );
+          }
+
+          // 3. SUCCESS STATE
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomAppBar(
+                    title: 'Consent settings'.tr,
+                    showBackButton: true,
+                    showMoreButton: true,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () => ConsentToggleItem(
-                    iconPath: IconPath.connectedSource,
-                    iconBackgroundColor: AppColors.indigoSoft4,
-                    title: 'Connected sources'.tr,
-                    subtitle:
-                        'Use optional connected data only after you link a source yourself.'
-                            .tr,
-                    value: controller.connectedSources.value,
-                    onChanged: (v) => controller.connectedSources.value = v,
+                  const SizedBox(height: 28),
+                  Text(
+                    data.title.tr,
+                    style: getTextStyle2(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () => ConsentToggleItem(
-                    iconPath: IconPath.lifestyle,
-                    iconBackgroundColor: AppColors.mintSoft2,
-                    title: 'Company pilot insights'.tr,
-                    subtitle:
-                        'Share aggregated and anonymised trends only. No individual logs are shown to an employer.'
-                            .tr,
-                    value: controller.companyPilotInsights.value,
-                    onChanged: (v) => controller.companyPilotInsights.value = v,
+                  const SizedBox(height: 12),
+                  Text(
+                    data.subtitle.tr,
+                    style: getTextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textMid,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () => ConsentToggleItem(
-                    iconPath: IconPath.usageAnalytics,
-                    iconBackgroundColor: AppColors.subtle,
-                    title: 'Usage analytics'.tr,
-                    subtitle:
-                        'Help improve RYVENZA with privacy-preserving usage analytics.'
-                            .tr,
-                    value: controller.usageAnalytics.value,
-                    onChanged: (v) => controller.usageAnalytics.value = v,
+                  const SizedBox(height: 30),
+                  Column(
+                    children: data.settings.map((setting) {
+                      final rxVal = _getRxBool(controller, setting.key);
+                      if (rxVal == null) return const SizedBox.shrink();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Obx(
+                          () => ConsentToggleItem(
+                            iconPath: _getIconPath(setting.key),
+                            iconBackgroundColor: _getIconBgColor(setting.key),
+                            title: setting.label.tr,
+                            subtitle: setting.desc.tr,
+                            value: rxVal.value,
+                            onChanged: (v) => rxVal.value = v,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                ),
-                const SizedBox(height: 30),
-                CustomButton(
-                  text: 'Save consent settings'.tr,
-                  onTap: controller.saveSettings,
-                  backgroundColor: AppColors.primaryButtonColor,
-                  icon: null,
-                ),
-              ],
+                  const SizedBox(height: 30),
+                  CustomButton(
+                    text: data.cta.tr,
+                    onTap: controller.saveSettings,
+                    backgroundColor: AppColors.primaryButtonColor,
+                    icon: null,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

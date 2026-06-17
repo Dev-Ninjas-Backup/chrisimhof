@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileService {
+  // GET /api/v1/auth/me
   Future<ProfileResponseModel> getProfile({required String accessToken}) async {
     final uri = Uri.parse(Urls.userMe);
 
@@ -13,7 +14,7 @@ class ProfileService {
       headers: {
         'accept': '*/*',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken', // CHANGE: authorized api
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
@@ -28,4 +29,6 @@ class ProfileService {
       throw Exception(jsonData['message'] ?? 'Failed to load profile');
     }
   }
+
+
 }

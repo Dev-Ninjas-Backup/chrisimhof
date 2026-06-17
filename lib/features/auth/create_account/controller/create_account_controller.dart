@@ -125,14 +125,13 @@ class CreateAccountController extends GetxController {
         EasyLoading.dismiss();
         EasyLoading.showSuccess("Registration Successful");
 
-        // Navigate to OTP verification with email
-        // Get.to(
-        //   VerifyCodeScreen(
-        //     email: emailController.text.trim(),
-        //     purpose: 'register',
-        //   ),
-        // );
-        Get.offNamed(AppRoutes.safetyScreen);
+        Get.offNamed(
+          AppRoutes.verifyCodeScreen,
+          arguments: {
+            'email': emailController.text.trim(),
+            'purpose': 'register',
+          },
+        );
       } else {
         EasyLoading.dismiss();
         EasyLoading.showError(response.message);

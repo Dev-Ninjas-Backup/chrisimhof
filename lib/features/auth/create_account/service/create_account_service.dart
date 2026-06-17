@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/features/auth/create_account/model/register_response_model.dart';
 import 'package:http/http.dart' as http;
@@ -25,6 +26,7 @@ class CreateAccountService {
     );
 
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    debugPrint('Register Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       return RegisterResponseModel.fromJson(jsonData);

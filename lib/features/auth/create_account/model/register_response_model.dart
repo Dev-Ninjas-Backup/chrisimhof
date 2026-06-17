@@ -21,13 +21,32 @@ class RegisterResponseModel {
 class RegisterData {
   final RegisterUser? user;
   final String otp;
+  final String? accessToken;
+  final String? refreshToken;
 
-  RegisterData({required this.user, required this.otp});
+  RegisterData({
+    required this.user,
+    required this.otp,
+    this.accessToken,
+    this.refreshToken,
+  });
 
   factory RegisterData.fromJson(Map<String, dynamic> json) {
+    String? access;
+    String? refresh;
+    if (json['tokens'] != null) {
+      access = json['tokens']['accessToken'];
+      refresh = json['tokens']['refreshToken'];
+    } else {
+      access = json['accessToken'];
+      refresh = json['refreshToken'];
+    }
+
     return RegisterData(
       user: json['user'] != null ? RegisterUser.fromJson(json['user']) : null,
       otp: json['otp'] ?? '',
+      accessToken: access,
+      refreshToken: refresh,
     );
   }
 }
