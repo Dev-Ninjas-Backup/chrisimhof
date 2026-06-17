@@ -10,18 +10,42 @@ import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboar
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class SleepController extends GetxController {
-  final bedtimeHour = 23.obs;
-  final bedtimeMinute = 8.obs;
+  // Default to midnight / 06:00 — overridden from DashboardController's optimalBedtime on init
+  final bedtimeHour = 22.obs;
+  final bedtimeMinute = 30.obs;
 
-  final wakeupHour = 5.obs;
-  final wakeupMinute = 50.obs;
+  final wakeupHour = 6.obs;
+  final wakeupMinute = 0.obs;
 
   final historyLogs = <SleepLog>[].obs;
+
+  final tonightBedtime = Rxn<Map<String, dynamic>>();
+  final tonightNote = RxnString();
 
   @override
   void onInit() {
     super.onInit();
     loadSleepHistory();
+    // Preload tonight's bedtime and note from DashboardController if available
+    if (Get.isRegistered<DashboardController>()) {
+      final dbController = Get.find<DashboardController>();
+      if (dbController.sleepTabData.value != null) {
+        updateFromLiveScoresTab(dbController.sleepTabData.value!);
+      }
+      // Seed bedtime picker from the API's optimal bedtime
+      _initBedtimeFromDashboard(dbController);
+    }
+  }
+
+  void _initBedtimeFromDashboard(DashboardController dbController) {
+    try {
+      final optimal = dbController.dashboardData.value.optimalBedtime;
+      final parts = optimal.split(':');
+      if (parts.length == 2) {
+        bedtimeHour.value = int.tryParse(parts[0]) ?? 22;
+        bedtimeMinute.value = int.tryParse(parts[1]) ?? 30;
+      }
+    } catch (_) {}
   }
 
   Future<void> loadSleepHistory() async {
@@ -65,30 +89,8 @@ class SleepController extends GetxController {
   }
 
   void _initializeMockHistory() async {
-    final today = DateTime.now();
-    historyLogs.assignAll([
-      SleepLog(
-        id: '1',
-        date: today.subtract(const Duration(days: 1)),
-        bedtime: const TimeOfDay(hour: 23, minute: 8),
-        wakeupTime: const TimeOfDay(hour: 5, minute: 50),
-        quality: 82,
-      ),
-      SleepLog(
-        id: '2',
-        date: today.subtract(const Duration(days: 2)),
-        bedtime: const TimeOfDay(hour: 0, minute: 14),
-        wakeupTime: const TimeOfDay(hour: 7, minute: 30),
-        quality: 88,
-      ),
-      SleepLog(
-        id: '3',
-        date: today.subtract(const Duration(days: 3)),
-        bedtime: const TimeOfDay(hour: 22, minute: 45),
-        wakeupTime: const TimeOfDay(hour: 6, minute: 8),
-        quality: 91,
-      ),
-    ]);
+    // No mock data — start with an empty history and save empty state
+    historyLogs.clear();
     await saveSleepHistory();
   }
 
@@ -156,7 +158,7 @@ class SleepController extends GetxController {
       date: DateTime.now(),
       bedtime: TimeOfDay(hour: bedtimeHour.value, minute: bedtimeMinute.value),
       wakeupTime: TimeOfDay(hour: wakeupHour.value, minute: wakeupMinute.value),
-      quality: 85,
+      quality: 0, // quality is calculated server-side; local placeholder
     );
 
     final today = DateTime.now();
@@ -253,6 +255,13 @@ class SleepController extends GetxController {
 
   void updateFromLiveScoresTab(Map<String, dynamic> tabData) {
     try {
+      if (tabData['tonightBedtime'] != null) {
+        tonightBedtime.value = Map<String, dynamic>.from(tabData['tonightBedtime']);
+      } else {
+        tonightBedtime.value = null;
+      }
+      tonightNote.value = tabData['tonightNote'] as String?;
+
       final List? historyList = tabData['history'] as List?;
       if (historyList != null) {
         final List<SleepLog> parsedLogs = [];

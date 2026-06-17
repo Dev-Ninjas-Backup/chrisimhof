@@ -48,7 +48,7 @@ class TodaysShiftCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Tue · 19 May · tap arrows to adjust",
+                      _formattedDate(),
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -137,5 +137,17 @@ class TodaysShiftCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formattedDate() {
+    final now = DateTime.now();
+    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    final weekday = weekdays[now.weekday - 1];
+    final month = months[now.month - 1];
+    return '$weekday · ${now.day} $month · tap arrows to adjust';
   }
 }

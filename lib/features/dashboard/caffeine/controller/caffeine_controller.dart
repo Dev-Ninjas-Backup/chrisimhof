@@ -58,27 +58,8 @@ class CaffeineController extends GetxController {
   }
 
   void _initializeMockEntries() async {
-    final now = DateTime.now();
-    entriesList.assignAll([
-      CaffeineEntry(
-        id: '1',
-        title: 'Espresso',
-        timestamp: DateTime(now.year, now.month, now.day, 14, 20),
-        amountMg: 75,
-      ),
-      CaffeineEntry(
-        id: '2',
-        title: 'Coffee',
-        timestamp: DateTime(now.year, now.month, now.day, 11, 45),
-        amountMg: 100,
-      ),
-      CaffeineEntry(
-        id: '3',
-        title: 'Energy drink',
-        timestamp: DateTime(now.year, now.month, now.day, 8, 30),
-        amountMg: 85,
-      ),
-    ]);
+    // No mock data — start with an empty entries list
+    entriesList.clear();
     recalculateCaffeine();
     await saveEntriesToPrefs();
   }

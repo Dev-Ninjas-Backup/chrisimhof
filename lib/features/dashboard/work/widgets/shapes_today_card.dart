@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,18 +14,59 @@ class ShapesTodayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final shift = controller.selectedShiftType.value;
-      final startHStr = controller.startHour.value.toString().padLeft(2, '0');
-      final startMStr = controller.startMinute.value.toString().padLeft(2, '0');
-      
+      final startH = controller.startHour.value.toString().padLeft(2, '0');
+      final startM = controller.startMinute.value.toString().padLeft(2, '0');
+      final shiftStart = '$startH:$startM';
+
+      // --- Dynamic values from DashboardController ---
+      String optimalBedtime = '22:30';
+      String caffeineEnd = '14:00';
+      try {
+        if (Get.isRegistered<DashboardController>()) {
+          final dashData = Get.find<DashboardController>().dashboardData.value;
+          optimalBedtime = dashData.optimalBedtime;
+
+          // Caffeine cut-off heuristic: 8 h before bedtime
+          final parts = optimalBedtime.split(':');
+          if (parts.length == 2) {
+            final bedH = int.tryParse(parts[0]) ?? 22;
+            final bedM = int.tryParse(parts[1]) ?? 30;
+            final cutoffMinutes = ((bedH * 60 + bedM) - 8 * 60 + 1440) % 1440;
+            caffeineEnd =
+                '${(cutoffMinutes ~/ 60).toString().padLeft(2, '0')}:${(cutoffMinutes % 60).toString().padLeft(2, '0')}';
+          }
+        }
+      } catch (_) {}
+
+      // Pre-shift meal: 1 h before start
+      String preMealTime = shiftStart;
+      try {
+        final sh = controller.startHour.value;
+        final sm = controller.startMinute.value;
+        final preMealMin = ((sh * 60 + sm) - 60 + 1440) % 1440;
+        preMealTime =
+            '${(preMealMin ~/ 60).toString().padLeft(2, '0')}:${(preMealMin % 60).toString().padLeft(2, '0')}';
+      } catch (_) {}
+
       String text;
       if (shift == 'Night') {
-        text = 'Night shift starts $startHStr:$startMStr → bedtime pushed to 14:30 tomorrow · caffeine cut-off at 10:00 · pre-shift Light meal at 21:00.';
+        text =
+            'Night shift starts $shiftStart → bedtime pushed to $optimalBedtime tomorrow'
+            ' · caffeine cut-off at $caffeineEnd'
+            ' · pre-shift light meal at $preMealTime.';
       } else if (shift == 'Day') {
-        text = 'Day shift starts $startHStr:$startMStr → standard bedtime tonight · caffeine cut-off at 14:00 · pre-shift breakfast at 08:00.';
+        text =
+            'Day shift starts $shiftStart → standard bedtime $optimalBedtime tonight'
+            ' · caffeine cut-off at $caffeineEnd'
+            ' · pre-shift breakfast at $preMealTime.';
       } else if (shift == 'Evening') {
-        text = 'Evening shift starts $startHStr:$startMStr → bedtime pushed to 01:30 tomorrow · caffeine cut-off at 16:30 · pre-shift light meal at 13:00.';
+        text =
+            'Evening shift starts $shiftStart → bedtime pushed to $optimalBedtime tomorrow'
+            ' · caffeine cut-off at $caffeineEnd'
+            ' · pre-shift light meal at $preMealTime.';
       } else {
-        text = 'Day off today → focus on recovery, natural daylight exposure, and catching up on sleep debt.';
+        text =
+            'Day off today → focus on recovery, natural daylight exposure, and catching up on sleep debt.';
       }
 
       return Container(

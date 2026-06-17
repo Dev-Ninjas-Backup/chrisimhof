@@ -18,20 +18,20 @@ class SportSession {
 }
 
 class SportsController extends GetxController {
-  // Today's Session metrics
-  final RxBool hasTodaySession = true.obs;
-  final RxInt todayDuration = 45.obs;
-  final RxString todayZone = 'Z3'.obs;
-  final RxString todaySport = 'Running'.obs;
-  final RxString todayDistance = '6.8 km'.obs;
-  final RxString todayStartTime = '12:40'.obs;
-  final RxString todayEndTime = '13:25'.obs;
-  final RxString todayEffort = 'Medium'.obs;
-  final RxString todayType = 'Cardio'.obs;
+  // Today's Session metrics — neutral defaults; real data loads from SharedPrefs
+  final RxBool hasTodaySession = false.obs;
+  final RxInt todayDuration = 0.obs;
+  final RxString todayZone = ''.obs;
+  final RxString todaySport = 'Rest day'.obs;
+  final RxString todayDistance = ''.obs;
+  final RxString todayStartTime = ''.obs;
+  final RxString todayEndTime = ''.obs;
+  final RxString todayEffort = ''.obs;
+  final RxString todayType = ''.obs;
 
   // Recovery Impact metrics
-  final RxInt recoveryScore = 64.obs;
-  final RxString recoveryText = 'Recovery is moderate — skip intense training tomorrow.'.obs;
+  final RxInt recoveryScore = 100.obs;
+  final RxString recoveryText = 'Log your activity to see recovery impact.'.obs;
 
   // This Week sessions list
   final RxList<SportSession> sessionsList = <SportSession>[].obs;
@@ -45,16 +45,16 @@ class SportsController extends GetxController {
   Future<void> loadSportsData() async {
     try {
       final todayMetrics = await SharedPreferencesHelper.getSportsTodayMetrics();
-      hasTodaySession.value = todayMetrics['hasTodaySession'] ?? true;
-      todayDuration.value = todayMetrics['duration'] ?? 45;
-      todayZone.value = todayMetrics['zone'] ?? 'Z3';
-      todaySport.value = todayMetrics['sport'] ?? 'Running';
-      todayDistance.value = todayMetrics['distance'] ?? '6.8 km';
-      todayStartTime.value = todayMetrics['startTime'] ?? '12:40';
-      todayEndTime.value = todayMetrics['endTime'] ?? '13:25';
-      todayEffort.value = todayMetrics['effort'] ?? 'Medium';
-      todayType.value = todayMetrics['type'] ?? 'Cardio';
-      recoveryScore.value = todayMetrics['recoveryScore'] ?? 64;
+      hasTodaySession.value = todayMetrics['hasTodaySession'] ?? false;
+      todayDuration.value = todayMetrics['duration'] ?? 0;
+      todayZone.value = todayMetrics['zone'] ?? '';
+      todaySport.value = todayMetrics['sport'] ?? 'Rest day';
+      todayDistance.value = todayMetrics['distance'] ?? '';
+      todayStartTime.value = todayMetrics['startTime'] ?? '';
+      todayEndTime.value = todayMetrics['endTime'] ?? '';
+      todayEffort.value = todayMetrics['effort'] ?? '';
+      todayType.value = todayMetrics['type'] ?? '';
+      recoveryScore.value = todayMetrics['recoveryScore'] ?? 100;
       _updateRecoveryText();
 
       final jsonStr = await SharedPreferencesHelper.getSportsSessions();
@@ -65,12 +65,10 @@ class SportsController extends GetxController {
           subtitle: s['subtitle'] ?? '',
           iconPath: s['iconPath'] ?? '',
         )).toList());
-      } else {
-        _initializeMockSessions();
       }
+      // No mock sessions — sessionsList stays empty if nothing saved
     } catch (e) {
       debugPrint('Error loading sports data: $e');
-      _initializeMockSessions();
     }
   }
 
@@ -105,31 +103,7 @@ class SportsController extends GetxController {
     }
   }
 
-  void _initializeMockSessions() async {
-    sessionsList.assignAll([
-      SportSession(
-        title: 'Running',
-        subtitle: 'Today · 45m · Z3',
-        iconPath: IconPath.running,
-      ),
-      SportSession(
-        title: 'Strength',
-        subtitle: 'Yesterday · 60m · Z2',
-        iconPath: IconPath.strength,
-      ),
-      SportSession(
-        title: 'Yoga',
-        subtitle: 'Sat · 30m · Z1',
-        iconPath: IconPath.yoga,
-      ),
-      SportSession(
-        title: 'Rest day',
-        subtitle: 'Fri · —',
-        iconPath: IconPath.restDay,
-      ),
-    ]);
-    await saveSportsData();
-  }
+  // No mock session initializer — real data only comes from SharedPrefs or user input
 
   void addSession({
     required String activity,

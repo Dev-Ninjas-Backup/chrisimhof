@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/core/const/icon_path.dart';
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
+import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,8 @@ class ForYouSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<RecommendationController>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -26,7 +29,6 @@ class ForYouSection extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                // Navigate to RecommendationsScreen
                 Get.toNamed(AppRoutes.recomendationsScreen);
               },
               child: Row(
@@ -51,52 +53,50 @@ class ForYouSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.borderSoft,
-              width: 1,
+        Obx(() {
+          if (controller.isLoading.value) {
+            return _buildLoadingPlaceholder();
+          }
+
+          final recommendations =
+              controller.recommendationResponse.value?.data?.recommendations ?? [];
+
+          if (recommendations.isEmpty) {
+            return _buildEmptyState();
+          }
+
+          // Show top 2
+          final preview = recommendations.take(2).toList();
+
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.borderSoft, width: 1),
             ),
-          ),
-          child: Column(
-            children: [
-              _buildRecommendationItem(
-                iconPath: IconPath.homeScreenCaffeineIcon,
-                iconColor: AppColors.amberDark,
-                iconBgColor: AppColors.amberSoft,
-                title: 'Caffeine cut-off at 16:30',
-                description:
-                    "You worked nights — stop early to protect tomorrow's recovery.",
-              ),
-              const Divider(
-                height: 1,
-                indent: 16,
-                endIndent: 16,
-                color: AppColors.borderSoft,
-              ),
-              _buildRecommendationItem(
-                iconPath: IconPath.homeScreenWaterIcon,
-                iconColor: AppColors.blue,
-                iconBgColor: AppColors.indigoSoft2,
-                title: 'Drink 600 ml before shift',
-                description: 'Hydration is 28% behind target for today.',
-              ),
-            ],
-          ),
-        ),
+            child: Column(
+              children: [
+                for (int i = 0; i < preview.length; i++) ...[
+                  if (i > 0)
+                    const Divider(
+                      height: 1,
+                      indent: 16,
+                      endIndent: 16,
+                      color: AppColors.borderSoft,
+                    ),
+                  _buildRecommendationItem(preview[i]),
+                ],
+              ],
+            ),
+          );
+        }),
       ],
     );
   }
 
-  Widget _buildRecommendationItem({
-    required String iconPath,
-    required Color iconColor,
-    required Color iconBgColor,
-    required String title,
-    required String description,
-  }) {
+  Widget _buildRecommendationItem(RecommendationItem item) {
+    final style = RecomendationStyleHelper.getStyle(item.category);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -106,18 +106,18 @@ class ForYouSection extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: iconBgColor,
+              color: style.iconBgColor,
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Image.asset(
-                iconPath,
+                style.iconPath,
                 width: 18,
                 height: 18,
-                color: iconColor,
-                errorBuilder: (context, error, stackTrace) => Icon(
+                color: style.iconColor,
+                errorBuilder: (_, e, s) => Icon(
                   Icons.lightbulb_outline,
-                  color: iconColor,
+                  color: style.iconColor,
                   size: 18,
                 ),
               ),
@@ -129,7 +129,7 @@ class ForYouSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  item.title ?? item.category ?? '',
                   style: getTextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -138,15 +138,114 @@ class ForYouSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  description,
+                  item.body ?? '',
                   style: getTextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
                     color: AppColors.textSoft,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingPlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSoft, width: 1),
+      ),
+      child: Column(
+        children: [
+          _buildShimmerRow(),
+          const Divider(height: 1, indent: 16, endIndent: 16, color: AppColors.borderSoft),
+          _buildShimmerRow(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerRow() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppColors.borderSoft,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 13,
+                  width: 160,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderSoft,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  height: 11,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderSoft,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSoft, width: 1),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.auto_awesome, color: AppColors.primaryButtonColor, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            'No recommendations yet',
+            style: getTextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryTextColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Log your daily data to get personalised tips.',
+            style: getTextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w400,
+              color: AppColors.textSoft,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

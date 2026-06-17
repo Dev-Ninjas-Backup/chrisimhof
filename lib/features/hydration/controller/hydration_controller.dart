@@ -52,58 +52,15 @@ class HydrationController extends GetxController {
   // Index of the currently selected day (0 for Monday, 6 for Sunday/Today)
   final RxInt selectedDayIndex = 6.obs;
 
-  // 7 lists of logs representing Monday through Sunday
+  // 7 lists of logs representing Monday through Sunday — all start empty
   final RxList<RxList<HydrationLog>> weeklyLogs = <RxList<HydrationLog>>[
-    // Monday (2.3 L)
-    <HydrationLog>[
-      HydrationLog(id: 'm1', time: '17:30', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 'm2', time: '13:15', type: 'Large', amountMl: 750),
-      HydrationLog(id: 'm3', time: '10:00', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 'm4', time: '08:20', type: 'Glass', amountMl: 330),
-      HydrationLog(id: 'm5', time: '07:05', type: 'Cup', amountMl: 220),
-    ].obs,
-    // Tuesday (2.0 L)
-    <HydrationLog>[
-      HydrationLog(id: 't1', time: '16:00', type: 'Large', amountMl: 750),
-      HydrationLog(id: 't2', time: '12:30', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 't3', time: '09:15', type: 'Glass', amountMl: 330),
-      HydrationLog(id: 't4', time: '07:45', type: 'Cup', amountMl: 420),
-    ].obs,
-    // Wednesday (2.5 L)
-    <HydrationLog>[
-      HydrationLog(id: 'w1', time: '18:10', type: 'Large', amountMl: 750),
-      HydrationLog(id: 'w2', time: '14:20', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 'w3', time: '11:05', type: 'Large', amountMl: 750),
-      HydrationLog(id: 'w4', time: '07:30', type: 'Bottle', amountMl: 500),
-    ].obs,
-    // Thursday (1.9 L)
-    <HydrationLog>[
-      HydrationLog(id: 'th1', time: '15:50', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 'th2', time: '11:40', type: 'Large', amountMl: 750),
-      HydrationLog(id: 'th3', time: '08:15', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 'th4', time: '07:00', type: 'Cup', amountMl: 150),
-    ].obs,
-    // Friday (2.4 L)
-    <HydrationLog>[
-      HydrationLog(id: 'f1', time: '19:00', type: 'Large', amountMl: 750),
-      HydrationLog(id: 'f2', time: '15:30', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 'f3', time: '11:15', type: 'Large', amountMl: 750),
-      HydrationLog(id: 'f4', time: '08:45', type: 'Cup', amountMl: 400),
-    ].obs,
-    // Saturday (2.0 L)
-    <HydrationLog>[
-      HydrationLog(id: 's1', time: '16:40', type: 'Large', amountMl: 750),
-      HydrationLog(id: 's2', time: '12:20', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: 's3', time: '09:05', type: 'Glass', amountMl: 330),
-      HydrationLog(id: 's4', time: '07:10', type: 'Bottle', amountMl: 420),
-    ].obs,
-    // Sunday / Today (1.6 L initial)
-    <HydrationLog>[
-      HydrationLog(id: '1', time: '15:42', type: 'Bottle', amountMl: 500),
-      HydrationLog(id: '2', time: '12:10', type: 'Glass', amountMl: 330),
-      HydrationLog(id: '3', time: '09:30', type: 'Cup', amountMl: 200),
-      HydrationLog(id: '4', time: '07:15', type: 'Bottle', amountMl: 570),
-    ].obs,
+    <HydrationLog>[].obs, // Monday
+    <HydrationLog>[].obs, // Tuesday
+    <HydrationLog>[].obs, // Wednesday
+    <HydrationLog>[].obs, // Thursday
+    <HydrationLog>[].obs, // Friday
+    <HydrationLog>[].obs, // Saturday
+    <HydrationLog>[].obs, // Sunday / Today
   ].obs;
 
   // Available quick add options
@@ -135,6 +92,7 @@ class HydrationController extends GetxController {
           )).toList());
         }
       } else {
+        // No saved data — save empty state so future loads start clean
         await saveLogsToPrefs();
       }
     } catch (e) {

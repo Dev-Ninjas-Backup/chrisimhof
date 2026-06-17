@@ -110,7 +110,7 @@ class BedtimeCard extends StatelessWidget {
                             imageShiftFactor: 0.52,
                             optimalBedtime: data.optimalBedtime,
                             minutesToBedtime: data.minutesToBedtime,
-                            isSleepLogged: data.isSleepLogged,
+                            isSleepLogged: false,
                             isSleepPrep: data.isSleepPrep,
                             isMissedBedtime: data.isMissedBedtime,
                           ),

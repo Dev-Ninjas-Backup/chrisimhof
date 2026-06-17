@@ -40,17 +40,9 @@ class NutritionController extends GetxController {
   final RxInt dailyTarget = 5.obs;
   final RxString selectedMealType = 'Light'.obs;
 
-  final RxList<MealItem> mealsList = <MealItem>[
-    MealItem(name: 'Meal 1', time: '07:30', type: 'Light', isLogged: true, isPlanned: false),
-    MealItem(name: 'Meal 2', time: '12:00', type: 'Medium', isLogged: true, isPlanned: false),
-    MealItem(name: 'Snack', time: '15:30', type: 'Light', isLogged: true, isPlanned: false),
-    MealItem(name: 'Pre-shift meal', time: '19:00', type: 'Medium', isLogged: false, isPlanned: true),
-    MealItem(name: 'Night meal', time: '02:00', type: 'Light', isLogged: false, isPlanned: true),
-  ].obs;
+  final RxList<MealItem> mealsList = <MealItem>[].obs;
 
-  final RxList<String> notesList = <String>[
-    'Energy dip around 14:00 — try logging the snack 30 min earlier tomorrow.'
-  ].obs;
+  final RxList<String> notesList = <String>[].obs;
 
   int get loggedMealsCount => mealsList.where((m) => m.isLogged).length;
 
@@ -75,15 +67,15 @@ class NutritionController extends GetxController {
           isPlanned: m['isPlanned'] ?? false,
         )).toList());
       } else {
+        // No saved data — start empty and persist empty state
         await saveNutritionData();
       }
 
       final notes = await SharedPreferencesHelper.getNutritionNotes();
       if (notes != null) {
         notesList.assignAll(notes);
-      } else {
-        await SharedPreferencesHelper.saveNutritionNotes(notesList);
       }
+      // No hardcoded notes — notes start empty if none saved
     } catch (e) {
       debugPrint('Error loading nutrition data: $e');
     }

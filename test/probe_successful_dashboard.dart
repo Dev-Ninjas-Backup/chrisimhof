@@ -98,9 +98,9 @@ void main() async {
       'Authorization': 'Bearer $accessToken',
     },
     body: jsonEncode({
-      'shiftType': 'night',
-      'shiftStartTime': '22:00',
-      'shiftEndTime': '06:00'
+      'shiftType': 'day',
+      'shiftStartTime': '09:00',
+      'shiftEndTime': '17:00'
     }),
   );
   print('Work Response: ${workRes.statusCode} - ${workRes.body}');

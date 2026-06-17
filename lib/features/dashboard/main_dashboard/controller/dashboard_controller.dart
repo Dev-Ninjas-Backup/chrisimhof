@@ -2,17 +2,22 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/features/auth/session/session.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/model/dashboard_model.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 
 class DashboardController extends GetxController {
   final _dashboardService = DashboardService();
   final _profileService = ProfileService();
+
+  final Rxn<Map<String, dynamic>> sleepTabData = Rxn<Map<String, dynamic>>();
 
   final Rx<DashboardModel> dashboardData = DashboardModel(
     date: DateTime.now(),
@@ -173,7 +178,6 @@ class DashboardController extends GetxController {
       // Parse cards
       final cards = apiData?['cards'] as Map<String, dynamic>?;
       final sleepCard = cards?['sleep'] as Map<String, dynamic>? ?? apiData?['lastSleepInfo'] as Map<String, dynamic>?;
-      final workCard = cards?['work'] as Map<String, dynamic>? ?? cards?['workFit'] as Map<String, dynamic>? ?? apiData?['workInfo'] as Map<String, dynamic>?;
 
       // Sleep details
       final isSleepLogged = sleepCard != null;
@@ -203,9 +207,61 @@ class DashboardController extends GetxController {
       }
 
       // Work details
-      final workShift = workCard?['workShift'] as String? ?? workCard?['subtitle'] as String? ?? 'Off Today';
-      final workShiftCountdown = workCard?['workShiftCountdown'] as String? ?? 'No shifts scheduled';
-      final workProgress = (workCard?['workProgress'] as num?)?.toDouble() ?? 0.0;
+      final workInfo = apiData?['workInfo'] as Map<String, dynamic>?;
+      final workFitCard = cards?['workFit'] as Map<String, dynamic>?;
+
+      String workShift = 'Off Today';
+      String workShiftCountdown = 'No shifts scheduled';
+      double workProgress = 0.0;
+
+      if (workInfo != null && workInfo['shiftType'] != 'off') {
+        final shiftType = workInfo['shiftType'] as String? ?? 'Work';
+        final capShiftType = shiftType.isNotEmpty ? shiftType[0].toUpperCase() + shiftType.substring(1) : 'Work';
+        final start = workInfo['shiftStart'] as String? ?? '';
+        final end = workInfo['shiftEnd'] as String? ?? '';
+
+        workShift = '$capShiftType shift';
+        if (start.isNotEmpty && end.isNotEmpty) {
+          workShiftCountdown = '$start — $end';
+        } else {
+          workShiftCountdown = workFitCard?['subtitle'] as String? ?? 'Active shift';
+        }
+
+        // Calculate progress dynamically based on time window
+        try {
+          if (start.isNotEmpty && end.isNotEmpty) {
+            final now = DateTime.now();
+            final startParts = start.split(':');
+            final endParts = end.split(':');
+            if (startParts.length == 2 && endParts.length == 2) {
+              final startHour = int.parse(startParts[0]);
+              final startMin = int.parse(startParts[1]);
+              final endHour = int.parse(endParts[0]);
+              final endMin = int.parse(endParts[1]);
+
+              final startTime = DateTime(now.year, now.month, now.day, startHour, startMin);
+              var endTime = DateTime(now.year, now.month, now.day, endHour, endMin);
+              if (endTime.isBefore(startTime)) {
+                endTime = endTime.add(const Duration(days: 1));
+              }
+
+              if (now.isAfter(startTime) && now.isBefore(endTime)) {
+                final totalMinutes = endTime.difference(startTime).inMinutes;
+                final elapsedMinutes = now.difference(startTime).inMinutes;
+                workProgress = (elapsedMinutes / totalMinutes).clamp(0.0, 1.0);
+              } else if (now.isAfter(endTime)) {
+                workProgress = 1.0;
+              } else {
+                workProgress = 0.0;
+              }
+            }
+          }
+        } catch (_) {}
+      } else {
+        workShift = workFitCard?['subtitle'] as String? ?? 'Off Today';
+        workShiftCountdown = 'No shifts scheduled';
+        workProgress = 0.0;
+      }
 
       dashboardData.value = DashboardModel(
         date: DateTime.now(),
@@ -224,13 +280,20 @@ class DashboardController extends GetxController {
         recoveryProgress: localRecoveryProgress,
         workShift: workShift,
         workShiftCountdown: workShiftCountdown,
-        workProgress: workProgress == 0.0 ? 0.35 : workProgress,
+        workProgress: workProgress == 0.0 ? (workInfo != null && workInfo['shiftType'] != 'off' ? 0.35 : 0.0) : workProgress,
         lastSleepDuration: lastSleepDuration,
         sleepDebtText: sleepDebtText,
         lastSleepWeekBars: lastSleepWeekBars,
         isSleepLogged: isSleepLogged,
         isSleepPrep: current.isSleepPrep,
       );
+
+      if (apiData?['tabs']?['sleep'] != null) {
+        sleepTabData.value = Map<String, dynamic>.from(apiData!['tabs']['sleep']);
+        if (Get.isRegistered<SleepController>()) {
+          Get.find<SleepController>().updateFromLiveScoresTab(sleepTabData.value!);
+        }
+      }
 
       updateSleepPrepStatus();
     } catch (e) {
@@ -272,7 +335,7 @@ class DashboardController extends GetxController {
           diff -= 1440;
         }
 
-        final bool isMissed = diff < 0 && !current.isSleepLogged;
+        final bool isMissed = diff < 0;
 
         String timeUntil;
         if (diff > 0) {
@@ -327,32 +390,24 @@ class DashboardController extends GetxController {
   void endMyDay() async {
     EasyLoading.show(status: 'Ending day...');
     try {
-      final sessionId = await SharedPreferencesHelper.getSessionId();
-      if (sessionId != null && sessionId.isNotEmpty) {
-        await _dashboardService.resetSession(sessionId: sessionId);
-      }
-      
-      // Clear local caches for caffeine, hydration, nutrition, and sports
+      // Create a brand-new session (the /reset endpoint doesn't exist —
+      // we get a fresh session the same way we do at login)
+      final newSessionId = await SessionService().fetchAndStoreSessionId();
+      debugPrint('endMyDay: new sessionId = $newSessionId');
+
+      // Clear all local caches
       await SharedPreferencesHelper.saveCaffeineLogs('[]');
-      
-      // For hydration: reset today's logs (or reset all to empty lists)
+
       final emptyHydration = List.generate(7, (_) => []).toList();
       await SharedPreferencesHelper.saveHydrationLogs(jsonEncode(emptyHydration));
 
-      // For nutrition: reset meals to empty or planned defaults
-      final emptyMeals = {
-        'dailyTarget': 5,
-        'meals': [
-          {'name': 'Meal 1', 'time': '07:30', 'type': 'Light', 'isLogged': false, 'isPlanned': true},
-          {'name': 'Meal 2', 'time': '12:00', 'type': 'Medium', 'isLogged': false, 'isPlanned': true},
-          {'name': 'Snack', 'time': '15:30', 'type': 'Light', 'isLogged': false, 'isPlanned': true},
-          {'name': 'Pre-shift meal', 'time': '19:00', 'type': 'Medium', 'isLogged': false, 'isPlanned': true},
-          {'name': 'Night meal', 'time': '02:00', 'type': 'Light', 'isLogged': false, 'isPlanned': true},
-        ]
-      };
-      await SharedPreferencesHelper.saveMeals(jsonEncode(emptyMeals));
+      // Nutrition: truly empty — no hardcoded meals
+      await SharedPreferencesHelper.saveMeals(jsonEncode({
+        'dailyTarget': 3,
+        'meals': [],
+      }));
 
-      // For sports: reset today metrics
+      // Sports: reset today metrics to neutral
       await SharedPreferencesHelper.saveSportsTodayMetrics(
         hasTodaySession: false,
         duration: 0,
@@ -367,8 +422,18 @@ class DashboardController extends GetxController {
       );
       await SharedPreferencesHelper.saveSportsSessions('[]');
 
-      // Clear cached dashboard calculations by re-fetching
+      // Re-fetch dashboard data with the new session
       await fetchDashboardData();
+
+      // Also refresh recommendations so ForYouSection reflects the new session
+      if (Get.isRegistered<RecommendationController>()) {
+        final locale = Get.locale?.languageCode == 'fr' ? 'fr' : 'en';
+        Get.find<RecommendationController>().getRecommendations(
+          sessionId: newSessionId ?? '',
+          locale: locale,
+        );
+      }
+
       EasyLoading.showSuccess('Day ended successfully!');
     } catch (e) {
       debugPrint('Error ending day: $e');
@@ -466,7 +531,6 @@ class DashboardController extends GetxController {
 
       final cards = apiData['cards'] as Map<String, dynamic>?;
       final sleepCard = cards?['sleep'] as Map<String, dynamic>? ?? apiData['lastSleepInfo'] as Map<String, dynamic>?;
-      final workCard = cards?['work'] as Map<String, dynamic>? ?? cards?['workFit'] as Map<String, dynamic>? ?? apiData['workInfo'] as Map<String, dynamic>?;
 
       final isSleepLogged = sleepCard != null;
       final lastSleepDuration = sleepCard?['lastSleepDuration'] as String? ?? sleepCard?['subtitle'] as String? ?? sleepCard?['display'] as String? ?? '—';
@@ -492,9 +556,62 @@ class DashboardController extends GetxController {
         } catch (_) {}
       }
 
-      final workShift = workCard?['workShift'] as String? ?? workCard?['subtitle'] as String? ?? 'Off Today';
-      final workShiftCountdown = workCard?['workShiftCountdown'] as String? ?? 'No shifts scheduled';
-      final workProgress = (workCard?['workProgress'] as num?)?.toDouble() ?? 0.0;
+      // Work details
+      final workInfo = apiData['workInfo'] as Map<String, dynamic>?;
+      final workFitCard = cards?['workFit'] as Map<String, dynamic>?;
+
+      String workShift = 'Off Today';
+      String workShiftCountdown = 'No shifts scheduled';
+      double workProgress = 0.0;
+
+      if (workInfo != null && workInfo['shiftType'] != 'off') {
+        final shiftType = workInfo['shiftType'] as String? ?? 'Work';
+        final capShiftType = shiftType.isNotEmpty ? shiftType[0].toUpperCase() + shiftType.substring(1) : 'Work';
+        final start = workInfo['shiftStart'] as String? ?? '';
+        final end = workInfo['shiftEnd'] as String? ?? '';
+
+        workShift = '$capShiftType shift';
+        if (start.isNotEmpty && end.isNotEmpty) {
+          workShiftCountdown = '$start — $end';
+        } else {
+          workShiftCountdown = workFitCard?['subtitle'] as String? ?? 'Active shift';
+        }
+
+        // Calculate progress dynamically based on time window
+        try {
+          if (start.isNotEmpty && end.isNotEmpty) {
+            final now = DateTime.now();
+            final startParts = start.split(':');
+            final endParts = end.split(':');
+            if (startParts.length == 2 && endParts.length == 2) {
+              final startHour = int.parse(startParts[0]);
+              final startMin = int.parse(startParts[1]);
+              final endHour = int.parse(endParts[0]);
+              final endMin = int.parse(endParts[1]);
+
+              final startTime = DateTime(now.year, now.month, now.day, startHour, startMin);
+              var endTime = DateTime(now.year, now.month, now.day, endHour, endMin);
+              if (endTime.isBefore(startTime)) {
+                endTime = endTime.add(const Duration(days: 1));
+              }
+
+              if (now.isAfter(startTime) && now.isBefore(endTime)) {
+                final totalMinutes = endTime.difference(startTime).inMinutes;
+                final elapsedMinutes = now.difference(startTime).inMinutes;
+                workProgress = (elapsedMinutes / totalMinutes).clamp(0.0, 1.0);
+              } else if (now.isAfter(endTime)) {
+                workProgress = 1.0;
+              } else {
+                workProgress = 0.0;
+              }
+            }
+          }
+        } catch (_) {}
+      } else {
+        workShift = workFitCard?['subtitle'] as String? ?? 'Off Today';
+        workShiftCountdown = 'No shifts scheduled';
+        workProgress = 0.0;
+      }
 
       dashboardData.value = DashboardModel(
         date: DateTime.now(),
@@ -513,13 +630,20 @@ class DashboardController extends GetxController {
         recoveryProgress: localRecoveryProgress,
         workShift: workShift,
         workShiftCountdown: workShiftCountdown,
-        workProgress: workProgress == 0.0 ? 0.35 : workProgress,
+        workProgress: workProgress == 0.0 ? (workInfo != null && workInfo['shiftType'] != 'off' ? 0.35 : 0.0) : workProgress,
         lastSleepDuration: lastSleepDuration,
         sleepDebtText: sleepDebtText,
         lastSleepWeekBars: lastSleepWeekBars,
         isSleepLogged: isSleepLogged,
         isSleepPrep: current.isSleepPrep,
       );
+
+      if (apiData['tabs']?['sleep'] != null) {
+        sleepTabData.value = Map<String, dynamic>.from(apiData['tabs']['sleep']);
+        if (Get.isRegistered<SleepController>()) {
+          Get.find<SleepController>().updateFromLiveScoresTab(sleepTabData.value!);
+        }
+      }
 
       updateSleepPrepStatus();
     } catch (e) {

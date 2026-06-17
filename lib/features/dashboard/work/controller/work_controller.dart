@@ -11,21 +11,63 @@ class WorkController extends GetxController {
   final startMinute = 0.obs;
   final endHour = 6.obs;
   final endMinute = 0.obs;
-  final selectedShiftType = 'Night'.obs;
+  final selectedShiftType = 'Off'.obs;
 
+  // Weekly pattern — defaults to "Off" for all days until API data arrives
   final weeklyPattern = <Map<String, String>>[
-    {'day': 'M', 'shift': 'N'},
-    {'day': 'T', 'shift': 'N'},
-    {'day': 'W', 'shift': 'N'},
+    {'day': 'M', 'shift': 'Off'},
+    {'day': 'T', 'shift': 'Off'},
+    {'day': 'W', 'shift': 'Off'},
     {'day': 'T', 'shift': 'Off'},
     {'day': 'F', 'shift': 'Off'},
-    {'day': 'S', 'shift': 'D'},
-    {'day': 'S', 'shift': 'D'},
+    {'day': 'S', 'shift': 'Off'},
+    {'day': 'S', 'shift': 'Off'},
   ].obs;
 
-  final defaultRotation = '3-2-2 night'.obs;
+  final defaultRotation = ''.obs;
   final shiftReminders = 'On · 30 min before'.obs;
-  final timeZone = 'CET · Geneva'.obs;
+  final timeZone = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeFromDashboard();
+  }
+
+  void _initializeFromDashboard() {
+    try {
+      final dashboardController = Get.find<DashboardController>();
+      final data = dashboardController.dashboardData.value;
+      
+      final shift = data.workShift.toLowerCase();
+      if (shift.contains('day') || shift.contains('jour')) {
+        selectedShiftType.value = 'Day';
+      } else if (shift.contains('evening') || shift.contains('après-midi') || shift.contains('apres-midi')) {
+        selectedShiftType.value = 'Evening';
+      } else if (shift.contains('night') || shift.contains('nuit') || shift.contains('soir')) {
+        selectedShiftType.value = 'Night';
+      } else {
+        selectedShiftType.value = 'Off';
+      }
+
+      // Extract start & end times
+      final times = data.workShiftCountdown.split(RegExp(r'[\s—\-\+]+'));
+      if (times.length >= 2) {
+        final startParts = times[0].split(':');
+        if (startParts.length == 2) {
+          startHour.value = int.tryParse(startParts[0]) ?? startHour.value;
+          startMinute.value = int.tryParse(startParts[1]) ?? startMinute.value;
+        }
+        final endParts = times[1].split(':');
+        if (endParts.length == 2) {
+          endHour.value = int.tryParse(endParts[0]) ?? endHour.value;
+          endMinute.value = int.tryParse(endParts[1]) ?? endMinute.value;
+        }
+      }
+    } catch (e) {
+      debugPrint('WorkController: Error initializing from dashboard data: $e');
+    }
+  }
 
   void incrementStartHour() => startHour.value = (startHour.value + 1) % 24;
   void decrementStartHour() => startHour.value = (startHour.value - 1 + 24) % 24;
