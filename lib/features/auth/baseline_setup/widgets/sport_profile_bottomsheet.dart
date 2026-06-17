@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,7 +11,8 @@ class SportProfileBottomsheet extends StatefulWidget {
   const SportProfileBottomsheet({super.key});
 
   @override
-  State<SportProfileBottomsheet> createState() => _SportProfileBottomsheetState();
+  State<SportProfileBottomsheet> createState() =>
+      _SportProfileBottomsheetState();
 }
 
 class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
@@ -22,31 +24,37 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
       'title': 'Sedentary',
       'desc': 'Little to no exercise',
       'icon': IconPath.sedentary,
-      'value': 'sedentary',
+      'value': BaselineEnums.sportProfileSedentary,
     },
     {
       'title': 'Lightly active',
       'desc': '1-2x per week',
       'icon': IconPath.lightlyActive,
-      'value': 'light',
+      'value': BaselineEnums.sportProfileLight,
     },
     {
       'title': 'Moderately active',
       'desc': '3-4x per week',
       'icon': IconPath.running,
-      'value': 'cardio',
+      'value': BaselineEnums.sportProfileCardio,
     },
     {
       'title': 'Very active',
       'desc': '5-6x per week',
       'icon': IconPath.veryActive,
-      'value': 'strength',
+      'value': BaselineEnums.sportProfileStrength,
+    },
+    {
+      'title': 'Mixed',
+      'desc': 'Mixed training',
+      'icon': IconPath.running,
+      'value': BaselineEnums.sportProfileMixed,
     },
     {
       'title': 'Athlete',
       'desc': 'Intense training daily',
       'icon': IconPath.athlete,
-      'value': 'endurance',
+      'value': BaselineEnums.sportProfileEndurance,
     },
   ];
 
@@ -54,7 +62,9 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
   void initState() {
     super.initState();
     controller = Get.find<BaselineSetupController>();
-    final currentEnum = controller.sportProfile.value;
+    final currentEnum = BaselineEnums.normalizeSportProfile(
+      controller.sportProfile.value,
+    );
     final matched = options.firstWhere(
       (opt) => opt['value'] == currentEnum,
       orElse: () => options[2],
@@ -249,7 +259,9 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
           // Save Button
           CustomButton(
             onTap: () {
-              final matched = options.firstWhere((opt) => opt['title'] == selectedTitle);
+              final matched = options.firstWhere(
+                (opt) => opt['title'] == selectedTitle,
+              );
               controller.sportProfile.value = matched['value']!;
               Get.back();
             },

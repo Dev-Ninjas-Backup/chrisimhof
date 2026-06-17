@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,17 +18,35 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
   late final BaselineSetupController controller;
 
   final List<Map<String, String>> options = [
-    {'title': 'Early Bird', 'range': '5am – 9pm', 'value': 'morning'},
-    {'title': 'Intermediate', 'range': '7am – 11pm', 'value': 'intermediate'},
-    {'title': 'Night Owl', 'range': '10am – 2am', 'value': 'evening'},
-    {'title': 'Extreme Night Owl', 'range': '12am – 4am', 'value': 'evening'},
+    {
+      'title': 'Early Bird',
+      'range': '5am – 9pm',
+      'value': BaselineEnums.chronotypeMorning,
+    },
+    {
+      'title': 'Intermediate',
+      'range': '7am – 11pm',
+      'value': BaselineEnums.chronotypeIntermediate,
+    },
+    {
+      'title': 'Night Owl',
+      'range': '10am – 2am',
+      'value': BaselineEnums.chronotypeEvening,
+    },
+    {
+      'title': 'Extreme Night Owl',
+      'range': '12am – 4am',
+      'value': BaselineEnums.chronotypeEvening,
+    },
   ];
 
   @override
   void initState() {
     super.initState();
     controller = Get.find<BaselineSetupController>();
-    final currentEnum = controller.chronotype.value;
+    final currentEnum = BaselineEnums.normalizeChronotype(
+      controller.chronotype.value,
+    );
     final matched = options.firstWhere(
       (opt) => opt['value'] == currentEnum,
       orElse: () => options[1],
@@ -125,12 +144,19 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
                 },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 14.0,
+                  ),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFECFDF5) : AppColors.white,
+                    color: isSelected
+                        ? const Color(0xFFECFDF5)
+                        : AppColors.white,
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF10B981) : AppColors.borderSoft,
+                      color: isSelected
+                          ? const Color(0xFF10B981)
+                          : AppColors.borderSoft,
                       width: isSelected ? 1.5 : 1.0,
                     ),
                   ),
@@ -154,7 +180,9 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
                               style: getTextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: isSelected ? const Color(0xFF047857) : AppColors.textSoft,
+                                color: isSelected
+                                    ? const Color(0xFF047857)
+                                    : AppColors.textSoft,
                               ),
                             ),
                           ],
@@ -189,7 +217,8 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
           // Info description text
           Center(
             child: Text(
-              'Your chronotype affects when you should ideally sleep and wake.'.tr,
+              'Your chronotype affects when you should ideally sleep and wake.'
+                  .tr,
               style: getTextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -203,7 +232,9 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
           // Save Button
           GestureDetector(
             onTap: () {
-              final matched = options.firstWhere((opt) => opt['title'] == selectedTitle);
+              final matched = options.firstWhere(
+                (opt) => opt['title'] == selectedTitle,
+              );
               controller.chronotype.value = matched['value']!;
               Get.back();
             },

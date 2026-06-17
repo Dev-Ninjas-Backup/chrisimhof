@@ -25,6 +25,8 @@ class BaselineSetupScreen extends StatelessWidget {
         return '3-4x per week';
       case 'strength':
         return '5-6x per week';
+      case 'mixed':
+        return 'Mixed training';
       case 'endurance':
         return 'Intense training daily';
       default:
@@ -69,77 +71,91 @@ class BaselineSetupScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-              Obx(() => BuildMenuItem(
-                iconPath: IconPath.sleep,
-                iconBackgroundColor: AppColors.subtle,
-                iconColor: AppColors.secondaryButtonColor,
-                title: 'Sleep target'.tr,
-                subtitle: '${controller.sleepHours.value}h ${controller.sleepMinutes.value}m'.tr,
-                borderRadius: 20,
-                containerWidth: 36,
-                containerHeight: 36,
-                iconSize: 18,
-                onTap: () {
-                  Get.bottomSheet(
-                    const SleepTaretBottomsheet(),
-                    isScrollControlled: true,
-                  );
-                },
-              )),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.sleep,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Sleep target'.tr,
+                  subtitle: controller.sleepTargetDisplay.value.tr,
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const SleepTaretBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
               const SizedBox(height: 16),
-              Obx(() => BuildMenuItem(
-                iconPath: IconPath.chronotype,
-                iconBackgroundColor: AppColors.subtle,
-                iconColor: AppColors.secondaryButtonColor,
-                title: 'Chronotype'.tr,
-                subtitle: controller.getChronotypeDisplay(controller.chronotype.value).tr,
-                borderRadius: 20,
-                containerWidth: 36,
-                containerHeight: 36,
-                iconSize: 18,
-                onTap: () {
-                  Get.bottomSheet(
-                    const ChronotypeBottomsheet(),
-                    isScrollControlled: true,
-                  );
-                },
-              )),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.chronotype,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Chronotype'.tr,
+                  subtitle: controller
+                      .getChronotypeDisplay(controller.chronotype.value)
+                      .tr,
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const ChronotypeBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
               const SizedBox(height: 16),
-              Obx(() => BuildMenuItem(
-                iconPath: IconPath.caffeine_sensitivity,
-                iconBackgroundColor: AppColors.subtle,
-                iconColor: AppColors.secondaryButtonColor,
-                title: 'Caffeine sensitivity'.tr,
-                subtitle: controller.getCaffeineDisplay(controller.caffeineSensitivity.value).tr,
-                borderRadius: 20,
-                containerWidth: 36,
-                containerHeight: 36,
-                iconSize: 18,
-                onTap: () {
-                  Get.bottomSheet(
-                    const CaffeineSensitivityBottomsheet(),
-                    isScrollControlled: true,
-                  );
-                },
-              )),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.caffeine_sensitivity,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Caffeine sensitivity'.tr,
+                  subtitle: controller
+                      .getCaffeineDisplay(controller.caffeineSensitivity.value)
+                      .tr,
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const CaffeineSensitivityBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
               const SizedBox(height: 16),
-              Obx(() => BuildMenuItem(
-                iconPath: IconPath.sport_profile,
-                iconBackgroundColor: AppColors.subtle,
-                iconColor: AppColors.secondaryButtonColor,
-                title: 'Sport profile'.tr,
-                subtitle: _getSportProfileSubtitle(controller.sportProfile.value).tr,
-                borderRadius: 20,
-                containerWidth: 36,
-                containerHeight: 36,
-                iconSize: 18,
-                onTap: () {
-                  Get.bottomSheet(
-                    const SportProfileBottomsheet(),
-                    isScrollControlled: true,
-                  );
-                },
-              )),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.sport_profile,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Sport profile'.tr,
+                  subtitle: _getSportProfileSubtitle(
+                    controller.sportProfile.value,
+                  ).tr,
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const SportProfileBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
               const SizedBox(height: 20),
               Container(
                 width: double.infinity,

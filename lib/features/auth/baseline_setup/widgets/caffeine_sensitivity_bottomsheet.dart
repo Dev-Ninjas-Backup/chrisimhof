@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,26 +10,50 @@ class CaffeineSensitivityBottomsheet extends StatefulWidget {
   const CaffeineSensitivityBottomsheet({super.key});
 
   @override
-  State<CaffeineSensitivityBottomsheet> createState() => _CaffeineSensitivityBottomsheetState();
+  State<CaffeineSensitivityBottomsheet> createState() =>
+      _CaffeineSensitivityBottomsheetState();
 }
 
-class _CaffeineSensitivityBottomsheetState extends State<CaffeineSensitivityBottomsheet> {
+class _CaffeineSensitivityBottomsheetState
+    extends State<CaffeineSensitivityBottomsheet> {
   late String selectedTitle;
   late final BaselineSetupController controller;
 
   final List<Map<String, String>> options = [
-    {'title': 'Very low', 'desc': 'Caffeine barely affects your sleep', 'value': 'low'},
-    {'title': 'Low', 'desc': 'Minimal sleep disruption', 'value': 'low'},
-    {'title': 'Moderate', 'desc': 'Some sleep impact after 2pm', 'value': 'medium'},
-    {'title': 'High', 'desc': 'Avoid caffeine after noon', 'value': 'high'},
-    {'title': 'Very high', 'desc': 'Caffeine significantly disrupts sleep', 'value': 'high'},
+    {
+      'title': 'Very low',
+      'desc': 'Caffeine barely affects your sleep',
+      'value': BaselineEnums.caffeineSensitivityLow,
+    },
+    {
+      'title': 'Low',
+      'desc': 'Minimal sleep disruption',
+      'value': BaselineEnums.caffeineSensitivityLow,
+    },
+    {
+      'title': 'Moderate',
+      'desc': 'Some sleep impact after 2pm',
+      'value': BaselineEnums.caffeineSensitivityMedium,
+    },
+    {
+      'title': 'High',
+      'desc': 'Avoid caffeine after noon',
+      'value': BaselineEnums.caffeineSensitivityHigh,
+    },
+    {
+      'title': 'Very high',
+      'desc': 'Caffeine significantly disrupts sleep',
+      'value': BaselineEnums.caffeineSensitivityHigh,
+    },
   ];
 
   @override
   void initState() {
     super.initState();
     controller = Get.find<BaselineSetupController>();
-    final currentEnum = controller.caffeineSensitivity.value;
+    final currentEnum = BaselineEnums.normalizeCaffeineSensitivity(
+      controller.caffeineSensitivity.value,
+    );
     final matched = options.firstWhere(
       (opt) => opt['value'] == currentEnum,
       orElse: () => options[2],
@@ -126,12 +151,19 @@ class _CaffeineSensitivityBottomsheetState extends State<CaffeineSensitivityBott
                 },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 14.0,
+                  ),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFECFDF5) : AppColors.white,
+                    color: isSelected
+                        ? const Color(0xFFECFDF5)
+                        : AppColors.white,
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF10B981) : AppColors.borderSoft,
+                      color: isSelected
+                          ? const Color(0xFF10B981)
+                          : AppColors.borderSoft,
                       width: isSelected ? 1.5 : 1.0,
                     ),
                   ),
@@ -155,7 +187,9 @@ class _CaffeineSensitivityBottomsheetState extends State<CaffeineSensitivityBott
                               style: getTextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: isSelected ? const Color(0xFF047857) : AppColors.textSoft,
+                                color: isSelected
+                                    ? const Color(0xFF047857)
+                                    : AppColors.textSoft,
                               ),
                             ),
                           ],
@@ -190,7 +224,9 @@ class _CaffeineSensitivityBottomsheetState extends State<CaffeineSensitivityBott
           // Save Button
           GestureDetector(
             onTap: () {
-              final matched = options.firstWhere((opt) => opt['title'] == selectedTitle);
+              final matched = options.firstWhere(
+                (opt) => opt['title'] == selectedTitle,
+              );
               controller.caffeineSensitivity.value = matched['value']!;
               Get.back();
             },
