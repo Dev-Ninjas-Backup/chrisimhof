@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/common/widgets/build_menu_item.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -78,7 +79,7 @@ class DataControlsScreen extends StatelessWidget {
                   title: 'Delete account'.tr,
                   subtitle: 'Request permanent deletion.'.tr,
                   onTap: () {
-                    Get.toNamed('/deleteAccountScreen');
+                    Get.toNamed(AppRoutes.deleteAccountScreen);
                   },
                 ),
               ],

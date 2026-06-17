@@ -70,14 +70,16 @@ class CircadianStabilityCard extends StatelessWidget {
                         size: 16,
                       ),
                       const SizedBox(width: 4.0),
-                      Text(
-                        controller.circadianChange.value.tr,
-                        style: getTextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSoft,
-                        ),
-                      ),
+                      Obx(() {
+                        return Text(
+                          controller.circadianChange.value.tr,
+                          style: getTextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSoft,
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ],

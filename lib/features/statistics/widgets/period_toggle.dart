@@ -5,63 +5,61 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PeriodToggle extends StatelessWidget {
-  const PeriodToggle({
-    super.key,
-    required this.controller,
-  });
+  const PeriodToggle({super.key, required this.controller});
 
   final StatisticsController controller;
 
   @override
   Widget build(BuildContext context) {
-    final List<String> periods = ['7d', '30d', '90d', '1y'];
     return Obx(() {
       return Container(
-      height: 44,
-      padding: const EdgeInsets.all(4.0),
-      decoration: BoxDecoration(
-        color: AppColors.greyToggleBg,
-        borderRadius: BorderRadius.circular(14.0),
-      ),
-      child: Row(
-        children: periods.map((period) {
-          final isSelected = controller.selectedPeriod.value == period;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => controller.changePeriod(period),
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.white : AppColors.transparent,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.04),
-                            blurRadius: 3.0,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Text(
-                  period,
-                  style: getTextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected
-                        ? AppColors.primaryTextColor
-                        : AppColors.textSoft,
+        height: 44,
+        padding: const EdgeInsets.all(4.0),
+        decoration: BoxDecoration(
+          color: AppColors.greyToggleBg,
+          borderRadius: BorderRadius.circular(14.0),
+        ),
+        child: Row(
+          children: controller.periods.map((period) {
+            final isSelected = controller.selectedPeriod.value == period;
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => controller.changePeriod(period),
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.white : AppColors.transparent,
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppColors.black.withValues(alpha: 0.04),
+                              blurRadius: 3.0,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Text(
+                    period,
+                    style: getTextStyle(
+                      fontSize: 13,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primaryTextColor
+                          : AppColors.textSoft,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
+            );
+          }).toList(),
+        ),
+      );
     });
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:chrisimhof/features/dashboard/widgets/sleep_orbit_painter.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/sleep_orbit_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

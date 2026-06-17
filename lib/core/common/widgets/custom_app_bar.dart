@@ -2,8 +2,9 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/auth/widgets/icon_tile.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class CustomAppBar extends StatelessWidget {
   final String? title;
@@ -63,7 +64,9 @@ class CustomAppBar extends StatelessWidget {
                           height: 36,
                           child: IconTile(
                             icon: Icons.settings_outlined,
-                            onTap: () {},
+                            onTap: () {
+                              Get.toNamed(AppRoutes.settingsScreen);
+                            },
                           ),
                         ),
                       )
@@ -88,7 +91,7 @@ class CustomAppBar extends StatelessWidget {
 
     if (title != null && title!.trim().isNotEmpty) {
       return Text(
-        title!,
+        title!.tr,
         style: getTextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w700,

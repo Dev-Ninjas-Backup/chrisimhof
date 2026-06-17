@@ -1,13 +1,13 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/dashboard/controller/dashboard_controller.dart';
-import 'package:chrisimhof/features/dashboard/widgets/bedtime_card.dart';
-import 'package:chrisimhof/features/dashboard/widgets/end_day_button.dart';
-import 'package:chrisimhof/features/dashboard/widgets/for_you_section.dart';
-import 'package:chrisimhof/features/dashboard/widgets/quick_add_section.dart';
-import 'package:chrisimhof/features/dashboard/widgets/split_status_section.dart';
-import 'package:chrisimhof/features/dashboard/widgets/today_progress_section.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/bedtime_card.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/end_day_button.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/for_you_section.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/quick_add_section.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/split_status_section.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/today_progress_section.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -63,11 +63,12 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 24),
               const TodayProgressSection(),
               const SizedBox(height: 24),
-              const SplitStatusSection(),
+              SplitStatusSection(),
               const SizedBox(height: 24),
               const ForYouSection(),
               const SizedBox(height: 28),
               const EndDayButton(),
+              SizedBox(height: 90),
             ],
           ),
         ),

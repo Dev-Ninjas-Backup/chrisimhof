@@ -2,8 +2,9 @@ import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
@@ -19,7 +20,7 @@ class SuccessScreen extends StatelessWidget {
             Image.asset(ImagePath.successImage, height: 164, width: 164),
             SizedBox(height: 12),
             Text(
-              'Success!',
+              'Success!'.tr,
               style: getTextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w600,
@@ -28,7 +29,7 @@ class SuccessScreen extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Your password has been changed successfully',
+              'Your password has been changed successfully'.tr,
               style: getTextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
@@ -37,9 +38,9 @@ class SuccessScreen extends StatelessWidget {
             ),
             SizedBox(height: 70),
             CustomButton(
-              text: 'Continue',
+              text: 'Continue'.tr,
               onTap: () {
-                Get.offNamed('/signInScreen');
+                Get.offAllNamed(AppRoutes.signInScreen);
               },
             ),
           ],

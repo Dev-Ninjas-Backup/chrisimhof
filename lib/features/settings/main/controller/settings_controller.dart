@@ -1,8 +1,8 @@
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
 import 'package:chrisimhof/features/settings/main/service/logout_service.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:ui';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -101,7 +101,7 @@ class SettingsController extends GetxController {
           refreshToken.trim().isEmpty) {
         await SharedPreferencesHelper.clearAuthData();
         EasyLoading.showInfo('You are already logged out.');
-        Get.offAllNamed('/signInScreen');
+        Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
 
@@ -113,7 +113,7 @@ class SettingsController extends GetxController {
       if (isSuccess) {
         await SharedPreferencesHelper.clearAuthData();
         EasyLoading.showSuccess('Logged out successfully');
-        Get.offAll(SignInScreen());
+        Get.offAllNamed(AppRoutes.signInScreen);
       }
     } catch (e) {
       String errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -123,7 +123,7 @@ class SettingsController extends GetxController {
           errorMessage.toLowerCase().contains('unauthorized')) {
         await SharedPreferencesHelper.clearAuthData();
         EasyLoading.showInfo('Session expired. Please sign in again.');
-        Get.offAllNamed('/signInScreen');
+        Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
 

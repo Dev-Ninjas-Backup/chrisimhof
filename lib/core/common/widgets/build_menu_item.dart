@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BuildMenuItem extends StatelessWidget {
   const BuildMenuItem({
@@ -63,7 +64,7 @@ class BuildMenuItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    title.tr,
                     style: getTextStyle2(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -71,7 +72,7 @@ class BuildMenuItem extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    subtitle,
+                    subtitle.tr,
                     style: getTextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,

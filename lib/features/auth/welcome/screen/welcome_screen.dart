@@ -77,7 +77,7 @@ class WelcomeScreen extends StatelessWidget {
                             SizedBox(
                               width: context.width * 0.75,
                               child: Text(
-                                'Your rhythm, rebuilt around real life.',
+                                'Your rhythm, rebuilt around real life.'.tr,
                                 style: getTextStyle2(
                                   color: AppColors.white,
                                   fontSize: 36,

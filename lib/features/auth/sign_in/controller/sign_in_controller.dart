@@ -156,7 +156,7 @@ class SignInController extends GetxController {
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
-          Get.offAllNamed('/medicalDisclaimerScreen');
+          Get.offAllNamed(AppRoutes.navbarScreen);
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(apiResponse.message ?? 'API login failed');
@@ -219,7 +219,7 @@ class SignInController extends GetxController {
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
-          Get.offAllNamed('/medicalDisclaimerScreen');
+          Get.offAllNamed(AppRoutes.navbarScreen);
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(

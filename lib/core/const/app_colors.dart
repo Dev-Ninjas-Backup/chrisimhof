@@ -12,6 +12,7 @@ class AppColors {
   static const Color mintSoft = Color(0xFFE8FBF3);
   static const Color mintSoftText = Color(0xFF065F46);
   static const Color mintSoft2 = Color(0xFFECFDF5);
+  static const Color mintSoft3 = Color(0xFFEAFCF3);
   static const Color indigo = Color(0xFF6366F1);
   static const Color indigoSoft = Color(0xFFE0E7FF);
   static const Color indigoSoft2 = Color(0xFFEFF6FF);
@@ -56,6 +57,11 @@ class AppColors {
   // Card chrome
   static const Color cardDivider = Color(0xFF17422E); // CTA top border
 
+  // Sleep details screen colors
+  static const Color sleepCardBg = Color(0xFF09201A);
+  static const Color selectionGray = Color(0xFF9CA3AF);
+  static const Color sleepIndicatorFaint = Color(0x2634D399); // #34D399 with 15% opacity
+  static const Color sleepHistoryCircle = Color(0xFFEFF6FF);
 
   // Consolidated global colors
   static const Color white = Colors.white;
@@ -69,6 +75,8 @@ class AppColors {
   static const Color gray100 = Color(0xFFF3F4F6);
   static const Color violet = Color(0xFF8B5CF6);
   static const Color amberSoft = Color(0xFFFFFBEB);
+  static const Color amberSoft3 = Color(0xFFFEF3C7);
+  static const Color orangeAccent2 = Color(0xFFF97316);
   static const Color orangeAccent = Color(0xFFFFA726);
   static const Color redBright = Color(0xFFEF4444);
   static const Color darkGreen = Color(0xFF0A1410);

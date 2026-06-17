@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +11,7 @@ class RecommendationService {
     String locale = 'en',
   }) async {
     final uri = Uri.parse(
-      'https://api.ryvenza.app/api/v1/calculator/session/$sessionId/recommendations',
+      '${Urls.baseUrl}/api/v1/calculator/session/$sessionId/recommendations',
     ).replace(
       queryParameters: {
         'locale': locale,

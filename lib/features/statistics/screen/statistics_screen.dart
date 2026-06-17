@@ -32,7 +32,7 @@ class StatisticsScreen extends StatelessWidget {
                 showSettingsButton: false,
                 showLogo: false,
                 title: 'Statistics',
-                showMoreButton: true,
+                showMoreButton: false,
               ),
               const SizedBox(height: 18.0),
 
@@ -41,32 +41,44 @@ class StatisticsScreen extends StatelessWidget {
               const SizedBox(height: 20.0),
 
               // Cards
-              Column(
-                children: [
-                  // Card 1: Global Rhythm Score
-                  RhythmScoreCard(controller: controller),
-                  const SizedBox(height: 16.0),
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 100.0),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryButtonColor,
+                      ),
+                    ),
+                  );
+                }
+                return Column(
+                  children: [
+                    // Card 1: Global Rhythm Score
+                    RhythmScoreCard(controller: controller),
+                    const SizedBox(height: 16.0),
 
-                  // Card 2: Circadian Stability
-                  CircadianStabilityCard(controller: controller),
-                  const SizedBox(height: 16.0),
+                    // Card 2: Circadian Stability
+                    CircadianStabilityCard(controller: controller),
+                    const SizedBox(height: 16.0),
 
-                  // Card 3: Sleep Duration
-                  SleepDurationCard(controller: controller),
-                  const SizedBox(height: 16.0),
+                    // Card 3: Sleep Duration
+                    SleepDurationCard(controller: controller),
+                    const SizedBox(height: 16.0),
 
-                  // Card 4: Recovery
-                  RecoveryCard(controller: controller),
-                  const SizedBox(height: 16.0),
+                    // Card 4: Recovery
+                    RecoveryCard(controller: controller),
+                    const SizedBox(height: 16.0),
 
-                  // Card 5: Fatigue Prediction
-                  FatiguePredictionCard(controller: controller),
-                  const SizedBox(height: 16.0),
+                    // Card 5: Fatigue Prediction
+                    FatiguePredictionCard(controller: controller),
+                    const SizedBox(height: 16.0),
 
-                  // Card 6: Sleep Debt
-                  SleepDebtCard(controller: controller),
-                ],
-              ),
+                    // Card 6: Sleep Debt
+                    SleepDebtCard(controller: controller),
+                  ],
+                );
+              }),
             ],
           ),
         ),

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 
 class LanguageController extends GetxController {
   // Use uppercase codes to match backend values (EN / FR)
@@ -55,7 +55,7 @@ class LanguageController extends GetxController {
         }
 
         // Navigate to NavbarScreen (replace all)
-        Get.offAll(() => const NavbarScreen());
+        Get.offAllNamed(AppRoutes.navbarScreen);
       } else {
         // Revert selection on failure
         selectedLanguage.value = prev;

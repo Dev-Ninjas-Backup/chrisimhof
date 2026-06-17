@@ -25,7 +25,7 @@ class ChangePasswordScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 // Header
                 Text(
-                  'Protect your account',
+                  'Protect your account'.tr,
                   style: getTextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
@@ -34,7 +34,7 @@ class ChangePasswordScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Use a unique password with at least 8\ncharacters.',
+                  'Use a unique password with at least 8\ncharacters.'.tr,
                   style: getTextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -117,7 +117,7 @@ class ChangePasswordScreen extends StatelessWidget {
       children: [
         // Label
         Text(
-          label,
+          label.tr,
           style: getTextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,

@@ -2,26 +2,36 @@ import 'package:chrisimhof/features/auth/baseline_setup/screen/baseline_setup_sc
 import 'package:chrisimhof/features/auth/connected_sources/screen/connected_sources_screen.dart';
 import 'package:chrisimhof/features/auth/create_account/screen/create_account_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_email_screen.dart';
+import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_screen.dart';
+import 'package:chrisimhof/features/auth/forget_password/screen/success_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/screen/verify_code_screen.dart';
 import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
+// import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/hydration/screen/hydration_screen.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 //import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
+import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/nutrition/screen/nutrition_screen.dart';
 import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
 import 'package:chrisimhof/features/settings/data_controls/screen/data_controls_screen.dart';
+import 'package:chrisimhof/features/settings/edit_profile/screen/edit_profile_screen.dart';
+import 'package:chrisimhof/features/settings/language/screens/language_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/consent_settings/screen/consent_settings_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/delete_account/screen/delete_account_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/health_and_safety_notes/screen/health_and_safety_notes_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/main_screen/legal_and_data_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/privacy_policy/screen/privacy_policy_screen.dart';
 import 'package:chrisimhof/features/settings/legal_and_data/terms_of_use/screen/terms_of_use_screen.dart';
+import 'package:chrisimhof/features/settings/main/screen/settings_screen.dart';
+import 'package:chrisimhof/features/settings/subscriptions/screen/subscriptions_screen.dart';
 import 'package:chrisimhof/features/splash/screen/splash_screen.dart';
 import 'package:chrisimhof/features/sports/screen/sports_screen.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/screen/caffeine_screen.dart';
+import 'package:chrisimhof/features/dashboard/sleep/screen/sleep_screen.dart';
+import 'package:chrisimhof/features/dashboard/work/screen/work_schedule_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -49,6 +59,15 @@ class AppRoutes {
   static String sportsScreen = '/sportsScreen';
   static String hydrationScreen = '/hydrationScreen';
   static String caffeineScreen = '/caffeineScreen';
+  static String sleepScreen = '/sleepScreen';
+  static String workScheduleScreen = '/workScheduleScreen';
+  static String settingsScreen = '/settingsScreen';
+  static String navbarScreen = '/navbarScreen';
+  static String forgetPasswordScreen = '/forgetPasswordScreen';
+  static String successScreen = '/successScreen';
+  static String editProfileScreen = '/editProfileScreen';
+  static String languageScreen = '/languageScreen';
+  static String subscriptionsScreen = '/subscriptionsScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -73,8 +92,17 @@ class AppRoutes {
   static String getNutritionScreen() => nutritionScreen;
   static String getSportsScreen() => sportsScreen;
   static String getHydrationScreen() => hydrationScreen;
-  
+
   static String getCaffeineScreen() => caffeineScreen;
+  static String getSleepScreen() => sleepScreen;
+  static String getWorkScheduleScreen() => workScheduleScreen;
+  static String getSettingsScreen() => settingsScreen;
+  static String getNavbarScreen() => navbarScreen;
+  static String getForgetPasswordScreen() => forgetPasswordScreen;
+  static String getSuccessScreen() => successScreen;
+  static String getEditProfileScreen() => editProfileScreen;
+  static String getLanguageScreen() => languageScreen;
+  static String getSubscriptionsScreen() => subscriptionsScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -104,11 +132,23 @@ class AppRoutes {
     GetPage(name: dataControlsScreen, page: () => const DataControlsScreen()),
     GetPage(name: safetyScreen, page: () => const SafetyScreen()),
     GetPage(name: baselineSetupScreen, page: () => const BaselineSetupScreen()),
-    GetPage(name: connectedSourcesScreen, page: () => const ConnectedSourcesScreen()),
+    GetPage(
+      name: connectedSourcesScreen,
+      page: () => const ConnectedSourcesScreen(),
+    ),
     GetPage(name: verifyCodeScreen, page: () => const VerifyCodeScreen()),
     GetPage(name: nutritionScreen, page: () => const NutritionScreen()),
     GetPage(name: sportsScreen, page: () => const SportsScreen()),
     GetPage(name: hydrationScreen, page: () => const HydrationScreen()),
     GetPage(name: caffeineScreen, page: () => const CaffeineScreen()),
+    GetPage(name: sleepScreen, page: () => const SleepScreen()),
+    GetPage(name: workScheduleScreen, page: () => const WorkScheduleScreen()),
+    GetPage(name: settingsScreen, page: () => SettingsScreen()),
+    GetPage(name: navbarScreen, page: () => const NavbarScreen()),
+    GetPage(name: forgetPasswordScreen, page: () => const ForgetPasswordScreen()),
+    GetPage(name: successScreen, page: () => const SuccessScreen()),
+    GetPage(name: editProfileScreen, page: () => const EditProfileScreen()),
+    GetPage(name: languageScreen, page: () => const LanguageScreen()),
+    GetPage(name: subscriptionsScreen, page: () => const SubscriptionsScreen()),
   ];
 }
