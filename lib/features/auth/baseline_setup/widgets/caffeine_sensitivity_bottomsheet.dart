@@ -20,11 +20,7 @@ class _CaffeineSensitivityBottomsheetState
   late final BaselineSetupController controller;
 
   final List<Map<String, String>> options = [
-    {
-      'title': 'Very low',
-      'desc': 'Caffeine barely affects your sleep',
-      'value': BaselineEnums.caffeineSensitivityLow,
-    },
+
     {
       'title': 'Low',
       'desc': 'Minimal sleep disruption',
@@ -38,11 +34,6 @@ class _CaffeineSensitivityBottomsheetState
     {
       'title': 'High',
       'desc': 'Avoid caffeine after noon',
-      'value': BaselineEnums.caffeineSensitivityHigh,
-    },
-    {
-      'title': 'Very high',
-      'desc': 'Caffeine significantly disrupts sleep',
       'value': BaselineEnums.caffeineSensitivityHigh,
     },
   ];

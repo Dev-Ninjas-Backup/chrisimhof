@@ -32,6 +32,10 @@ class ProfileData {
   final bool isSubscribed;
   final String signInBy;
   final String accountStatus;
+  final int ?sleepTargetMinutes;
+  final String ?chronotype;
+  final String ?caffeineSensitivity;
+  final String ?sportProfile;
   final String role;
   final String? language;
   final String? safetyAcknowledgedAt;
@@ -57,6 +61,10 @@ class ProfileData {
     required this.safetyAcknowledgedAt,
     required this.consentSettings,
     required this.connectedSources,
+    required this.sleepTargetMinutes,
+    required this.chronotype,
+    required this.caffeineSensitivity,
+    required this.sportProfile,
   });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
@@ -85,6 +93,10 @@ class ProfileData {
       safetyAcknowledgedAt: profile['safetyAcknowledgedAt'] as String?,
       consentSettings: profile['consentSettings'],
       connectedSources: profile['connectedSources'],
+      sleepTargetMinutes: profile['sleepTargetMinutes'] ?? json['sleepTargetMinutes'] ?? 0,
+      chronotype: profile['chronotype'] ?? json['chronotype'] ?? '',
+      caffeineSensitivity: profile['caffeineSensitivity'] ?? json['caffeineSensitivity'] ?? '',
+      sportProfile: profile['sportProfile'] ?? json['sportProfile'] ?? '',
     );
   }
 }

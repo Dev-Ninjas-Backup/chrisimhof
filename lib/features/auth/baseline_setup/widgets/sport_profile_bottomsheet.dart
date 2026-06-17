@@ -33,13 +33,13 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
       'value': BaselineEnums.sportProfileLight,
     },
     {
-      'title': 'Moderately active',
+      'title': 'Cardio',
       'desc': '3-4x per week',
       'icon': IconPath.running,
       'value': BaselineEnums.sportProfileCardio,
     },
     {
-      'title': 'Very active',
+      'title': 'Strength',
       'desc': '5-6x per week',
       'icon': IconPath.veryActive,
       'value': BaselineEnums.sportProfileStrength,
@@ -51,7 +51,7 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
       'value': BaselineEnums.sportProfileMixed,
     },
     {
-      'title': 'Athlete',
+      'title': 'Endurance',
       'desc': 'Intense training daily',
       'icon': IconPath.athlete,
       'value': BaselineEnums.sportProfileEndurance,

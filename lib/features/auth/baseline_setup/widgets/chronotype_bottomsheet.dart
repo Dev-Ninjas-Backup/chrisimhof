@@ -33,11 +33,6 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
       'range': '10am – 2am',
       'value': BaselineEnums.chronotypeEvening,
     },
-    {
-      'title': 'Extreme Night Owl',
-      'range': '12am – 4am',
-      'value': BaselineEnums.chronotypeEvening,
-    },
   ];
 
   @override
