@@ -7,6 +7,7 @@ import 'package:chrisimhof/features/auth/safety/screen/safety_screen.dart';
 import 'package:chrisimhof/features/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
 import 'package:chrisimhof/features/hydration/screen/hydration_screen.dart';
+import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 //import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
 import 'package:chrisimhof/features/nutrition/screen/nutrition_screen.dart';
 import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';
@@ -31,6 +32,7 @@ class AppRoutes {
   static String changePasswordScreen = '/changePasswordScreen';
   static String verifyCodeScreen = '/verifyCodeScreen';
   static String forgetPasswordEmailScreen = '/forgetPasswordEmailScreen';
+  static String navbarScreen = '/navbarScreen';
   // static String medicalDisclaimerScreen = '/medicalDisclaimerScreen';
   static String recomendationsScreen = '/recomendationsScreen';
   static String legalAndDataScreen = '/legalAndDataScreen';
@@ -54,6 +56,7 @@ class AppRoutes {
   static String getCreateAccountScreen() => createAccountScreen;
   static String getChangePasswordScreen() => changePasswordScreen;
   static String getForgetPasswordEmailScreen() => forgetPasswordEmailScreen;
+  static String getNavbarScreen() => navbarScreen;
   // static String getMedicalDisclaimerScreen() => medicalDisclaimerScreen;
   static String getRecomendationsScreen() => recomendationsScreen;
   static String getLegalAndDataScreen() => legalAndDataScreen;
@@ -83,6 +86,7 @@ class AppRoutes {
       name: forgetPasswordEmailScreen,
       page: () => ForgetPasswordEmailScreen(),
     ),
+    GetPage(name: navbarScreen, page: () => const NavbarScreen()),
     // GetPage(
     //   name: medicalDisclaimerScreen,
     //   page: () => MedicalDisclaimerScreen(),

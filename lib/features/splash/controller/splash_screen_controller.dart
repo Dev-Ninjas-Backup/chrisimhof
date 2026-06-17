@@ -34,7 +34,10 @@ class SplashScreenController extends GetxController {
               Get.offAllNamed(AppRoutes.baselineSetupScreen);
             } else if (profile.connectedSources == null) {
               Get.offAllNamed(AppRoutes.connectedSourcesScreen);
-            } else {
+            }else if(profile.consentSettings ==null){
+              Get.offAllNamed(AppRoutes.consentSettingsScreen);
+            }
+            else {
               Get.offAll(() => const NavbarScreen());
             }
           } else {

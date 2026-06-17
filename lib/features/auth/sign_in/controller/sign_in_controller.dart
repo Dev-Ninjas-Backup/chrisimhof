@@ -90,11 +90,18 @@ class SignInController extends GetxController {
           if (profile != null) {
             if (profile.safetyAcknowledgedAt == null) {
               Get.offAllNamed(AppRoutes.safetyScreen);
-            } else if (profile.consentSettings == null) {
+            } else if (profile.sleepTargetMinutes == null || 
+            profile.chronotype == null || 
+            profile.caffeineSensitivity == null || 
+            profile.sportProfile == null)  {
               Get.offAllNamed(AppRoutes.baselineSetupScreen);
             } else if (profile.connectedSources == null) {
               Get.offAllNamed(AppRoutes.connectedSourcesScreen);
-            } else {
+            }
+            else if(profile.consentSettings ==null){
+              Get.offAllNamed(AppRoutes.consentSettingsScreen);
+            } 
+            else {
               Get.offAll(() => const NavbarScreen());
             }
           } else {
