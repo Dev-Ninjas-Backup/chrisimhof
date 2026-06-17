@@ -1,11 +1,13 @@
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_setup_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class BaselineSetupController extends GetxController {
   final _service = BaselineSetupService();
+  bool isFromSettings = false;
 
   final sleepHours = 7.obs;
   final sleepMinutes = 45.obs;
@@ -71,7 +73,13 @@ class BaselineSetupController extends GetxController {
 
       if (response['success'] == true) {
         EasyLoading.showSuccess('Baseline saved successfully');
-        Get.toNamed(AppRoutes.connectedSourcesScreen);
+        if (isFromSettings) {
+          if (Get.isRegistered<SettingsController>()) {
+            Get.find<SettingsController>().getProfile();
+          }
+        } else {
+          Get.toNamed(AppRoutes.connectedSourcesScreen);
+        }
       }
     } catch (e) {
       EasyLoading.showError('Failed to save baseline: $e');

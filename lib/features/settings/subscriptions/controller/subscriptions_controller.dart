@@ -52,8 +52,9 @@ class SubscriptionsController extends GetxController {
 
       if (userResponse.success) {
         // Get the active plan ID from user's current subscription
-        if (userResponse.data.subscriptions?.plan != null) {
-          activePlanId.value = userResponse.data.subscriptions!.plan!.id;
+        final subPlan = userResponse.data.subscriptions?.plan;
+        if (subPlan != null) {
+          activePlanId.value = subPlan.id;
         }
       }
 
@@ -122,8 +123,9 @@ class SubscriptionsController extends GetxController {
       final userResponse = await _service.getCurrentUser();
 
       if (userResponse.success) {
-        if (userResponse.data.subscriptions?.plan != null) {
-          activePlanId.value = userResponse.data.subscriptions!.plan!.id;
+        final subPlan = userResponse.data.subscriptions?.plan;
+        if (subPlan != null) {
+          activePlanId.value = subPlan.id;
         }
       }
     } catch (e) {

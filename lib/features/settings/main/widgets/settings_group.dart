@@ -93,7 +93,7 @@ class SettingsRow extends StatelessWidget {
               if (data.trailing != null) ...[
                 const SizedBox(width: 8),
                 Text(
-                  data.trailing!.tr,
+                  (data.trailing ?? '').tr,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
