@@ -12,7 +12,6 @@ import 'package:chrisimhof/features/auth/welcome/screen/welcome_screen.dart';
 import 'package:chrisimhof/features/hydration/screen/hydration_screen.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 //import 'package:chrisimhof/features/medical_disclaimer/screen/medical_disclaimer_screen.dart';
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/nutrition/screen/nutrition_screen.dart';
 import 'package:chrisimhof/features/recomendations/screen/recomendations_screen.dart';
 import 'package:chrisimhof/features/settings/change_password/screen/change_password_screen.dart';
@@ -62,7 +61,6 @@ class AppRoutes {
   static String sleepScreen = '/sleepScreen';
   static String workScheduleScreen = '/workScheduleScreen';
   static String settingsScreen = '/settingsScreen';
-  static String navbarScreen = '/navbarScreen';
   static String forgetPasswordScreen = '/forgetPasswordScreen';
   static String successScreen = '/successScreen';
   static String editProfileScreen = '/editProfileScreen';
@@ -97,7 +95,6 @@ class AppRoutes {
   static String getSleepScreen() => sleepScreen;
   static String getWorkScheduleScreen() => workScheduleScreen;
   static String getSettingsScreen() => settingsScreen;
-  static String getNavbarScreen() => navbarScreen;
   static String getForgetPasswordScreen() => forgetPasswordScreen;
   static String getSuccessScreen() => successScreen;
   static String getEditProfileScreen() => editProfileScreen;
