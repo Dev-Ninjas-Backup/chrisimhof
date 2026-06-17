@@ -1,7 +1,7 @@
 import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
-import 'package:chrisimhof/core/common/widgets/custom_text_form_field.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
+import 'package:chrisimhof/features/auth/widgets/custom_text_field.dart';
 import 'package:chrisimhof/features/settings/edit_profile/controller/edit_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -63,14 +63,14 @@ class EditProfileScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 32),
-              CustomTextFormField(
+              CustomTextField(
                 label: 'Full Name'.tr,
                 hintText: 'Enter your full name'.tr,
                 isRequired: true,
                 controller: controller.fullNameController,
               ),
               const SizedBox(height: 16),
-              CustomTextFormField(
+              CustomTextField(
                 label: 'Bio'.tr,
                 hintText: 'Write something about yourself'.tr,
                 isRequired: false,
@@ -82,6 +82,7 @@ class EditProfileScreen extends StatelessWidget {
                   text: controller.isLoading.value
                       ? 'Updating...'.tr
                       : 'Update Profile'.tr,
+                      icon: null,
                   onTap: controller.isLoading.value
                       ? null
                       : controller.updateProfile,
