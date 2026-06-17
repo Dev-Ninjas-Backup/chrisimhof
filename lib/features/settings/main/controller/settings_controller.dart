@@ -23,6 +23,12 @@ class SettingsController extends GetxController {
   final bio = ''.obs;
   final userId = ''.obs;
 
+  // Baseline variables
+  final sleepTargetMinutes = 465.obs;
+  final chronotype = ''.obs;
+  final caffeineSensitivity = ''.obs;
+  final sportProfile = ''.obs;
+
   Future<void> getProfile() async {
     try {
       isProfileLoading.value = true;
@@ -44,17 +50,23 @@ class SettingsController extends GetxController {
         accessToken: accessToken,
       );
 
-      if (response.success && response.data != null) {
-        fullName.value = response.data!.fullName;
-        email.value = response.data!.email;
-        avatarUrl.value = response.data!.avatarUrl ?? '';
-        bio.value = response.data!.bio ?? '';
-        userId.value = response.data!.userId.isNotEmpty
-            ? response.data!.userId
-            : response.data!.id;
+      final profileData = response.data;
+      if (response.success && profileData != null) {
+        fullName.value = profileData.fullName;
+        email.value = profileData.email;
+        avatarUrl.value = profileData.avatarUrl ?? '';
+        bio.value = profileData.bio ?? '';
+        userId.value = profileData.userId.isNotEmpty
+            ? profileData.userId
+            : profileData.id;
+        
+        sleepTargetMinutes.value = profileData.sleepTargetMinutes ?? 465;
+        chronotype.value = profileData.chronotype ?? '';
+        caffeineSensitivity.value = profileData.caffeineSensitivity ?? '';
+        sportProfile.value = profileData.sportProfile ?? '';
         // Apply language from profile if provided (EN / FR)
         try {
-          final String? lang = response.data!.language?.toUpperCase();
+          final String? lang = profileData.language?.toUpperCase();
           if (lang != null && (lang == 'FR' || lang == 'EN')) {
             // Update app locale without calling the backend
             if (lang == 'FR') {

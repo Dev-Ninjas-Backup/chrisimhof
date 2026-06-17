@@ -55,7 +55,7 @@ class LanguageButton extends StatelessWidget {
                 if (subtitle != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    subtitle!.tr,
+                    (subtitle ?? '').tr,
                     style: getTextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
