@@ -1,3 +1,7 @@
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
+import 'package:chrisimhof/features/statistics/controller/statistics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,5 +22,29 @@ class NavController extends GetxController {
     NavItemData(label: 'Profile', icon: Icons.person_outline_rounded),
   ];
 
-  void changeTab(int index) => currentIndex.value = index;
+  void changeTab(int index) {
+    switch (index) {
+      case 0:
+        try {
+          Get.delete<DashboardController>(force: true);
+        } catch (_) {}
+        break;
+      case 1:
+        try {
+          Get.delete<RecommendationController>(force: true);
+        } catch (_) {}
+        break;
+      case 2:
+        try {
+          Get.delete<StatisticsController>(force: true);
+        } catch (_) {}
+        break;
+      case 3:
+        try {
+          Get.delete<SettingsController>(force: true);
+        } catch (_) {}
+        break;
+    }
+    currentIndex.value = index;
+  }
 }
