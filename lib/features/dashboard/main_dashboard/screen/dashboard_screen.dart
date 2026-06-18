@@ -18,11 +18,15 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DashboardController());
+    // Use putOrFind to avoid re-creating controllers on every rebuild
+    final controller = Get.isRegistered<DashboardController>()
+        ? Get.find<DashboardController>()
+        : Get.put(DashboardController());
     // Register shared controllers so they persist across route changes
     // and receive socket updates from DashboardController.
-    Get.put(RecommendationController());
-    Get.put(SleepController());
+    if (!Get.isRegistered<RecommendationController>())
+      Get.put(RecommendationController());
+    if (!Get.isRegistered<SleepController>()) Get.put(SleepController());
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -37,6 +41,7 @@ class DashboardScreen extends StatelessWidget {
                 showSettingsButton: true,
                 showLogo: true,
               ),
+              SizedBox(height: 30),
               Obx(() {
                 final data = controller.dashboardData.value;
                 return Column(

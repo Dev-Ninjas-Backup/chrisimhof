@@ -18,6 +18,7 @@ import 'package:chrisimhof/features/hydration/controller/hydration_controller.da
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
+import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 
 class DashboardController extends GetxController {
   final _dashboardService = DashboardService();
@@ -56,6 +57,7 @@ class DashboardController extends GetxController {
   ).obs;
 
   Timer? _updateTimer;
+  bool _isEndingDay = false;
 
   @override
   void onInit() {
@@ -347,6 +349,19 @@ class DashboardController extends GetxController {
         Get.find<SportsController>().updateFromLiveScoresTab(apiData['tabs']['sport']);
       }
     }
+    if (apiData['tabs']?['work'] != null) {
+      if (Get.isRegistered<WorkController>()) {
+        Get.find<WorkController>().updateFromLiveScoresTab(
+          Map<String, dynamic>.from(apiData['tabs']['work']),
+        );
+      }
+    }
+    // Also forward top-level workInfo so WorkController can init shift data
+    if (apiData['workInfo'] != null && Get.isRegistered<WorkController>()) {
+      Get.find<WorkController>().updateWorkInfoFromSession(
+        Map<String, dynamic>.from(apiData['workInfo'] as Map<String, dynamic>),
+      );
+    }
 
     updateSleepPrepStatus();
   }
@@ -538,6 +553,8 @@ class DashboardController extends GetxController {
   }
 
   void endMyDay() async {
+    if (_isEndingDay) return;
+    _isEndingDay = true;
     EasyLoading.show(status: 'Ending day...');
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
@@ -611,6 +628,8 @@ class DashboardController extends GetxController {
     } catch (e) {
       debugPrint('Error ending day: $e');
       EasyLoading.showError('Failed to end day.');
+    } finally {
+      _isEndingDay = false;
     }
   }
 

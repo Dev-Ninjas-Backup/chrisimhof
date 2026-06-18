@@ -4,6 +4,7 @@ class GoogleSignInResponse {
   final String? accessToken;
   final String? refreshToken;
   final dynamic user;
+  final bool isNewUser;
 
   GoogleSignInResponse({
     required this.success,
@@ -11,6 +12,7 @@ class GoogleSignInResponse {
     this.accessToken,
     this.refreshToken,
     this.user,
+    this.isNewUser = false,
   });
 
   factory GoogleSignInResponse.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class GoogleSignInResponse {
       accessToken: json['data']?['tokens']?['accessToken'],
       refreshToken: json['data']?['tokens']?['refreshToken'],
       user: json['data']?['user'],
+      isNewUser: json['data']?['isNewUser'] ?? false,
     );
   }
 }
