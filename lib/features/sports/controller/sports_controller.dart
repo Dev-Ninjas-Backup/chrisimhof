@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:get/get.dart';
 
 class SportSession {
@@ -44,7 +46,8 @@ class SportsController extends GetxController {
 
   Future<void> loadSportsData() async {
     try {
-      final todayMetrics = await SharedPreferencesHelper.getSportsTodayMetrics();
+      final todayMetrics =
+          await SharedPreferencesHelper.getSportsTodayMetrics();
       hasTodaySession.value = todayMetrics['hasTodaySession'] ?? false;
       todayDuration.value = todayMetrics['duration'] ?? 0;
       todayZone.value = todayMetrics['zone'] ?? '';
@@ -60,11 +63,17 @@ class SportsController extends GetxController {
       final jsonStr = await SharedPreferencesHelper.getSportsSessions();
       if (jsonStr != null) {
         final List decoded = jsonDecode(jsonStr);
-        sessionsList.assignAll(decoded.map((s) => SportSession(
-          title: s['title'] ?? '',
-          subtitle: s['subtitle'] ?? '',
-          iconPath: s['iconPath'] ?? '',
-        )).toList());
+        sessionsList.assignAll(
+          decoded
+              .map(
+                (s) => SportSession(
+                  title: s['title'] ?? '',
+                  subtitle: s['subtitle'] ?? '',
+                  iconPath: s['iconPath'] ?? '',
+                ),
+              )
+              .toList(),
+        );
       }
       // No mock sessions — sessionsList stays empty if nothing saved
     } catch (e) {
@@ -72,7 +81,7 @@ class SportsController extends GetxController {
     }
   }
 
-  Future<void> saveSportsData() async {
+  Future<void> saveSportsData({bool syncWithServer = true}) async {
     try {
       await SharedPreferencesHelper.saveSportsTodayMetrics(
         hasTodaySession: hasTodaySession.value,
@@ -87,17 +96,23 @@ class SportsController extends GetxController {
         recoveryScore: recoveryScore.value,
       );
 
-      final listToSave = sessionsList.map((s) => {
-        'title': s.title,
-        'subtitle': s.subtitle,
-        'iconPath': s.iconPath,
-      }).toList();
+      final listToSave = sessionsList
+          .map(
+            (s) => {
+              'title': s.title,
+              'subtitle': s.subtitle,
+              'iconPath': s.iconPath,
+            },
+          )
+          .toList();
       await SharedPreferencesHelper.saveSportsSessions(jsonEncode(listToSave));
 
-      try {
-        final dashboardController = Get.find<DashboardController>();
-        await dashboardController.fetchDashboardData();
-      } catch (_) {}
+      if (syncWithServer) {
+        try {
+          final dashboardController = Get.find<DashboardController>();
+          await dashboardController.fetchDashboardData();
+        } catch (_) {}
+      }
     } catch (e) {
       debugPrint('Error saving sports data: $e');
     }
@@ -115,100 +130,235 @@ class SportsController extends GetxController {
     required String type,
     String? distance,
   }) async {
-    String timeStr = '${duration}m';
-    if (activity == 'Rest day') {
-      timeStr = '—';
-    } else if (zone.isNotEmpty) {
-      timeStr += ' · $zone';
+    final bool isRest = activity == 'Rest day';
+    if (!isRest) {
+      EasyLoading.show(status: 'Saving session...');
     }
+    try {
+      if (activity != 'Rest day') {
+        try {
+          final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+          if (sessionId.isNotEmpty) {
+            double? distVal;
+            if (distance != null && distance.isNotEmpty) {
+              distVal = double.tryParse(distance);
+            }
 
-    final newSession = SportSession(
-      title: activity,
-      subtitle: activity == 'Rest day' ? 'Today · —' : 'Today · $timeStr',
-      iconPath: _getIconPathForActivity(activity),
-    );
+            String intensity = 'medium';
+            final z = zone.toUpperCase();
+            if (z == 'Z1' || z == 'Z2') {
+              intensity = 'low';
+            } else if (z == 'Z3') {
+              intensity = 'medium';
+            } else if (z == 'Z4' || z == 'Z5') {
+              intensity = 'high';
+            }
 
-    // Update old "Today" to "Yesterday"
-    for (int i = 0; i < sessionsList.length; i++) {
-      final s = sessionsList[i];
-      if (s.subtitle.startsWith('Today')) {
-        sessionsList[i] = SportSession(
-          title: s.title,
-          subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
-          iconPath: s.iconPath,
-        );
-      } else if (s.subtitle.startsWith('Yesterday')) {
-        sessionsList[i] = SportSession(
-          title: s.title,
-          subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
-          iconPath: s.iconPath,
-        );
+            String sportType = type.toLowerCase().trim();
+            if (sportType != 'cardio' &&
+                sportType != 'strength' &&
+                sportType != 'mobility' &&
+                sportType != 'mixed' &&
+                sportType != 'other') {
+              final actLower = activity.toLowerCase();
+              if (actLower.contains('run') || actLower.contains('cycling') || actLower.contains('swimming')) {
+                sportType = 'cardio';
+              } else if (actLower.contains('strength')) {
+                sportType = 'strength';
+              } else if (actLower.contains('walking')) {
+                sportType = 'mobility';
+              } else {
+                sportType = 'other';
+              }
+            }
+
+            int heartRate = 140;
+            if (z == 'Z1') {
+              heartRate = 100;
+            } else if (z == 'Z2') {
+              heartRate = 120;
+            } else if (z == 'Z3') {
+              heartRate = 140;
+            } else if (z == 'Z4') {
+              heartRate = 160;
+            } else if (z == 'Z5') {
+              heartRate = 180;
+            }
+
+            await DashboardService().patchQuickAddLog(
+              sessionId: sessionId,
+              newSportSessions: [
+                {
+                  'timestampStart': startTime,
+                  'durationMinutes': duration,
+                  'intensity': intensity,
+                  'sportType': sportType,
+                  'distanceKm': distVal,
+                  'heartRateAvgBpm': heartRate,
+                },
+              ],
+            );
+          }
+        } catch (e) {
+          debugPrint('Sports API quickAdd error: $e');
+        }
       }
-    }
 
-    sessionsList.insert(0, newSession);
+      String timeStr = '${duration}m';
+      if (activity == 'Rest day') {
+        timeStr = '—';
+      } else if (zone.isNotEmpty) {
+        timeStr += ' · $zone';
+      }
 
-    if (activity == 'Rest day') {
-      hasTodaySession.value = false;
-      recoveryScore.value = (recoveryScore.value + 15).clamp(0, 100);
-      _updateRecoveryText();
-    } else {
-      hasTodaySession.value = true;
-      todaySport.value = activity;
-      todayDuration.value = duration;
-      todayZone.value = zone;
-      todayStartTime.value = startTime;
-      todayEndTime.value = endTime;
-      todayEffort.value = effort;
-      todayType.value = type;
-      if (distance != null && distance.isNotEmpty) {
-        todayDistance.value = distance;
+      final newSession = SportSession(
+        title: activity,
+        subtitle: activity == 'Rest day' ? 'Today · —' : 'Today · $timeStr',
+        iconPath: _getIconPathForActivity(activity),
+      );
+
+      // Update old "Today" to "Yesterday"
+      for (int i = 0; i < sessionsList.length; i++) {
+        final s = sessionsList[i];
+        if (s.subtitle.startsWith('Today')) {
+          sessionsList[i] = SportSession(
+            title: s.title,
+            subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
+            iconPath: s.iconPath,
+          );
+        } else if (s.subtitle.startsWith('Yesterday')) {
+          sessionsList[i] = SportSession(
+            title: s.title,
+            subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
+            iconPath: s.iconPath,
+          );
+        }
+      }
+
+      sessionsList.insert(0, newSession);
+
+      if (activity == 'Rest day') {
+        hasTodaySession.value = false;
+        recoveryScore.value = (recoveryScore.value + 15).clamp(0, 100);
+        _updateRecoveryText();
       } else {
-        todayDistance.value = '';
+        hasTodaySession.value = true;
+        todaySport.value = activity;
+        todayDuration.value = duration;
+        todayZone.value = zone;
+        todayStartTime.value = startTime;
+        todayEndTime.value = endTime;
+        todayEffort.value = effort;
+        todayType.value = type;
+        if (distance != null && distance.isNotEmpty) {
+          todayDistance.value = distance;
+        } else {
+          todayDistance.value = '';
+        }
+
+        int impact = 10;
+        if (zone == 'Z5') {
+          impact = 25;
+        } else if (zone == 'Z4') {
+          impact = 18;
+        } else if (zone == 'Z3') {
+          impact = 12;
+        } else if (zone == 'Z2') {
+          impact = 8;
+        } else if (zone == 'Z1') {
+          impact = 4;
+        }
+
+        recoveryScore.value = (recoveryScore.value - impact).clamp(0, 100);
+        _updateRecoveryText();
       }
 
-      int impact = 10;
-      if (zone == 'Z5') {
-        impact = 25;
-      } else if (zone == 'Z4') {
-        impact = 18;
-      } else if (zone == 'Z3') {
-        impact = 12;
-      } else if (zone == 'Z2') {
-        impact = 8;
-      } else if (zone == 'Z1') {
-        impact = 4;
+      await saveSportsData();
+    } finally {
+      if (!isRest) {
+        EasyLoading.dismiss();
       }
-
-      recoveryScore.value = (recoveryScore.value - impact).clamp(0, 100);
-      _updateRecoveryText();
     }
-
-    await saveSportsData();
   }
 
   void _updateRecoveryText() {
     final score = recoveryScore.value;
     if (score >= 80) {
-      recoveryText.value = 'Recovery is excellent — ready for high-intensity training.';
+      recoveryText.value =
+          'Recovery is excellent — ready for high-intensity training.';
     } else if (score >= 50) {
-      recoveryText.value = 'Recovery is moderate — skip intense training tomorrow.';
+      recoveryText.value =
+          'Recovery is moderate — skip intense training tomorrow.';
     } else {
-      recoveryText.value = 'Recovery is low — prioritize rest and light stretching today.';
+      recoveryText.value =
+          'Recovery is low — prioritize rest and light stretching today.';
     }
   }
 
   String _getIconPathForActivity(String activity) {
     switch (activity.toLowerCase()) {
-      case 'running':
+      case 'mobility':
         return IconPath.running;
       case 'strength':
         return IconPath.strength;
-      case 'yoga':
+      case 'cardio':
+        return IconPath.yoga;
+      case 'mixed':
         return IconPath.yoga;
       case 'rest day':
       default:
         return IconPath.restDay;
+    }
+  }
+
+  void updateFromLiveScoresTab(Map<String, dynamic> sportTab) {
+    try {
+      final sessions = sportTab['sessions'] as List? ?? [];
+      final mappedSessions = sessions.map((s) {
+        final title = s['displayType'] ?? s['sportType'] ?? 'Workout';
+        final duration = s['displayDuration'] ?? '${s['durationMinutes']} min';
+        final zone = s['zoneLabel'] as String? ?? '';
+        final subtitle =
+            'Today · $duration${zone.isNotEmpty ? ' · $zone' : ''}';
+        return SportSession(
+          title: title,
+          subtitle: subtitle,
+          iconPath: _getIconPathForActivity(title),
+        );
+      }).toList();
+
+      sessionsList.assignAll(mappedSessions);
+
+      final todaySession = sportTab['todaySession'] as Map<String, dynamic>?;
+      if (todaySession != null) {
+        hasTodaySession.value = true;
+        todayDuration.value =
+            (todaySession['durationMinutes'] as num?)?.toInt() ?? 0;
+        todayZone.value = todaySession['zoneLabel'] as String? ?? '';
+        todaySport.value =
+            todaySession['displayType'] ??
+            todaySession['sportType'] ??
+            'Workout';
+        todayDistance.value =
+            todaySession['distanceDisplay'] ??
+            (todaySession['distanceKm']?.toString() ?? '');
+        todayStartTime.value = todaySession['timestampStart'] as String? ?? '';
+        todayEndTime.value = todaySession['timestampEnd'] as String? ?? '';
+        todayEffort.value = todaySession['displayIntensity'] as String? ?? '';
+        todayType.value = todaySession['sportType'] as String? ?? '';
+      } else {
+        hasTodaySession.value = false;
+        todaySport.value = 'Rest day';
+      }
+
+      if (sportTab['recoveryLoadScore'] != null) {
+        recoveryScore.value = (sportTab['recoveryLoadScore'] as num).toInt();
+        _updateRecoveryText();
+      }
+
+      saveSportsData(syncWithServer: false);
+    } catch (e) {
+      debugPrint('SportsController: Error updating from live scores tab: $e');
     }
   }
 }

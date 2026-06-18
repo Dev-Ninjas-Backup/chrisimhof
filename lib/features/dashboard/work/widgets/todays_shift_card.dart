@@ -1,8 +1,8 @@
+import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/shift_type_pill.dart';
-import 'package:chrisimhof/features/dashboard/work/widgets/work_time_adjuster_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -72,7 +72,7 @@ class TodaysShiftCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Obx(() => WorkTimeAdjusterBox(
+                child: Obx(() => TimeWidget(
                       title: 'START',
                       icon: Icons.access_time_outlined,
                       hour: controller.startHour.value,
@@ -85,7 +85,7 @@ class TodaysShiftCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Obx(() => WorkTimeAdjusterBox(
+                child: Obx(() => TimeWidget(
                       title: 'END',
                       icon: Icons.flag_outlined,
                       hour: controller.endHour.value,
@@ -148,6 +148,6 @@ class TodaysShiftCard extends StatelessWidget {
     ];
     final weekday = weekdays[now.weekday - 1];
     final month = months[now.month - 1];
-    return '$weekday · ${now.day} $month · tap arrows to adjust';
+    return '$weekday · ${now.day} $month · drag or tap to adjust';
   }
 }

@@ -5,6 +5,10 @@ import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
+import 'package:chrisimhof/features/hydration/controller/hydration_controller.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
+import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.dart';
+import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
 import 'package:get/get.dart';
 
 class RealtimeSocketService {
@@ -77,7 +81,7 @@ class RealtimeSocketService {
       // Events from server
       _socket!.on('live_scores', (data) {
         debugPrint('Socket.io: Received live_scores event');
-        _handleLiveScores(data);
+        handleLiveScores(data);
       });
 
       _socket!.on('dashboard', (data) {
@@ -123,12 +127,12 @@ class RealtimeSocketService {
     }
   }
 
-  void _handleLiveScores(dynamic data) {
+  void handleLiveScores(dynamic data, {bool useLocalCaches = true}) {
     if (data == null) return;
     try {
       if (Get.isRegistered<DashboardController>()) {
         final dashboardController = Get.find<DashboardController>();
-        dashboardController.updateFromLiveScores(data);
+        dashboardController.updateFromLiveScores(data, useLocalCaches: useLocalCaches);
       }
 
       if (Get.isRegistered<SleepController>() && data['tabs']?['sleep'] != null) {
@@ -139,6 +143,22 @@ class RealtimeSocketService {
       if (Get.isRegistered<WorkController>() && data['tabs']?['work'] != null) {
         final workController = Get.find<WorkController>();
         workController.updateFromLiveScoresTab(data['tabs']['work']);
+      }
+
+      if (Get.isRegistered<HydrationController>() && data['tabs']?['hydration'] != null) {
+        Get.find<HydrationController>().updateFromLiveScoresTab(data['tabs']['hydration']);
+      }
+
+      if (Get.isRegistered<CaffeineController>() && data['tabs']?['caffeine'] != null) {
+        Get.find<CaffeineController>().updateFromLiveScoresTab(data['tabs']['caffeine']);
+      }
+
+      if (Get.isRegistered<NutritionController>() && data['tabs']?['nutrition'] != null) {
+        Get.find<NutritionController>().updateFromLiveScoresTab(data['tabs']['nutrition']);
+      }
+
+      if (Get.isRegistered<SportsController>() && data['tabs']?['sport'] != null) {
+        Get.find<SportsController>().updateFromLiveScoresTab(data['tabs']['sport']);
       }
     } catch (e) {
       debugPrint('Socket.io: Error handling live_scores payload: $e');

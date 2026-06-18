@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:get/get.dart';
 
 class CaffeineController extends GetxController {
@@ -38,7 +40,7 @@ class CaffeineController extends GetxController {
     }
   }
 
-  Future<void> saveEntriesToPrefs() async {
+  Future<void> saveEntriesToPrefs({bool syncWithServer = true}) async {
     try {
       final listToSave = entriesList.map((entry) => {
         'id': entry.id,
@@ -48,10 +50,12 @@ class CaffeineController extends GetxController {
       }).toList();
       await SharedPreferencesHelper.saveCaffeineLogs(jsonEncode(listToSave));
       
-      try {
-        final dashboardController = Get.find<DashboardController>();
-        await dashboardController.fetchDashboardData();
-      } catch (_) {}
+      if (syncWithServer) {
+        try {
+          final dashboardController = Get.find<DashboardController>();
+          await dashboardController.fetchDashboardData();
+        } catch (_) {}
+      }
     } catch (e) {
       debugPrint('Error saving caffeine entries: $e');
     }
@@ -104,16 +108,50 @@ class CaffeineController extends GetxController {
   }
 
   void addCaffeineEntry(String title, int amountMg, DateTime timestamp) async {
-    final newEntry = CaffeineEntry(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: title,
-      timestamp: timestamp,
-      amountMg: amountMg,
-    );
-    entriesList.add(newEntry);
-    entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    recalculateCaffeine();
-    await saveEntriesToPrefs();
+    EasyLoading.show(status: 'Logging caffeine...');
+    try {
+      final formattedTime = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+      
+      try {
+        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+        if (sessionId.isNotEmpty) {
+          String drinkType = 'coffee';
+          final t = title.toLowerCase();
+          if (t.contains('tea')) {
+            drinkType = 'tea';
+          } else if (t.contains('energy') || t.contains('soda') || t.contains('coke')) {
+            drinkType = 'energy_drink';
+          } else if (t.contains('espresso')) {
+            drinkType = 'espresso';
+          }
+          await DashboardService().patchQuickAddLog(
+            sessionId: sessionId,
+            newCaffeineLogs: [
+              {
+                'timestamp': formattedTime,
+                'caffeineMg': amountMg,
+                'drinkType': drinkType,
+              }
+            ],
+          );
+        }
+      } catch (e) {
+        debugPrint('Caffeine API quickAdd error: $e');
+      }
+
+      final newEntry = CaffeineEntry(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title,
+        timestamp: timestamp,
+        amountMg: amountMg,
+      );
+      entriesList.add(newEntry);
+      entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      recalculateCaffeine();
+      await saveEntriesToPrefs();
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
 
   void quickAdd(String title, int amountMg) {
@@ -145,5 +183,54 @@ class CaffeineController extends GetxController {
     entriesList.removeWhere((e) => e.id == id);
     recalculateCaffeine();
     await saveEntriesToPrefs();
+  }
+
+  void updateFromLiveScoresTab(Map<String, dynamic> caffeineTab) {
+    try {
+      if (caffeineTab['logs'] is List) {
+        final logsList = caffeineTab['logs'] as List;
+        final now = DateTime.now();
+        final mappedLogs = logsList.map((item) {
+          final timeStr = item['timestamp'] as String? ?? '00:00';
+          final amount = (item['caffeineMg'] as num?)?.toInt() ?? 0;
+          final titleStr = item['drinkLabel'] as String? ?? 'Espresso';
+          
+          DateTime logTime = now;
+          final parts = timeStr.split(':');
+          if (parts.length == 2) {
+            final h = int.tryParse(parts[0]) ?? now.hour;
+            final m = int.tryParse(parts[1]) ?? now.minute;
+            logTime = DateTime(now.year, now.month, now.day, h, m);
+          }
+
+          return CaffeineEntry(
+            id: '${timeStr}_$amount',
+            title: titleStr,
+            timestamp: logTime,
+            amountMg: amount,
+          );
+        }).toList();
+
+        entriesList.assignAll(mappedLogs);
+        entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        
+        todayTotalCaffeine.value = entriesList.fold(0, (sum, entry) => sum + entry.amountMg);
+        
+        final decayed = entriesList.fold<double>(0, (sum, entry) {
+          if (now.isAfter(entry.timestamp)) {
+            final hoursPassed = now.difference(entry.timestamp).inMinutes / 60.0;
+            return sum + entry.amountMg * math.pow(0.5, hoursPassed / 5.0);
+          } else {
+            return sum + entry.amountMg;
+          }
+        });
+        activeCaffeine.value = decayed;
+        
+        _syncWithDashboard();
+        saveEntriesToPrefs(syncWithServer: false);
+      }
+    } catch (e) {
+      debugPrint('CaffeineController: Error updating from live scores tab: $e');
+    }
   }
 }

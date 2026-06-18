@@ -77,33 +77,36 @@ class AddSportSessionBottomsheet extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Large Duration and Zone Selector (Interactive)
-            Obx(() => GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => Get.bottomSheet(ZoneSelectionBottomsheet(zone: zone)),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    '${duration.value}',
-                    style: getTextStyle2(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF4C1D95),
+            Obx(
+              () => GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () =>
+                    Get.bottomSheet(ZoneSelectionBottomsheet(zone: zone)),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      '${duration.value}',
+                      style: getTextStyle2(
+                        fontSize: 48,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF4C1D95),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 4.0),
-                  Text(
-                    'min · ${zone.value}',
-                    style: getTextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF4C1D95),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      'min · ${zone.value}',
+                      style: getTextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF4C1D95),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
             const SizedBox(height: 16),
 
             // Time range row
@@ -115,14 +118,14 @@ class AddSportSessionBottomsheet extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Activity Type Section
-            ActivityTypeSelector(
-              activity: activity,
-              type: type,
-              zone: zone,
-              duration: duration,
-              onActivityChanged: _updateDuration,
-            ),
-            const SizedBox(height: 24),
+            // ActivityTypeSelector(
+            //   activity: activity,
+            //   type: type,
+            //   zone: zone,
+            //   duration: duration,
+            //   onActivityChanged: _updateDuration,
+            // ),
+            // const SizedBox(height: 24),
 
             // Distance Section
             DistanceCard(
@@ -132,18 +135,16 @@ class AddSportSessionBottomsheet extends StatelessWidget {
             ),
 
             // Effort and Type dropdowns
-            EffortAndTypeRow(
-              activity: activity,
-              effort: effort,
-              type: type,
-            ),
+            EffortAndTypeRow(activity: activity, effort: effort, type: type),
             const SizedBox(height: 32),
 
             // Save Session Button
             CustomButton(
               text: 'SAVE SESSION',
               icon: null,
-              backgroundColor: const Color(0xFF4C1D95), // Deep purple matching Figma
+              backgroundColor: const Color(
+                0xFF4C1D95,
+              ), // Deep purple matching Figma
               textColor: Colors.white,
               onTap: () {
                 controller.addSession(
@@ -154,7 +155,9 @@ class AddSportSessionBottomsheet extends StatelessWidget {
                   endTime: endTime.value,
                   effort: effort.value,
                   type: type.value,
-                  distance: activity.value == 'Rest day' ? null : distanceController.text,
+                  distance: activity.value == 'Rest day'
+                      ? null
+                      : distanceController.text,
                 );
                 Get.back();
               },

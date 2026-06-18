@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 
 class HydrationLog {
   final String id;
@@ -52,6 +54,9 @@ class HydrationController extends GetxController {
   // Index of the currently selected day (0 for Monday, 6 for Sunday/Today)
   final RxInt selectedDayIndex = 6.obs;
 
+  // Index of the actual today day (0 for Monday, 6 for Sunday)
+  final RxInt todayIndex = 6.obs;
+
   // 7 lists of logs representing Monday through Sunday — all start empty
   final RxList<RxList<HydrationLog>> weeklyLogs = <RxList<HydrationLog>>[
     <HydrationLog>[].obs, // Monday
@@ -100,7 +105,7 @@ class HydrationController extends GetxController {
     }
   }
 
-  Future<void> saveLogsToPrefs() async {
+  Future<void> saveLogsToPrefs({bool syncWithServer = true}) async {
     try {
       final listToSave = weeklyLogs.map((dayList) {
         return dayList.map((log) => {
@@ -112,10 +117,12 @@ class HydrationController extends GetxController {
       }).toList();
       await SharedPreferencesHelper.saveHydrationLogs(jsonEncode(listToSave));
       
-      try {
-        final dashboardController = Get.find<DashboardController>();
-        await dashboardController.fetchDashboardData();
-      } catch (_) {}
+      if (syncWithServer) {
+        try {
+          final dashboardController = Get.find<DashboardController>();
+          await dashboardController.fetchDashboardData();
+        } catch (_) {}
+      }
     } catch (e) {
       debugPrint('Error saving hydration logs: $e');
     }
@@ -150,7 +157,7 @@ class HydrationController extends GetxController {
         label: weekLabels[index],
         intakeL: intake,
         goalL: dailyGoal.value,
-        isToday: index == 6,
+        isToday: index == todayIndex.value,
       );
     });
   }
@@ -164,19 +171,41 @@ class HydrationController extends GetxController {
 
   // Log water intake for the selected day
   void addIntake(int amountMl, String type) async {
-    final now = DateTime.now();
-    final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    
-    final newLog = HydrationLog(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      time: timeStr,
-      type: type,
-      amountMl: amountMl,
-    );
+    EasyLoading.show(status: 'Logging water...');
+    try {
+      final now = DateTime.now();
+      final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      
+      try {
+        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+        if (sessionId.isNotEmpty) {
+          await DashboardService().patchQuickAddLog(
+            sessionId: sessionId,
+            newWaterLogs: [
+              {
+                'timestamp': timeStr,
+                'volumeMl': amountMl,
+              }
+            ],
+          );
+        }
+      } catch (e) {
+        debugPrint('Hydration API quickAdd error: $e');
+      }
 
-    weeklyLogs[selectedDayIndex.value].insert(0, newLog);
-    weeklyLogs.refresh(); // Triggers reactive update in Obx
-    await saveLogsToPrefs();
+      final newLog = HydrationLog(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        time: timeStr,
+        type: type,
+        amountMl: amountMl,
+      );
+
+      weeklyLogs[selectedDayIndex.value].insert(0, newLog);
+      weeklyLogs.refresh(); // Triggers reactive update in Obx
+      await saveLogsToPrefs();
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
 
   // Remove water intake from the selected day
@@ -184,5 +213,74 @@ class HydrationController extends GetxController {
     weeklyLogs[selectedDayIndex.value].removeWhere((log) => log.id == id);
     weeklyLogs.refresh(); // Triggers reactive update in Obx
     await saveLogsToPrefs();
+  }
+
+  void updateFromLiveScoresTab(Map<String, dynamic> hydrationTab) {
+    try {
+      int activeDayIndex = 6;
+      if (hydrationTab['weekly'] != null && hydrationTab['weekly']['days'] is List) {
+        final daysList = hydrationTab['weekly']['days'] as List;
+        for (int i = 0; i < 7 && i < daysList.length; i++) {
+          final dayData = daysList[i] as Map<String, dynamic>;
+          if (dayData['isToday'] == true) {
+            activeDayIndex = i;
+            break;
+          }
+        }
+      }
+      todayIndex.value = activeDayIndex;
+
+      // Only set selectedDayIndex to the active day if it hasn't been set before or is default
+      if (selectedDayIndex.value == 6 && activeDayIndex != 6) {
+        selectedDayIndex.value = activeDayIndex;
+      }
+
+      if (hydrationTab['logs'] is List) {
+        final logsList = hydrationTab['logs'] as List;
+        final mappedLogs = logsList.map((item) {
+          final timeStr = item['timestamp'] as String? ?? '00:00';
+          final volume = (item['volumeMl'] as num?)?.toInt() ?? 0;
+          final typeStr = item['label'] as String? ?? 'Glass';
+          return HydrationLog(
+            id: '${timeStr}_$volume',
+            time: timeStr,
+            type: typeStr,
+            amountMl: volume,
+          );
+        }).toList();
+
+        // Update active day's logs
+        weeklyLogs[activeDayIndex].assignAll(mappedLogs);
+      }
+
+      // Update weekly logs for other days from the weekly.days totals
+      if (hydrationTab['weekly'] != null && hydrationTab['weekly']['days'] is List) {
+        final daysList = hydrationTab['weekly']['days'] as List;
+        for (int i = 0; i < 7 && i < daysList.length; i++) {
+          final dayData = daysList[i] as Map<String, dynamic>;
+          final totalMl = (dayData['totalMl'] as num?)?.toInt() ?? 0;
+          
+          if (i != activeDayIndex) {
+            if (totalMl > 0) {
+              weeklyLogs[i].assignAll([
+                HydrationLog(
+                  id: 'dummy_${i}_$totalMl',
+                  time: '12:00',
+                  type: 'Intake',
+                  amountMl: totalMl,
+                )
+              ]);
+            } else {
+              weeklyLogs[i].clear();
+            }
+          }
+        }
+      }
+
+      weeklyLogs.refresh();
+      saveLogsToPrefs(syncWithServer: false);
+    } catch (e) {
+      debugPrint('HydrationController: Error updating from live scores tab: $e');
+    }
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 
 class MealItem {
   final String name;
@@ -43,13 +45,24 @@ class NutritionController extends GetxController {
   final RxList<MealItem> mealsList = <MealItem>[].obs;
 
   final RxList<String> notesList = <String>[].obs;
+  final RxnString sleepImpactNote = RxnString();
 
   int get loggedMealsCount => mealsList.where((m) => m.isLogged).length;
 
   @override
   void onInit() {
     super.onInit();
-    loadNutritionData();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await loadNutritionData();
+    try {
+      final dbController = Get.find<DashboardController>();
+      if (dbController.nutritionTabData.value != null) {
+        updateFromLiveScoresTab(dbController.nutritionTabData.value!);
+      }
+    } catch (_) {}
   }
 
   Future<void> loadNutritionData() async {
@@ -59,13 +72,19 @@ class NutritionController extends GetxController {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
         dailyTarget.value = data['dailyTarget'] ?? 5;
         final List mealsJson = data['meals'] ?? [];
-        mealsList.assignAll(mealsJson.map((m) => MealItem(
-          name: m['name'] ?? '',
-          time: m['time'] ?? '',
-          type: m['type'] ?? 'Light',
-          isLogged: m['isLogged'] ?? false,
-          isPlanned: m['isPlanned'] ?? false,
-        )).toList());
+        mealsList.assignAll(
+          mealsJson
+              .map(
+                (m) => MealItem(
+                  name: m['name'] ?? '',
+                  time: m['time'] ?? '',
+                  type: m['type'] ?? 'Light',
+                  isLogged: m['isLogged'] ?? false,
+                  isPlanned: m['isPlanned'] ?? false,
+                ),
+              )
+              .toList(),
+        );
       } else {
         // No saved data — start empty and persist empty state
         await saveNutritionData();
@@ -81,25 +100,31 @@ class NutritionController extends GetxController {
     }
   }
 
-  Future<void> saveNutritionData() async {
+  Future<void> saveNutritionData({bool syncWithServer = true}) async {
     try {
       final Map<String, dynamic> data = {
         'dailyTarget': dailyTarget.value,
-        'meals': mealsList.map((m) => {
-          'name': m.name,
-          'time': m.time,
-          'type': m.type,
-          'isLogged': m.isLogged,
-          'isPlanned': m.isPlanned,
-        }).toList(),
+        'meals': mealsList
+            .map(
+              (m) => {
+                'name': m.name,
+                'time': m.time,
+                'type': m.type,
+                'isLogged': m.isLogged,
+                'isPlanned': m.isPlanned,
+              },
+            )
+            .toList(),
       };
       await SharedPreferencesHelper.saveMeals(jsonEncode(data));
       await SharedPreferencesHelper.saveNutritionNotes(notesList);
 
-      try {
-        final dashboardController = Get.find<DashboardController>();
-        await dashboardController.fetchDashboardData();
-      } catch (_) {}
+      if (syncWithServer) {
+        try {
+          final dashboardController = Get.find<DashboardController>();
+          await dashboardController.fetchDashboardData();
+        } catch (_) {}
+      }
     } catch (e) {
       debugPrint('Error saving nutrition data: $e');
     }
@@ -110,76 +135,178 @@ class NutritionController extends GetxController {
   }
 
   void incrementTarget() async {
-    dailyTarget.value++;
-    final newIndex = mealsList.length + 1;
-    String nextTime = '22:00';
-    if (mealsList.isNotEmpty) {
-      final lastTimeStr = mealsList.last.time.split(' ')[0];
-      final timeParts = lastTimeStr.split(':');
-      if (timeParts.length == 2) {
-        int hour = int.tryParse(timeParts[0]) ?? 22;
-        int minute = int.tryParse(timeParts[1]) ?? 0;
-        hour = (hour + 3) % 24;
-        nextTime = '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+    EasyLoading.show(status: 'Updating target...');
+    try {
+      dailyTarget.value++;
+
+      try {
+        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+        if (sessionId.isNotEmpty) {
+          await DashboardService().patchQuickAddLog(
+            sessionId: sessionId,
+            dailyMealTarget: dailyTarget.value,
+          );
+        }
+      } catch (e) {
+        debugPrint('Nutrition API increment target error: $e');
       }
+
+      final newIndex = mealsList.length + 1;
+      String nextTime = '22:00';
+      if (mealsList.isNotEmpty) {
+        final lastTimeStr = mealsList.last.time.split(' ')[0];
+        final timeParts = lastTimeStr.split(':');
+        if (timeParts.length == 2) {
+          int hour = int.tryParse(timeParts[0]) ?? 22;
+          int minute = int.tryParse(timeParts[1]) ?? 0;
+          hour = (hour + 3) % 24;
+          nextTime =
+              '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+        }
+      }
+      mealsList.add(
+        MealItem(
+          name: 'Meal $newIndex',
+          time: nextTime,
+          type: 'Light',
+          isLogged: false,
+          isPlanned: true,
+        ),
+      );
+      await saveNutritionData();
+    } finally {
+      EasyLoading.dismiss();
     }
-    mealsList.add(
-      MealItem(
-        name: 'Meal $newIndex',
-        time: nextTime,
-        type: 'Light',
-        isLogged: false,
-        isPlanned: true,
-      ),
-    );
-    await saveNutritionData();
   }
 
   void decrementTarget() async {
     if (dailyTarget.value > 1) {
-      dailyTarget.value--;
-      int lastUnloggedIdx = mealsList.lastIndexWhere((m) => !m.isLogged);
-      if (lastUnloggedIdx != -1) {
-        mealsList.removeAt(lastUnloggedIdx);
-      } else {
-        mealsList.removeLast();
+      EasyLoading.show(status: 'Updating target...');
+      try {
+        dailyTarget.value--;
+
+        try {
+          final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+          if (sessionId.isNotEmpty) {
+            await DashboardService().patchQuickAddLog(
+              sessionId: sessionId,
+              dailyMealTarget: dailyTarget.value,
+            );
+          }
+        } catch (e) {
+          debugPrint('Nutrition API decrement target error: $e');
+        }
+
+        int lastUnloggedIdx = mealsList.lastIndexWhere((m) => !m.isLogged);
+        if (lastUnloggedIdx != -1) {
+          mealsList.removeAt(lastUnloggedIdx);
+        } else {
+          mealsList.removeLast();
+        }
+        await saveNutritionData();
+      } finally {
+        EasyLoading.dismiss();
       }
-      await saveNutritionData();
     }
   }
 
   void saveMeal() async {
-    int firstUnloggedIdx = mealsList.indexWhere((m) => !m.isLogged);
-    final now = DateTime.now();
-    final formattedTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    EasyLoading.show(status: 'Saving meal...');
+    try {
+      int firstUnloggedIdx = mealsList.indexWhere((m) => !m.isLogged);
+      final now = DateTime.now();
+      final formattedTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-    if (firstUnloggedIdx != -1) {
-      final oldMeal = mealsList[firstUnloggedIdx];
-      mealsList[firstUnloggedIdx] = oldMeal.copyWith(
-        type: selectedMealType.value,
-        isLogged: true,
-        isPlanned: false,
-        time: formattedTime,
-      );
-    } else {
-      final newIndex = mealsList.length + 1;
-      mealsList.add(
-        MealItem(
-          name: 'Meal $newIndex',
-          time: formattedTime,
+      try {
+        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+        if (sessionId.isNotEmpty) {
+          final heaviness = selectedMealType.value.toLowerCase();
+          final order = firstUnloggedIdx != -1
+              ? firstUnloggedIdx + 1
+              : mealsList.length + 1;
+          await DashboardService().patchQuickAddLog(
+            sessionId: sessionId,
+            newMealLogs: [
+              {
+                'order': order,
+                'timestamp': formattedTime,
+                'plannedTime': formattedTime,
+                'heaviness': heaviness,
+              },
+            ],
+          );
+        }
+      } catch (e) {
+        debugPrint('Nutrition API quickAdd error: $e');
+      }
+
+      if (firstUnloggedIdx != -1) {
+        final oldMeal = mealsList[firstUnloggedIdx];
+        mealsList[firstUnloggedIdx] = oldMeal.copyWith(
           type: selectedMealType.value,
           isLogged: true,
           isPlanned: false,
-        ),
-      );
+          time: formattedTime,
+        );
+      } else {
+        final newIndex = mealsList.length + 1;
+        mealsList.add(
+          MealItem(
+            name: 'Meal $newIndex',
+            time: formattedTime,
+            type: selectedMealType.value,
+            isLogged: true,
+            isPlanned: false,
+          ),
+        );
+      }
+      await saveNutritionData();
+    } finally {
+      EasyLoading.dismiss();
     }
-    await saveNutritionData();
   }
 
   void addNote(String note) async {
     if (note.trim().isNotEmpty) {
       notesList.add(note.trim());
       await saveNutritionData();
+    }
+  }
+
+  void updateFromLiveScoresTab(Map<String, dynamic> nutritionTab) {
+    try {
+      if (nutritionTab['meals'] is List) {
+        final mealsJson = nutritionTab['meals'] as List;
+        final mappedMeals = mealsJson.map((m) {
+          final typeStr =
+              m['heavinessLabel'] as String? ??
+              m['heaviness'] as String? ??
+              'Light';
+          final capType = typeStr.isNotEmpty
+              ? typeStr[0].toUpperCase() + typeStr.substring(1)
+              : 'Light';
+          return MealItem(
+            name: m['label'] ?? m['name'] ?? '',
+            time: m['timestamp'] ?? m['displayTime'] ?? m['plannedTime'] ?? '',
+            type: capType,
+            isLogged: m['status'] == 'logged' || m['isLogged'] == true,
+            isPlanned: m['status'] == 'planned' || m['isPlanned'] == true,
+          );
+        }).toList();
+
+        mealsList.assignAll(mappedMeals);
+      }
+      if (nutritionTab['dailyMealTarget'] != null) {
+        dailyTarget.value = (nutritionTab['dailyMealTarget'] as num).toInt();
+      }
+      sleepImpactNote.value = nutritionTab['sleepImpactNote'] ?? "--";
+
+      saveNutritionData(syncWithServer: false);
+    } catch (e) {
+      debugPrint(
+        'NutritionController: Error updating from live scores tab: $e',
+      );
     }
   }
 }
