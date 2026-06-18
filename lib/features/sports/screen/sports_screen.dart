@@ -78,7 +78,7 @@ class SportsScreen extends StatelessWidget {
     final duration = 45.obs;
     final zone = 'Z3'.obs;
     final effort = 'Medium'.obs;
-    final type = 'Cardio'.obs;
+    final type = 'cardio'.obs;
     final distanceController = TextEditingController(text: '6.8 km');
     final startTime = '12:40'.obs;
     final endTime = '13:25'.obs;

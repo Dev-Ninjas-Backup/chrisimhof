@@ -78,7 +78,7 @@ class HydrationScreen extends StatelessWidget {
                 
               // 3. SELECTED DAY'S INTAKE LIST
               Obx(() {
-                final String dayName = controller.selectedDayIndex.value == 6
+                final String dayName = controller.selectedDayIndex.value == controller.todayIndex.value
                     ? 'TODAY'.tr
                     : controller.weekLabels[controller.selectedDayIndex.value].tr;
                 return Text(

@@ -45,7 +45,7 @@ class QuickAddSection extends StatelessWidget {
               _buildAddCard(
                 iconPath: IconPath.homeScreenWaterIcon,
                 label: 'Water',
-                value: '${data.waterLiters}L',
+                value: data.waterDisplay,
                 iconColor: AppColors.blue,
                 bgColor: AppColors.indigoSoft2,
                 onTap: controller.addWater,
@@ -54,7 +54,7 @@ class QuickAddSection extends StatelessWidget {
               _buildAddCard(
                 iconPath: IconPath.homeScreenCaffeineIcon,
                 label: 'Caffeine',
-                value: '${data.caffeineMg}mg',
+                value: data.caffeineDisplay,
                 iconColor: AppColors.amberDark,
                 bgColor: AppColors.amberSoft,
                 onTap: () => Get.toNamed(AppRoutes.caffeineScreen),
@@ -63,7 +63,7 @@ class QuickAddSection extends StatelessWidget {
               _buildAddCard(
                 iconPath: IconPath.homeScreenMealIcon,
                 label: 'Meal',
-                value: '${data.mealsLogged}/${data.mealsTarget}',
+                value: data.mealsDisplay,
                 iconColor: AppColors.secondaryButtonColor,
                 bgColor: AppColors.mintSoft2,
                 onTap: controller.addMeal,
@@ -72,7 +72,7 @@ class QuickAddSection extends StatelessWidget {
               _buildAddCard(
                 iconPath: IconPath.homeScreenSportIcon,
                 label: 'Sport',
-                value: '${data.sportMinutes}m',
+                value: data.sportDisplay,
                 iconColor: AppColors.violet,
                 bgColor: AppColors.indigoSoft3,
                 onTap: controller.addSport,

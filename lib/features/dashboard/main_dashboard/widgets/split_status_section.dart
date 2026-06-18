@@ -3,7 +3,6 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class SplitStatusSection extends StatelessWidget {
@@ -48,7 +47,7 @@ class SplitStatusSection extends StatelessWidget {
               headerLabel: 'LAST SLEEP',
               titleText: data.lastSleepDuration,
               subtitleText: data.sleepDebtText,
-              onTap: () => EasyLoading.showToast('Sleep analysis clicked!'),
+              onTap: () => Get.toNamed(AppRoutes.sleepScreen),
               bottomWidget: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Row(

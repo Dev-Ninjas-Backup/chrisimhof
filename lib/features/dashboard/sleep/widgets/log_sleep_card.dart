@@ -1,8 +1,8 @@
+import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
-import 'package:chrisimhof/features/dashboard/sleep/widgets/time_adjuster_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -54,7 +54,7 @@ class LogSleepCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Mon 17 May · tap arrows to adjust',
+                      'Mon 17 May · drag or tap to adjust',
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -97,7 +97,7 @@ class LogSleepCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Obx(
-                  () => TimeAdjusterBox(
+                  () => TimeWidget(
                     title: 'Bedtime',
                     iconPath: IconPath.moon,
                     hour: controller.bedtimeHour.value,
@@ -112,7 +112,7 @@ class LogSleepCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Obx(
-                  () => TimeAdjusterBox(
+                  () => TimeWidget(
                     title: 'Wake-up',
                     iconPath: IconPath.sun,
                     hour: controller.wakeupHour.value,

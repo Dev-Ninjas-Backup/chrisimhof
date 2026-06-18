@@ -8,6 +8,8 @@ import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/for_you_sec
 import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/quick_add_section.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/split_status_section.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/today_progress_section.dart';
+import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +19,10 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DashboardController());
+    // Register shared controllers so they persist across route changes
+    // and receive socket updates from DashboardController.
+    Get.put(RecommendationController());
+    Get.put(SleepController());
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

@@ -12,9 +12,10 @@ class RecomendationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final RecommendationController controller = Get.put(
-      RecommendationController(),
-    );
+    final RecommendationController controller =
+        Get.isRegistered<RecommendationController>()
+            ? Get.find<RecommendationController>()
+            : Get.put(RecommendationController());
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

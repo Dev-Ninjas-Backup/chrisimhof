@@ -12,6 +12,12 @@ class DashboardModel {
   final int mealsTarget;
   final int sportMinutes;
 
+  // Quick Add display values
+  final String waterDisplay;
+  final String caffeineDisplay;
+  final String mealsDisplay;
+  final String sportDisplay;
+
   // Today progress metrics (0.0 to 1.0)
   final double sleepProgress;
   final double hydrationProgress;
@@ -47,6 +53,10 @@ class DashboardModel {
     required this.mealsLogged,
     required this.mealsTarget,
     required this.sportMinutes,
+    required this.waterDisplay,
+    required this.caffeineDisplay,
+    required this.mealsDisplay,
+    required this.sportDisplay,
     required this.sleepProgress,
     required this.hydrationProgress,
     required this.caffeineProgress,
@@ -74,6 +84,10 @@ class DashboardModel {
     int? mealsLogged,
     int? mealsTarget,
     int? sportMinutes,
+    String? waterDisplay,
+    String? caffeineDisplay,
+    String? mealsDisplay,
+    String? sportDisplay,
     double? sleepProgress,
     double? hydrationProgress,
     double? caffeineProgress,
@@ -100,6 +114,10 @@ class DashboardModel {
       mealsLogged: mealsLogged ?? this.mealsLogged,
       mealsTarget: mealsTarget ?? this.mealsTarget,
       sportMinutes: sportMinutes ?? this.sportMinutes,
+      waterDisplay: waterDisplay ?? this.waterDisplay,
+      caffeineDisplay: caffeineDisplay ?? this.caffeineDisplay,
+      mealsDisplay: mealsDisplay ?? this.mealsDisplay,
+      sportDisplay: sportDisplay ?? this.sportDisplay,
       sleepProgress: sleepProgress ?? this.sleepProgress,
       hydrationProgress: hydrationProgress ?? this.hydrationProgress,
       caffeineProgress: caffeineProgress ?? this.caffeineProgress,

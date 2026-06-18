@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
+import 'package:chrisimhof/features/auth/session/session.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
@@ -24,6 +26,10 @@ class SplashScreenController extends GetxController {
           final profile = profileResp.data;
 
           if (profile != null) {
+            // Fetch and save the calculator session ID at startup
+            await SessionService().fetchAndStoreSessionId();
+            await RealtimeSocketService().connectSocket();
+
             if (profile.safetyAcknowledgedAt == null) {
               Get.offAllNamed(AppRoutes.safetyScreen);
             } else if (profile.sleepTargetMinutes == null || 
@@ -34,10 +40,9 @@ class SplashScreenController extends GetxController {
               Get.offAllNamed(AppRoutes.baselineSetupScreen);
             } else if (profile.connectedSources == null) {
               Get.offAllNamed(AppRoutes.connectedSourcesScreen);
-            }else if(profile.consentSettings ==null){
+            } else if (profile.consentSettings == null) {
               Get.offAllNamed(AppRoutes.consentSettingsScreen);
-            }
-            else {
+            } else {
               Get.offAll(() => const NavbarScreen());
             }
           } else {

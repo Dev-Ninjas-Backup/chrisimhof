@@ -61,7 +61,8 @@ class NutritionScreen extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: ' / ${controller.dailyTarget.value} planned',
+                              text:
+                                  ' / ${controller.dailyTarget.value} planned',
                               style: getTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -79,7 +80,9 @@ class NutritionScreen extends StatelessWidget {
                             child: Container(
                               height: 8,
                               margin: EdgeInsets.only(
-                                right: index == controller.dailyTarget.value - 1 ? 0 : 6,
+                                right: index == controller.dailyTarget.value - 1
+                                    ? 0
+                                    : 6,
                               ),
                               decoration: BoxDecoration(
                                 color: index < controller.loggedMealsCount
@@ -162,7 +165,11 @@ class NutritionScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: AppColors.gray200),
                               ),
-                              child: const Icon(Icons.remove, size: 16, color: AppColors.textSoft),
+                              child: const Icon(
+                                Icons.remove,
+                                size: 16,
+                                color: AppColors.textSoft,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -184,7 +191,11 @@ class NutritionScreen extends StatelessWidget {
                                 color: AppColors.secondaryButtonColor,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(Icons.add, size: 16, color: AppColors.white),
+                              child: const Icon(
+                                Icons.add,
+                                size: 16,
+                                color: AppColors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -197,7 +208,8 @@ class NutritionScreen extends StatelessWidget {
 
               // LOG A MEAL CARD
               Obx(() {
-                final formattedTime = '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+                final formattedTime =
+                    '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
                 return Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -221,7 +233,11 @@ class NutritionScreen extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              const Icon(Icons.access_time, size: 14, color: AppColors.textSoft),
+                              const Icon(
+                                Icons.access_time,
+                                size: 14,
+                                color: AppColors.textSoft,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'now - $formattedTime',
@@ -251,7 +267,8 @@ class NutritionScreen extends StatelessWidget {
                             type: 'Light',
                             iconPath: IconPath.lightMeal,
                             subtext: 'salad • fruit • snack',
-                            isSelected: controller.selectedMealType.value == 'Light',
+                            isSelected:
+                                controller.selectedMealType.value == 'Light',
                             activeColor: AppColors.secondaryButtonColor,
                             bgColor: AppColors.mintSoft2,
                             textColor: AppColors.emerald,
@@ -263,7 +280,8 @@ class NutritionScreen extends StatelessWidget {
                             type: 'Medium',
                             iconPath: IconPath.mediumMeal,
                             subtext: 'standard • balanced',
-                            isSelected: controller.selectedMealType.value == 'Medium',
+                            isSelected:
+                                controller.selectedMealType.value == 'Medium',
                             activeColor: AppColors.amber,
                             bgColor: AppColors.amberSoft,
                             textColor: AppColors.amberDarker,
@@ -275,7 +293,8 @@ class NutritionScreen extends StatelessWidget {
                             type: 'Heavy',
                             iconPath: IconPath.heavyMeal,
                             subtext: 'rich • fatty • large',
-                            isSelected: controller.selectedMealType.value == 'Heavy',
+                            isSelected:
+                                controller.selectedMealType.value == 'Heavy',
                             activeColor: AppColors.rose,
                             bgColor: AppColors.roseSoft2,
                             textColor: AppColors.roseDark,
@@ -297,7 +316,11 @@ class NutritionScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.add, color: AppColors.white, size: 18),
+                              const Icon(
+                                Icons.add,
+                                color: AppColors.white,
+                                size: 18,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'Save meal',
@@ -338,7 +361,9 @@ class NutritionScreen extends StatelessWidget {
                     border: Border.all(color: AppColors.borderSoft),
                   ),
                   child: Column(
-                    children: List.generate(controller.mealsList.length, (index) {
+                    children: List.generate(controller.mealsList.length, (
+                      index,
+                    ) {
                       final item = controller.mealsList[index];
                       final isLast = index == controller.mealsList.length - 1;
 
@@ -370,7 +395,9 @@ class NutritionScreen extends StatelessWidget {
                                 width: 24,
                                 height: 24,
                                 decoration: BoxDecoration(
-                                  color: item.isLogged ? statusColor : AppColors.white,
+                                  color: item.isLogged
+                                      ? statusColor
+                                      : AppColors.white,
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: statusColor,
@@ -378,7 +405,11 @@ class NutritionScreen extends StatelessWidget {
                                   ),
                                 ),
                                 child: item.isLogged
-                                    ? const Icon(Icons.check, size: 14, color: AppColors.white)
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 14,
+                                        color: AppColors.white,
+                                      )
                                     : null,
                               ),
                               if (!isLast)
@@ -395,11 +426,13 @@ class NutritionScreen extends StatelessWidget {
                             child: SizedBox(
                               height: isLast ? 40 : 60,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item.name,
@@ -411,7 +444,9 @@ class NutritionScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        item.isLogged ? item.time : '${item.time} • planned',
+                                        item.isLogged
+                                            ? item.time
+                                            : '${item.time} • planned',
                                         style: getTextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
@@ -421,7 +456,10 @@ class NutritionScreen extends StatelessWidget {
                                     ],
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: badgeBgColor,
                                       borderRadius: BorderRadius.circular(12),
@@ -448,75 +486,66 @@ class NutritionScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               // SLEEP IMPACT ALERT CARD
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 234, 236, 244), // Indigo soft
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 1, color: AppColors.indigoSoft),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.indigoSoft,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Image(
-                          image: AssetImage(IconPath.sleep),
-                          width: 24,
-                          height: 24,
-                          color: AppColors.indigo,
+              Obx(() {
+                final note = controller.sleepImpactNote.value;
+                if (note == null || note.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 234, 236, 244),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(width: 1, color: AppColors.indigoSoft),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.indigoSoft,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Center(
+                          child: Image(
+                            image: AssetImage(IconPath.sleep),
+                            width: 24,
+                            height: 24,
+                            color: AppColors.indigo,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'SLEEP IMPACT',
-                            style: getTextStyle2(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.blue,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'SLEEP IMPACT',
+                              style: getTextStyle2(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.blue,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          RichText(
-                            text: TextSpan(
+                            const SizedBox(height: 4),
+                            Text(
+                              note,
                               style: getTextStyle2(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.blueDark,
                               ),
-                              children: [
-                                const TextSpan(text: 'Keep night meal '),
-                                TextSpan(
-                                  text: 'Light',
-                                  style: getTextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.blueDark,
-                                  ),
-                                ),
-                                const TextSpan(
-                                  text: ' — Heavy meals after 02:00 reduce deep sleep by ~15%.',
-                                ),
-                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                );
+              }),
               const SizedBox(height: 20),
 
               // DAILY NOTES CARD
@@ -541,23 +570,29 @@ class NutritionScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ...controller.notesList.map((note) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(
-                              '"$note"',
-                              style: getTextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.primaryTextColor,
-                              ),
+                      ...controller.notesList.map(
+                        (note) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            '"$note"',
+                            style: getTextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryTextColor,
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: () => _showAddNoteDialog(context, controller),
                         child: Row(
                           children: [
-                            const Icon(Icons.add, size: 16, color: AppColors.secondaryButtonColor),
+                            const Icon(
+                              Icons.add,
+                              size: 16,
+                              color: AppColors.secondaryButtonColor,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'Add note',
@@ -608,11 +643,7 @@ class NutritionScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                iconPath,
-                height: 24,
-                width: 24,
-              ),
+              Image.asset(iconPath, height: 24, width: 24),
               const SizedBox(height: 8),
               Text(
                 type,
@@ -639,7 +670,10 @@ class NutritionScreen extends StatelessWidget {
     );
   }
 
-  void _showAddNoteDialog(BuildContext context, NutritionController controller) {
+  void _showAddNoteDialog(
+    BuildContext context,
+    NutritionController controller,
+  ) {
     final textController = TextEditingController();
     showDialog(
       context: context,

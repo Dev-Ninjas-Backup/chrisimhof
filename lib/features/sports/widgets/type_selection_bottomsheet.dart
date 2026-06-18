@@ -9,7 +9,7 @@ class TypeSelectionBottomsheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final options = ['Cardio', 'Strength', 'Flexibility', 'Sport', 'Recovery'];
+    final options = ['cardio', 'strength', 'mobility', 'mixed', 'other'];
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
