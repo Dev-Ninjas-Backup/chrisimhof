@@ -159,7 +159,12 @@ class SignInController extends GetxController {
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
-          Get.offAllNamed(AppRoutes.navbarScreen);
+
+          if (apiResponse.isNewUser) {
+            Get.offAllNamed(AppRoutes.safetyScreen);
+          } else {
+            Get.offAllNamed(AppRoutes.navbarScreen);
+          }
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(apiResponse.message ?? 'API login failed');
@@ -223,7 +228,12 @@ class SignInController extends GetxController {
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful');
-          Get.offAllNamed(AppRoutes.navbarScreen);
+
+          if (apiResponse.isNewUser) {
+            Get.offAllNamed(AppRoutes.safetyScreen);
+          } else {
+            Get.offAllNamed(AppRoutes.navbarScreen);
+          }
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(

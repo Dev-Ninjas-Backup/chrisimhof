@@ -79,4 +79,9 @@ class Urls {
       '$baseUrl/api/v1/calculator/session/$sessionId/end';
   static String liveScore(String sessionId, String locale) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/scores?locale=$locale';
+  static String addDailyNotes(String sessionId) =>
+      '$baseUrl/api/v1/calculator/session/$sessionId/notes';
+  static String createWeeklyPattern(String sessionId) =>
+      '$baseUrl/api/v1/calculator/work-settings/session/$sessionId/weekly-pattern';
+  static const String createWorkSettings = '$baseUrl/api/v1/calculator/work-settings';
 }

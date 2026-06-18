@@ -7,6 +7,7 @@ class PulsingRhythmBadgeController extends GetxController
   late final Animation<double> anim;
   bool _initialized = false;
   bool _isSleepPrep = false;
+  bool _disposed = false;
 
   @override
   void onInit() {
@@ -22,6 +23,7 @@ class PulsingRhythmBadgeController extends GetxController
   }
 
   void updateState({required bool isSleepPrep}) {
+    if (_disposed) return;
     if (!_initialized) {
       _initialized = true;
       _isSleepPrep = isSleepPrep;
@@ -43,6 +45,7 @@ class PulsingRhythmBadgeController extends GetxController
 
   @override
   void onClose() {
+    _disposed = true;
     ctrl.dispose();
     super.onClose();
   }

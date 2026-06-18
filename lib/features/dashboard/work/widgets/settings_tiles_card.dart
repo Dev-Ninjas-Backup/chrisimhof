@@ -110,6 +110,10 @@ class SettingsTilesCard extends StatelessWidget {
                   onTap: () {
                     if (title == 'Default rotation') {
                       controller.applyRotationPattern(option);
+                    } else if (title == 'Shift reminders') {
+                      controller.updateShiftReminders(option);
+                    } else if (title == 'Time zone') {
+                      controller.updateTimeZone(option);
                     } else {
                       selectedVal.value = option;
                     }

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
@@ -57,12 +59,41 @@ class NutritionController extends GetxController {
 
   Future<void> _initData() async {
     await loadNutritionData();
+    await fetchNotes();
     try {
       final dbController = Get.find<DashboardController>();
       if (dbController.nutritionTabData.value != null) {
         updateFromLiveScoresTab(dbController.nutritionTabData.value!);
       }
     } catch (_) {}
+  }
+
+  Future<void> fetchNotes() async {
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      if (sessionId.isEmpty || token.isEmpty) return;
+
+      final response = await http.get(
+        Uri.parse(Urls.addDailyNotes(sessionId)),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        if (decoded['success'] == true && decoded['data'] is List) {
+          final list = decoded['data'] as List;
+          notesList.assignAll(
+            list.map((n) => (n['text'] as String? ?? '')).where((t) => t.isNotEmpty).toList(),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('fetchNotes error: $e');
+    }
   }
 
   Future<void> loadNutritionData() async {
@@ -89,12 +120,6 @@ class NutritionController extends GetxController {
         // No saved data — start empty and persist empty state
         await saveNutritionData();
       }
-
-      final notes = await SharedPreferencesHelper.getNutritionNotes();
-      if (notes != null) {
-        notesList.assignAll(notes);
-      }
-      // No hardcoded notes — notes start empty if none saved
     } catch (e) {
       debugPrint('Error loading nutrition data: $e');
     }
@@ -117,7 +142,6 @@ class NutritionController extends GetxController {
             .toList(),
       };
       await SharedPreferencesHelper.saveMeals(jsonEncode(data));
-      await SharedPreferencesHelper.saveNutritionNotes(notesList);
 
       if (syncWithServer) {
         try {
@@ -269,8 +293,35 @@ class NutritionController extends GetxController {
 
   void addNote(String note) async {
     if (note.trim().isNotEmpty) {
-      notesList.add(note.trim());
-      await saveNutritionData();
+      try {
+        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+        final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+        if (sessionId.isEmpty || token.isEmpty) return;
+
+        final response = await http.post(
+          Uri.parse(Urls.addDailyNotes(sessionId)),
+          headers: {
+            'accept': '*/*',
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({'text': note.trim()}),
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+          if (decoded['success'] == true && decoded['data'] is List) {
+            final list = decoded['data'] as List;
+            notesList.assignAll(
+              list.map((n) => (n['text'] as String? ?? '')).where((t) => t.isNotEmpty).toList(),
+            );
+          }
+        } else {
+          debugPrint('addNote POST failed: ${response.statusCode} ${response.body}');
+        }
+      } catch (e) {
+        debugPrint('addNote error: $e');
+      }
     }
   }
 
@@ -303,6 +354,8 @@ class NutritionController extends GetxController {
       sleepImpactNote.value = nutritionTab['sleepImpactNote'] ?? "--";
 
       saveNutritionData(syncWithServer: false);
+      // Refresh notes from API after live-scores update
+      fetchNotes();
     } catch (e) {
       debugPrint(
         'NutritionController: Error updating from live scores tab: $e',

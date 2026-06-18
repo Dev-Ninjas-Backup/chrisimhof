@@ -4,6 +4,7 @@ class MicrosoftSignInResponse {
   final String? accessToken;
   final String? refreshToken;
   final dynamic user;
+  final bool isNewUser;
 
   MicrosoftSignInResponse({
     required this.success,
@@ -11,6 +12,7 @@ class MicrosoftSignInResponse {
     this.accessToken,
     this.refreshToken,
     this.user,
+    this.isNewUser = false,
   });
 
   factory MicrosoftSignInResponse.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class MicrosoftSignInResponse {
       accessToken: json['data']?['tokens']?['accessToken'],
       refreshToken: json['data']?['tokens']?['refreshToken'],
       user: json['data']?['user'],
+      isNewUser: json['data']?['isNewUser'] ?? false,
     );
   }
 }
