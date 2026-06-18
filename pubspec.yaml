@@ -40,7 +40,6 @@ dependencies:
   flutter_screenutil: ^5.9.3
   image_picker: ^1.0.7
   fl_chart: ^1.2.0
-  flutter_launcher_icons: ^0.14.4
   http: ^1.6.0
   shared_preferences: ^2.5.5
   flutter_localization: ^0.4.0
@@ -57,6 +56,15 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.14.4
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icons/ryvenza_launcher_logo.jpg
+  remove_alpha_ios: true
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
