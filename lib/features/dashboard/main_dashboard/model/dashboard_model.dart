@@ -39,7 +39,6 @@ class DashboardModel {
   final bool isSleepPrep;
   final bool isMissedBedtime;
 
-  // Signed minutes to bedtime (negative = past bedtime)
   final int minutesToBedtime;
 
   DashboardModel({

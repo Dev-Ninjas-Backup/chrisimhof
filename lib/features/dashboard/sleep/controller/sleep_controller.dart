@@ -19,8 +19,38 @@ class SleepController extends GetxController {
 
   final historyLogs = <SleepLog>[].obs;
 
+  List<SleepLog> get filteredHistoryLogs {
+    final idx = selectedDebtIndex.value;
+    if (idx == -1 || sleepDebtChartData.isEmpty) return historyLogs;
+    
+    final todayIndex = sleepDebtChartData.indexWhere((d) => d['isToday'] == true);
+    if (todayIndex == -1) return historyLogs;
+
+    final offsetDays = idx - todayIndex;
+    final targetDate = DateTime.now().add(Duration(days: offsetDays));
+
+    return historyLogs.where((log) {
+      final localDate = log.date.toLocal();
+      return localDate.year == targetDate.year &&
+             localDate.month == targetDate.month &&
+             localDate.day == targetDate.day;
+    }).toList();
+  }
+
   final tonightBedtime = Rxn<Map<String, dynamic>>();
   final tonightNote = RxnString();
+
+  /// From forYouPreview[sleep].body — e.g. "Aim for bed by 22:30 — your circadian window opens then."
+  final forYouSleepBody = RxnString();
+
+  /// From forYouPreview[sleep].bodyParams.bedtime — e.g. "22:30"
+  final forYouSleepBedtime = RxnString();
+
+  // Sleep Debt observables
+  final sleepDebtLabel = RxString('rolling 7 days');
+  final sleepDebtTotalDisplay = RxString('--');
+  final sleepDebtChartData = <Map<String, dynamic>>[].obs;
+  final selectedDebtIndex = RxInt(-1);
 
   @override
   void onInit() {
@@ -32,6 +62,9 @@ class SleepController extends GetxController {
       if (dbController.sleepTabData.value != null) {
         updateFromLiveScoresTab(dbController.sleepTabData.value!);
       }
+      // Seed forYouPreview sleep entry if DashboardController already has it
+      final preview = dbController.forYouPreviewData.value;
+      if (preview != null) updateFromForYouPreview(preview);
       // Seed bedtime picker from the API's optimal bedtime
       _initBedtimeFromDashboard(dbController);
     }
@@ -253,6 +286,23 @@ class SleepController extends GetxController {
     EasyLoading.showSuccess('Sleep log deleted!');
   }
 
+  /// Called with the top-level liveScores payload to extract forYouPreview sleep entry.
+  void updateFromForYouPreview(List<dynamic> forYouPreview) {
+    try {
+      final sleepEntry = forYouPreview.firstWhereOrNull(
+        (item) => (item as Map<String, dynamic>)['category'] == 'sleep',
+      ) as Map<String, dynamic>?;
+
+      if (sleepEntry != null) {
+        forYouSleepBody.value = sleepEntry['body'] as String?;
+        final bodyParams = sleepEntry['bodyParams'] as Map<String, dynamic>?;
+        forYouSleepBedtime.value = bodyParams?['bedtime'] as String?;
+      }
+    } catch (e) {
+      debugPrint('SleepController forYouPreview parse error: $e');
+    }
+  }
+
   void updateFromLiveScoresTab(Map<String, dynamic> tabData) {
     try {
       if (tabData['tonightBedtime'] != null) {
@@ -261,6 +311,25 @@ class SleepController extends GetxController {
         tonightBedtime.value = null;
       }
       tonightNote.value = tabData['tonightNote'] as String?;
+
+      if (tabData['sleepDebt7d'] != null) {
+        final debtData = tabData['sleepDebt7d'];
+        sleepDebtLabel.value = debtData['label'] as String? ?? 'rolling 7 days';
+        sleepDebtTotalDisplay.value = debtData['display'] as String? ?? '--';
+        
+        if (debtData['chartData'] != null) {
+          final chartList = List<Map<String, dynamic>>.from(debtData['chartData']);
+          sleepDebtChartData.assignAll(chartList);
+          
+          // Auto-select today if nothing is selected or if we just loaded
+          final todayIndex = chartList.indexWhere((day) => day['isToday'] == true);
+          if (todayIndex != -1) {
+            selectedDebtIndex.value = todayIndex;
+          } else if (chartList.isNotEmpty && selectedDebtIndex.value == -1) {
+            selectedDebtIndex.value = chartList.length - 1;
+          }
+        }
+      }
 
       final List? historyList = tabData['history'] as List?;
       if (historyList != null) {

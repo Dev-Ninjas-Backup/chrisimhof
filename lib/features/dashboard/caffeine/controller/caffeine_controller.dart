@@ -13,10 +13,22 @@ class CaffeineController extends GetxController {
   final RxDouble activeCaffeine = 0.0.obs;
   final RxInt todayTotalCaffeine = 0.obs;
 
+  /// From forYouPreview[caffeine].body — e.g. "Cut-off 18:30 — protect tonight's sleep window."
+  final forYouCaffeineBody = RxnString();
+
+  /// From forYouPreview[caffeine].bodyParams.cutoffTime — e.g. "18:30"
+  final forYouCaffeineCutoff = RxnString();
+
   @override
   void onInit() {
     super.onInit();
     loadEntries();
+    // Seed forYouPreview data if DashboardController already fetched it
+    // (handles the case where this controller registers after the dashboard loads)
+    if (Get.isRegistered<DashboardController>()) {
+      final preview = Get.find<DashboardController>().forYouPreviewData.value;
+      if (preview != null) updateFromForYouPreview(preview);
+    }
   }
 
   Future<void> loadEntries() async {
@@ -231,6 +243,23 @@ class CaffeineController extends GetxController {
       }
     } catch (e) {
       debugPrint('CaffeineController: Error updating from live scores tab: $e');
+    }
+  }
+
+  /// Called with the top-level liveScores forYouPreview list to extract caffeine entry.
+  void updateFromForYouPreview(List<dynamic> forYouPreview) {
+    try {
+      final caffeineEntry = forYouPreview.firstWhereOrNull(
+        (item) => (item as Map<String, dynamic>)['category'] == 'caffeine',
+      ) as Map<String, dynamic>?;
+
+      if (caffeineEntry != null) {
+        forYouCaffeineBody.value = caffeineEntry['body'] as String?;
+        final bodyParams = caffeineEntry['bodyParams'] as Map<String, dynamic>?;
+        forYouCaffeineCutoff.value = bodyParams?['cutoffTime'] as String?;
+      }
+    } catch (e) {
+      debugPrint('CaffeineController forYouPreview parse error: $e');
     }
   }
 }

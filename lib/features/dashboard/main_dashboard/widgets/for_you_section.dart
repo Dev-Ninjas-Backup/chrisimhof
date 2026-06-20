@@ -54,12 +54,7 @@ class ForYouSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Obx(() {
-          if (controller.isLoading.value) {
-            return _buildLoadingPlaceholder();
-          }
-
-          final recommendations =
-              controller.recommendationResponse.value?.data?.recommendations ?? [];
+          final recommendations = controller.forYouPreview;
 
           if (recommendations.isEmpty) {
             return _buildEmptyState();

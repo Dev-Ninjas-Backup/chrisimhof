@@ -72,6 +72,7 @@ class RecommendationController extends GetxController {
 
   final isLoading = false.obs;
   final recommendationResponse = Rxn<RecommendationResponse>();
+  final forYouPreview = <RecommendationItem>[].obs;
   final expandedCategories = <String>[].obs;
 
   void toggleCategoryExpansion(String? category) {
@@ -87,6 +88,15 @@ class RecommendationController extends GetxController {
   bool isCategoryExpanded(String? category) {
     if (category == null) return false;
     return expandedCategories.contains(category.toLowerCase());
+  }
+
+  void updateFromForYouPreview(List<dynamic> data) {
+    try {
+      final items = data.map((e) => RecommendationItem.fromJson(Map<String, dynamic>.from(e))).toList();
+      forYouPreview.assignAll(items);
+    } catch (e) {
+      Get.log('RecommendationController parse error: $e');
+    }
   }
 
   @override

@@ -57,16 +57,31 @@ class TodaysSportSessionCard extends StatelessWidget {
       }
     
       final parts = <String>[];
-      parts.add(controller.todaySport.value.tr);
+      if (controller.todayDisplayType.value.isNotEmpty) {
+        parts.add(controller.todayDisplayType.value.tr);
+      }
       if (controller.todayDistance.value.isNotEmpty) {
         parts.add(controller.todayDistance.value);
       }
-      if (controller.todayStartTime.value.isNotEmpty &&
-          controller.todayEndTime.value.isNotEmpty) {
-        parts.add(
-            '${controller.todayStartTime.value} → ${controller.todayEndTime.value}');
+      if (controller.todayTimeRange.value.isNotEmpty) {
+        parts.add(controller.todayTimeRange.value);
       }
       final infoText = parts.join(' · ');
+
+      // Gracefully parse the `displayDuration` to keep the large number + small unit design
+      String displayDur = controller.todayDisplayDuration.value;
+      String bigText = displayDur;
+      String smallText = '';
+      if (displayDur.endsWith(' min')) {
+        bigText = displayDur.replaceAll(' min', '');
+        smallText = 'min';
+      }
+
+      final zoneLabel = controller.todayHeartRateZoneLabel.value;
+      if (zoneLabel.isNotEmpty) {
+        if (smallText.isNotEmpty) smallText += ' · ';
+        smallText += zoneLabel;
+      }
     
       return Container(
         width: double.infinity,
@@ -92,22 +107,24 @@ class TodaysSportSessionCard extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  '${controller.todayDuration.value}',
+                  bigText,
                   style: getTextStyle2(
                     fontSize: 48,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF4C1D95),
                   ),
                 ),
-                const SizedBox(width: 4.0),
-                Text(
-                  'min · ${controller.todayZone.value}'.tr,
-                  style: getTextStyle2(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF4C1D95),
+                if (smallText.isNotEmpty) ...[
+                  const SizedBox(width: 4.0),
+                  Text(
+                    smallText.tr,
+                    style: getTextStyle2(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF4C1D95),
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
             const SizedBox(height: 8.0),
@@ -143,7 +160,7 @@ class TodaysSportSessionCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4.0),
                         Text(
-                          controller.todayEffort.value.tr,
+                          controller.todayDisplayIntensity.value.tr,
                           style: getTextStyle2(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -176,7 +193,7 @@ class TodaysSportSessionCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4.0),
                         Text(
-                          controller.todayType.value.tr,
+                          controller.todayDisplayType.value.tr,
                           style: getTextStyle2(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,

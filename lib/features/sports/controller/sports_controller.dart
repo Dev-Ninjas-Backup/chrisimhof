@@ -31,9 +31,19 @@ class SportsController extends GetxController {
   final RxString todayEffort = ''.obs;
   final RxString todayType = ''.obs;
 
+  // Exact API display fields for the session card
+  final RxString todayDisplayDuration = ''.obs;
+  final RxString todayHeartRateZoneLabel = ''.obs;
+  final RxString todayTimeRange = ''.obs;
+  final RxString todayDisplayIntensity = ''.obs;
+  final RxString todayDisplayType = ''.obs;
+
   // Recovery Impact metrics
   final RxInt recoveryScore = 100.obs;
   final RxString recoveryText = 'Log your activity to see recovery impact.'.obs;
+
+  /// From cards.sport.readinessNote — e.g. "Consider a lighter session or mobility work today."
+  final RxnString readinessNote = RxnString();
 
   // This Week sessions list
   final RxList<SportSession> sessionsList = <SportSession>[].obs;
@@ -41,7 +51,14 @@ class SportsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadSportsData();
+    loadSportsData().then((_) {
+      // Seed from DashboardController cache if it already loaded
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        final cached = db.sportCardData.value;
+        if (cached != null) updateFromSportCard(cached);
+      }
+    });
   }
 
   Future<void> loadSportsData() async {
@@ -57,6 +74,18 @@ class SportsController extends GetxController {
       todayEndTime.value = todayMetrics['endTime'] ?? '';
       todayEffort.value = todayMetrics['effort'] ?? '';
       todayType.value = todayMetrics['type'] ?? '';
+
+      // Fallback: populate the display fields from the old metrics so it doesn't render blank on restart
+      todayDisplayDuration.value = '${todayDuration.value} min';
+      todayHeartRateZoneLabel.value = todayZone.value;
+      if (todayStartTime.value.isNotEmpty && todayEndTime.value.isNotEmpty) {
+        todayTimeRange.value = '${todayStartTime.value} → ${todayEndTime.value}';
+      } else {
+        todayTimeRange.value = '';
+      }
+      todayDisplayIntensity.value = todayEffort.value;
+      todayDisplayType.value = todayType.value.isNotEmpty ? todayType.value : todaySport.value;
+
       recoveryScore.value = todayMetrics['recoveryScore'] ?? 100;
       _updateRecoveryText();
 
@@ -346,6 +375,13 @@ class SportsController extends GetxController {
         todayEndTime.value = todaySession['timestampEnd'] as String? ?? '';
         todayEffort.value = todaySession['displayIntensity'] as String? ?? '';
         todayType.value = todaySession['sportType'] as String? ?? '';
+        
+        // Populate the exact display fields
+        todayDisplayDuration.value = todaySession['displayDuration'] as String? ?? '${todaySession['durationMinutes'] ?? 0} min';
+        todayHeartRateZoneLabel.value = todaySession['heartRateZoneLabel'] as String? ?? todaySession['zoneLabel'] as String? ?? '';
+        todayTimeRange.value = todaySession['timeRange'] as String? ?? '$todayStartTime → $todayEndTime';
+        todayDisplayIntensity.value = todaySession['displayIntensity'] as String? ?? '';
+        todayDisplayType.value = todaySession['displayType'] as String? ?? '';
       } else {
         hasTodaySession.value = false;
         todaySport.value = 'Rest day';
@@ -359,6 +395,24 @@ class SportsController extends GetxController {
       saveSportsData(syncWithServer: false);
     } catch (e) {
       debugPrint('SportsController: Error updating from live scores tab: $e');
+    }
+  }
+
+  /// Called with cards.sport from the live scores payload.
+  /// Provides recoveryLoadScore and readinessNote.
+  void updateFromSportCard(Map<String, dynamic> sportCard) {
+    try {
+      if (sportCard['recoveryLoadScore'] != null) {
+        recoveryScore.value = (sportCard['recoveryLoadScore'] as num).toInt();
+        _updateRecoveryText();
+      }
+      final note = sportCard['readinessNote'] as String?;
+      if (note != null && note.isNotEmpty) {
+        readinessNote.value = note;
+      }
+      saveSportsData(syncWithServer: false);
+    } catch (e) {
+      debugPrint('SportsController: Error updating from sport card: $e');
     }
   }
 }

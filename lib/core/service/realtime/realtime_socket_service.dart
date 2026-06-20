@@ -1,3 +1,4 @@
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io_client;
 import 'package:chrisimhof/core/service/end_points.dart';
@@ -12,7 +13,8 @@ import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
 import 'package:get/get.dart';
 
 class RealtimeSocketService {
-  static final RealtimeSocketService _instance = RealtimeSocketService._internal();
+  static final RealtimeSocketService _instance =
+      RealtimeSocketService._internal();
 
   factory RealtimeSocketService() {
     return _instance;
@@ -57,7 +59,9 @@ class RealtimeSocketService {
       );
 
       _socket!.onConnect((_) {
-        debugPrint('Socket.io: Connected successfully, socket ID: ${_socket!.id}');
+        debugPrint(
+          'Socket.io: Connected successfully, socket ID: ${_socket!.id}',
+        );
         if (_currentSessionId != null) {
           _joinSession(_currentSessionId!);
         }
@@ -132,33 +136,97 @@ class RealtimeSocketService {
     try {
       if (Get.isRegistered<DashboardController>()) {
         final dashboardController = Get.find<DashboardController>();
-        dashboardController.updateFromLiveScores(data, useLocalCaches: useLocalCaches);
+        dashboardController.updateFromLiveScores(
+          data,
+          useLocalCaches: useLocalCaches,
+        );
       }
 
-      if (Get.isRegistered<SleepController>() && data['tabs']?['sleep'] != null) {
+      if (Get.isRegistered<SleepController>() &&
+          data['tabs']?['sleep'] != null) {
         final sleepController = Get.find<SleepController>();
         sleepController.updateFromLiveScoresTab(data['tabs']['sleep']);
       }
 
-      if (Get.isRegistered<WorkController>() && data['tabs']?['work'] != null) {
+      // Forward forYouPreview sleep entry via socket updates
+      if (Get.isRegistered<SleepController>() &&
+          data['forYouPreview'] is List) {
+        Get.find<SleepController>().updateFromForYouPreview(
+          data['forYouPreview'] as List<dynamic>,
+        );
+      }
+
+      if (Get.isRegistered<WorkController>()) {
         final workController = Get.find<WorkController>();
-        workController.updateFromLiveScoresTab(data['tabs']['work']);
+        if (data['tabs']?['work'] != null) {
+          workController.updateFromLiveScoresTab(data['tabs']['work']);
+        }
+        if (data['workShapesToday'] is List) {
+          workController.updateWorkShapesToday(data['workShapesToday'] as List<dynamic>);
+        } else if (data['shapesToday'] is List) {
+          workController.updateWorkShapesToday(data['shapesToday'] as List<dynamic>);
+        }
       }
 
-      if (Get.isRegistered<HydrationController>() && data['tabs']?['hydration'] != null) {
-        Get.find<HydrationController>().updateFromLiveScoresTab(data['tabs']['hydration']);
+      if (Get.isRegistered<HydrationController>() &&
+          data['tabs']?['hydration'] != null) {
+        Get.find<HydrationController>().updateFromLiveScoresTab(
+          data['tabs']['hydration'],
+        );
       }
 
-      if (Get.isRegistered<CaffeineController>() && data['tabs']?['caffeine'] != null) {
-        Get.find<CaffeineController>().updateFromLiveScoresTab(data['tabs']['caffeine']);
+      if (Get.isRegistered<HydrationController>() &&
+          data['forYouPreview'] is List) {
+        Get.find<HydrationController>().updateFromForYouPreview(
+          data['forYouPreview'] as List<dynamic>,
+        );
       }
 
-      if (Get.isRegistered<NutritionController>() && data['tabs']?['nutrition'] != null) {
-        Get.find<NutritionController>().updateFromLiveScoresTab(data['tabs']['nutrition']);
+      if (Get.isRegistered<CaffeineController>() &&
+          data['tabs']?['caffeine'] != null) {
+        Get.find<CaffeineController>().updateFromLiveScoresTab(
+          data['tabs']['caffeine'],
+        );
       }
 
-      if (Get.isRegistered<SportsController>() && data['tabs']?['sport'] != null) {
-        Get.find<SportsController>().updateFromLiveScoresTab(data['tabs']['sport']);
+      // Forward forYouPreview caffeine entry via socket updates
+      if (Get.isRegistered<CaffeineController>() &&
+          data['forYouPreview'] is List) {
+        Get.find<CaffeineController>().updateFromForYouPreview(
+          data['forYouPreview'] as List<dynamic>,
+        );
+      }
+
+      if (Get.isRegistered<NutritionController>() &&
+          data['tabs']?['nutrition'] != null) {
+        Get.find<NutritionController>().updateFromLiveScoresTab(
+          data['tabs']['nutrition'],
+        );
+      }
+
+      if (Get.isRegistered<SportsController>() &&
+          data['tabs']?['sport'] != null) {
+        Get.find<SportsController>().updateFromLiveScoresTab(
+          data['tabs']['sport'],
+        );
+      }
+
+      // Forward cards.sport (recoveryLoadScore + readinessNote) via socket updates
+      final socketCards = data['cards'];
+      if (Get.isRegistered<SportsController>() &&
+          socketCards is Map &&
+          socketCards['sport'] is Map) {
+        Get.find<SportsController>().updateFromSportCard(
+          Map<String, dynamic>.from(socketCards['sport'] as Map),
+        );
+      }
+
+      // Forward forYouPreview to RecommendationController
+      if (Get.isRegistered<RecommendationController>() &&
+          data['forYouPreview'] is List) {
+        Get.find<RecommendationController>().updateFromForYouPreview(
+          data['forYouPreview'] as List<dynamic>,
+        );
       }
     } catch (e) {
       debugPrint('Socket.io: Error handling live_scores payload: $e');

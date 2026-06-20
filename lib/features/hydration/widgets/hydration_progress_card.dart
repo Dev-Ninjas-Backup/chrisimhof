@@ -8,13 +8,9 @@ import 'package:get/get.dart';
 const Color _hydrationTrack = Color(0xFFD6EEFB);
 
 class HydrationProgressCard extends StatelessWidget {
-  const HydrationProgressCard({
-    super.key,
-    required this.controller,
-  });
+  const HydrationProgressCard({super.key, required this.controller});
 
   final HydrationController controller;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +18,10 @@ class HydrationProgressCard extends StatelessWidget {
       final double progress = (controller.dailyGoal.value > 0)
           ? controller.selectedDayIntake / controller.dailyGoal.value
           : 0.0;
-    
+      final String? previewBody = controller.isSelectedDayToday
+          ? controller.hydrationPreviewBody.value
+          : null;
+
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
@@ -92,30 +91,41 @@ class HydrationProgressCard extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             // Dynamic Left sub-indicator text
-            RichText(
-              text: TextSpan(
+            if (previewBody != null && previewBody.isNotEmpty)
+              Text(
+                previewBody,
+                textAlign: TextAlign.center,
                 style: getTextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: AppColors.greyMedium,
                 ),
-                children: [
-                  TextSpan(
-                    text: '${controller.selectedDayLeftIntakeMl} ml ',
-                    style: getTextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.blue2,
+              )
+            else
+              RichText(
+                text: TextSpan(
+                  style: getTextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.greyMedium,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '${controller.selectedDayLeftIntakeMl} ml ',
+                      style: getTextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.blue2,
+                      ),
                     ),
-                  ),
-                  TextSpan(
-                    text: (controller.selectedDayIndex.value == 6)
-                        ? 'left for today'.tr
-                        : 'left'.tr,
-                  ),
-                ],
+                    TextSpan(
+                      text: controller.isSelectedDayToday
+                          ? 'left for today'.tr
+                          : 'left'.tr,
+                    ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       );

@@ -5,17 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ListofIntakes extends StatelessWidget {
-  const ListofIntakes({
-    super.key,
-    required this.controller,
-  });
+  const ListofIntakes({super.key, required this.controller});
 
   final HydrationController controller;
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.selectedDayLogs.isEmpty) {
+      final logs = controller.selectedDayDisplayLogs;
+
+      if (logs.isEmpty) {
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 30),
@@ -36,7 +35,7 @@ class ListofIntakes extends StatelessWidget {
           ),
         );
       }
-    
+
       return Container(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -47,19 +46,18 @@ class ListofIntakes extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
-          itemCount: controller.selectedDayLogs.length,
+          itemCount: logs.length,
           separatorBuilder: (context, index) => const Padding(
             padding: EdgeInsets.symmetric(vertical: 4.0),
-            child: Divider(
-              height: 1.5,
-              color: AppColors.subtle,
-            ),
+            child: Divider(height: 1.5, color: AppColors.subtle),
           ),
           itemBuilder: (context, index) {
-            final log = controller.selectedDayLogs[index];
+            final log = logs[index];
             return Dismissible(
               key: Key(log.id),
-              direction: DismissDirection.endToStart,
+              direction: controller.isSelectedDayToday
+                  ? DismissDirection.endToStart
+                  : DismissDirection.none,
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 20),

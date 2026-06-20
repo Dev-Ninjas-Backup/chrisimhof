@@ -7,10 +7,7 @@ import 'package:get/get.dart';
 const Color _hydrationWeekGreen = Color(0xFF83EDBA);
 
 class WeeklyCard extends StatelessWidget {
-  const WeeklyCard({
-    super.key,
-    required this.controller,
-  });
+  const WeeklyCard({super.key, required this.controller});
 
   final HydrationController controller;
 
@@ -51,12 +48,15 @@ class WeeklyCard extends StatelessWidget {
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: controller.computedWeeklySummary.asMap().entries.map((entry) {
+              children: controller.computedWeeklySummary.asMap().entries.map((
+                entry,
+              ) {
                 final int index = entry.key;
                 final day = entry.value;
-    
+
                 // Define colors depending on if it is selected
-                final bool isSelected = index == controller.selectedDayIndex.value;
+                final bool isSelected =
+                    index == controller.selectedDayIndex.value;
                 final Color barColor = isSelected
                     ? AppColors.blue2
                     : _hydrationWeekGreen;
@@ -66,7 +66,7 @@ class WeeklyCard extends StatelessWidget {
                 final Color labelColor = isSelected
                     ? AppColors.primaryTextColor
                     : AppColors.greyAlt;
-    
+
                 return Expanded(
                   child: GestureDetector(
                     onTap: () => controller.selectDay(index),

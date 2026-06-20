@@ -27,43 +27,59 @@ class SleepHistoryList extends StatelessWidget {
                 color: AppColors.primaryTextColor,
               ),
             ),
-            GestureDetector(
-              onTap: () => showSleepEntryDialog(context, controller),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.add,
-                    color: AppColors.secondaryButtonColor,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Log a past night',
-                    style: getTextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.secondaryButtonColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // GestureDetector(
+            //   onTap: () => showSleepEntryDialog(context, controller),
+            //   child: Row(
+            //     children: [
+            //       const Icon(
+            //         Icons.add,
+            //         color: AppColors.secondaryButtonColor,
+            //         size: 16,
+            //       ),
+            //       const SizedBox(width: 4),
+            //       Text(
+            //         'Log a past night',
+            //         style: getTextStyle(
+            //           fontSize: 14,
+            //           fontWeight: FontWeight.w600,
+            //           color: AppColors.secondaryButtonColor,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 16),
 
         // List of history logs
-        Obx(
-          () => ListView.builder(
+        Obx(() {
+          final logs = controller.filteredHistoryLogs;
+          if (logs.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: Text(
+                  'No sleep logged for this day.',
+                  style: getTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.selectionGray,
+                  ),
+                ),
+              ),
+            );
+          }
+          return ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.historyLogs.length,
+            itemCount: logs.length,
             itemBuilder: (context, index) {
-              final log = controller.historyLogs[index];
+              final log = logs[index];
               return _buildHistoryCard(context, log, controller);
             },
-          ),
-        ),
+          );
+        }),
       ],
     );
   }

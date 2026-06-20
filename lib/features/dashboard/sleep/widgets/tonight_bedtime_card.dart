@@ -1,6 +1,5 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,10 +16,9 @@ class TonightBedtimeCard extends StatelessWidget {
       final apiWakeTime   = controller.tonightBedtime.value?['wakeTime']   as String?;
       final apiNote       = controller.tonightNote.value;
 
-      // --- Fallback: use DashboardController's optimalBedtime ---
-      String bedtime = apiSleepStart ?? _fallbackBedtime();
-      String wakeup  = apiWakeTime  ?? _computeWakeup(bedtime);
-      String note    = apiNote      ?? _fallbackNote();
+      String bedtime = apiSleepStart ?? '--:--';
+      String wakeup  = apiWakeTime  ?? '--:--';
+      String note    = apiNote      ?? '';
 
       return Container(
         width: double.infinity,
@@ -117,49 +115,6 @@ class TonightBedtimeCard extends StatelessWidget {
         ),
       );
     });
-  }
-
-  /// Returns the optimal bedtime from DashboardController, or '--:--' while loading.
-  String _fallbackBedtime() {
-    try {
-      if (Get.isRegistered<DashboardController>()) {
-        final optimal = Get.find<DashboardController>().dashboardData.value.optimalBedtime;
-        if (optimal.isNotEmpty && optimal != '--:--') return optimal;
-      }
-    } catch (_) {}
-    return '--:--';
-  }
-
-  /// Computes wake time as bedtime + 7h30m (target sleep duration).
-  String _computeWakeup(String bedtime) {
-    try {
-      final parts = bedtime.split(':');
-      if (parts.length == 2) {
-        final h = int.tryParse(parts[0]) ?? 0;
-        final m = int.tryParse(parts[1]) ?? 0;
-        final wakeMinutes = (h * 60 + m + 450) % 1440; // +7h30m = +450 min
-        return '${(wakeMinutes ~/ 60).toString().padLeft(2, '0')}:${(wakeMinutes % 60).toString().padLeft(2, '0')}';
-      }
-    } catch (_) {}
-    return '--:--';
-  }
-
-  /// Builds a contextual note from DashboardController's work shift data.
-  String _fallbackNote() {
-    try {
-      if (Get.isRegistered<DashboardController>()) {
-        final data = Get.find<DashboardController>().dashboardData.value;
-        final shift = data.workShift;
-        final bedtime = data.optimalBedtime;
-        if (shift.isNotEmpty && shift.toLowerCase() != 'off' && bedtime.isNotEmpty) {
-          return 'Adjusted for your $shift.\nTargets 7h 30m.';
-        }
-        if (bedtime.isNotEmpty && bedtime != '--:--') {
-          return 'Your optimal bedtime based on today\'s schedule.\nTargets 7h 30m.';
-        }
-      }
-    } catch (_) {}
-    return 'Log your activity to get a personalised bedtime.';
   }
 }
 

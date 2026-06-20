@@ -8,13 +8,25 @@ import 'package:chrisimhof/features/hydration/widgets/weekly_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HydrationScreen extends StatelessWidget {
+class HydrationScreen extends StatefulWidget {
   const HydrationScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final HydrationController controller = Get.put(HydrationController());
+  State<HydrationScreen> createState() => _HydrationScreenState();
+}
 
+class _HydrationScreenState extends State<HydrationScreen> {
+  late final HydrationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(HydrationController());
+    controller.selectToday();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
@@ -23,28 +35,34 @@ class HydrationScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomAppBar(
-                title: 'Hydration'.tr,
-                showBackButton: true,
-              ),
+              CustomAppBar(title: 'Hydration'.tr, showBackButton: true),
               const SizedBox(height: 16),
-                
+
               // 1. HYDRATION PROGRESS CARD
               HydrationProgressCard(controller: controller),
               const SizedBox(height: 20),
-                
+
               // 2. QUICK INTAKE ROW
               Row(
                 children: controller.quickOptions.map((option) {
                   return Expanded(
                     child: GestureDetector(
-                      onTap: () => controller.addIntake(option.amountMl, option.typeName),
+                      onTap: () => controller.addIntake(
+                        option.amountMl,
+                        option.typeName,
+                      ),
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 4),
-                        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                          horizontal: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.white,
-                          border: Border.all(color: AppColors.subtle, width: 1.5),
+                          border: Border.all(
+                            color: AppColors.subtle,
+                            width: 1.5,
+                          ),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
@@ -75,12 +93,16 @@ class HydrationScreen extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 28),
-                
+
               // 3. SELECTED DAY'S INTAKE LIST
               Obx(() {
-                final String dayName = controller.selectedDayIndex.value == controller.todayIndex.value
+                final String dayName =
+                    controller.selectedDayIndex.value ==
+                        controller.todayIndex.value
                     ? 'TODAY'.tr
-                    : controller.weekLabels[controller.selectedDayIndex.value].tr;
+                    : controller
+                          .weekLabels[controller.selectedDayIndex.value]
+                          .tr;
                 return Text(
                   "$dayName'S INTAKE",
                   style: getTextStyle(
@@ -91,10 +113,10 @@ class HydrationScreen extends StatelessWidget {
                 );
               }),
               const SizedBox(height: 12),
-                
+
               ListofIntakes(controller: controller),
               const SizedBox(height: 30),
-                
+
               // 4. WEEKLY CARD (Containing Weekly header & bar charts)
               WeeklyCard(controller: controller),
             ],
