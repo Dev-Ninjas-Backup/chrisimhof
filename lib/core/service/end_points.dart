@@ -30,29 +30,11 @@ class Urls {
       '$baseUrl/api/v1/calculator/session/$sessionId/sleep';
   static String workCalculator(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/work';
-  static String skipWork(String sessionId) =>
-      '$baseUrl/api/v1/calculator/session/$sessionId/work/skip';
-  static String nutritionCalculator(String sessionId) =>
-      '$baseUrl/api/v1/calculator/session/$sessionId/nutrition';
-  static String hydrationCalculator(String sessionId) =>
-      '$baseUrl/api/v1/calculator/session/$sessionId/hydration';
-  static const String caffeineQuickEntry =
-      '$baseUrl/api/v1/calculator/caffeine-presets';
-  static String addCaffeineIntake(String sessionId) =>
-      '$baseUrl/api/v1/calculator/session/$sessionId/caffeine';
-  static String skipCaffeineIntake(String sessionId) =>
-      '$baseUrl/api/v1/calculator/session/$sessionId/caffeine/skip';
-  static String sportsCalculator(String sessionId) =>
-      '$baseUrl/api/v1/calculator/session/$sessionId/sport';
   static String calculateResult(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/calculate';
   static const String selectlanguage = '$baseUrl/api/v1/profile/language';
   static String deleteAccount(String userId) =>
       '$baseUrl/api/v1/users/$userId/permanent';
-  static const String latestResults =
-      '$baseUrl/api/v1/calculator/latest-result';
-  static String historyDetails(String historyId) =>
-      '$baseUrl/api/v1/history/$historyId';
   static String sessionReset(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/reset';
   static String updateCalculatorSession(String sessionId) =>

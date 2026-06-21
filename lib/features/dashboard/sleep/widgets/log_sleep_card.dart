@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -129,39 +130,14 @@ class LogSleepCard extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Save sleep button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    AppColors.primaryButtonColor, // Selection color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 0,
-              ),
-              onPressed: controller.saveSleep,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.check_rounded,
-                    color: AppColors.sleepCardBg,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Save sleep',
-                    style: getTextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.sleepCardBg, 
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          CustomButton(
+            text: 'Save Sleep',
+            onTap: controller.saveSleep,
+            textColor: AppColors.black,
+            backgroundColor: AppColors.primaryButtonColor,
+            plusIcon: true,
+            icon: null,
+            showIcon: Icons.check,
           ),
         ],
       ),

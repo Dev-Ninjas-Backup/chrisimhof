@@ -26,7 +26,7 @@ class CustomButton extends StatelessWidget {
     this.borderWidth,
     this.icon = Icons.chevron_right_rounded,
     this.plusIcon,
-    this.showIcon ,
+    this.showIcon,
   });
 
   @override
@@ -58,6 +58,7 @@ class CustomButton extends StatelessWidget {
               if (plusIcon == true) const SizedBox(width: 4),
               if (plusIcon == true)
                 Icon(showIcon, size: 20, color: iconColor ?? Colors.black),
+              if (plusIcon == true && icon == null) const SizedBox(width: 8),
               Text(
                 text.tr,
                 style: getTextStyle(

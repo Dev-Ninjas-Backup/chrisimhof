@@ -13,10 +13,8 @@ class CaffeineController extends GetxController {
   final RxDouble activeCaffeine = 0.0.obs;
   final RxInt todayTotalCaffeine = 0.obs;
 
-  /// From forYouPreview[caffeine].body — e.g. "Cut-off 18:30 — protect tonight's sleep window."
   final forYouCaffeineBody = RxnString();
 
-  /// From forYouPreview[caffeine].bodyParams.cutoffTime — e.g. "18:30"
   final forYouCaffeineCutoff = RxnString();
 
   @override
@@ -29,8 +27,6 @@ class CaffeineController extends GetxController {
         if (cachedCard != null) updateFromCaffeineCard(cachedCard);
       }
     });
-    // Seed forYouPreview data if DashboardController already fetched it
-    // (handles the case where this controller registers after the dashboard loads)
     if (Get.isRegistered<DashboardController>()) {
       final preview = Get.find<DashboardController>().forYouPreviewData.value;
       if (preview != null) updateFromForYouPreview(preview);
@@ -42,12 +38,18 @@ class CaffeineController extends GetxController {
       final jsonStr = await SharedPreferencesHelper.getCaffeineLogs();
       if (jsonStr != null) {
         final decoded = jsonDecode(jsonStr) as List;
-        entriesList.assignAll(decoded.map((item) => CaffeineEntry(
-          id: item['id'],
-          title: item['title'],
-          timestamp: DateTime.parse(item['timestamp']),
-          amountMg: item['amountMg'],
-        )).toList());
+        entriesList.assignAll(
+          decoded
+              .map(
+                (item) => CaffeineEntry(
+                  id: item['id'],
+                  title: item['title'],
+                  timestamp: DateTime.parse(item['timestamp']),
+                  amountMg: item['amountMg'],
+                ),
+              )
+              .toList(),
+        );
         recalculateCaffeine();
       } else {
         _initializeMockEntries();
@@ -60,14 +62,18 @@ class CaffeineController extends GetxController {
 
   Future<void> saveEntriesToPrefs({bool syncWithServer = true}) async {
     try {
-      final listToSave = entriesList.map((entry) => {
-        'id': entry.id,
-        'title': entry.title,
-        'timestamp': entry.timestamp.toIso8601String(),
-        'amountMg': entry.amountMg,
-      }).toList();
+      final listToSave = entriesList
+          .map(
+            (entry) => {
+              'id': entry.id,
+              'title': entry.title,
+              'timestamp': entry.timestamp.toIso8601String(),
+              'amountMg': entry.amountMg,
+            },
+          )
+          .toList();
       await SharedPreferencesHelper.saveCaffeineLogs(jsonEncode(listToSave));
-      
+
       if (syncWithServer) {
         try {
           final dashboardController = Get.find<DashboardController>();
@@ -128,8 +134,9 @@ class CaffeineController extends GetxController {
   void addCaffeineEntry(String title, int amountMg, DateTime timestamp) async {
     EasyLoading.show(status: 'Logging caffeine...');
     try {
-      final formattedTime = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
-      
+      final formattedTime =
+          '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+
       try {
         final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
         if (sessionId.isNotEmpty) {
@@ -137,8 +144,10 @@ class CaffeineController extends GetxController {
           final t = title.toLowerCase();
           if (t.contains('tea')) {
             drinkType = 'tea';
-          } else if (t.contains('energy') || t.contains('soda') || t.contains('coke')) {
-            drinkType = 'energy_drink';
+          } else if (t.contains('energy') ||
+              t.contains('soda') ||
+              t.contains('coke')) {
+            drinkType = 'energy';
           } else if (t.contains('espresso')) {
             drinkType = 'espresso';
           }
@@ -149,7 +158,7 @@ class CaffeineController extends GetxController {
                 'timestamp': formattedTime,
                 'caffeineMg': amountMg,
                 'drinkType': drinkType,
-              }
+              },
             ],
           );
         }
@@ -212,7 +221,7 @@ class CaffeineController extends GetxController {
           final timeStr = item['timestamp'] as String? ?? '00:00';
           final amount = (item['caffeineMg'] as num?)?.toInt() ?? 0;
           final titleStr = item['drinkLabel'] as String? ?? 'Espresso';
-          
+
           DateTime logTime = now;
           final parts = timeStr.split(':');
           if (parts.length == 2) {
@@ -231,19 +240,23 @@ class CaffeineController extends GetxController {
 
         entriesList.assignAll(mappedLogs);
         entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        
-        todayTotalCaffeine.value = entriesList.fold(0, (sum, entry) => sum + entry.amountMg);
-        
+
+        todayTotalCaffeine.value = entriesList.fold(
+          0,
+          (sum, entry) => sum + entry.amountMg,
+        );
+
         final decayed = entriesList.fold<double>(0, (sum, entry) {
           if (now.isAfter(entry.timestamp)) {
-            final hoursPassed = now.difference(entry.timestamp).inMinutes / 60.0;
+            final hoursPassed =
+                now.difference(entry.timestamp).inMinutes / 60.0;
             return sum + entry.amountMg * math.pow(0.5, hoursPassed / 5.0);
           } else {
             return sum + entry.amountMg;
           }
         });
         activeCaffeine.value = decayed;
-        
+
         _syncWithDashboard();
         saveEntriesToPrefs(syncWithServer: false);
       }
@@ -255,9 +268,12 @@ class CaffeineController extends GetxController {
   /// Called with the top-level liveScores forYouPreview list to extract caffeine entry.
   void updateFromForYouPreview(List<dynamic> forYouPreview) {
     try {
-      final caffeineEntry = forYouPreview.firstWhereOrNull(
-        (item) => (item as Map<String, dynamic>)['category'] == 'caffeine',
-      ) as Map<String, dynamic>?;
+      final caffeineEntry =
+          forYouPreview.firstWhereOrNull(
+                (item) =>
+                    (item as Map<String, dynamic>)['category'] == 'caffeine',
+              )
+              as Map<String, dynamic>?;
 
       if (caffeineEntry != null) {
         forYouCaffeineBody.value = caffeineEntry['body'] as String?;
@@ -269,8 +285,6 @@ class CaffeineController extends GetxController {
     }
   }
 
-  /// Called with cards.caffeine from the live scores payload.
-  /// Provides activeMg (caffeine active in body).
   void updateFromCaffeineCard(Map<String, dynamic> caffeineCard) {
     try {
       if (caffeineCard['activeMg'] != null) {

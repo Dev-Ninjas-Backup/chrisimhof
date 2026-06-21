@@ -41,6 +41,7 @@ class RealtimeSocketService {
         debugPrint('Socket.io: Already connected.');
         if (_currentSessionId != sessionId && sessionId != null) {
           _joinSession(sessionId);
+          _currentSessionId = sessionId;
         }
         return;
       }

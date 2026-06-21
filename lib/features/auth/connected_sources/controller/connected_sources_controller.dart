@@ -1,7 +1,7 @@
 import 'package:chrisimhof/core/common/controller/language_controller.dart';
 import 'package:chrisimhof/features/auth/connected_sources/model/connected_sources_model.dart';
 import 'package:chrisimhof/features/auth/connected_sources/service/connected_sources_service.dart';
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
@@ -42,9 +42,11 @@ class ConnectedSourcesController extends GetxController {
         // Initialize states based on the response status values
         for (var src in response.data.sources) {
           if (src.key == 'apple') {
-            isAppleHealthConnected.value = src.status == 'enabled' || src.status == 'linked';
+            isAppleHealthConnected.value =
+                src.status == 'enabled' || src.status == 'linked';
           } else if (src.key == 'google') {
-            isGoogleHealthConnected.value = src.status == 'enabled' || src.status == 'linked';
+            isGoogleHealthConnected.value =
+                src.status == 'enabled' || src.status == 'linked';
           }
         }
       }
@@ -77,7 +79,7 @@ class ConnectedSourcesController extends GetxController {
 
       if (response.success && response.data.saved) {
         EasyLoading.dismiss();
-        Get.offAll(() => const NavbarScreen());
+        Get.toNamed(AppRoutes.consentSettingsScreen);
       } else {
         EasyLoading.showError('Could not save connected sources.');
       }

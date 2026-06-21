@@ -1,6 +1,4 @@
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/auth/forget_password/screen/forget_password_screen.dart';
-import 'package:chrisimhof/features/auth/forget_password/screen/success_screen.dart';
 import 'package:chrisimhof/features/auth/forget_password/service/verify_otp_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
