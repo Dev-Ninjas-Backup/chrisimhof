@@ -32,6 +32,9 @@ class DashboardController extends GetxController {
 
   /// Cached cards.sport data for late-registering SportsController.
   final Rxn<Map<String, dynamic>> sportCardData = Rxn<Map<String, dynamic>>();
+  
+  /// Cached cards.caffeine data for late-registering CaffeineController.
+  final Rxn<Map<String, dynamic>> caffeineCardData = Rxn<Map<String, dynamic>>();
 
   final Rx<DashboardModel> dashboardData = DashboardModel(
     date: DateTime.now(),
@@ -140,8 +143,13 @@ class DashboardController extends GetxController {
     String optimalBedtime = '--:--';
     if (apiData['optimalBedtime'] != null) {
       if (apiData['optimalBedtime'] is Map) {
-        optimalBedtime =
-            apiData['optimalBedtime']['time'] as String? ?? '--:--';
+        final timeVal = apiData['optimalBedtime']['time'] as String? ?? '';
+        final sleepAsap = apiData['optimalBedtime']['sleepAsap'] as bool? ?? false;
+        if (timeVal.isEmpty && sleepAsap) {
+          optimalBedtime = 'ASAP';
+        } else {
+          optimalBedtime = timeVal.isNotEmpty ? timeVal : '--:--';
+        }
       } else if (apiData['optimalBedtime'] is String) {
         optimalBedtime = apiData['optimalBedtime'] as String;
       }
@@ -461,6 +469,14 @@ class DashboardController extends GetxController {
         Get.find<SportsController>().updateFromSportCard(sportCard);
       }
     }
+    // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) to CaffeineController
+    final caffeineCard = cards?['caffeine'] as Map<String, dynamic>?;
+    if (caffeineCard != null) {
+      caffeineCardData.value = caffeineCard;
+      if (Get.isRegistered<CaffeineController>()) {
+        Get.find<CaffeineController>().updateFromCaffeineCard(caffeineCard);
+      }
+    }
     if (apiData['tabs']?['work'] != null) {
       if (Get.isRegistered<WorkController>()) {
         Get.find<WorkController>().updateFromLiveScoresTab(
@@ -478,7 +494,11 @@ class DashboardController extends GetxController {
     updateSleepPrepStatus();
   }
 
+  final RxBool isLoading = false.obs;
+  final RxBool hasLoadedOnce = false.obs;
+
   Future<void> fetchDashboardData() async {
+    isLoading.value = true;
     try {
       final token = await SharedPreferencesHelper.getAccessToken();
       if (token == null || token.isEmpty) return;
@@ -578,6 +598,7 @@ class DashboardController extends GetxController {
 
       if (mergedData.isNotEmpty) {
         _updateDashboardModelFromPayload(mergedData, userName: userName);
+        hasLoadedOnce.value = true;
         
         // Distribute the initial payload to all other controllers (Sleep, Hydration, Recommendations, etc)
         // so they don't sit empty waiting for the first socket push.
@@ -585,11 +606,23 @@ class DashboardController extends GetxController {
       }
     } catch (e) {
       debugPrint('Dashboard: error in fetchDashboardData: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 
   void updateSleepPrepStatus() {
     final current = dashboardData.value;
+    if (current.optimalBedtime == 'ASAP' || current.optimalBedtime.toLowerCase().contains('asap')) {
+      dashboardData.value = current.copyWith(
+        isSleepPrep: true,
+        timeUntilBedtime: 'Sleep ASAP',
+        minutesToBedtime: 0,
+        isMissedBedtime: true,
+      );
+      return;
+    }
+
     try {
       final parts = current.optimalBedtime.split(':');
       if (parts.length == 2) {

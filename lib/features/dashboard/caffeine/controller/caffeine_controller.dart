@@ -22,7 +22,13 @@ class CaffeineController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadEntries();
+    loadEntries().then((_) {
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        final cachedCard = db.caffeineCardData.value;
+        if (cachedCard != null) updateFromCaffeineCard(cachedCard);
+      }
+    });
     // Seed forYouPreview data if DashboardController already fetched it
     // (handles the case where this controller registers after the dashboard loads)
     if (Get.isRegistered<DashboardController>()) {
@@ -260,6 +266,18 @@ class CaffeineController extends GetxController {
       }
     } catch (e) {
       debugPrint('CaffeineController forYouPreview parse error: $e');
+    }
+  }
+
+  /// Called with cards.caffeine from the live scores payload.
+  /// Provides activeMg (caffeine active in body).
+  void updateFromCaffeineCard(Map<String, dynamic> caffeineCard) {
+    try {
+      if (caffeineCard['activeMg'] != null) {
+        activeCaffeine.value = (caffeineCard['activeMg'] as num).toDouble();
+      }
+    } catch (e) {
+      debugPrint('CaffeineController: Error updating from caffeine card: $e');
     }
   }
 }

@@ -64,7 +64,7 @@ class TonightBedtimeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'TONIGHT\'S BEDTIME',
+                    'TONIGHT\'S BEDTIME'.tr,
                     style: getTextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,

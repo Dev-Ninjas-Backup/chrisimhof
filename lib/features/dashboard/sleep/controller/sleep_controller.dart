@@ -185,6 +185,8 @@ class SleepController extends GetxController {
   }
 
   void saveSleep() async {
+    final oldLogs = List<SleepLog>.from(historyLogs);
+
     // Add to history logs
     final newLog = SleepLog(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -215,11 +217,22 @@ class SleepController extends GetxController {
         final endHStr = wakeupHour.value.toString().padLeft(2, '0');
         final endMStr = wakeupMinute.value.toString().padLeft(2, '0');
 
-        await SleepService().saveSleep(
+        final result = await SleepService().saveSleep(
           sessionId: sessionId,
           sleepStartTime: '$startHStr:$startMStr',
           wakeTime: '$endHStr:$endMStr',
         );
+
+        final data = result['data'] as Map<String, dynamic>?;
+        if (data != null && data['saved'] == false) {
+          // Revert local changes
+          historyLogs.assignAll(oldLogs);
+          await saveSleepHistory();
+
+          final conflictMessage = data['message'] as String? ?? 'Sleep overlap conflict detected. Please adjust.';
+          EasyLoading.showError(conflictMessage);
+          return;
+        }
 
         await DashboardService().calculateResult(sessionId: sessionId);
 
@@ -234,6 +247,9 @@ class SleepController extends GetxController {
         EasyLoading.showError('No active session found.');
       }
     } catch (e) {
+      // Revert local changes on error
+      historyLogs.assignAll(oldLogs);
+      await saveSleepHistory();
       debugPrint('Error saving sleep: $e');
       EasyLoading.showError('Failed to save sleep log.');
     }

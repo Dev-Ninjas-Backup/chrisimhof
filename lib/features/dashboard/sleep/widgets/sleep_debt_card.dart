@@ -38,7 +38,7 @@ class SleepDebtCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'SLEEP DEBT',
+                  'SLEEP DEBT'.tr,
                   style: getTextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,

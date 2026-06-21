@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:get/utils.dart';
 
 class QuickAddChipsSection extends StatelessWidget {
   final CaffeineController controller;
@@ -15,7 +16,7 @@ class QuickAddChipsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'QUICK ADD',
+          'QUICK ADD'.tr,
           style: getTextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w800,
@@ -64,7 +65,7 @@ class QuickAddChipsSection extends StatelessWidget {
                     const Icon(Icons.add, color: AppColors.white, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      'Custom',
+                      'Custom'.tr,
                       style: getTextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,

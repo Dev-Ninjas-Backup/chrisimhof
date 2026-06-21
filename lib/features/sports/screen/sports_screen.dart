@@ -41,7 +41,7 @@ class SportsScreen extends StatelessWidget {
 
               // LOG A NEW SESSION BUTTON
               CustomButton(
-                text: 'Log a new session',
+                text: 'Log a new session'.tr,
                 plusIcon: true,
                 showIcon: Icons.add,
                 icon: null,

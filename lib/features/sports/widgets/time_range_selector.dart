@@ -30,8 +30,8 @@ class TimeRangeSelector extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'START',
+                   Text(
+                    'START'.tr,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
@@ -72,8 +72,8 @@ class TimeRangeSelector extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'END',
+                   Text(
+                    'END'.tr,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,

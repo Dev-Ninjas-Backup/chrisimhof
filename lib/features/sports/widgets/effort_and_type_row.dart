@@ -34,8 +34,8 @@ class EffortAndTypeRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'EFFORT',
+                     Text(
+                      'EFFORT'.tr,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
@@ -69,8 +69,8 @@ class EffortAndTypeRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'TYPE',
+                     Text(
+                      'TYPE'.tr,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,

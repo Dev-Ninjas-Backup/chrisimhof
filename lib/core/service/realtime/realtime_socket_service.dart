@@ -221,6 +221,15 @@ class RealtimeSocketService {
         );
       }
 
+      // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) via socket updates
+      if (Get.isRegistered<CaffeineController>() &&
+          socketCards is Map &&
+          socketCards['caffeine'] is Map) {
+        Get.find<CaffeineController>().updateFromCaffeineCard(
+          Map<String, dynamic>.from(socketCards['caffeine'] as Map),
+        );
+      }
+
       // Forward forYouPreview to RecommendationController
       if (Get.isRegistered<RecommendationController>() &&
           data['forYouPreview'] is List) {

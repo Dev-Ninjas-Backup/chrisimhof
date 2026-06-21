@@ -20,7 +20,7 @@ class SleepHistoryList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'History',
+              'History'.tr,
               style: getTextStyle2(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,

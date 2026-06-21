@@ -34,7 +34,7 @@ class CaffeineEntryDialog extends StatelessWidget {
           children: [
             // Title
             Text(
-              entry == null ? 'Add Caffeine' : 'Edit Entry',
+              entry == null ? 'Add Caffeine'.tr : 'Edit Entry'.tr,
               style: getTextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -44,7 +44,7 @@ class CaffeineEntryDialog extends StatelessWidget {
             const SizedBox(height: 20),
 
             Text(
-              'DRINK NAME',
+              'DRINK NAME'.tr,
               style: getTextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -60,7 +60,7 @@ class CaffeineEntryDialog extends StatelessWidget {
                 color: AppColors.primaryTextColor,
               ),
               decoration: InputDecoration(
-                hintText: 'e.g. Espresso, Coffee, Tea',
+                hintText: 'e.g. Espresso, Coffee, Tea'.tr,
                 hintStyle: getTextStyle(
                   color: AppColors.textSoft.withValues(alpha: 0.5),
                 ),
@@ -86,7 +86,7 @@ class CaffeineEntryDialog extends StatelessWidget {
             const SizedBox(height: 16),
 
             Text(
-              'AMOUNT (MG)',
+              'AMOUNT (MG)'.tr,
               style: getTextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -130,7 +130,7 @@ class CaffeineEntryDialog extends StatelessWidget {
 
             // Time Selector Row
             Text(
-              'TIME',
+              'TIME'.tr,
               style: getTextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,

@@ -64,7 +64,7 @@ class ShapesTodayCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'HOW THIS SHAPES TODAY',
+                    'HOW THIS SHAPES TODAY'.tr,
                     style: getTextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,

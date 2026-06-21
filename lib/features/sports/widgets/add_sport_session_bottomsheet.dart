@@ -49,7 +49,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'LOG NEW SESSION',
+                  'LOG NEW SESSION'.tr,
                   style: getTextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
@@ -133,7 +133,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
 
             // Save Session Button
             CustomButton(
-              text: 'SAVE SESSION',
+              text: 'SAVE SESSION'.tr,
               icon: null,
               backgroundColor: const Color(
                 0xFF4C1D95,

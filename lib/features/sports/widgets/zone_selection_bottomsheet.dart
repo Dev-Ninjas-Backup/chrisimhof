@@ -25,7 +25,7 @@ class ZoneSelectionBottomsheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Heart Rate Zone',
+            'Heart Rate Zone'.tr,
             style: getTextStyle2(
               fontSize: 18,
               fontWeight: FontWeight.w700,

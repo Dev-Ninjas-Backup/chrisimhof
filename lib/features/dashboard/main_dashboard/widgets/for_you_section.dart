@@ -20,7 +20,7 @@ class ForYouSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'FOR YOU',
+              'FOR YOU'.tr,
               style: getTextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
