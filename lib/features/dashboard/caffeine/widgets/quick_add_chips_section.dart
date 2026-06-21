@@ -41,7 +41,7 @@ class QuickAddChipsSection extends StatelessWidget {
             _buildQuickAddChip(
               name: 'Energy',
               amount: 85,
-              onTap: () => controller.quickAdd('Energy drink', 85),
+              onTap: () => controller.quickAdd('Energy', 85),
             ),
             _buildQuickAddChip(
               name: 'Tea',

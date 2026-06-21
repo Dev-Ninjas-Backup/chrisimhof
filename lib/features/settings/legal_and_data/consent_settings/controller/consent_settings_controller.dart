@@ -9,7 +9,8 @@ class ConsentSettingsController extends GetxController {
   final ConsentSettingsService _service = ConsentSettingsService();
 
   final RxBool isLoading = true.obs;
-  final Rxn<ConsentSettingsData> consentSettingsData = Rxn<ConsentSettingsData>();
+  final Rxn<ConsentSettingsData> consentSettingsData =
+      Rxn<ConsentSettingsData>();
 
   final RxBool lifestyleRecommendations = true.obs;
   final RxBool reminders = true.obs;
@@ -85,7 +86,6 @@ class ConsentSettingsController extends GetxController {
       if (response.success && response.data.saved) {
         EasyLoading.dismiss();
         EasyLoading.showSuccess('Consent settings saved successfully'.tr);
-        Get.back();
         Get.offAllNamed(AppRoutes.navbarScreen);
       } else {
         EasyLoading.showError('Could not save consent settings.');

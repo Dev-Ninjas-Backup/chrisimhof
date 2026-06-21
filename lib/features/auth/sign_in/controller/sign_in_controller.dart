@@ -12,7 +12,6 @@ import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/features/auth/session/session.dart';
-import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +82,9 @@ class SignInController extends GetxController {
         EasyLoading.show(status: 'Checking onboarding status...'.tr);
         try {
           final profileService = ProfileService();
-          final profileResp = await profileService.getProfile(accessToken: accessToken);
+          final profileResp = await profileService.getProfile(
+            accessToken: accessToken,
+          );
           final profile = profileResp.data;
 
           EasyLoading.dismiss();
@@ -92,27 +93,25 @@ class SignInController extends GetxController {
           if (profile != null) {
             if (profile.safetyAcknowledgedAt == null) {
               Get.offAllNamed(AppRoutes.safetyScreen);
-            } else if (profile.sleepTargetMinutes == null || 
-            profile.chronotype == null || 
-            profile.caffeineSensitivity == null || 
-            profile.sportProfile == null)  {
+            } else if (profile.sleepTargetMinutes == null ||
+                profile.chronotype == null ||
+                profile.caffeineSensitivity == null ||
+                profile.sportProfile == null) {
               Get.offAllNamed(AppRoutes.baselineSetupScreen);
             } else if (profile.connectedSources == null) {
               Get.offAllNamed(AppRoutes.connectedSourcesScreen);
-            }
-            else if(profile.consentSettings ==null){
+            } else if (profile.consentSettings == null) {
               Get.offAllNamed(AppRoutes.consentSettingsScreen);
-            } 
-            else {
-              Get.offAll(() => const NavbarScreen());
+            } else {
+              Get.offAllNamed(AppRoutes.navbarScreen);
             }
           } else {
-            Get.offAll(() => const NavbarScreen());
+            Get.offAllNamed(AppRoutes.navbarScreen);
           }
         } catch (e) {
           EasyLoading.dismiss();
           debugPrint('Error getting profile during login onboarding check: $e');
-          Get.offAll(() => const NavbarScreen());
+          Get.offAllNamed(AppRoutes.navbarScreen);
         }
       } else {
         EasyLoading.showError(response.message);

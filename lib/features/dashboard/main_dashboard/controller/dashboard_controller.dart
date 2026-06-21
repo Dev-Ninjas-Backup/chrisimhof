@@ -785,6 +785,11 @@ class DashboardController extends GetxController {
         );
       }
 
+      if (newSessionId != null && newSessionId.isNotEmpty) {
+        await RealtimeSocketService().connectSocket();
+        await fetchDashboardData();
+      }
+
       EasyLoading.showSuccess('Day ended successfully!');
     } catch (e) {
       debugPrint('Error ending day: $e');
