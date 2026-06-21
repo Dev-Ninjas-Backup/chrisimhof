@@ -81,7 +81,7 @@ class RecomendationCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                recomendation.category ?? '',
+                                recomendation.category?.tr ?? '',
                                 style: getTextStyle2(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,

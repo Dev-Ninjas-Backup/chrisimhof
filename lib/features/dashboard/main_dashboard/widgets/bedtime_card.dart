@@ -48,7 +48,7 @@ class BedtimeCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'OPTIMAL BEDTIME',
+                            'OPTIMAL BEDTIME'.tr,
                             style: getTextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -138,10 +138,10 @@ class BedtimeCard extends StatelessWidget {
     bool isMissed,
   ) {
     final String label = isLogged
-        ? "Logged tonight's sleep"
+        ? "Logged tonight's sleep".tr
         : isMissed
-            ? "Log sleep — it's not too late"
-            : "Log tonight's sleep";
+            ? "Log sleep — it's not too late".tr
+            : "Log tonight's sleep".tr;
 
     return Container(
       decoration: const BoxDecoration(

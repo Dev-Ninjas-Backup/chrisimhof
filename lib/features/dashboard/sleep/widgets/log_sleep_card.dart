@@ -45,7 +45,7 @@ class LogSleepCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'LOG TONIGHT\'S SLEEP',
+                      'LOG TONIGHT\'S SLEEP'.tr,
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -54,7 +54,7 @@ class LogSleepCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Mon 17 May · drag or tap to adjust',
+                      'drag or tap to adjust'.tr,
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,

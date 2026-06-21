@@ -69,7 +69,7 @@ class RecomendationsScreen extends StatelessWidget {
 
                           Expanded(
                             child: Text(
-                              data?.actionsLabel ?? '',
+                              data?.actionsLabel?.tr ?? '',
                               style: getTextStyle2(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,

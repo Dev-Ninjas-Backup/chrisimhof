@@ -29,7 +29,7 @@ class ActiveInBodyCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ACTIVE IN BODY',
+              'ACTIVE IN BODY'.tr,
               style: getTextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,

@@ -41,9 +41,9 @@ class EndDayButton extends StatelessWidget {
                     color: AppColors.gray700, // Cool grey 700
                   ),
                   children: [
-                    const TextSpan(text: 'End my day '),
+                     TextSpan(text: 'End my day '.tr),
                     TextSpan(
-                      text: '(save & reset)',
+                      text: '(save & reset)'.tr,
                       style: getTextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,

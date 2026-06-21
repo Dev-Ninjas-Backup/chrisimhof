@@ -25,7 +25,16 @@ class DashboardController extends GetxController {
   final _profileService = ProfileService();
 
   final Rxn<Map<String, dynamic>> sleepTabData = Rxn<Map<String, dynamic>>();
-  final Rxn<Map<String, dynamic>> nutritionTabData = Rxn<Map<String, dynamic>>();
+  final Rxn<Map<String, dynamic>> nutritionTabData =
+      Rxn<Map<String, dynamic>>();
+
+  final Rxn<List<dynamic>> forYouPreviewData = Rxn<List<dynamic>>();
+
+  /// Cached cards.sport data for late-registering SportsController.
+  final Rxn<Map<String, dynamic>> sportCardData = Rxn<Map<String, dynamic>>();
+  
+  /// Cached cards.caffeine data for late-registering CaffeineController.
+  final Rxn<Map<String, dynamic>> caffeineCardData = Rxn<Map<String, dynamic>>();
 
   final Rx<DashboardModel> dashboardData = DashboardModel(
     date: DateTime.now(),
@@ -50,7 +59,7 @@ class DashboardController extends GetxController {
     workShiftCountdown: 'No shifts scheduled',
     workProgress: 0.0,
     lastSleepDuration: '—',
-    sleepDebtText: 'debt 0h 0m / 7d',
+    sleepDebtText: '',
     lastSleepWeekBars: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     isSleepLogged: false,
     isSleepPrep: false,
@@ -77,7 +86,8 @@ class DashboardController extends GetxController {
 
   Map<String, dynamic> normalizeDashboardPayload(Map<String, dynamic> payload) {
     Map<String, dynamic> data = payload;
-    if (payload.containsKey('data') && payload['data'] is Map<String, dynamic>) {
+    if (payload.containsKey('data') &&
+        payload['data'] is Map<String, dynamic>) {
       data = payload['data'] as Map<String, dynamic>;
     }
 
@@ -91,7 +101,8 @@ class DashboardController extends GetxController {
     });
 
     // 2. If there's a nested liveScores, merge its contents
-    if (data.containsKey('liveScores') && data['liveScores'] is Map<String, dynamic>) {
+    if (data.containsKey('liveScores') &&
+        data['liveScores'] is Map<String, dynamic>) {
       final liveScores = data['liveScores'] as Map<String, dynamic>;
       liveScores.forEach((key, value) {
         flat[key] = value;
@@ -99,7 +110,8 @@ class DashboardController extends GetxController {
     }
 
     // 3. If there's a nested calculation, merge its contents
-    if (data.containsKey('calculation') && data['calculation'] is Map<String, dynamic>) {
+    if (data.containsKey('calculation') &&
+        data['calculation'] is Map<String, dynamic>) {
       final calculation = data['calculation'] as Map<String, dynamic>;
       calculation.forEach((key, value) {
         flat[key] = value;
@@ -118,17 +130,26 @@ class DashboardController extends GetxController {
     return flat;
   }
 
-  void _updateDashboardModelFromPayload(Map<String, dynamic> rawData, {String? userName}) {
+  void _updateDashboardModelFromPayload(
+    Map<String, dynamic> rawData, {
+    String? userName,
+  }) {
     final apiData = normalizeDashboardPayload(rawData);
     final current = dashboardData.value;
     final nameToUse = userName ?? current.userName;
 
     final rhythmScore = apiData['globalRhythmScore'] as int? ?? 0;
 
-    String optimalBedtime = '22:30';
+    String optimalBedtime = '--:--';
     if (apiData['optimalBedtime'] != null) {
       if (apiData['optimalBedtime'] is Map) {
-        optimalBedtime = apiData['optimalBedtime']['time'] as String? ?? '22:30';
+        final timeVal = apiData['optimalBedtime']['time'] as String? ?? '';
+        final sleepAsap = apiData['optimalBedtime']['sleepAsap'] as bool? ?? false;
+        if (timeVal.isEmpty && sleepAsap) {
+          optimalBedtime = 'ASAP';
+        } else {
+          optimalBedtime = timeVal.isNotEmpty ? timeVal : '--:--';
+        }
       } else if (apiData['optimalBedtime'] is String) {
         optimalBedtime = apiData['optimalBedtime'] as String;
       }
@@ -136,22 +157,34 @@ class DashboardController extends GetxController {
 
     // Parse cards
     final cards = apiData['cards'] as Map<String, dynamic>?;
-    final sleepCard = cards?['sleep'] as Map<String, dynamic>? ?? apiData['lastSleepInfo'] as Map<String, dynamic>?;
+    final sleepCard =
+        cards?['sleep'] as Map<String, dynamic>? ??
+        apiData['lastSleepInfo'] as Map<String, dynamic>?;
 
     // Sleep details
     final isSleepLogged = sleepCard != null;
-    final lastSleepDuration = sleepCard?['lastSleepDuration'] as String? ?? sleepCard?['subtitle'] as String? ?? sleepCard?['display'] as String? ?? '—';
-    final sleepDebtText = sleepCard?['sleepDebtText'] as String? ?? 'debt 0h 0m / 7d';
+    final lastSleepDuration =
+        sleepCard?['subtitle'] as String? ??
+        sleepCard?['lastSleepDuration'] as String? ??
+        sleepCard?['display'] as String? ??
+        '—';
+    final sleepDebtMin = (sleepCard?['sleepDebtMin'] as num?)?.toInt();
+    final sleepDebtText = sleepDebtMin != null
+        ? _formatSleepDebtText(sleepDebtMin)
+        : sleepCard?['sleepDebtText'] as String? ?? '--';
 
     List<double> lastSleepWeekBars = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
     if (sleepCard != null && sleepCard['weeklyTrend'] is List) {
       final list = sleepCard['weeklyTrend'] as List;
-      lastSleepWeekBars = list.map<double>((v) => (v as num).toDouble()).toList();
+      lastSleepWeekBars = list
+          .map<double>((v) => (v as num).toDouble())
+          .toList();
     }
 
     double sleepProgress = 0.0;
     if (cards?['sleep']?['score'] != null) {
-      sleepProgress = ((cards!['sleep']!['score'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      sleepProgress = ((cards!['sleep']!['score'] as num).toDouble() / 100.0)
+          .clamp(0.0, 1.0);
     } else if (isSleepLogged) {
       try {
         final regex = RegExp(r'(\d+)h\s*(\d+)m');
@@ -175,7 +208,9 @@ class DashboardController extends GetxController {
 
     if (workInfo != null && workInfo['shiftType'] != 'off') {
       final shiftType = workInfo['shiftType'] as String? ?? 'Work';
-      final capShiftType = shiftType.isNotEmpty ? shiftType[0].toUpperCase() + shiftType.substring(1) : 'Work';
+      final capShiftType = shiftType.isNotEmpty
+          ? shiftType[0].toUpperCase() + shiftType.substring(1)
+          : 'Work';
       final start = workInfo['shiftStart'] as String? ?? '';
       final end = workInfo['shiftEnd'] as String? ?? '';
 
@@ -183,7 +218,8 @@ class DashboardController extends GetxController {
       if (start.isNotEmpty && end.isNotEmpty) {
         workShiftCountdown = '$start — $end';
       } else {
-        workShiftCountdown = workFitCard?['subtitle'] as String? ?? 'Active shift';
+        workShiftCountdown =
+            workFitCard?['subtitle'] as String? ?? 'Active shift';
       }
 
       // Calculate progress dynamically based on time window
@@ -198,8 +234,20 @@ class DashboardController extends GetxController {
             final endHour = int.parse(endParts[0]);
             final endMin = int.parse(endParts[1]);
 
-            final startTime = DateTime(now.year, now.month, now.day, startHour, startMin);
-            var endTime = DateTime(now.year, now.month, now.day, endHour, endMin);
+            final startTime = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              startHour,
+              startMin,
+            );
+            var endTime = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              endHour,
+              endMin,
+            );
             if (endTime.isBefore(startTime)) {
               endTime = endTime.add(const Duration(days: 1));
             }
@@ -224,23 +272,40 @@ class DashboardController extends GetxController {
 
     double hydrationProgress = 0.0;
     if (cards?['hydration']?['score'] != null) {
-      hydrationProgress = ((cards!['hydration']!['score'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      hydrationProgress =
+          ((cards!['hydration']!['score'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
     }
 
     double caffeineProgress = 0.0;
     if (cards?['caffeine']?['score'] != null) {
-      caffeineProgress = ((cards!['caffeine']!['score'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      caffeineProgress =
+          ((cards!['caffeine']!['score'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
     }
 
     double recoveryProgress = 0.64;
     if (cards?['sport']?['recoveryLoadScore'] != null) {
-      recoveryProgress = ((cards!['sport']!['recoveryLoadScore'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      recoveryProgress =
+          ((cards!['sport']!['recoveryLoadScore'] as num).toDouble() / 100.0)
+              .clamp(0.0, 1.0);
     } else if (cards?['recovery']?['recoveryLoadScore'] != null) {
-      recoveryProgress = ((cards!['recovery']!['recoveryLoadScore'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      recoveryProgress =
+          ((cards!['recovery']!['recoveryLoadScore'] as num).toDouble() / 100.0)
+              .clamp(0.0, 1.0);
     } else if (cards?['sport']?['score'] != null) {
-      recoveryProgress = ((cards!['sport']!['score'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      recoveryProgress = ((cards!['sport']!['score'] as num).toDouble() / 100.0)
+          .clamp(0.0, 1.0);
     } else if (cards?['recovery']?['score'] != null) {
-      recoveryProgress = ((cards!['recovery']!['score'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      recoveryProgress =
+          ((cards!['recovery']!['score'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
     }
 
     // Parse quickAddSummary
@@ -251,7 +316,8 @@ class DashboardController extends GetxController {
     if (quickAdd?['water']?['totalMl'] != null) {
       waterLiters = (quickAdd!['water']!['totalMl'] as num).toDouble() / 1000.0;
     } else if (derived?['hydrationTotalTodayMl'] != null) {
-      waterLiters = (derived!['hydrationTotalTodayMl'] as num).toDouble() / 1000.0;
+      waterLiters =
+          (derived!['hydrationTotalTodayMl'] as num).toDouble() / 1000.0;
     }
 
     int caffeineMg = 0;
@@ -277,20 +343,24 @@ class DashboardController extends GetxController {
       sportMinutes = (derived!['sportLoadToday'] as num).toInt();
     }
 
-    final waterDisplay = quickAdd?['water']?['displayL'] as String? ?? 
-        (cards?['hydration']?['subtitle'] as String?) ?? 
+    final waterDisplay =
+        quickAdd?['water']?['displayL'] as String? ??
+        (cards?['hydration']?['subtitle'] as String?) ??
         '${waterLiters.toStringAsFixed(1)}L';
 
-    final caffeineDisplay = quickAdd?['caffeine']?['displayMg'] as String? ?? 
-        (cards?['caffeine']?['subtitle'] as String?) ?? 
+    final caffeineDisplay =
+        quickAdd?['caffeine']?['displayMg'] as String? ??
+        (cards?['caffeine']?['subtitle'] as String?) ??
         '${caffeineMg}mg';
 
-    final mealsDisplay = quickAdd?['meals']?['display'] as String? ?? 
-        (cards?['nutrition']?['subtitle'] as String?) ?? 
+    final mealsDisplay =
+        quickAdd?['meals']?['display'] as String? ??
+        (cards?['nutrition']?['subtitle'] as String?) ??
         '$mealsLogged/$mealsTarget';
 
-    final sportDisplay = quickAdd?['sport']?['display'] as String? ?? 
-        (cards?['sport']?['subtitle'] as String?) ?? 
+    final sportDisplay =
+        quickAdd?['sport']?['display'] as String? ??
+        (cards?['sport']?['subtitle'] as String?) ??
         (sportMinutes > 0 ? '${sportMinutes}m' : 'Rest');
 
     dashboardData.value = DashboardModel(
@@ -314,7 +384,9 @@ class DashboardController extends GetxController {
       recoveryProgress: recoveryProgress,
       workShift: workShift,
       workShiftCountdown: workShiftCountdown,
-      workProgress: workProgress == 0.0 ? (workInfo != null && workInfo['shiftType'] != 'off' ? 0.35 : 0.0) : workProgress,
+      workProgress: workProgress == 0.0
+          ? (workInfo != null && workInfo['shiftType'] != 'off' ? 0.35 : 0.0)
+          : workProgress,
       lastSleepDuration: lastSleepDuration,
       sleepDebtText: sleepDebtText,
       lastSleepWeekBars: lastSleepWeekBars,
@@ -325,28 +397,84 @@ class DashboardController extends GetxController {
     if (apiData['tabs']?['sleep'] != null) {
       sleepTabData.value = Map<String, dynamic>.from(apiData['tabs']['sleep']);
       if (Get.isRegistered<SleepController>()) {
-        Get.find<SleepController>().updateFromLiveScoresTab(sleepTabData.value!);
+        Get.find<SleepController>().updateFromLiveScoresTab(
+          sleepTabData.value!,
+        );
       }
+    }
+
+    // Cache forYouPreview for late-registering controllers
+    if (apiData['forYouPreview'] is List) {
+      forYouPreviewData.value = apiData['forYouPreview'] as List<dynamic>;
+    }
+
+    // Forward forYouPreview sleep entry to SleepController
+    if (forYouPreviewData.value != null &&
+        Get.isRegistered<SleepController>()) {
+      Get.find<SleepController>().updateFromForYouPreview(
+        forYouPreviewData.value!,
+      );
     }
     if (apiData['tabs']?['hydration'] != null) {
       if (Get.isRegistered<HydrationController>()) {
-        Get.find<HydrationController>().updateFromLiveScoresTab(apiData['tabs']['hydration']);
+        Get.find<HydrationController>().updateFromLiveScoresTab(
+          apiData['tabs']['hydration'],
+        );
       }
+    }
+    if (forYouPreviewData.value != null &&
+        Get.isRegistered<HydrationController>()) {
+      Get.find<HydrationController>().updateFromForYouPreview(
+        forYouPreviewData.value!,
+      );
     }
     if (apiData['tabs']?['caffeine'] != null) {
       if (Get.isRegistered<CaffeineController>()) {
-        Get.find<CaffeineController>().updateFromLiveScoresTab(apiData['tabs']['caffeine']);
+        Get.find<CaffeineController>().updateFromLiveScoresTab(
+          apiData['tabs']['caffeine'],
+        );
       }
     }
+
+    // Forward forYouPreview caffeine entry to CaffeineController
+    if (forYouPreviewData.value != null &&
+        Get.isRegistered<CaffeineController>()) {
+      Get.find<CaffeineController>().updateFromForYouPreview(
+        forYouPreviewData.value!,
+      );
+    }
     if (apiData['tabs']?['nutrition'] != null) {
-      nutritionTabData.value = Map<String, dynamic>.from(apiData['tabs']['nutrition']);
+      nutritionTabData.value = Map<String, dynamic>.from(
+        apiData['tabs']['nutrition'],
+      );
       if (Get.isRegistered<NutritionController>()) {
-        Get.find<NutritionController>().updateFromLiveScoresTab(nutritionTabData.value!);
+        Get.find<NutritionController>().updateFromLiveScoresTab(
+          nutritionTabData.value!,
+        );
       }
     }
     if (apiData['tabs']?['sport'] != null) {
       if (Get.isRegistered<SportsController>()) {
-        Get.find<SportsController>().updateFromLiveScoresTab(apiData['tabs']['sport']);
+        Get.find<SportsController>().updateFromLiveScoresTab(
+          apiData['tabs']['sport'],
+        );
+      }
+    }
+
+    // Forward cards.sport (recoveryLoadScore + readinessNote) to SportsController
+    final sportCard = cards?['sport'] as Map<String, dynamic>?;
+    if (sportCard != null) {
+      sportCardData.value = sportCard;
+      if (Get.isRegistered<SportsController>()) {
+        Get.find<SportsController>().updateFromSportCard(sportCard);
+      }
+    }
+    // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) to CaffeineController
+    final caffeineCard = cards?['caffeine'] as Map<String, dynamic>?;
+    if (caffeineCard != null) {
+      caffeineCardData.value = caffeineCard;
+      if (Get.isRegistered<CaffeineController>()) {
+        Get.find<CaffeineController>().updateFromCaffeineCard(caffeineCard);
       }
     }
     if (apiData['tabs']?['work'] != null) {
@@ -366,7 +494,11 @@ class DashboardController extends GetxController {
     updateSleepPrepStatus();
   }
 
+  final RxBool isLoading = false.obs;
+  final RxBool hasLoadedOnce = false.obs;
+
   Future<void> fetchDashboardData() async {
+    isLoading.value = true;
     try {
       final token = await SharedPreferencesHelper.getAccessToken();
       if (token == null || token.isEmpty) return;
@@ -374,8 +506,11 @@ class DashboardController extends GetxController {
       // 1. Fetch User Name from Profile
       String userName = 'User';
       try {
-        final profileResp = await _profileService.getProfile(accessToken: token);
-        userName = profileResp.data?.firstName ?? profileResp.data?.fullName ?? 'User';
+        final profileResp = await _profileService.getProfile(
+          accessToken: token,
+        );
+        userName =
+            profileResp.data?.firstName ?? profileResp.data?.fullName ?? 'User';
       } catch (e) {
         debugPrint('Dashboard: profile fetch error: $e');
       }
@@ -420,7 +555,9 @@ class DashboardController extends GetxController {
       if (storedSessionId != null && storedSessionId.isNotEmpty) {
         try {
           final locale = Get.locale?.languageCode == 'fr' ? 'fr' : 'en';
-          final liveScoresUri = Uri.parse(Urls.liveScore(storedSessionId, locale));
+          final liveScoresUri = Uri.parse(
+            Urls.liveScore(storedSessionId, locale),
+          );
           final response = await http.get(
             liveScoresUri,
             headers: {
@@ -431,7 +568,8 @@ class DashboardController extends GetxController {
           );
           debugPrint('Live Scores GET status: ${response.statusCode}');
           if (response.statusCode == 200 || response.statusCode == 201) {
-            liveScoresDataMap = jsonDecode(response.body) as Map<String, dynamic>;
+            liveScoresDataMap =
+                jsonDecode(response.body) as Map<String, dynamic>;
           }
         } catch (e) {
           debugPrint('Dashboard: Live Scores fetch error: $e');
@@ -460,14 +598,31 @@ class DashboardController extends GetxController {
 
       if (mergedData.isNotEmpty) {
         _updateDashboardModelFromPayload(mergedData, userName: userName);
+        hasLoadedOnce.value = true;
+        
+        // Distribute the initial payload to all other controllers (Sleep, Hydration, Recommendations, etc)
+        // so they don't sit empty waiting for the first socket push.
+        RealtimeSocketService().handleLiveScores(mergedData, useLocalCaches: false);
       }
     } catch (e) {
       debugPrint('Dashboard: error in fetchDashboardData: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 
   void updateSleepPrepStatus() {
     final current = dashboardData.value;
+    if (current.optimalBedtime == 'ASAP' || current.optimalBedtime.toLowerCase().contains('asap')) {
+      dashboardData.value = current.copyWith(
+        isSleepPrep: true,
+        timeUntilBedtime: 'Sleep ASAP',
+        minutesToBedtime: 0,
+        isMissedBedtime: true,
+      );
+      return;
+    }
+
     try {
       final parts = current.optimalBedtime.split(':');
       if (parts.length == 2) {
@@ -559,7 +714,8 @@ class DashboardController extends GetxController {
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       if (sessionId.isNotEmpty) {
-        final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+        final accessToken =
+            await SharedPreferencesHelper.getAccessToken() ?? '';
         final response = await http.post(
           Uri.parse(Urls.endSession(sessionId)),
           headers: {
@@ -574,10 +730,14 @@ class DashboardController extends GetxController {
 
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
-          final calculation = jsonData['data']?['calculation'] as Map<String, dynamic>?;
+          final calculation =
+              jsonData['data']?['calculation'] as Map<String, dynamic>?;
           if (calculation != null) {
             // Update scores across the app based on the response
-            RealtimeSocketService().handleLiveScores(calculation, useLocalCaches: false);
+            RealtimeSocketService().handleLiveScores(
+              calculation,
+              useLocalCaches: false,
+            );
           }
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to end session');
@@ -592,13 +752,14 @@ class DashboardController extends GetxController {
       await SharedPreferencesHelper.saveCaffeineLogs('[]');
 
       final emptyHydration = List.generate(7, (_) => []).toList();
-      await SharedPreferencesHelper.saveHydrationLogs(jsonEncode(emptyHydration));
+      await SharedPreferencesHelper.saveHydrationLogs(
+        jsonEncode(emptyHydration),
+      );
 
       // Nutrition: truly empty — no hardcoded meals
-      await SharedPreferencesHelper.saveMeals(jsonEncode({
-        'dailyTarget': 3,
-        'meals': [],
-      }));
+      await SharedPreferencesHelper.saveMeals(
+        jsonEncode({'dailyTarget': 3, 'meals': []}),
+      );
 
       // Sports: reset today metrics to neutral
       await SharedPreferencesHelper.saveSportsTodayMetrics(
@@ -633,11 +794,21 @@ class DashboardController extends GetxController {
     }
   }
 
-  Future<void> updateFromLiveScores(Map<String, dynamic> apiData, {bool useLocalCaches = true}) async {
+  Future<void> updateFromLiveScores(
+    Map<String, dynamic> apiData, {
+    bool useLocalCaches = true,
+  }) async {
     _updateDashboardModelFromPayload(apiData);
   }
 
   void updateFromDashboardEvent(Map<String, dynamic> data) {
     updateFromLiveScores(data);
+  }
+
+  String _formatSleepDebtText(int minutes) {
+    final normalizedMinutes = minutes < 0 ? 0 : minutes;
+    final hours = normalizedMinutes ~/ 60;
+    final mins = normalizedMinutes % 60;
+    return 'debt ${hours}h ${mins}m';
   }
 }

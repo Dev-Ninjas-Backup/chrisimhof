@@ -46,7 +46,7 @@ class ShiftTypeGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'SHIFT TYPE',
+          'SHIFT TYPE'.tr,
           style: getTextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w800,

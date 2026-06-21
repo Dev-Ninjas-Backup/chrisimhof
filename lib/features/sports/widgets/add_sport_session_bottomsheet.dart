@@ -1,7 +1,6 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
-import 'package:chrisimhof/features/sports/widgets/activity_type_selector.dart';
 import 'package:chrisimhof/features/sports/widgets/distance_card.dart';
 import 'package:chrisimhof/features/sports/widgets/effort_and_type_row.dart';
 import 'package:chrisimhof/features/sports/widgets/time_range_selector.dart';
@@ -50,7 +49,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'LOG NEW SESSION',
+                  'LOG NEW SESSION'.tr,
                   style: getTextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
@@ -116,23 +115,17 @@ class AddSportSessionBottomsheet extends StatelessWidget {
               onTimeChanged: _updateDuration,
             ),
             const SizedBox(height: 24),
-
-            // Activity Type Section
-            // ActivityTypeSelector(
-            //   activity: activity,
-            //   type: type,
-            //   zone: zone,
-            //   duration: duration,
-            //   onActivityChanged: _updateDuration,
-            // ),
-            // const SizedBox(height: 24),
-
             // Distance Section
-            DistanceCard(
-              activity: activity,
-              distanceController: distanceController,
-              onDistanceChanged: () => activity.refresh(),
-            ),
+            Obx(() {
+              if (type.value.toLowerCase() == 'cardio') {
+                return const SizedBox.shrink();
+              }
+              return DistanceCard(
+                activity: activity,
+                distanceController: distanceController,
+                onDistanceChanged: () => activity.refresh(),
+              );
+            }),
 
             // Effort and Type dropdowns
             EffortAndTypeRow(activity: activity, effort: effort, type: type),
@@ -140,7 +133,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
 
             // Save Session Button
             CustomButton(
-              text: 'SAVE SESSION',
+              text: 'SAVE SESSION'.tr,
               icon: null,
               backgroundColor: const Color(
                 0xFF4C1D95,

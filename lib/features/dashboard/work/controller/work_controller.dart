@@ -15,6 +15,7 @@ class WorkController extends GetxController {
   final endHour = 6.obs;
   final endMinute = 0.obs;
   final selectedShiftType = 'Off'.obs;
+  final workShapesToday = <String>[].obs;
 
   // Weekly pattern — defaults to "Off" for all days until API data arrives
   final weeklyPattern = <Map<String, String>>[
@@ -100,6 +101,13 @@ class WorkController extends GetxController {
 
         final liveScores = data['liveScores'] as Map<String, dynamic>?;
 
+        // Extract shapesToday/workShapesToday directly from liveScores
+        if (liveScores?['workShapesToday'] is List) {
+          updateWorkShapesToday(liveScores!['workShapesToday'] as List<dynamic>);
+        } else if (liveScores?['shapesToday'] is List) {
+          updateWorkShapesToday(liveScores!['shapesToday'] as List<dynamic>);
+        }
+
         // 1. tabs.work — full tab with weeklyPatternDisplay
         final workTab = liveScores?['tabs']?['work'] as Map<String, dynamic>?;
         if (workTab != null) {
@@ -180,6 +188,14 @@ class WorkController extends GetxController {
       }
     } catch (e) {
       debugPrint('WorkController updateWorkInfoFromSession error: $e');
+    }
+  }
+
+  void updateWorkShapesToday(List<dynamic> shapes) {
+    try {
+      workShapesToday.assignAll(shapes.map((e) => e.toString()));
+    } catch (e) {
+      debugPrint('WorkController updateWorkShapesToday error: $e');
     }
   }
 
@@ -304,12 +320,20 @@ class WorkController extends GetxController {
         final shiftEndTime = shiftType == 'off' ? null : '$endHStr:$endMStr';
 
         // 1. Post to Work Service
-        await WorkService().saveWork(
+        final response = await WorkService().saveWork(
           sessionId: sessionId,
           shiftType: shiftType,
           shiftStartTime: shiftStartTime,
           shiftEndTime: shiftEndTime,
         );
+
+        // Check if there were business logic conflicts (e.g. overlap with sleep)
+        final data = response['data'] as Map<String, dynamic>?;
+        if (data != null && data['saved'] == false) {
+          final errorMsg = data['message'] ?? 'Failed to save shift due to conflicts.';
+          EasyLoading.showError(errorMsg, duration: const Duration(seconds: 4));
+          return; // Stop execution, let user correct it
+        }
 
         // 2. Central session calculations
         await DashboardService().calculateResult(sessionId: sessionId);

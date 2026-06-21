@@ -103,7 +103,7 @@ class SplitStatusSection extends StatelessWidget {
                 Icon(headerIcon, size: 14, color: AppColors.textSoft),
                 const SizedBox(width: 4),
                 Text(
-                  headerLabel,
+                  headerLabel.tr,
                   style: getTextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,

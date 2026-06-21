@@ -108,7 +108,10 @@ class RecoveryImpactCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 10.0),
                       Text(
-                        controller.recoveryText.value.tr,
+                        // Prefer API readinessNote, fall back to locally-computed text
+                        (controller.readinessNote.value?.isNotEmpty == true
+                            ? controller.readinessNote.value!
+                            : controller.recoveryText.value).tr,
                         style: getTextStyle2(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

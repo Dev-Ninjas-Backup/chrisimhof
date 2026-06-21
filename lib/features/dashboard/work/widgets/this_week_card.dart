@@ -35,7 +35,7 @@ class ThisWeekCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'THIS WEEK',
+                'THIS WEEK'.tr,
                 style: getTextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
@@ -45,7 +45,7 @@ class ThisWeekCard extends StatelessWidget {
               GestureDetector(
                 onTap: () => Get.bottomSheet(EditPatternBottomSheet(controller: controller)),
                 child: Text(
-                  'Edit pattern →',
+                  'Edit pattern →'.tr,
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,

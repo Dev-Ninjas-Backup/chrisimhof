@@ -41,7 +41,7 @@ class NutritionScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "TODAY'S MEALS",
+                        "TODAY'S MEALS".tr,
                         style: getTextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
@@ -133,7 +133,7 @@ class NutritionScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Daily target',
+                              'Daily target'.tr,
                               style: getTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -142,7 +142,7 @@ class NutritionScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'How many meals per day?',
+                              'How many meals per day?'.tr,
                               style: getTextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
@@ -224,7 +224,7 @@ class NutritionScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'LOG A MEAL',
+                            'LOG A MEAL'.tr,
                             style: getTextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
@@ -253,7 +253,7 @@ class NutritionScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'How heavy was it (no food names — only heaviness matters for sleep & recovery)',
+                        'How heavy was it (no food names — only heaviness matters for sleep & recovery)'.tr,
                         style: getTextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
@@ -264,9 +264,9 @@ class NutritionScreen extends StatelessWidget {
                       Row(
                         children: [
                           _buildMealSelectionCard(
-                            type: 'Light',
+                            type: 'Light'.tr,
                             iconPath: IconPath.lightMeal,
-                            subtext: 'salad • fruit • snack',
+                            subtext: 'salad • fruit • snack'.tr,
                             isSelected:
                                 controller.selectedMealType.value == 'Light',
                             activeColor: AppColors.secondaryButtonColor,
@@ -277,9 +277,9 @@ class NutritionScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           _buildMealSelectionCard(
-                            type: 'Medium',
+                            type: 'Medium'.tr,
                             iconPath: IconPath.mediumMeal,
-                            subtext: 'standard • balanced',
+                            subtext: 'standard • balanced'.tr,
                             isSelected:
                                 controller.selectedMealType.value == 'Medium',
                             activeColor: AppColors.amber,
@@ -290,9 +290,9 @@ class NutritionScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           _buildMealSelectionCard(
-                            type: 'Heavy',
+                            type: 'Heavy'.tr,
                             iconPath: IconPath.heavyMeal,
-                            subtext: 'rich • fatty • large',
+                            subtext: 'rich • fatty • large'.tr,
                             isSelected:
                                 controller.selectedMealType.value == 'Heavy',
                             activeColor: AppColors.rose,
@@ -523,7 +523,7 @@ class NutritionScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'SLEEP IMPACT',
+                              'SLEEP IMPACT'.tr,
                               style: getTextStyle2(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -562,7 +562,7 @@ class NutritionScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'DAILY NOTES',
+                        'DAILY NOTES'.tr,
                         style: getTextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,

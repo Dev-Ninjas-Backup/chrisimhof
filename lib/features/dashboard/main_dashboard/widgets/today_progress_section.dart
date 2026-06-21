@@ -15,7 +15,7 @@ class TodayProgressSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'TODAY',
+          'TODAY'.tr,
           style: getTextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w800,
@@ -91,7 +91,7 @@ class TodayProgressSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            label,
+            label.tr,
             style: getTextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,

@@ -20,7 +20,7 @@ class QuickAddSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'QUICK ADD',
+              'QUICK ADD'.tr,
               style: getTextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -128,7 +128,7 @@ class QuickAddSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    label,
+                    label.tr,
                     style: getTextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w500,

@@ -39,7 +39,7 @@ class TodaysShiftCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "TODAY'S SHIFT",
+                      "TODAY'S SHIFT".tr,
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
@@ -148,6 +148,6 @@ class TodaysShiftCard extends StatelessWidget {
     ];
     final weekday = weekdays[now.weekday - 1];
     final month = months[now.month - 1];
-    return '$weekday · ${now.day} $month · drag or tap to adjust';
+    return '$weekday · ${now.day} $month · drag or tap to adjust'.tr;
   }
 }

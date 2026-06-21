@@ -20,7 +20,7 @@ class ForYouSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'FOR YOU',
+              'FOR YOU'.tr,
               style: getTextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -54,12 +54,7 @@ class ForYouSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Obx(() {
-          if (controller.isLoading.value) {
-            return _buildLoadingPlaceholder();
-          }
-
-          final recommendations =
-              controller.recommendationResponse.value?.data?.recommendations ?? [];
+          final recommendations = controller.forYouPreview;
 
           if (recommendations.isEmpty) {
             return _buildEmptyState();
