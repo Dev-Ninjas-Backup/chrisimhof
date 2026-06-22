@@ -38,8 +38,8 @@ class DashboardModel {
   final bool isSleepLogged;
   final bool isSleepPrep;
   final bool isMissedBedtime;
-
   final int minutesToBedtime;
+  final double hoursUntilBed;
 
   DashboardModel({
     required this.date,
@@ -70,6 +70,7 @@ class DashboardModel {
     this.isSleepPrep = false,
     this.isMissedBedtime = false,
     this.minutesToBedtime = 120,
+    this.hoursUntilBed = 0.0,
   });
 
   DashboardModel copyWith({
@@ -101,6 +102,7 @@ class DashboardModel {
     bool? isSleepPrep,
     bool? isMissedBedtime,
     int? minutesToBedtime,
+    double? hoursUntilBed,
   }) {
     return DashboardModel(
       date: date ?? this.date,
@@ -131,6 +133,7 @@ class DashboardModel {
       isSleepPrep: isSleepPrep ?? this.isSleepPrep,
       isMissedBedtime: isMissedBedtime ?? this.isMissedBedtime,
       minutesToBedtime: minutesToBedtime ?? this.minutesToBedtime,
+      hoursUntilBed: hoursUntilBed ?? this.hoursUntilBed,
     );
   }
 }

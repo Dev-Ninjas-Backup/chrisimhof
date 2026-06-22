@@ -63,6 +63,7 @@ class DashboardController extends GetxController {
     lastSleepWeekBars: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     isSleepLogged: false,
     isSleepPrep: false,
+    hoursUntilBed: 0.0,
   ).obs;
 
   Timer? _updateTimer;
@@ -141,10 +142,12 @@ class DashboardController extends GetxController {
     final rhythmScore = apiData['globalRhythmScore'] as int? ?? 0;
 
     String optimalBedtime = '--:--';
+    double hoursUntilBed = 0.0;
     if (apiData['optimalBedtime'] != null) {
       if (apiData['optimalBedtime'] is Map) {
         final timeVal = apiData['optimalBedtime']['time'] as String? ?? '';
         final sleepAsap = apiData['optimalBedtime']['sleepAsap'] as bool? ?? false;
+        hoursUntilBed = (apiData['optimalBedtime']['hoursUntilBed'] as num?)?.toDouble() ?? 0.0;
         if (timeVal.isEmpty && sleepAsap) {
           optimalBedtime = 'ASAP';
         } else {
@@ -392,6 +395,7 @@ class DashboardController extends GetxController {
       lastSleepWeekBars: lastSleepWeekBars,
       isSleepLogged: isSleepLogged,
       isSleepPrep: current.isSleepPrep,
+      hoursUntilBed: hoursUntilBed,
     );
 
     if (apiData['tabs']?['sleep'] != null) {
@@ -406,13 +410,14 @@ class DashboardController extends GetxController {
     // Cache forYouPreview for late-registering controllers
     if (apiData['forYouPreview'] is List) {
       forYouPreviewData.value = apiData['forYouPreview'] as List<dynamic>;
+    } else {
+      forYouPreviewData.value = null;
     }
 
     // Forward forYouPreview sleep entry to SleepController
-    if (forYouPreviewData.value != null &&
-        Get.isRegistered<SleepController>()) {
+    if (Get.isRegistered<SleepController>()) {
       Get.find<SleepController>().updateFromForYouPreview(
-        forYouPreviewData.value!,
+        forYouPreviewData.value ?? [],
       );
     }
     if (apiData['tabs']?['hydration'] != null) {
@@ -422,10 +427,9 @@ class DashboardController extends GetxController {
         );
       }
     }
-    if (forYouPreviewData.value != null &&
-        Get.isRegistered<HydrationController>()) {
+    if (Get.isRegistered<HydrationController>()) {
       Get.find<HydrationController>().updateFromForYouPreview(
-        forYouPreviewData.value!,
+        forYouPreviewData.value ?? [],
       );
     }
     if (apiData['tabs']?['caffeine'] != null) {
@@ -437,10 +441,9 @@ class DashboardController extends GetxController {
     }
 
     // Forward forYouPreview caffeine entry to CaffeineController
-    if (forYouPreviewData.value != null &&
-        Get.isRegistered<CaffeineController>()) {
+    if (Get.isRegistered<CaffeineController>()) {
       Get.find<CaffeineController>().updateFromForYouPreview(
-        forYouPreviewData.value!,
+        forYouPreviewData.value ?? [],
       );
     }
     if (apiData['tabs']?['nutrition'] != null) {
@@ -624,6 +627,56 @@ class DashboardController extends GetxController {
     }
 
     try {
+      if (current.hoursUntilBed > 0.0) {
+        final bedtimeDateTime = current.date.add(
+          Duration(minutes: (current.hoursUntilBed * 60).round()),
+        );
+
+        final now = DateTime.now();
+        final diff = bedtimeDateTime.difference(now).inMinutes;
+        final bool isMissed = diff < 0;
+
+        final bedHour = bedtimeDateTime.hour;
+        final bedMin = bedtimeDateTime.minute;
+        final targetMinutes = bedHour * 60 + bedMin;
+
+        final currentMinutes = now.hour * 60 + now.minute;
+
+        // Sleep prep starts 2 hours before bedtime, ends at 6:00 AM next morning
+        final startPrepMinutes = (targetMinutes - 120 + 1440) % 1440;
+        const endPrepMinutes = 6 * 60;
+
+        bool isPrep = false;
+        if (startPrepMinutes < endPrepMinutes) {
+          isPrep =
+              currentMinutes >= startPrepMinutes &&
+              currentMinutes < endPrepMinutes;
+        } else {
+          isPrep =
+              currentMinutes >= startPrepMinutes ||
+              currentMinutes < endPrepMinutes;
+        }
+
+        String timeUntil;
+        if (diff > 0) {
+          timeUntil = 'in ${diff ~/ 60}h ${diff % 60}m';
+        } else if (diff == 0) {
+          timeUntil = 'bedtime now';
+        } else {
+          timeUntil =
+              '${-diff ~/ 60 > 0 ? "${-diff ~/ 60}h " : ""}${(-diff) % 60}m past bedtime';
+        }
+
+        dashboardData.value = current.copyWith(
+          isSleepPrep: isPrep,
+          timeUntilBedtime: timeUntil,
+          minutesToBedtime: diff,
+          isMissedBedtime: isMissed,
+        );
+        return;
+      }
+
+      // Fallback: local time-only calculation
       final parts = current.optimalBedtime.split(':');
       if (parts.length == 2) {
         final bedHour = int.parse(parts[0]);
@@ -711,6 +764,26 @@ class DashboardController extends GetxController {
     if (_isEndingDay) return;
     _isEndingDay = true;
     EasyLoading.show(status: 'Ending day...');
+
+    // Clear recommendations preview cache and active controllers immediately
+    forYouPreviewData.value = null;
+    if (Get.isRegistered<RecommendationController>()) {
+      Get.find<RecommendationController>().forYouPreview.clear();
+    }
+    if (Get.isRegistered<SleepController>()) {
+      final sleepCtrl = Get.find<SleepController>();
+      sleepCtrl.forYouSleepBody.value = null;
+      sleepCtrl.forYouSleepBedtime.value = null;
+    }
+    if (Get.isRegistered<HydrationController>()) {
+      Get.find<HydrationController>().hydrationPreviewBody.value = null;
+    }
+    if (Get.isRegistered<CaffeineController>()) {
+      final caffeineCtrl = Get.find<CaffeineController>();
+      caffeineCtrl.forYouCaffeineBody.value = null;
+      caffeineCtrl.forYouCaffeineCutoff.value = null;
+    }
+
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       if (sessionId.isNotEmpty) {

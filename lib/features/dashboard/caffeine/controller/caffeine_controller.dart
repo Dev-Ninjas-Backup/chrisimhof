@@ -289,6 +289,9 @@ class CaffeineController extends GetxController {
         forYouCaffeineBody.value = caffeineEntry['body'] as String?;
         final bodyParams = caffeineEntry['bodyParams'] as Map<String, dynamic>?;
         forYouCaffeineCutoff.value = bodyParams?['cutoffTime'] as String?;
+      } else {
+        forYouCaffeineBody.value = null;
+        forYouCaffeineCutoff.value = null;
       }
     } catch (e) {
       debugPrint('CaffeineController forYouPreview parse error: $e');

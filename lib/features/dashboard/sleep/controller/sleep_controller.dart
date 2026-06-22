@@ -313,6 +313,9 @@ class SleepController extends GetxController {
         forYouSleepBody.value = sleepEntry['body'] as String?;
         final bodyParams = sleepEntry['bodyParams'] as Map<String, dynamic>?;
         forYouSleepBedtime.value = bodyParams?['bedtime'] as String?;
+      } else {
+        forYouSleepBody.value = null;
+        forYouSleepBedtime.value = null;
       }
     } catch (e) {
       debugPrint('SleepController forYouPreview parse error: $e');
