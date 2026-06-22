@@ -392,7 +392,10 @@ class HydrationController extends GetxController {
               )
               as Map<String, dynamic>?;
 
-      if (hydrationEntry == null) return;
+      if (hydrationEntry == null) {
+        hydrationPreviewBody.value = null;
+        return;
+      }
 
       hydrationPreviewBody.value = hydrationEntry['body'] as String?;
       final bodyParams = hydrationEntry['bodyParams'] as Map<String, dynamic>?;

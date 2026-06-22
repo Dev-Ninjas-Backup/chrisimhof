@@ -150,66 +150,7 @@ class ForYouSection extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingPlaceholder() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSoft, width: 1),
-      ),
-      child: Column(
-        children: [
-          _buildShimmerRow(),
-          const Divider(height: 1, indent: 16, endIndent: 16, color: AppColors.borderSoft),
-          _buildShimmerRow(),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildShimmerRow() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: AppColors.borderSoft,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 13,
-                  width: 160,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderSoft,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  height: 11,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderSoft,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildEmptyState() {
     return Container(
