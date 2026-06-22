@@ -288,7 +288,7 @@ class DashboardController extends GetxController {
           );
     }
 
-    double recoveryProgress = 0.64;
+    double recoveryProgress = 0.0;
     if (cards?['sport']?['recoveryLoadScore'] != null) {
       recoveryProgress =
           ((cards!['sport']!['recoveryLoadScore'] as num).toDouble() / 100.0)
@@ -744,6 +744,9 @@ class DashboardController extends GetxController {
         }
       }
 
+      // Remove old session ID to ensure no fallback state
+      await SharedPreferencesHelper.removeSessionId();
+
       // Create a brand-new session
       final newSessionId = await SessionService().fetchAndStoreSessionId();
       debugPrint('endMyDay: new sessionId = $newSessionId');
@@ -772,7 +775,7 @@ class DashboardController extends GetxController {
         endTime: '',
         effort: '',
         type: '',
-        recoveryScore: 100,
+        recoveryScore: 0,
       );
       await SharedPreferencesHelper.saveSportsSessions('[]');
 

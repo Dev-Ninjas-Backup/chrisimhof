@@ -46,7 +46,7 @@ class LogSleepCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'LOG TONIGHT\'S SLEEP'.tr,
+                      'RECORD LAST SLEEP'.tr,
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,

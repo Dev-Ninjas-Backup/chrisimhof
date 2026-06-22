@@ -235,59 +235,72 @@ class NutritionController extends GetxController {
   }
 
   void saveMeal() async {
-    EasyLoading.show(status: 'Saving meal...');
-    try {
-      int firstUnloggedIdx = mealsList.indexWhere((m) => !m.isLogged);
-      final now = DateTime.now();
-      final formattedTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    int firstUnloggedIdx = mealsList.indexWhere((m) => !m.isLogged);
+    final now = DateTime.now();
+    final formattedTime =
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-      try {
-        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
-        if (sessionId.isNotEmpty) {
-          final heaviness = selectedMealType.value.toLowerCase();
-          final order = firstUnloggedIdx != -1
-              ? firstUnloggedIdx + 1
-              : mealsList.length + 1;
-          await DashboardService().patchQuickAddLog(
-            sessionId: sessionId,
-            newMealLogs: [
-              {
-                'order': order,
-                'timestamp': formattedTime,
-                'plannedTime': formattedTime,
-                'heaviness': heaviness,
-              },
-            ],
-          );
-        }
-      } catch (e) {
-        debugPrint('Nutrition API quickAdd error: $e');
-      }
-
-      if (firstUnloggedIdx != -1) {
-        final oldMeal = mealsList[firstUnloggedIdx];
-        mealsList[firstUnloggedIdx] = oldMeal.copyWith(
-          type: selectedMealType.value,
-          isLogged: true,
-          isPlanned: false,
-          time: formattedTime,
-        );
-      } else {
-        final newIndex = mealsList.length + 1;
-        mealsList.add(
-          MealItem(
+    final oldMeal = firstUnloggedIdx != -1 ? mealsList[firstUnloggedIdx] : null;
+    final newIndex = mealsList.length + 1;
+    final tempMeal = oldMeal != null
+        ? oldMeal.copyWith(
+            type: selectedMealType.value,
+            isLogged: true,
+            isPlanned: false,
+            time: formattedTime,
+          )
+        : MealItem(
             name: 'Meal $newIndex',
             time: formattedTime,
             type: selectedMealType.value,
             isLogged: true,
             isPlanned: false,
-          ),
+          );
+
+    // Optimistic update
+    if (firstUnloggedIdx != -1) {
+      mealsList[firstUnloggedIdx] = tempMeal;
+    } else {
+      mealsList.add(tempMeal);
+    }
+
+    EasyLoading.show(status: 'Saving meal...');
+    bool apiSuccess = false;
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isNotEmpty) {
+        final heaviness = selectedMealType.value.toLowerCase();
+        final order = firstUnloggedIdx != -1
+            ? firstUnloggedIdx + 1
+            : mealsList.length + 1;
+        await DashboardService().patchQuickAddLog(
+          sessionId: sessionId,
+          newMealLogs: [
+            {
+              'order': order,
+              'timestamp': formattedTime,
+              'plannedTime': formattedTime,
+              'heaviness': heaviness,
+            },
+          ],
         );
+        apiSuccess = true;
       }
-      await saveNutritionData();
+    } catch (e) {
+      debugPrint('Nutrition API quickAdd error: $e');
     } finally {
       EasyLoading.dismiss();
+    }
+
+    if (!apiSuccess) {
+      // Revert if API failed
+      if (firstUnloggedIdx != -1 && oldMeal != null) {
+        mealsList[firstUnloggedIdx] = oldMeal;
+      } else {
+        mealsList.removeLast();
+      }
+    } else {
+      await saveNutritionData();
     }
   }
 

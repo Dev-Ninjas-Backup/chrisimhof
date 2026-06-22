@@ -38,6 +38,7 @@ class RecommendationData {
   int? totalActions;
   String? actionsLabel;
   String? contextNote;
+  String? message;
   List<RecommendationItem>? recommendations;
   GroupedRecommendations? grouped;
 
@@ -47,6 +48,7 @@ class RecommendationData {
     this.totalActions,
     this.actionsLabel,
     this.contextNote,
+    this.message,
     this.recommendations,
     this.grouped,
   });
@@ -58,6 +60,7 @@ class RecommendationData {
       totalActions: json['totalActions'],
       actionsLabel: json['actionsLabel'],
       contextNote: json['contextNote'],
+      message: json['message'],
       recommendations: (json['recommendations'] as List?)
           ?.map((e) => RecommendationItem.fromJson(e))
           .toList(),
@@ -73,6 +76,7 @@ class RecommendationData {
         'totalActions': totalActions,
         'actionsLabel': actionsLabel,
         'contextNote': contextNote,
+        'message': message,
         'recommendations':
             recommendations?.map((e) => e.toJson()).toList(),
         'grouped': grouped?.toJson(),
@@ -128,20 +132,20 @@ class RecommendationItem {
 }
 
 class GroupedRecommendations {
-  List<RecommendationItem>? sleep;
-  List<RecommendationItem>? caffeine;
-  List<RecommendationItem>? hydration;
-  List<RecommendationItem>? sport;
-  List<RecommendationItem>? nutrition;
-  List<RecommendationItem>? fatigue;
+  List<RecommendationItem>? Sleep;
+  List<RecommendationItem>? Caffeine;
+  List<RecommendationItem>? Hydration;
+  List<RecommendationItem>? Sport;
+  List<RecommendationItem>? Nutrition;
+  List<RecommendationItem>? Fatigue;
 
   GroupedRecommendations({
-    this.sleep,
-    this.caffeine,
-    this.hydration,
-    this.sport,
-    this.nutrition,
-    this.fatigue,
+    this.Sleep,
+    this.Caffeine,
+    this.Hydration,
+    this.Sport,
+    this.Nutrition,
+    this.Fatigue,
   });
 
   factory GroupedRecommendations.fromJson(Map<String, dynamic> json) {
@@ -152,22 +156,22 @@ class GroupedRecommendations {
     }
 
     return GroupedRecommendations(
-      sleep: parseList(json['sleep']),
-      caffeine: parseList(json['caffeine']),
-      hydration: parseList(json['hydration']),
-      sport: parseList(json['sport']),
-      nutrition: parseList(json['nutrition']),
-      fatigue: parseList(json['fatigue']),
+      Sleep: parseList(json['sleep']),
+      Caffeine: parseList(json['caffeine']),
+      Hydration: parseList(json['hydration']),
+      Sport: parseList(json['sport']),
+      Nutrition: parseList(json['nutrition']),
+      Fatigue: parseList(json['fatigue']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'sleep': sleep?.map((e) => e.toJson()).toList(),
-        'caffeine': caffeine?.map((e) => e.toJson()).toList(),
-        'hydration': hydration?.map((e) => e.toJson()).toList(),
-        'sport': sport?.map((e) => e.toJson()).toList(),
-        'nutrition': nutrition?.map((e) => e.toJson()).toList(),
-        'fatigue': fatigue?.map((e) => e.toJson()).toList(),
+        'Sleep': Sleep?.map((e) => e.toJson()).toList(),
+        'Caffeine': Caffeine?.map((e) => e.toJson()).toList(),
+        'Hydration': Hydration?.map((e) => e.toJson()).toList(),
+        'Sport': Sport?.map((e) => e.toJson()).toList(),
+        'Nutrition': Nutrition?.map((e) => e.toJson()).toList(),
+        'Fatigue': Fatigue?.map((e) => e.toJson()).toList(),
       };
 }
 

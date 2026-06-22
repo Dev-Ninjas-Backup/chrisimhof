@@ -1070,7 +1070,7 @@ class AppTranslations extends Translations {
       'SHIFT TYPE': 'TYPE DE QUART',
       'Edit pattern →': 'Modifier le modèle →',
       'HOW THIS SHAPES TODAY': 'COMMENT CELA FAÇONNE AUJOURD\'HUI',
-      'LOG TONIGHT\'S SLEEP': 'ENREGISTRER LE SOMMEIL DE CE SOIR',
+      'RECORD LAST SLEEP': 'ENREGISTRER LE DERNIER SOMMEIL',
       'drag or tap to adjust': 'glisser ou taper pour ajuster',
       'SLEEP DEBT': 'DETTE DE SOMMEIL',
       'TONIGHT\'S BEDTIME': 'HEURE DE COUCHER DE CE SOIR',
