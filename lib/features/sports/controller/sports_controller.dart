@@ -160,153 +160,184 @@ class SportsController extends GetxController {
     String? distance,
   }) async {
     final bool isRest = activity == 'Rest day';
+
+    // Save previous state for rollback if API fails
+    final oldSessionsList = List<SportSession>.from(sessionsList);
+    final oldHasTodaySession = hasTodaySession.value;
+    final oldTodaySport = todaySport.value;
+    final oldTodayDuration = todayDuration.value;
+    final oldTodayZone = todayZone.value;
+    final oldTodayStartTime = todayStartTime.value;
+    final oldTodayEndTime = todayEndTime.value;
+    final oldTodayEffort = todayEffort.value;
+    final oldTodayType = todayType.value;
+    final oldTodayDistance = todayDistance.value;
+    final oldRecoveryScore = recoveryScore.value;
+
+    // Optimistic Update
+    String timeStr = '${duration}m';
+    if (activity == 'Rest day') {
+      timeStr = '—';
+    } else if (zone.isNotEmpty) {
+      timeStr += ' · $zone';
+    }
+
+    final newSession = SportSession(
+      title: activity,
+      subtitle: activity == 'Rest day' ? 'Today · —' : 'Today · $timeStr',
+      iconPath: _getIconPathForActivity(activity),
+    );
+
+    // Update old "Today" to "Yesterday"
+    for (int i = 0; i < sessionsList.length; i++) {
+      final s = sessionsList[i];
+      if (s.subtitle.startsWith('Today')) {
+        sessionsList[i] = SportSession(
+          title: s.title,
+          subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
+          iconPath: s.iconPath,
+        );
+      } else if (s.subtitle.startsWith('Yesterday')) {
+        sessionsList[i] = SportSession(
+          title: s.title,
+          subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
+          iconPath: s.iconPath,
+        );
+      }
+    }
+
+    sessionsList.insert(0, newSession);
+
+    if (activity == 'Rest day') {
+      hasTodaySession.value = false;
+      recoveryScore.value = (recoveryScore.value + 15).clamp(0, 100);
+      _updateRecoveryText();
+    } else {
+      hasTodaySession.value = true;
+      todaySport.value = activity;
+      todayDuration.value = duration;
+      todayZone.value = zone;
+      todayStartTime.value = startTime;
+      todayEndTime.value = endTime;
+      todayEffort.value = effort;
+      todayType.value = type;
+      if (distance != null && distance.isNotEmpty) {
+        todayDistance.value = distance;
+      } else {
+        todayDistance.value = '';
+      }
+
+      int impact = 10;
+      if (zone == 'Z5') {
+        impact = 25;
+      } else if (zone == 'Z4') {
+        impact = 18;
+      } else if (zone == 'Z3') {
+        impact = 12;
+      } else if (zone == 'Z2') {
+        impact = 8;
+      } else if (zone == 'Z1') {
+        impact = 4;
+      }
+
+      recoveryScore.value = (recoveryScore.value - impact).clamp(0, 100);
+      _updateRecoveryText();
+    }
+
     if (!isRest) {
       EasyLoading.show(status: 'Saving session...');
     }
-    try {
-      if (activity != 'Rest day') {
-        try {
-          final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
-          if (sessionId.isNotEmpty) {
-            double? distVal;
-            if (distance != null && distance.isNotEmpty) {
-              distVal = double.tryParse(distance);
-            }
 
-            String intensity = 'medium';
-            final z = zone.toUpperCase();
-            if (z == 'Z1' || z == 'Z2') {
-              intensity = 'low';
-            } else if (z == 'Z3') {
-              intensity = 'medium';
-            } else if (z == 'Z4' || z == 'Z5') {
-              intensity = 'high';
-            }
-
-            String sportType = type.toLowerCase().trim();
-            if (sportType != 'cardio' &&
-                sportType != 'strength' &&
-                sportType != 'mobility' &&
-                sportType != 'mixed' &&
-                sportType != 'other') {
-              final actLower = activity.toLowerCase();
-              if (actLower.contains('run') || actLower.contains('cycling') || actLower.contains('swimming')) {
-                sportType = 'cardio';
-              } else if (actLower.contains('strength')) {
-                sportType = 'strength';
-              } else if (actLower.contains('walking')) {
-                sportType = 'mobility';
-              } else {
-                sportType = 'other';
-              }
-            }
-
-            int heartRate = 140;
-            if (z == 'Z1') {
-              heartRate = 100;
-            } else if (z == 'Z2') {
-              heartRate = 120;
-            } else if (z == 'Z3') {
-              heartRate = 140;
-            } else if (z == 'Z4') {
-              heartRate = 160;
-            } else if (z == 'Z5') {
-              heartRate = 180;
-            }
-
-            await DashboardService().patchQuickAddLog(
-              sessionId: sessionId,
-              newSportSessions: [
-                {
-                  'timestampStart': startTime,
-                  'durationMinutes': duration,
-                  'intensity': intensity,
-                  'sportType': sportType,
-                  'distanceKm': distVal,
-                  'heartRateAvgBpm': heartRate,
-                },
-              ],
-            );
+    bool apiSuccess = isRest; // Rest day doesn't call API
+    if (!isRest) {
+      try {
+        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+        if (sessionId.isNotEmpty) {
+          double? distVal;
+          if (distance != null && distance.isNotEmpty) {
+            distVal = double.tryParse(distance);
           }
-        } catch (e) {
-          debugPrint('Sports API quickAdd error: $e');
-        }
-      }
 
-      String timeStr = '${duration}m';
-      if (activity == 'Rest day') {
-        timeStr = '—';
-      } else if (zone.isNotEmpty) {
-        timeStr += ' · $zone';
-      }
+          String intensity = 'medium';
+          final z = zone.toUpperCase();
+          if (z == 'Z1' || z == 'Z2') {
+            intensity = 'low';
+          } else if (z == 'Z3') {
+            intensity = 'medium';
+          } else if (z == 'Z4' || z == 'Z5') {
+            intensity = 'high';
+          }
 
-      final newSession = SportSession(
-        title: activity,
-        subtitle: activity == 'Rest day' ? 'Today · —' : 'Today · $timeStr',
-        iconPath: _getIconPathForActivity(activity),
-      );
+          String sportType = type.toLowerCase().trim();
+          if (sportType != 'cardio' &&
+              sportType != 'strength' &&
+              sportType != 'mobility' &&
+              sportType != 'mixed' &&
+              sportType != 'other') {
+            final actLower = activity.toLowerCase();
+            if (actLower.contains('run') || actLower.contains('cycling') || actLower.contains('swimming')) {
+              sportType = 'cardio';
+            } else if (actLower.contains('strength')) {
+              sportType = 'strength';
+            } else if (actLower.contains('walking')) {
+              sportType = 'mobility';
+            } else {
+              sportType = 'other';
+            }
+          }
 
-      // Update old "Today" to "Yesterday"
-      for (int i = 0; i < sessionsList.length; i++) {
-        final s = sessionsList[i];
-        if (s.subtitle.startsWith('Today')) {
-          sessionsList[i] = SportSession(
-            title: s.title,
-            subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
-            iconPath: s.iconPath,
+          // Midpoints derived from zone ranges: Z1:95-114, Z2:114-133, Z3:133-152, Z4:152-171, Z5:171-190
+          int heartRate = 142; // default to Z3 midpoint
+          if (z == 'Z1') {
+            heartRate = 104; // avg of 95-114
+          } else if (z == 'Z2') {
+            heartRate = 123; // avg of 114-133
+          } else if (z == 'Z3') {
+            heartRate = 142; // avg of 133-152
+          } else if (z == 'Z4') {
+            heartRate = 161; // avg of 152-171
+          } else if (z == 'Z5') {
+            heartRate = 180; // avg of 171-190
+          }
+
+          await DashboardService().patchQuickAddLog(
+            sessionId: sessionId,
+            newSportSessions: [
+              {
+                'timestampStart': startTime,
+                'durationMinutes': duration,
+                'intensity': intensity,
+                'sportType': sportType,
+                'distanceKm': distVal,
+                'heartRateAvgBpm': heartRate,
+              },
+            ],
           );
-        } else if (s.subtitle.startsWith('Yesterday')) {
-          sessionsList[i] = SportSession(
-            title: s.title,
-            subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
-            iconPath: s.iconPath,
-          );
+          apiSuccess = true;
         }
-      }
-
-      sessionsList.insert(0, newSession);
-
-      if (activity == 'Rest day') {
-        hasTodaySession.value = false;
-        recoveryScore.value = (recoveryScore.value + 15).clamp(0, 100);
-        _updateRecoveryText();
-      } else {
-        hasTodaySession.value = true;
-        todaySport.value = activity;
-        todayDuration.value = duration;
-        todayZone.value = zone;
-        todayStartTime.value = startTime;
-        todayEndTime.value = endTime;
-        todayEffort.value = effort;
-        todayType.value = type;
-        if (distance != null && distance.isNotEmpty) {
-          todayDistance.value = distance;
-        } else {
-          todayDistance.value = '';
-        }
-
-        int impact = 10;
-        if (zone == 'Z5') {
-          impact = 25;
-        } else if (zone == 'Z4') {
-          impact = 18;
-        } else if (zone == 'Z3') {
-          impact = 12;
-        } else if (zone == 'Z2') {
-          impact = 8;
-        } else if (zone == 'Z1') {
-          impact = 4;
-        }
-
-        recoveryScore.value = (recoveryScore.value - impact).clamp(0, 100);
-        _updateRecoveryText();
-      }
-
-      await saveSportsData();
-    } finally {
-      if (!isRest) {
+      } catch (e) {
+        debugPrint('Sports API quickAdd error: $e');
+      } finally {
         EasyLoading.dismiss();
       }
+    }
+
+    if (!apiSuccess) {
+      // Revert if API failed
+      sessionsList.assignAll(oldSessionsList);
+      hasTodaySession.value = oldHasTodaySession;
+      todaySport.value = oldTodaySport;
+      todayDuration.value = oldTodayDuration;
+      todayZone.value = oldTodayZone;
+      todayStartTime.value = oldTodayStartTime;
+      todayEndTime.value = oldTodayEndTime;
+      todayEffort.value = oldTodayEffort;
+      todayType.value = oldTodayType;
+      todayDistance.value = oldTodayDistance;
+      recoveryScore.value = oldRecoveryScore;
+      _updateRecoveryText();
+    } else {
+      await saveSportsData();
     }
   }
 

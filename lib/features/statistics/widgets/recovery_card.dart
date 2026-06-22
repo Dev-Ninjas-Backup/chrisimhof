@@ -62,7 +62,7 @@ class RecoveryCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 30.0),
             SparklineCurve(
               data: controller.recoveryData,
               lineColor: AppColors.primaryButtonColor, // Green/teal

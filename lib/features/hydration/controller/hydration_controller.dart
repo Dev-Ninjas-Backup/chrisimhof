@@ -248,43 +248,57 @@ class HydrationController extends GetxController {
       return;
     }
 
+    final now = DateTime.now();
+    final timeStr =
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+    final newLog = HydrationLog(
+      id: tempId,
+      time: timeStr,
+      type: type,
+      amountMl: amountMl,
+    );
+
+    // Optimistic update
+    weeklyLogs[todayIndex.value].insert(0, newLog);
+    weeklyDayTotalsMl[todayIndex.value] = weeklyLogs[todayIndex.value].fold(
+      0,
+      (sum, log) => sum + log.amountMl,
+    );
+    weeklyDayTotalsMl.refresh();
+    weeklyLogs.refresh();
+
     EasyLoading.show(status: 'Logging water...');
+    bool apiSuccess = false;
     try {
-      final now = DateTime.now();
-      final timeStr =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
-      try {
-        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
-        if (sessionId.isNotEmpty) {
-          await DashboardService().patchQuickAddLog(
-            sessionId: sessionId,
-            newWaterLogs: [
-              {'timestamp': timeStr, 'volumeMl': amountMl},
-            ],
-          );
-        }
-      } catch (e) {
-        debugPrint('Hydration API quickAdd error: $e');
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isNotEmpty) {
+        await DashboardService().patchQuickAddLog(
+          sessionId: sessionId,
+          newWaterLogs: [
+            {'timestamp': timeStr, 'volumeMl': amountMl},
+          ],
+        );
+        apiSuccess = true;
       }
+    } catch (e) {
+      debugPrint('Hydration API quickAdd error: $e');
+    } finally {
+      EasyLoading.dismiss();
+    }
 
-      final newLog = HydrationLog(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        time: timeStr,
-        type: type,
-        amountMl: amountMl,
-      );
-
-      weeklyLogs[todayIndex.value].insert(0, newLog);
+    if (!apiSuccess) {
+      // Revert if API failed
+      weeklyLogs[todayIndex.value].removeWhere((log) => log.id == tempId);
       weeklyDayTotalsMl[todayIndex.value] = weeklyLogs[todayIndex.value].fold(
         0,
         (sum, log) => sum + log.amountMl,
       );
       weeklyDayTotalsMl.refresh();
-      weeklyLogs.refresh(); // Triggers reactive update in Obx
+      weeklyLogs.refresh();
+    } else {
       await saveLogsToPrefs();
-    } finally {
-      EasyLoading.dismiss();
     }
   }
 

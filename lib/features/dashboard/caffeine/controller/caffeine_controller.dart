@@ -132,52 +132,62 @@ class CaffeineController extends GetxController {
   }
 
   void addCaffeineEntry(String title, int amountMg, DateTime timestamp) async {
+    final formattedTime =
+        '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+
+    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+    final newEntry = CaffeineEntry(
+      id: tempId,
+      title: title,
+      timestamp: timestamp,
+      amountMg: amountMg,
+    );
+
+    // Optimistic update
+    entriesList.add(newEntry);
+    entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    recalculateCaffeine();
+
     EasyLoading.show(status: 'Logging caffeine...');
+    bool apiSuccess = false;
     try {
-      final formattedTime =
-          '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
-
-      try {
-        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
-        if (sessionId.isNotEmpty) {
-          String drinkType = 'coffee';
-          final t = title.toLowerCase();
-          if (t.contains('tea')) {
-            drinkType = 'tea';
-          } else if (t.contains('energy') ||
-              t.contains('soda') ||
-              t.contains('coke')) {
-            drinkType = 'energy';
-          } else if (t.contains('espresso')) {
-            drinkType = 'espresso';
-          }
-          await DashboardService().patchQuickAddLog(
-            sessionId: sessionId,
-            newCaffeineLogs: [
-              {
-                'timestamp': formattedTime,
-                'caffeineMg': amountMg,
-                'drinkType': drinkType,
-              },
-            ],
-          );
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isNotEmpty) {
+        String drinkType = 'coffee';
+        final t = title.toLowerCase();
+        if (t.contains('tea')) {
+          drinkType = 'tea';
+        } else if (t.contains('energy') ||
+            t.contains('soda') ||
+            t.contains('coke')) {
+          drinkType = 'energy';
+        } else if (t.contains('espresso')) {
+          drinkType = 'espresso';
         }
-      } catch (e) {
-        debugPrint('Caffeine API quickAdd error: $e');
+        await DashboardService().patchQuickAddLog(
+          sessionId: sessionId,
+          newCaffeineLogs: [
+            {
+              'timestamp': formattedTime,
+              'caffeineMg': amountMg,
+              'drinkType': drinkType,
+            },
+          ],
+        );
+        apiSuccess = true;
       }
-
-      final newEntry = CaffeineEntry(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: title,
-        timestamp: timestamp,
-        amountMg: amountMg,
-      );
-      entriesList.add(newEntry);
-      entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      recalculateCaffeine();
-      await saveEntriesToPrefs();
+    } catch (e) {
+      debugPrint('Caffeine API quickAdd error: $e');
     } finally {
       EasyLoading.dismiss();
+    }
+
+    if (!apiSuccess) {
+      // Revert if API failed
+      entriesList.removeWhere((e) => e.id == tempId);
+      recalculateCaffeine();
+    } else {
+      await saveEntriesToPrefs();
     }
   }
 

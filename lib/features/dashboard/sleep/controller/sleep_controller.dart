@@ -381,6 +381,18 @@ class SleepController extends GetxController {
           }
         }
         if (parsedLogs.isNotEmpty) {
+          // Preserve optimistic logs that are not yet returned by the server on the same day
+          final optimisticLogs = historyLogs.where((log) => int.tryParse(log.id) != null).toList();
+          for (var optLog in optimisticLogs) {
+            final hasSameDay = parsedLogs.any((pLog) =>
+                pLog.date.year == optLog.date.year &&
+                pLog.date.month == optLog.date.month &&
+                pLog.date.day == optLog.date.day);
+            if (!hasSameDay) {
+              parsedLogs.add(optLog);
+            }
+          }
+          parsedLogs.sort((a, b) => b.date.compareTo(a.date));
           historyLogs.assignAll(parsedLogs);
           saveSleepHistory();
         }

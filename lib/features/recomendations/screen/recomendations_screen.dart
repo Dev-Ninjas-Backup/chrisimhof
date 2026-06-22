@@ -69,7 +69,9 @@ class RecomendationsScreen extends StatelessWidget {
 
                           Expanded(
                             child: Text(
-                              data?.actionsLabel?.tr ?? '',
+                              (data?.actionsLabel != null && data!.actionsLabel!.isNotEmpty)
+                                  ? data.actionsLabel!.tr
+                                  : (data?.message != null && data!.message!.isNotEmpty ? 'Note'.tr : ''),
                               style: getTextStyle2(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -83,7 +85,9 @@ class RecomendationsScreen extends StatelessWidget {
                       const SizedBox(height: 6),
 
                       Text(
-                        data?.contextNote ?? '',
+                        (data?.contextNote != null && data!.contextNote!.isNotEmpty)
+                            ? data.contextNote!
+                            : (data?.message ?? ''),
                         style: getTextStyle2(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -104,26 +108,26 @@ class RecomendationsScreen extends StatelessWidget {
                     final item = recommendations[index];
 
                     List<RecommendationItem>? subRecommendations;
-                    final category = item.category?.toLowerCase();
+                    final category = item.category;
                     if (data?.grouped != null && category != null) {
                       switch (category) {
-                        case 'sleep':
-                          subRecommendations = data!.grouped!.sleep;
+                        case 'Sleep':
+                          subRecommendations = data!.grouped!.Sleep;
                           break;
-                        case 'caffeine':
-                          subRecommendations = data!.grouped!.caffeine;
+                        case 'Caffeine':
+                          subRecommendations = data!.grouped!.Caffeine;
                           break;
-                        case 'hydration':
-                          subRecommendations = data!.grouped!.hydration;
+                        case 'Hydration':
+                          subRecommendations = data!.grouped!.Hydration;
                           break;
-                        case 'sport':
-                          subRecommendations = data!.grouped!.sport;
+                        case 'Sport':
+                          subRecommendations = data!.grouped!.Sport;
                           break;
-                        case 'nutrition':
-                          subRecommendations = data!.grouped!.nutrition;
+                        case 'Nutrition':
+                          subRecommendations = data!.grouped!.Nutrition;
                           break;
-                        case 'fatigue':
-                          subRecommendations = data!.grouped!.fatigue;
+                        case 'Fatigue':
+                          subRecommendations = data!.grouped!.Fatigue;
                           break;
                       }
                     }

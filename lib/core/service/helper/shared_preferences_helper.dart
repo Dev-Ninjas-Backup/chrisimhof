@@ -42,6 +42,12 @@ class SharedPreferencesHelper {
     return prefs.getString(_sessionIdKey);
   }
 
+  // Remove session id
+  static Future<void> removeSessionId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_sessionIdKey);
+  }
+
   // Save login status
   static Future<void> setLoginStatus(bool value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -154,7 +160,7 @@ class SharedPreferencesHelper {
       'endTime': prefs.getString('sportsEndTime') ?? '',
       'effort': prefs.getString('sportsEffort') ?? '',
       'type': prefs.getString('sportsType') ?? '',
-      'recoveryScore': prefs.getInt('sportsRecoveryScore') ?? 64,
+      'recoveryScore': prefs.getInt('sportsRecoveryScore') ?? 0,
     };
   }
 }
