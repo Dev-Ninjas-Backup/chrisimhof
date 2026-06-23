@@ -36,6 +36,7 @@ class WorkController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeFromDashboard();
+    fetchWorkSettings();
     fetchFromSession();
   }
 
@@ -390,13 +391,13 @@ class WorkController extends GetxController {
 
       final settings = tabData['settings'] as Map<String, dynamic>?;
       if (settings != null) {
-        if (settings['defaultRotation'] != null) {
+        if (settings['defaultRotation'] != null && (settings['defaultRotation'] as String).isNotEmpty) {
           defaultRotation.value = settings['defaultRotation'] as String;
         }
-        if (settings['shiftReminderDisplay'] != null) {
+        if (settings['shiftReminderDisplay'] != null && (settings['shiftReminderDisplay'] as String).isNotEmpty) {
           shiftReminders.value = settings['shiftReminderDisplay'] as String;
         }
-        if (settings['timezoneDisplay'] != null) {
+        if (settings['timezoneDisplay'] != null && (settings['timezoneDisplay'] as String).isNotEmpty) {
           timeZone.value = settings['timezoneDisplay'] as String;
         }
       }
@@ -473,6 +474,40 @@ class WorkController extends GetxController {
       }
     } catch (e) {
       debugPrint('WorkController saveWorkSettings error: $e');
+    }
+  }
+
+  Future<void> fetchWorkSettings() async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      if (token.isEmpty) return;
+
+      final response = await http.get(
+        Uri.parse(Urls.createWorkSettings),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('WorkSettings GET status: ${response.statusCode}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          if (data['defaultRotation'] != null && (data['defaultRotation'] as String).isNotEmpty) {
+            defaultRotation.value = data['defaultRotation'];
+          }
+          if (data['shiftReminderDisplay'] != null && (data['shiftReminderDisplay'] as String).isNotEmpty) {
+            shiftReminders.value = data['shiftReminderDisplay'];
+          }
+          if (data['timezoneDisplay'] != null && (data['timezoneDisplay'] as String).isNotEmpty) {
+            timeZone.value = data['timezoneDisplay'];
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('WorkController fetchWorkSettings error: $e');
     }
   }
 }

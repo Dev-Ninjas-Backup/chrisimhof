@@ -108,25 +108,25 @@ class RecomendationsScreen extends StatelessWidget {
                     final item = recommendations[index];
 
                     List<RecommendationItem>? subRecommendations;
-                    final category = item.category;
+                    final category = item.category?.toLowerCase();
                     if (data?.grouped != null && category != null) {
                       switch (category) {
-                        case 'Sleep':
+                        case 'sleep':
                           subRecommendations = data!.grouped!.Sleep;
                           break;
-                        case 'Caffeine':
+                        case 'caffeine':
                           subRecommendations = data!.grouped!.Caffeine;
                           break;
-                        case 'Hydration':
+                        case 'hydration':
                           subRecommendations = data!.grouped!.Hydration;
                           break;
-                        case 'Sport':
+                        case 'sport':
                           subRecommendations = data!.grouped!.Sport;
                           break;
-                        case 'Nutrition':
+                        case 'nutrition':
                           subRecommendations = data!.grouped!.Nutrition;
                           break;
-                        case 'Fatigue':
+                        case 'fatigue':
                           subRecommendations = data!.grouped!.Fatigue;
                           break;
                       }
