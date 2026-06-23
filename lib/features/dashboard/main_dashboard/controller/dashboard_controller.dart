@@ -864,6 +864,9 @@ class DashboardController extends GetxController {
       if (newSessionId != null && newSessionId.isNotEmpty) {
         await RealtimeSocketService().connectSocket();
         await fetchDashboardData();
+        if (Get.isRegistered<WorkController>()) {
+          await Get.find<WorkController>().fetchWorkSettings();
+        }
       }
 
       EasyLoading.showSuccess('Day ended successfully!');
