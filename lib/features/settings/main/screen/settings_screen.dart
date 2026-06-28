@@ -42,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
               CustomAppBar(title: 'Settings', showBackButton: false),
               const SizedBox(height: 28),
               ProfileCard(controller: controller),
-              sectionLabel('Account'),
+              sectionLabel('Account'.tr),
               SettingsGroup(
                 rows: [
                   SettingsRowData(
@@ -82,24 +82,34 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              sectionLabel('Baseline profile'),
+              sectionLabel('Baseline profile'.tr),
               Obx(() {
                 final sleepMinutes = controller.sleepTargetMinutes.value;
                 final hours = sleepMinutes ~/ 60;
                 final mins = sleepMinutes % 60;
-                final sleepDisplay = mins == 0 ? '${hours}h' : '${hours}h ${mins}m';
+                final sleepDisplay = mins == 0
+                    ? '${hours}h'
+                    : '${hours}h ${mins}m';
 
-                final chronoDisplay = BaselineEnums.chronotype[
-                      BaselineEnums.normalizeChronotype(controller.chronotype.value)
-                    ] ?? 'Intermediate';
+                final chronoDisplay =
+                    BaselineEnums.chronotype[BaselineEnums.normalizeChronotype(
+                      controller.chronotype.value,
+                    )] ??
+                    'Intermediate';
 
-                final caffeineDisplay = BaselineEnums.caffeineSensitivity[
-                      BaselineEnums.normalizeCaffeineSensitivity(controller.caffeineSensitivity.value)
-                    ] ?? 'Medium sensitivity';
+                final caffeineDisplay =
+                    BaselineEnums
+                        .caffeineSensitivity[BaselineEnums.normalizeCaffeineSensitivity(
+                      controller.caffeineSensitivity.value,
+                    )] ??
+                    'Medium sensitivity';
 
-                final sportDisplay = BaselineEnums.sportProfile[
-                      BaselineEnums.normalizeSportProfile(controller.sportProfile.value)
-                    ] ?? 'Light activity';
+                final sportDisplay =
+                    BaselineEnums
+                        .sportProfile[BaselineEnums.normalizeSportProfile(
+                      controller.sportProfile.value,
+                    )] ??
+                    'Light activity';
 
                 return SettingsGroup(
                   accent: true,
@@ -109,11 +119,14 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Sleep target',
                       trailing: sleepDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(BaselineSetupController());
+                        final baselineController = Get.put(
+                          BaselineSetupController(),
+                        );
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
-                        final initialMinutes = baselineController.sleepHours.value * 60 +
+                        final initialMinutes =
+                            baselineController.sleepHours.value * 60 +
                             baselineController.sleepMinutes.value;
 
                         await Get.bottomSheet(
@@ -121,7 +134,8 @@ class SettingsScreen extends StatelessWidget {
                           isScrollControlled: true,
                         );
 
-                        final finalMinutes = baselineController.sleepHours.value * 60 +
+                        final finalMinutes =
+                            baselineController.sleepHours.value * 60 +
                             baselineController.sleepMinutes.value;
 
                         if (finalMinutes != initialMinutes) {
@@ -134,18 +148,22 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Chronotype',
                       trailing: chronoDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(BaselineSetupController());
+                        final baselineController = Get.put(
+                          BaselineSetupController(),
+                        );
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
-                        final initialChrono = baselineController.chronotype.value;
+                        final initialChrono =
+                            baselineController.chronotype.value;
 
                         await Get.bottomSheet(
                           const ChronotypeBottomsheet(),
                           isScrollControlled: true,
                         );
 
-                        if (baselineController.chronotype.value != initialChrono) {
+                        if (baselineController.chronotype.value !=
+                            initialChrono) {
                           await baselineController.saveBaselineData();
                         }
                       },
@@ -155,18 +173,22 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Caffeine sensitivity',
                       trailing: caffeineDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(BaselineSetupController());
+                        final baselineController = Get.put(
+                          BaselineSetupController(),
+                        );
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
-                        final initialCaffeine = baselineController.caffeineSensitivity.value;
+                        final initialCaffeine =
+                            baselineController.caffeineSensitivity.value;
 
                         await Get.bottomSheet(
                           const CaffeineSensitivityBottomsheet(),
                           isScrollControlled: true,
                         );
 
-                        if (baselineController.caffeineSensitivity.value != initialCaffeine) {
+                        if (baselineController.caffeineSensitivity.value !=
+                            initialCaffeine) {
                           await baselineController.saveBaselineData();
                         }
                       },
@@ -176,18 +198,22 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Sport profile',
                       trailing: sportDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(BaselineSetupController());
+                        final baselineController = Get.put(
+                          BaselineSetupController(),
+                        );
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
-                        final initialSport = baselineController.sportProfile.value;
+                        final initialSport =
+                            baselineController.sportProfile.value;
 
                         await Get.bottomSheet(
                           const SportProfileBottomsheet(),
                           isScrollControlled: true,
                         );
 
-                        if (baselineController.sportProfile.value != initialSport) {
+                        if (baselineController.sportProfile.value !=
+                            initialSport) {
                           await baselineController.saveBaselineData();
                         }
                       },
@@ -197,13 +223,13 @@ class SettingsScreen extends StatelessWidget {
               }),
               const SectionHeaderWithBadge(label: 'Wearables', badge: 'Soon'),
               const WearablesGroup(),
-              sectionLabel('More'),
+              sectionLabel('More'.tr),
               SettingsGroup(
                 rows: [
                   SettingsRowData(
                     iconpath: IconPath.premium,
-                    label: 'Subscription',
-                    trailing: 'Premium',
+                    label: 'Subscription'.tr,
+                    trailing: 'Premium'.tr,
                     highlightTrailing: true,
                     onTap: () => Get.toNamed(AppRoutes.subscriptionsScreen),
                   ),

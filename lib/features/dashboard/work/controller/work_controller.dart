@@ -336,8 +336,7 @@ class WorkController extends GetxController {
           return; // Stop execution, let user correct it
         }
 
-        // 2. Central session calculations
-        await DashboardService().calculateResult(sessionId: sessionId);
+
 
         // 3. Sync and refresh dashboard controller
         try {

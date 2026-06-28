@@ -30,7 +30,6 @@ class AppTranslations extends Translations {
       'Passwords do not match': 'Passwords do not match',
       'Update password successfully': 'Update password successfully',
       'Update password failed': 'Update password failed',
-
       'Daily Recommendations': 'Daily Recommendations',
       'Recommendations of the day': 'Recommendations of the day',
       'Overall state': 'Overall state',
@@ -136,7 +135,7 @@ class AppTranslations extends Translations {
       'Advanced modules like (fatigue management, caffeine tracking, and performance optimization':
           'Advanced modules like (fatigue management, caffeine tracking, and performance optimization)',
       '\$9.99/mo': '\$9.99/mo',
-      'Premium': 'Premium',
+      'Premium': 'Prime',
       'English': 'English',
       'French': 'French',
       'Logout': 'Logout',
@@ -474,6 +473,8 @@ class AppTranslations extends Translations {
           'Your password has been changed successfully',
       'Work fit': 'Work fit',
       'Edit Profile': 'Edit Profile',
+      ' — protect tonight\'s sleep window.':
+          ' — protégez votre fenêtre de sommeil de ce soir.',
     },
     'fr_FR': {
       'Welcome Back': 'Bon retour',
@@ -1001,6 +1002,9 @@ class AppTranslations extends Translations {
       'Your rhythm, rebuilt around real life.':
           'Votre rythme, reconstruit autour de la vraie vie.',
       'Log out': 'Déconnexion',
+      'Account': 'Compte',
+      'Baseline profile': 'Profil de base',
+      'More': 'Plus',
       'Protect your account': 'Protégez votre compte',
       'Use a unique password with at least 8\ncharacters.':
           'Utilisez un mot de passe unique d\'au moins 8\ncaractères.',
@@ -1022,7 +1026,8 @@ class AppTranslations extends Translations {
           'Votre mot de passe a été modifié avec succès',
       'Edit Profile': 'Modifier le profil',
       "Logged tonight's sleep": "Enregistré le sommeil de ce soir",
-      "Log sleep — it's not too late": "Enregistrez le sommeil - il n'est pas trop tard",
+      "Log sleep — it's not too late":
+          "Enregistrez le sommeil - il n'est pas trop tard",
       "Log tonight's sleep": "Enregistrez le sommeil de ce soir",
       'QUICK ADD': 'AJOUT RAPIDE',
       'WORK': 'TRAVAIL',
@@ -1068,13 +1073,38 @@ class AppTranslations extends Translations {
       'Heart Rate Zone': 'Zone de fréquence cardiaque',
       "TODAY'S SHIFT": "LE QUART D'AUJOURD'HUI",
       'SHIFT TYPE': 'TYPE DE QUART',
+      'No account?': 'Pas de compte ?',
       'Edit pattern →': 'Modifier le modèle →',
       'HOW THIS SHAPES TODAY': 'COMMENT CELA FAÇONNE AUJOURD\'HUI',
       'RECORD LAST SLEEP': 'ENREGISTRER LE DERNIER SOMMEIL',
       'drag or tap to adjust': 'glisser ou taper pour ajuster',
       'SLEEP DEBT': 'DETTE DE SOMMEIL',
+      'No recommendations yet': 'Aucune recommandation pour le moment',
+      'Log your daily data to get personalised tips.':
+          'Enregistrez vos données quotidiennes pour obtenir des conseils personnalisés.',
+      'Off Today': 'Jour de repos',
+      'See all': 'Voir tout',
+      'Today: ': 'Aujourd\'hui: ',
+      'Statistics': 'Statistiques',
+      'Recommendations': 'Recommendations',
+      'tap to log': 'appuyez pour enregistrer',
       'TONIGHT\'S BEDTIME': 'HEURE DE COUCHER DE CE SOIR',
+      'Continue with Google': 'Continuer avec Google',
+      'No shifts scheduled': 'Aucun quart de travail prévu',
+      'Continue with Apple': 'Continuer avec Apple',
+      'Continue with Microsoft': 'Continuer avec Microsoft',
+      'Sleep, caffeine, hydration, meals and work shifts in one adaptive daily plan.':
+          'Le sommeil, la caféine, l\'hydratation, les repas et les quarts de travail dans un plan quotidien adaptatif.',
+      'Cut-off': 'Heure limite',
+      'Save meal': 'Enregistrer le repas',
+      "TODAY'S TIMING": "L'HORAIRE D'AUJOURD'HUI",
+      'No caffeine entries logged today.':
+          'Aucune entrée de caféine enregistrée aujourd\'hui.',
+      'entry': 'entrée',
+      'entries': 'entrées',
+      'Add Note': 'Ajouter une note',
+      ' — protect tonight\'s sleep window.':
+          ' — protégez votre fenêtre de sommeil de ce soir.',
     },
   };
-  
 }

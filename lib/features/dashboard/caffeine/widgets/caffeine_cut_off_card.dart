@@ -27,8 +27,8 @@ class CaffeineCutOffCard extends StatelessWidget {
         boldPart   = fullBody;
         normalPart = '';
       } else {
-        boldPart   = 'Cut-off ${cutoffTime ?? '--:--'}';
-        normalPart = cutoffTime != null ? ' — protect tonight\'s sleep window.' : '';
+        boldPart   = '${'Cut-off'.tr} ${cutoffTime ?? '--:--'}';
+        normalPart = cutoffTime != null ? ' — protect tonight\'s sleep window.'.tr : '';
       }
 
 

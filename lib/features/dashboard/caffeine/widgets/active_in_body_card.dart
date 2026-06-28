@@ -159,7 +159,7 @@ class ActiveInBodyCard extends StatelessWidget {
                   color: AppColors.caffeineTextDark,
                 ),
                 children: [
-                  const TextSpan(text: 'Today: '),
+                  TextSpan(text: 'Today: '.tr),
                   TextSpan(
                     text: '$totalVal / 400 mg',
                     style: getTextStyle(

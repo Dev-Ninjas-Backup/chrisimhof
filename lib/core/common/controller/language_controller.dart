@@ -13,8 +13,22 @@ class LanguageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final currentLocale = Get.locale?.languageCode ?? 'en';
-    selectedLanguage.value = currentLocale == 'fr' ? 'FR' : 'EN';
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final savedLang = await SharedPreferencesHelper.getLanguage();
+    if (savedLang != null) {
+      selectedLanguage.value = savedLang.toUpperCase();
+      if (selectedLanguage.value == 'FR') {
+        Get.updateLocale(const Locale('fr', 'FR'));
+      } else {
+        Get.updateLocale(const Locale('en', 'US'));
+      }
+    } else {
+      final currentLocale = Get.locale?.languageCode ?? 'en';
+      selectedLanguage.value = currentLocale == 'fr' ? 'FR' : 'EN';
+    }
   }
 
   Future<void> changeLanguage(String langCode, {bool force = false}) async {
@@ -53,6 +67,9 @@ class LanguageController extends GetxController {
         } else if (langCode == 'FR') {
           Get.updateLocale(const Locale('fr', 'FR'));
         }
+
+        // Save language preference locally
+        await SharedPreferencesHelper.saveLanguage(langCode);
 
         // Navigate to NavbarScreen (replace all)
         Get.offAllNamed(AppRoutes.navbarScreen);

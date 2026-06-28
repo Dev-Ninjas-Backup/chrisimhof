@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/common/widgets/custom_button.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
@@ -20,7 +21,6 @@ class _CaffeineSensitivityBottomsheetState
   late final BaselineSetupController controller;
 
   final List<Map<String, String>> options = [
-
     {
       'title': 'Low',
       'desc': 'Minimal sleep disruption',
@@ -59,7 +59,7 @@ class _CaffeineSensitivityBottomsheetState
         color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32.0)),
       ),
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 32),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 50),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -213,7 +213,8 @@ class _CaffeineSensitivityBottomsheetState
           const SizedBox(height: 24),
 
           // Save Button
-          GestureDetector(
+          CustomButton(
+            text: 'Save'.tr,
             onTap: () {
               final matched = options.firstWhere(
                 (opt) => opt['title'] == selectedTitle,
@@ -221,40 +222,18 @@ class _CaffeineSensitivityBottomsheetState
               controller.caffeineSensitivity.value = matched['value']!;
               Get.back();
             },
-            child: Container(
-              height: 52,
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'Save'.tr,
-                style: getTextStyle2(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+            icon: null,
+            textColor: AppColors.white,
           ),
+
           const SizedBox(height: 16),
 
-          // Cancel Button
-          GestureDetector(
+          CustomButton(
+            text: 'Cancel'.tr,
             onTap: () => Get.back(),
-            child: Container(
-              height: 36,
-              alignment: Alignment.center,
-              child: Text(
-                'Cancel'.tr,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSoft,
-                ),
-              ),
-            ),
+            icon: null,
+            textColor: AppColors.textSoft,
+            backgroundColor: AppColors.transparent,
           ),
         ],
       ),
