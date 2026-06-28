@@ -55,8 +55,8 @@ class DashboardController extends GetxController {
     hydrationProgress: 0.0,
     caffeineProgress: 0.0,
     recoveryProgress: 0.0,
-    workShift: 'Off Today',
-    workShiftCountdown: 'No shifts scheduled',
+    workShift: 'Off Today'.tr,
+    workShiftCountdown: 'No shifts scheduled'.tr,
     workProgress: 0.0,
     lastSleepDuration: '—',
     sleepDebtText: '',
@@ -205,8 +205,8 @@ class DashboardController extends GetxController {
     final workInfo = apiData['workInfo'] as Map<String, dynamic>?;
     final workFitCard = cards?['workFit'] as Map<String, dynamic>?;
 
-    String workShift = 'Off Today';
-    String workShiftCountdown = 'No shifts scheduled';
+    String workShift = 'Off Today'.tr;
+    String workShiftCountdown = 'No shifts scheduled'.tr;
     double workProgress = 0.0;
 
     if (workInfo != null && workInfo['shiftType'] != 'off') {
@@ -268,8 +268,8 @@ class DashboardController extends GetxController {
         }
       } catch (_) {}
     } else {
-      workShift = workFitCard?['subtitle'] as String? ?? 'Off Today';
-      workShiftCountdown = 'No shifts scheduled';
+      workShift = workFitCard?['subtitle'] as String? ?? 'Off Today'.tr;
+      workShiftCountdown = 'No shifts scheduled'.tr;
       workProgress = 0.0;
     }
 

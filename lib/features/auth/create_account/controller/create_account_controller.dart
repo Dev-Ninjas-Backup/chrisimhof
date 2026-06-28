@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/auth/create_account/model/register_response_model.dart';
 import 'package:chrisimhof/features/auth/create_account/service/create_account_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
@@ -23,9 +24,17 @@ class CreateAccountController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialize language from current app locale
-    final currentLocale = Get.locale?.languageCode ?? 'en';
-    selectedLanguage.value = currentLocale == 'fr' ? 'FR' : 'EN';
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final savedLang = await SharedPreferencesHelper.getLanguage();
+    if (savedLang != null) {
+      selectedLanguage.value = savedLang.toUpperCase();
+    } else {
+      final currentLocale = Get.locale?.languageCode ?? 'en';
+      selectedLanguage.value = currentLocale == 'fr' ? 'FR' : 'EN';
+    }
   }
 
   void togglePasswordVisibility() {
@@ -46,6 +55,8 @@ class CreateAccountController extends GetxController {
       } else if (langCode == 'FR') {
         Get.updateLocale(const Locale('fr', 'FR'));
       }
+
+      await SharedPreferencesHelper.saveLanguage(langCode);
 
       debugPrint('Language changed to: $langCode');
     } catch (e) {

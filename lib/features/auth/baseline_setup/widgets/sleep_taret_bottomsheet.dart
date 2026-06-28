@@ -54,7 +54,7 @@ class SleepTaretBottomsheet extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32.0)),
       ),
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 40),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 50),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

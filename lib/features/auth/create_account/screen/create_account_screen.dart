@@ -130,7 +130,7 @@ class CreateAccountScreen extends StatelessWidget {
                   ),
                 ),
                 CustomButton(
-                  text: 'Continue with Google',
+                  text: 'Continue with Google'.tr,
                   onTap: signInController.signInWithGoogle,
                   backgroundColor: AppColors.white,
                   textColor: AppColors.black,
@@ -140,7 +140,7 @@ class CreateAccountScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 CustomButton(
-                  text: 'Continue with Apple',
+                  text: 'Continue with Apple'.tr,
                   onTap: signInController.signInWithApple,
                   backgroundColor: AppColors.white,
                   textColor: AppColors.black,
@@ -151,7 +151,7 @@ class CreateAccountScreen extends StatelessWidget {
 
                 const SizedBox(height: 10),
                 CustomButton(
-                  text: 'Continue with Microsoft',
+                  text: 'Continue with Microsoft'.tr,
                   onTap: signInController.signInWithMicrosoft,
                   backgroundColor: AppColors.white,
                   textColor: AppColors.black,

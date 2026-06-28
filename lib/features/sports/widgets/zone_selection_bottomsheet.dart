@@ -33,25 +33,31 @@ class ZoneSelectionBottomsheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Obx(() => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: zones.map((z) {
-              final isSelected = tempZone.value == z;
-              return ChoiceChip(
-                label: Text(z),
-                selected: isSelected,
-                onSelected: (selected) {
-                  if (selected) tempZone.value = z;
-                },
-                selectedColor: const Color(0xFF4C1D95).withValues(alpha: 0.15),
-                labelStyle: getTextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isSelected ? const Color(0xFF4C1D95) : AppColors.primaryTextColor,
-                ),
-              );
-            }).toList(),
-          )),
+          Obx(
+            () => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: zones.map((z) {
+                final isSelected = tempZone.value == z;
+                return ChoiceChip(
+                  label: Text(z),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) tempZone.value = z;
+                  },
+                  selectedColor: const Color(
+                    0xFF4C1D95,
+                  ).withValues(alpha: 0.15),
+                  labelStyle: getTextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isSelected
+                        ? const Color(0xFF4C1D95)
+                        : AppColors.primaryTextColor,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
           const SizedBox(height: 24),
           CustomButton(
             text: 'Save Details',
@@ -63,6 +69,7 @@ class ZoneSelectionBottomsheet extends StatelessWidget {
               Get.back();
             },
           ),
+          SizedBox(height: 40),
         ],
       ),
     );

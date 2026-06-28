@@ -155,7 +155,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
                 Get.back();
               },
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 40),
           ],
         ),
       ),

@@ -40,7 +40,7 @@ class CaffeineScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'TODAY',
+                      'TODAY'.tr,
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
@@ -48,7 +48,7 @@ class CaffeineScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '$count ${count == 1 ? 'entry' : 'entries'}',
+                      '$count ${count == 1 ? 'entry'.tr : 'entries'.tr}',
                       style: getTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -68,7 +68,7 @@ class CaffeineScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 30),
                     alignment: Alignment.center,
                     child: Text(
-                      'No caffeine entries logged today.',
+                      'No caffeine entries logged today.'.tr,
                       style: getTextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

@@ -51,7 +51,12 @@ class CircadianAvatar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           // ── PNG image: no clip, full image visible ───
-          Positioned.fill(
+          Positioned(
+            top: 30,
+            left: 0,
+            right: 0,
+            bottom: 0,
+
             child: Image.asset(
               imagePath,
               width: avatarSize,
@@ -62,11 +67,12 @@ class CircadianAvatar extends StatelessWidget {
 
           // ── Orbit ring + orbs ───────────────────────
           Positioned(
-            top: orbitCenterY - r,
-            left: (avatarSize / 2) - r,
+            top: -10,
+            left: 0,
+            right: 0,
             child: SizedBox(
-              width: r * 2,
-              height: r * 2,
+              width: r * 1.75,
+              height: r * 1.75,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -76,20 +82,21 @@ class CircadianAvatar extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: const Color(0xFFE9F7E7).withValues(alpha: .18),
-                        width: 2.5,
+                        width: 1,
                       ),
                     ),
-                    child: SizedBox(width: r * 2, height: r * 2),
+                    child: SizedBox(width: r * 1.5, height: r * 1.5),
                   ),
 
                   // orbs
                   Obx(() {
                     final _ = controller.currentTime.value;
 
-                    final sunX = r * math.cos(controller.sunAngle);
-                    final sunY = r * math.sin(controller.sunAngle);
-                    final moonX = r * math.cos(controller.moonAngle);
-                    final moonY = r * math.sin(controller.moonAngle);
+                    final double ringRadius = (r * 1.5) / 2;
+                    final sunX = ringRadius * math.cos(controller.sunAngle);
+                    final sunY = ringRadius * math.sin(controller.sunAngle);
+                    final moonX = ringRadius * math.cos(controller.moonAngle);
+                    final moonY = ringRadius * math.sin(controller.moonAngle);
 
                     return Stack(
                       alignment: Alignment.center,
@@ -99,8 +106,9 @@ class CircadianAvatar extends StatelessWidget {
                           child: _buildOrb(
                             icon: IconPath.sun,
                             color: AppColors.white,
-                            glowColor:
-                                AppColors.yellowAccent.withValues(alpha: .65),
+                            glowColor: AppColors.yellowAccent.withValues(
+                              alpha: .65,
+                            ),
                           ),
                         ),
                         Transform.translate(
@@ -108,8 +116,9 @@ class CircadianAvatar extends StatelessWidget {
                           child: _buildOrb(
                             icon: IconPath.moon1,
                             color: const Color(0xFF00E5BF),
-                            glowColor:
-                                const Color(0xFF00E5BF).withValues(alpha: .35),
+                            glowColor: const Color(
+                              0xFF00E5BF,
+                            ).withValues(alpha: .35),
                           ),
                         ),
                       ],
@@ -140,12 +149,7 @@ class CircadianAvatar extends StatelessWidget {
           BoxShadow(color: glowColor, blurRadius: 12, spreadRadius: 2),
         ],
       ),
-      child: Image.asset(
-        icon,
-        color: color,
-        width: 30,
-        height: 30,
-      ),
+      child: Image.asset(icon, color: color, width: 30, height: 30),
     );
   }
 }
