@@ -10,7 +10,7 @@ class SplitStatusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<DashboardController>();
+    final controller = Get.put(DashboardController());
     return Obx(() {
       final data = controller.dashboardData.value;
       return Row(

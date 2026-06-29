@@ -237,7 +237,15 @@ class CaffeineController extends GetxController {
           if (parts.length == 2) {
             final h = int.tryParse(parts[0]) ?? now.hour;
             final m = int.tryParse(parts[1]) ?? now.minute;
-            logTime = DateTime(now.year, now.month, now.day, h, m);
+            // Parse as UTC first, then convert to local to avoid timezone offset issues
+            final utcLogTime = DateTime.utc(now.year, now.month, now.day, h, m);
+            var localTime = utcLogTime.toLocal();
+            // If the converted local time is in the future, it means the log actually
+            // occurred yesterday UTC/local, so we adjust it by subtracting 1 day.
+            if (localTime.isAfter(now)) {
+              localTime = localTime.subtract(const Duration(days: 1));
+            }
+            logTime = localTime;
           }
 
           return CaffeineEntry(
@@ -265,7 +273,18 @@ class CaffeineController extends GetxController {
             return sum + entry.amountMg;
           }
         });
-        activeCaffeine.value = decayed;
+        
+        // Prioritize the server-calculated active caffeine value from the cached dashboard card data.
+        if (Get.isRegistered<DashboardController>()) {
+          final cachedCard = Get.find<DashboardController>().caffeineCardData.value;
+          if (cachedCard != null && cachedCard['activeMg'] != null) {
+            activeCaffeine.value = (cachedCard['activeMg'] as num).toDouble();
+          } else {
+            activeCaffeine.value = decayed;
+          }
+        } else {
+          activeCaffeine.value = decayed;
+        }
 
         _syncWithDashboard();
         saveEntriesToPrefs(syncWithServer: false);
