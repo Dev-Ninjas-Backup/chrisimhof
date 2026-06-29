@@ -11,7 +11,7 @@ class ForYouSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<RecommendationController>();
+    final controller = Get.put(RecommendationController());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
