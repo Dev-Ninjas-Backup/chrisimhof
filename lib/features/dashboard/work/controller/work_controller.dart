@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:chrisimhof/features/dashboard/work/service/work_service.dart';
+import 'package:chrisimhof/core/service/helper/custom_rotation_prefs.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 
 class WorkController extends GetxController {
   final startHour = 22.obs;
@@ -37,7 +38,12 @@ class WorkController extends GetxController {
     super.onInit();
     _initializeFromDashboard();
     fetchWorkSettings();
-    fetchFromSession();
+    _initCustomRotation();
+  }
+
+  Future<void> _initCustomRotation() async {
+    await fetchFromSession();
+    await loadCustomRotationSchedule();
   }
 
   void _initializeFromDashboard() {
@@ -218,36 +224,81 @@ class WorkController extends GetxController {
     return hours == hours.toInt() ? '${hours.toInt()}h' : '${hours.toStringAsFixed(1)}h';
   }
 
-  void selectShift(String shift) {
+  void selectShift(String shift) async {
     selectedShiftType.value = shift;
-    if (shift == 'Day') {
-      startHour.value = 9; startMinute.value = 0; endHour.value = 17; endMinute.value = 0;
-    } else if (shift == 'Evening') {
-      startHour.value = 14; startMinute.value = 0; endHour.value = 22; endMinute.value = 0;
-    } else if (shift == 'Night') {
-      startHour.value = 22; startMinute.value = 0; endHour.value = 6; endMinute.value = 0;
-    } else if (shift == 'Off') {
-      startHour.value = 0; startMinute.value = 0; endHour.value = 0; endMinute.value = 0;
+    final customEnabled = await CustomRotationPrefs.isEnabled();
+    if (customEnabled) {
+      final times = await CustomRotationPrefs.getShiftTimes();
+      if (times.containsKey(shift)) {
+        final start = times[shift]!['start']!;
+        final end = times[shift]!['end']!;
+        final startParts = start.split(':');
+        final endParts = end.split(':');
+        if (startParts.length == 2) {
+          startHour.value = int.tryParse(startParts[0]) ?? startHour.value;
+          startMinute.value = int.tryParse(startParts[1]) ?? startMinute.value;
+        }
+        if (endParts.length == 2) {
+          endHour.value = int.tryParse(endParts[0]) ?? endHour.value;
+          endMinute.value = int.tryParse(endParts[1]) ?? endMinute.value;
+        }
+      } else {
+        startHour.value = 0; startMinute.value = 0; endHour.value = 0; endMinute.value = 0;
+      }
+    } else {
+      if (shift == 'Day') {
+        startHour.value = 9; startMinute.value = 0; endHour.value = 17; endMinute.value = 0;
+      } else if (shift == 'Evening') {
+        startHour.value = 14; startMinute.value = 0; endHour.value = 22; endMinute.value = 0;
+      } else if (shift == 'Night') {
+        startHour.value = 22; startMinute.value = 0; endHour.value = 6; endMinute.value = 0;
+      } else if (shift == 'Off') {
+        startHour.value = 0; startMinute.value = 0; endHour.value = 0; endMinute.value = 0;
+      }
     }
   }
 
-  void toggleDayShift(int index) {
-    final currentShift = weeklyPattern[index]['shift'];
-    String nextShift = 'Off';
-    if (currentShift == 'N') {
-      nextShift = 'Off';
-    } else if (currentShift == 'Off') {
-      nextShift = 'D';
-    } else if (currentShift == 'D') {
-      nextShift = 'E';
-    } else if (currentShift == 'E') {
-      nextShift = 'N';
+  void toggleDayShift(int index) async {
+    final customEnabled = await CustomRotationPrefs.isEnabled();
+    if (customEnabled) {
+      final now = DateTime.now();
+      final monday = now.subtract(Duration(days: now.weekday - 1));
+      final date = monday.add(Duration(days: index));
+      final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+      final currentShift = weeklyPattern[index]['shift'];
+      String nextShift = 'Off';
+      if (currentShift == 'N') {
+        nextShift = 'Off';
+      } else if (currentShift == 'Off') {
+        nextShift = 'D';
+      } else if (currentShift == 'D') {
+        nextShift = 'E';
+      } else if (currentShift == 'E') {
+        nextShift = 'N';
+      }
+
+      await CustomRotationPrefs.addOverride(dateStr, nextShift);
+      await loadCustomRotationSchedule();
+    } else {
+      final currentShift = weeklyPattern[index]['shift'];
+      String nextShift = 'Off';
+      if (currentShift == 'N') {
+        nextShift = 'Off';
+      } else if (currentShift == 'Off') {
+        nextShift = 'D';
+      } else if (currentShift == 'D') {
+        nextShift = 'E';
+      } else if (currentShift == 'E') {
+        nextShift = 'N';
+      }
+      weeklyPattern[index] = {'day': weeklyPattern[index]['day']!, 'shift': nextShift};
+      saveWeeklyPattern();
     }
-    weeklyPattern[index] = {'day': weeklyPattern[index]['day']!, 'shift': nextShift};
-    saveWeeklyPattern();
   }
 
-  void applyRotationPattern(String pattern) {
+  void applyRotationPattern(String pattern) async {
+    await CustomRotationPrefs.setEnabled(false);
     defaultRotation.value = pattern;
     saveWorkSettings();
     final Map<String, List<String>> patterns = {
@@ -357,36 +408,42 @@ class WorkController extends GetxController {
 
   void updateFromLiveScoresTab(Map<String, dynamic> tabData) {
     try {
-      if (tabData['shiftType'] != null) {
-        final sType = tabData['shiftType'] as String;
-        if (sType.isNotEmpty) {
-          selectedShiftType.value = sType[0].toUpperCase() + sType.substring(1);
-        }
-      }
-      if (tabData['shiftStartTime'] != null) {
-        final parts = (tabData['shiftStartTime'] as String).split(':');
-        if (parts.length == 2) {
-          startHour.value = int.tryParse(parts[0]) ?? 22;
-          startMinute.value = int.tryParse(parts[1]) ?? 0;
-        }
-      }
-      if (tabData['shiftEndTime'] != null) {
-        final parts = (tabData['shiftEndTime'] as String).split(':');
-        if (parts.length == 2) {
-          endHour.value = int.tryParse(parts[0]) ?? 6;
-          endMinute.value = int.tryParse(parts[1]) ?? 0;
-        }
-      }
+      CustomRotationPrefs.isEnabled().then((customEnabled) {
+        if (customEnabled) {
+          loadCustomRotationSchedule();
+        } else {
+          if (tabData['shiftType'] != null) {
+            final sType = tabData['shiftType'] as String;
+            if (sType.isNotEmpty) {
+              selectedShiftType.value = sType[0].toUpperCase() + sType.substring(1);
+            }
+          }
+          if (tabData['shiftStartTime'] != null) {
+            final parts = (tabData['shiftStartTime'] as String).split(':');
+            if (parts.length == 2) {
+              startHour.value = int.tryParse(parts[0]) ?? 22;
+              startMinute.value = int.tryParse(parts[1]) ?? 0;
+            }
+          }
+          if (tabData['shiftEndTime'] != null) {
+            final parts = (tabData['shiftEndTime'] as String).split(':');
+            if (parts.length == 2) {
+              endHour.value = int.tryParse(parts[0]) ?? 6;
+              endMinute.value = int.tryParse(parts[1]) ?? 0;
+            }
+          }
 
-      final List? patternList = tabData['weeklyPatternDisplay'] as List?;
-      if (patternList != null) {
-        weeklyPattern.assignAll(patternList.map((item) {
-          return {
-            'day': item['day'] as String? ?? '',
-            'shift': item['shiftCode'] as String? ?? 'Off',
-          };
-        }).toList());
-      }
+          final List? patternList = tabData['weeklyPatternDisplay'] as List?;
+          if (patternList != null) {
+            weeklyPattern.assignAll(patternList.map((item) {
+              return {
+                'day': item['day'] as String? ?? '',
+                'shift': item['shiftCode'] as String? ?? 'Off',
+              };
+            }).toList());
+          }
+        }
+      });
 
       final settings = tabData['settings'] as Map<String, dynamic>?;
       if (settings != null) {
@@ -508,5 +565,10 @@ class WorkController extends GetxController {
     } catch (e) {
       debugPrint('WorkController fetchWorkSettings error: $e');
     }
+  }
+
+  Future<void> loadCustomRotationSchedule() async {
+    final settingsCtrl = Get.put(WorkScheduleSettingsController());
+    await settingsCtrl.loadCustomRotationSchedule(this);
   }
 }

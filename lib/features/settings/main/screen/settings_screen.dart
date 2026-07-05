@@ -65,7 +65,7 @@ class SettingsScreen extends StatelessWidget {
                   SettingsRowData(
                     iconpath: IconPath.work,
                     label: 'Work schedule',
-                    onTap: () => Get.toNamed(AppRoutes.workScheduleScreen),
+                    onTap: () => Get.toNamed(AppRoutes.workScheduleSettingsScreen),
                   ),
                   SettingsRowData(
                     iconpath: IconPath.privacy,
