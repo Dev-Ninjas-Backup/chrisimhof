@@ -20,12 +20,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingsScreen extends StatelessWidget {
-  SettingsScreen({super.key});
-
-  final SettingsController controller = Get.put(SettingsController());
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final SettingsController controller = Get.isRegistered<SettingsController>()
+        ? Get.find<SettingsController>()
+        : Get.put(SettingsController());
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(

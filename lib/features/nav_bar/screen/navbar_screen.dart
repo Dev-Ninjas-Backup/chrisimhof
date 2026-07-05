@@ -19,7 +19,7 @@ class NavbarScreen extends StatelessWidget {
 
   static bool _languageApplied = false;
 
-  static final List<Widget> _screens = [
+  static const List<Widget> _screens = [
     DashboardScreen(),
     RecomendationsScreen(),
     StatisticsScreen(),
