@@ -74,14 +74,16 @@ class _NavItem extends StatelessWidget {
           curve: Curves.easeOut,
           constraints: BoxConstraints(
             minWidth: isActive ? 88 : 46,
-            maxWidth: isActive ? 110 : 46,
+            maxWidth: isActive ? 125 : 46,
           ),
           padding: EdgeInsets.symmetric(
             horizontal: isActive ? 16 : 0,
             vertical: 8,
           ),
           decoration: BoxDecoration(
-            color: isActive ? AppColors.primaryButtonColor : AppColors.transparent,
+            color: isActive
+                ? AppColors.primaryButtonColor
+                : AppColors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -91,9 +93,7 @@ class _NavItem extends StatelessWidget {
               Icon(
                 item.icon,
                 size: 18,
-                color: isActive
-                    ? AppColors.darkGreen
-                    : AppColors.sageMuted,
+                color: isActive ? AppColors.darkGreen : AppColors.sageMuted,
               ),
               AnimatedSize(
                 duration: const Duration(milliseconds: 180),
