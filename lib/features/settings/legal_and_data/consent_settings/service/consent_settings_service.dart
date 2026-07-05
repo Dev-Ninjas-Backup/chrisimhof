@@ -6,7 +6,9 @@ import 'package:http/http.dart' as http;
 
 class ConsentSettingsService {
   // GET /api/v1/onboarding/consent?locale=$locale
-  Future<ConsentSettingsResponseModel> getConsentSettings({required String locale}) async {
+  Future<ConsentSettingsResponseModel> getConsentSettings({
+    required String locale,
+  }) async {
     final uri = Uri.parse(Urls.getConsentSettings(locale));
     final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
 
@@ -20,7 +22,7 @@ class ConsentSettingsService {
     );
 
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
-
+    print('consent settings: $jsonData');
     if (response.statusCode == 200 || response.statusCode == 201) {
       return ConsentSettingsResponseModel.fromJson(jsonData);
     } else {

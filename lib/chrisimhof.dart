@@ -7,17 +7,33 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 
 class Chrisimhof extends StatelessWidget {
-  const Chrisimhof({super.key});
+  final String? initialLanguage;
+
+  const Chrisimhof({super.key, this.initialLanguage});
 
   @override
   Widget build(BuildContext context) {
     // Initialize the LanguageController at app level
-    Get.put(LanguageController(), permanent: true);
+    final languageController = Get.put(LanguageController(), permanent: true);
+
+    // If initialLanguage is provided, set it in the language controller immediately
+    if (initialLanguage != null) {
+      languageController.selectedLanguage.value = initialLanguage!.toUpperCase();
+    }
+
+    final Locale initialLocale;
+    if (initialLanguage?.toUpperCase() == 'FR') {
+      initialLocale = const Locale('fr', 'FR');
+    } else if (initialLanguage?.toUpperCase() == 'EN') {
+      initialLocale = const Locale('en', 'US');
+    } else {
+      initialLocale = Get.deviceLocale ?? const Locale('en', 'US');
+    }
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       translations: AppTranslations(),
-      locale: Get.deviceLocale ?? const Locale('en', 'US'),
+      locale: initialLocale,
       fallbackLocale: const Locale('en', 'US'),
       supportedLocales: const [Locale('en', 'US'), Locale('fr', 'FR')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

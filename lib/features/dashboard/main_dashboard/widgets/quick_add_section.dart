@@ -28,7 +28,7 @@ class QuickAddSection extends StatelessWidget {
               ),
             ),
             Text(
-              'tap to log',
+              'tap to log'.tr,
               style: getTextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

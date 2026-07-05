@@ -253,7 +253,8 @@ class NutritionScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'How heavy was it (no food names — only heaviness matters for sleep & recovery)'.tr,
+                        'How heavy was it (no food names — only heaviness matters for sleep & recovery)'
+                            .tr,
                         style: getTextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
@@ -323,7 +324,7 @@ class NutritionScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Save meal',
+                                'Save meal'.tr,
                                 style: getTextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -342,7 +343,7 @@ class NutritionScreen extends StatelessWidget {
 
               // TODAY'S TIMING HEADER
               Text(
-                "TODAY'S TIMING",
+                "TODAY'S TIMING".tr,
                 style: getTextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
@@ -595,7 +596,7 @@ class NutritionScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Add note',
+                              'Add note'.tr,
                               style: getTextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -680,7 +681,7 @@ class NutritionScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Add Note',
+          'Add Note'.tr,
           style: getTextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -689,9 +690,9 @@ class NutritionScreen extends StatelessWidget {
         ),
         content: TextField(
           controller: textController,
-          decoration: const InputDecoration(
-            hintText: 'Enter your note here...',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: 'Enter your note here...'.tr,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),

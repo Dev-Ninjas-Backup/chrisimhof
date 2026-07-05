@@ -5,6 +5,19 @@ class SharedPreferencesHelper {
   static const String _refreshTokenKey = 'refreshToken';
   static const String _isLoggedInKey = 'isLoggedIn';
   static const String _sessionIdKey = 'sessionId';
+  static const String _languageKey = 'language';
+
+  // Save language
+  static Future<void> saveLanguage(String language) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_languageKey, language);
+  }
+
+  // Get language
+  static Future<String?> getLanguage() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_languageKey);
+  }
 
   // Save access token
   static Future<void> saveAccessToken(String token) async {

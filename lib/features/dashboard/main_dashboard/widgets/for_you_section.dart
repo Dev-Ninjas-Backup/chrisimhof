@@ -11,7 +11,7 @@ class ForYouSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<RecommendationController>();
+    final controller = Get.put(RecommendationController());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,7 +34,7 @@ class ForYouSection extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    'See all',
+                    'See all'.tr,
                     style: getTextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -150,8 +150,6 @@ class ForYouSection extends StatelessWidget {
     );
   }
 
-
-
   Widget _buildEmptyState() {
     return Container(
       width: double.infinity,
@@ -163,10 +161,14 @@ class ForYouSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.auto_awesome, color: AppColors.primaryButtonColor, size: 24),
+          const Icon(
+            Icons.auto_awesome,
+            color: AppColors.primaryButtonColor,
+            size: 24,
+          ),
           const SizedBox(height: 8),
           Text(
-            'No recommendations yet',
+            'No recommendations yet'.tr,
             style: getTextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -175,7 +177,7 @@ class ForYouSection extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Log your daily data to get personalised tips.',
+            'Log your daily data to get personalised tips.'.tr,
             style: getTextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w400,

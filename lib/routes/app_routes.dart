@@ -31,6 +31,7 @@ import 'package:chrisimhof/features/sports/screen/sports_screen.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/screen/caffeine_screen.dart';
 import 'package:chrisimhof/features/dashboard/sleep/screen/sleep_screen.dart';
 import 'package:chrisimhof/features/dashboard/work/screen/work_schedule_screen.dart';
+import 'package:chrisimhof/features/work_schedule_settings/screen/work_schedule_settings_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -60,6 +61,7 @@ class AppRoutes {
   static String caffeineScreen = '/caffeineScreen';
   static String sleepScreen = '/sleepScreen';
   static String workScheduleScreen = '/workScheduleScreen';
+  static String workScheduleSettingsScreen = '/workScheduleSettingsScreen';
   static String settingsScreen = '/settingsScreen';
   static String forgetPasswordScreen = '/forgetPasswordScreen';
   static String successScreen = '/successScreen';
@@ -94,6 +96,7 @@ class AppRoutes {
   static String getCaffeineScreen() => caffeineScreen;
   static String getSleepScreen() => sleepScreen;
   static String getWorkScheduleScreen() => workScheduleScreen;
+  static String getWorkScheduleSettingsScreen() => workScheduleSettingsScreen;
   static String getSettingsScreen() => settingsScreen;
   static String getForgetPasswordScreen() => forgetPasswordScreen;
   static String getSuccessScreen() => successScreen;
@@ -140,6 +143,10 @@ class AppRoutes {
     GetPage(name: caffeineScreen, page: () => const CaffeineScreen()),
     GetPage(name: sleepScreen, page: () => const SleepScreen()),
     GetPage(name: workScheduleScreen, page: () => const WorkScheduleScreen()),
+    GetPage(
+      name: workScheduleSettingsScreen,
+      page: () => const WorkScheduleSettingsScreen(),
+    ),
     GetPage(name: settingsScreen, page: () => SettingsScreen()),
     GetPage(name: navbarScreen, page: () => const NavbarScreen()),
     GetPage(name: forgetPasswordScreen, page: () => const ForgetPasswordScreen()),

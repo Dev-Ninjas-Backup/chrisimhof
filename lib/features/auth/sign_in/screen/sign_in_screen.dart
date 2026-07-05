@@ -144,7 +144,7 @@ class SignInScreen extends StatelessWidget {
                 ),
               ),
               CustomButton(
-                text: 'Continue with Google',
+                text: 'Continue with Google'.tr,
                 onTap: controller.signInWithGoogle,
                 backgroundColor: AppColors.white,
                 textColor: AppColors.black,
@@ -154,7 +154,7 @@ class SignInScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               CustomButton(
-                text: 'Continue with Apple',
+                text: 'Continue with Apple'.tr,
                 onTap: controller.signInWithApple,
                 backgroundColor: AppColors.white,
                 textColor: AppColors.black,
@@ -165,7 +165,7 @@ class SignInScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
               CustomButton(
-                text: 'Continue with Microsoft',
+                text: 'Continue with Microsoft'.tr,
                 onTap: controller.signInWithMicrosoft,
                 backgroundColor: AppColors.white,
                 textColor: AppColors.black,

@@ -14,6 +14,10 @@ class ActiveInBodyCard extends StatelessWidget {
     return Obx(() {
       final activeVal = controller.activeCaffeine.value;
       final totalVal = controller.todayTotalCaffeine.value;
+      final double totalValDouble = totalVal.toDouble();
+      final double maxVal = totalValDouble > 400.0
+          ? ((totalValDouble / 200.0).ceil() * 200.0)
+          : 400.0;
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
@@ -73,7 +77,7 @@ class ActiveInBodyCard extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final double width = constraints.maxWidth;
-                final double progress = (activeVal / 400.0).clamp(0.0, 1.0);
+                final double progress = (totalValDouble / maxVal).clamp(0.0, 1.0);
                 final double knobPosition = progress * width;
                 return Stack(
                   alignment: Alignment.centerLeft,
@@ -134,7 +138,7 @@ class ActiveInBodyCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '200 mg',
+                  '${(maxVal / 2).round()} mg',
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -142,7 +146,7 @@ class ActiveInBodyCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '400 mg',
+                  '${maxVal.round()} mg',
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -159,9 +163,9 @@ class ActiveInBodyCard extends StatelessWidget {
                   color: AppColors.caffeineTextDark,
                 ),
                 children: [
-                  const TextSpan(text: 'Today: '),
+                  TextSpan(text: 'Today: '.tr),
                   TextSpan(
-                    text: '$totalVal / 400 mg',
+                    text: '$totalVal',
                     style: getTextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,

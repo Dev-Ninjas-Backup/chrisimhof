@@ -373,7 +373,7 @@ class SleepController extends GetxController {
             );
 
             parsedLogs.add(SleepLog(
-              id: item['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
+              id: item['id'] as String? ?? 'server_${date.millisecondsSinceEpoch}',
               date: date,
               bedtime: bedtime,
               wakeupTime: wakeupTime,
@@ -383,22 +383,21 @@ class SleepController extends GetxController {
             debugPrint('SleepController socket item parsing error: $e');
           }
         }
-        if (parsedLogs.isNotEmpty) {
-          // Preserve optimistic logs that are not yet returned by the server on the same day
-          final optimisticLogs = historyLogs.where((log) => int.tryParse(log.id) != null).toList();
-          for (var optLog in optimisticLogs) {
-            final hasSameDay = parsedLogs.any((pLog) =>
-                pLog.date.year == optLog.date.year &&
-                pLog.date.month == optLog.date.month &&
-                pLog.date.day == optLog.date.day);
-            if (!hasSameDay) {
-              parsedLogs.add(optLog);
-            }
+        
+        // Preserve optimistic logs that are not yet returned by the server on the same day
+        final optimisticLogs = historyLogs.where((log) => int.tryParse(log.id) != null).toList();
+        for (var optLog in optimisticLogs) {
+          final hasSameDay = parsedLogs.any((pLog) =>
+              pLog.date.year == optLog.date.year &&
+              pLog.date.month == optLog.date.month &&
+              pLog.date.day == optLog.date.day);
+          if (!hasSameDay) {
+            parsedLogs.add(optLog);
           }
-          parsedLogs.sort((a, b) => b.date.compareTo(a.date));
-          historyLogs.assignAll(parsedLogs);
-          saveSleepHistory();
         }
+        parsedLogs.sort((a, b) => b.date.compareTo(a.date));
+        historyLogs.assignAll(parsedLogs);
+        saveSleepHistory();
       }
     } catch (e) {
       debugPrint('SleepController socket update error: $e');
