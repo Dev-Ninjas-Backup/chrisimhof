@@ -4,6 +4,14 @@ import 'package:chrisimhof/features/settings/main/model/profile_response_model.d
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+class UnauthorizedException implements Exception {
+  final String message;
+  UnauthorizedException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 class ProfileService {
   // GET /api/v1/auth/me
   Future<ProfileResponseModel> getProfile({required String accessToken}) async {
@@ -25,6 +33,8 @@ class ProfileService {
 
     if (response.statusCode == 200) {
       return ProfileResponseModel.fromJson(jsonData);
+    } else if (response.statusCode == 401) {
+      throw UnauthorizedException(jsonData['message'] ?? 'Invalid or expired token');
     } else {
       throw Exception(jsonData['message'] ?? 'Failed to load profile');
     }

@@ -86,13 +86,20 @@ class WorkController extends GetxController {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
       if (token.isEmpty) return;
 
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       final locale = Get.locale?.languageCode == 'fr' ? 'fr' : 'en';
-      final sessionUri = Uri.parse(Urls.createCalculatorSession).replace(
-        queryParameters: {'locale': locale},
-      );
+      
+      final Uri uri;
+      if (sessionId.isNotEmpty) {
+        uri = Uri.parse(Urls.liveScore(sessionId, locale));
+      } else {
+        uri = Uri.parse(Urls.createCalculatorSession).replace(
+          queryParameters: {'locale': locale},
+        );
+      }
 
       final sessionResponse = await http.get(
-        sessionUri,
+        uri,
         headers: {
           'accept': '*/*',
           'Authorization': 'Bearer $token',
@@ -100,6 +107,7 @@ class WorkController extends GetxController {
       );
 
       debugPrint('WorkController session GET status: ${sessionResponse.statusCode}');
+      debugPrint('WorkController session GET body: ${sessionResponse.body}');
 
       if (sessionResponse.statusCode == 200 || sessionResponse.statusCode == 201) {
         final decoded = jsonDecode(sessionResponse.body) as Map<String, dynamic>;
@@ -108,15 +116,19 @@ class WorkController extends GetxController {
 
         final liveScores = data['liveScores'] as Map<String, dynamic>?;
 
-        // Extract shapesToday/workShapesToday directly from liveScores
-        if (liveScores?['workShapesToday'] is List) {
+        // Try getting workTab from data['tabs']['work'] first, fall back to liveScores['tabs']['work']
+        final workTab = (data['tabs']?['work'] ?? liveScores?['tabs']?['work']) as Map<String, dynamic>?;
+
+        // Extract shapesToday/workShapesToday
+        if (workTab?['shapesToday'] is List) {
+          updateWorkShapesToday(workTab!['shapesToday'] as List<dynamic>);
+        } else if (liveScores?['workShapesToday'] is List) {
           updateWorkShapesToday(liveScores!['workShapesToday'] as List<dynamic>);
         } else if (liveScores?['shapesToday'] is List) {
           updateWorkShapesToday(liveScores!['shapesToday'] as List<dynamic>);
         }
 
         // 1. tabs.work — full tab with weeklyPatternDisplay
-        final workTab = liveScores?['tabs']?['work'] as Map<String, dynamic>?;
         if (workTab != null) {
           updateFromLiveScoresTab(workTab);
           return;

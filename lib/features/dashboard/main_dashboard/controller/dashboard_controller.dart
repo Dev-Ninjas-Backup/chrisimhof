@@ -784,6 +784,7 @@ class DashboardController extends GetxController {
       caffeineCtrl.forYouCaffeineCutoff.value = null;
     }
 
+    String? newSessionId;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       if (sessionId.isNotEmpty) {
@@ -812,6 +813,7 @@ class DashboardController extends GetxController {
               useLocalCaches: false,
             );
           }
+          newSessionId = jsonData['data']?['newSession']?['sessionId'] as String?;
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to end session');
         }
@@ -820,9 +822,15 @@ class DashboardController extends GetxController {
       // Remove old session ID to ensure no fallback state
       await SharedPreferencesHelper.removeSessionId();
 
-      // Create a brand-new session
-      final newSessionId = await SessionService().fetchAndStoreSessionId();
-      debugPrint('endMyDay: new sessionId = $newSessionId');
+      // Save new session ID from end session response if available
+      if (newSessionId != null && newSessionId.isNotEmpty) {
+        await SharedPreferencesHelper.saveSessionId(newSessionId);
+        debugPrint('endMyDay: saved new sessionId from response = $newSessionId');
+      } else {
+        // Fallback: Create a brand-new session
+        newSessionId = await SessionService().fetchAndStoreSessionId();
+        debugPrint('endMyDay: new sessionId fetched as fallback = $newSessionId');
+      }
 
       // Clear all local caches
       await SharedPreferencesHelper.saveCaffeineLogs('[]');

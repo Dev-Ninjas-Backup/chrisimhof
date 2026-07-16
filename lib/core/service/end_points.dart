@@ -6,6 +6,7 @@ class Urls {
   static const String verifyOtp = '$baseUrl/api/v1/auth/verify';
   static const String login = '$baseUrl/api/v1/auth/login';
   static const String logout = '$baseUrl/api/v1/auth/logout';
+  static const String refresh = '$baseUrl/api/v1/auth/refresh';
   static const String googleSignin = '$baseUrl/api/v1/auth/google';
 
   static const String microsoftSignin = '$baseUrl/api/v1/auth/microsoft';
