@@ -90,14 +90,14 @@ class CaffeineEntryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 12),
-          GestureDetector(
-            onTap: onEdit,
-            child: const Icon(
-              Icons.edit_outlined,
-              color: AppColors.textSoft,
-              size: 18,
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: onEdit,
+          //   child: const Icon(
+          //     Icons.edit_outlined,
+          //     color: AppColors.textSoft,
+          //     size: 18,
+          //   ),
+          // ),
         ],
       ),
     );
