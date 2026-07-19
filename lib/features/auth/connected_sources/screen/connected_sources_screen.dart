@@ -28,7 +28,7 @@ class ConnectedSourcesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ConnectedSourcesController());
+    final controller = Get.find<ConnectedSourcesController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

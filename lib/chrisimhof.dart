@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/binder/controller_binder.dart';
 import 'package:chrisimhof/core/common/controller/language_controller.dart';
 import 'package:chrisimhof/core/common/widgets/app_translations.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
@@ -32,6 +33,7 @@ class Chrisimhof extends StatelessWidget {
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      initialBinding: ControllerBinder(),
       translations: AppTranslations(),
       locale: initialLocale,
       fallbackLocale: const Locale('en', 'US'),
@@ -44,3 +46,4 @@ class Chrisimhof extends StatelessWidget {
     );
   }
 }
+

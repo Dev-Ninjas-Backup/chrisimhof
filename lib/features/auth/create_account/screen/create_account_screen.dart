@@ -15,8 +15,8 @@ import 'package:get/get.dart';
 class CreateAccountScreen extends StatelessWidget {
   CreateAccountScreen({super.key});
 
-  final CreateAccountController controller = Get.put(CreateAccountController());
-  final SignInController signInController = Get.put(SignInController());
+  final CreateAccountController controller = Get.find<CreateAccountController>();
+  final SignInController signInController = Get.find<SignInController>();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final String title = 'Create account';
 

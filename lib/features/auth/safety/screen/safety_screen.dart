@@ -13,7 +13,7 @@ class SafetyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Instantiate/Find the SafetyController using GetX
-    final controller = Get.put(SafetyController());
+    final controller = Get.find<SafetyController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

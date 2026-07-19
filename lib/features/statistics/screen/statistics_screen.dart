@@ -16,7 +16,7 @@ class StatisticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final StatisticsController controller = Get.put(StatisticsController());
+    final StatisticsController controller = Get.find<StatisticsController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

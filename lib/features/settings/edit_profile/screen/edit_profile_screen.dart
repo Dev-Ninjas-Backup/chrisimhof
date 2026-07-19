@@ -11,7 +11,7 @@ class EditProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(EditProfileController(), tag: 'editProfile');
+    final controller = Get.find<EditProfileController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

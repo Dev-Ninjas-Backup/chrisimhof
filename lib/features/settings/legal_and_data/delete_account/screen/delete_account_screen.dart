@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 
 class DeleteAccountScreen extends StatelessWidget {
   DeleteAccountScreen({super.key});
-  final DeleteAccountController controller = Get.put(DeleteAccountController());
+  final DeleteAccountController controller = Get.find<DeleteAccountController>();
 
   @override
   Widget build(BuildContext context) {

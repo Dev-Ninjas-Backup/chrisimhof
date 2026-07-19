@@ -28,7 +28,7 @@ class NavbarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(NavController());
+    final controller = Get.find<NavController>();
 
     if (!_languageApplied) {
       _languageApplied = true;

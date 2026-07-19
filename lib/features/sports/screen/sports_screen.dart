@@ -15,7 +15,7 @@ class SportsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SportsController controller = Get.put(SportsController());
+    final SportsController controller = Get.find<SportsController>();
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(

@@ -580,7 +580,7 @@ class WorkController extends GetxController {
   }
 
   Future<void> loadCustomRotationSchedule() async {
-    final settingsCtrl = Get.put(WorkScheduleSettingsController());
+    final settingsCtrl = Get.find<WorkScheduleSettingsController>();
     await settingsCtrl.loadCustomRotationSchedule(this);
   }
 }

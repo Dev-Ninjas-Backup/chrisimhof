@@ -15,7 +15,7 @@ class WorkScheduleSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(WorkScheduleSettingsController());
+    final controller = Get.find<WorkScheduleSettingsController>();
     final daysOfWeek = [
       'Monday',
       'Tuesday',

@@ -36,7 +36,7 @@ class BaselineSetupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(BaselineSetupController());
+    final controller = Get.find<BaselineSetupController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

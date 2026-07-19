@@ -13,9 +13,7 @@ class RecomendationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RecommendationController controller =
-        Get.isRegistered<RecommendationController>()
-            ? Get.find<RecommendationController>()
-            : Get.put(RecommendationController());
+        Get.find<RecommendationController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -31,7 +29,31 @@ class RecomendationsScreen extends StatelessWidget {
           }
 
           final data = controller.recommendationResponse.value?.data;
-          final recommendations = data?.recommendations ?? [];
+          final grouped = data?.grouped;
+          final List<List<RecommendationItem>> activeCategories = [];
+          if (grouped != null) {
+            if (grouped.Caffeine != null && grouped.Caffeine!.isNotEmpty) {
+              activeCategories.add(grouped.Caffeine!);
+            }
+            if (grouped.Hydration != null && grouped.Hydration!.isNotEmpty) {
+              activeCategories.add(grouped.Hydration!);
+            }
+            if (grouped.Nutrition != null && grouped.Nutrition!.isNotEmpty) {
+              activeCategories.add(grouped.Nutrition!);
+            }
+            if (grouped.Sport != null && grouped.Sport!.isNotEmpty) {
+              activeCategories.add(grouped.Sport!);
+            }
+            if (grouped.Work != null && grouped.Work!.isNotEmpty) {
+              activeCategories.add(grouped.Work!);
+            }
+            if (grouped.Fatigue != null && grouped.Fatigue!.isNotEmpty) {
+              activeCategories.add(grouped.Fatigue!);
+            }
+            if (grouped.Sleep != null && grouped.Sleep!.isNotEmpty) {
+              activeCategories.add(grouped.Sleep!);
+            }
+          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 120),
@@ -103,38 +125,14 @@ class RecomendationsScreen extends StatelessWidget {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: recommendations.length,
+                  itemCount: activeCategories.length,
                   itemBuilder: (context, index) {
-                    final item = recommendations[index];
-
-                    List<RecommendationItem>? subRecommendations;
-                    final category = item.category?.toLowerCase();
-                    if (data?.grouped != null && category != null) {
-                      switch (category) {
-                        case 'sleep':
-                          subRecommendations = data!.grouped!.Sleep;
-                          break;
-                        case 'caffeine':
-                          subRecommendations = data!.grouped!.Caffeine;
-                          break;
-                        case 'hydration':
-                          subRecommendations = data!.grouped!.Hydration;
-                          break;
-                        case 'sport':
-                          subRecommendations = data!.grouped!.Sport;
-                          break;
-                        case 'nutrition':
-                          subRecommendations = data!.grouped!.Nutrition;
-                          break;
-                        case 'fatigue':
-                          subRecommendations = data!.grouped!.Fatigue;
-                          break;
-                      }
-                    }
+                    final categoryList = activeCategories[index];
+                    final item = categoryList.first;
 
                     return RecomendationCard(
                       recomendation: item,
-                      subRecommendations: subRecommendations,
+                      subRecommendations: categoryList,
                       onTap: () {
                         debugPrint('Tapped ${item.title}');
                       },

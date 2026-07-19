@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
-  final SignInController controller = Get.put(SignInController());
+  final SignInController controller = Get.find<SignInController>();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final String title = 'Log in';
 

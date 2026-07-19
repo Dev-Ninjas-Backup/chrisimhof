@@ -13,7 +13,7 @@ class ForgetPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ForgetPasswordController());
+    final controller = Get.find<ForgetPasswordController>();
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null && args.containsKey('userId')) {
       controller.userId = args['userId'];

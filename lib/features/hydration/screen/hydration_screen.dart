@@ -21,7 +21,7 @@ class _HydrationScreenState extends State<HydrationScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(HydrationController());
+    controller = Get.find<HydrationController>();
     controller.selectToday();
   }
 

@@ -13,9 +13,7 @@ class SleepScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SleepController controller = Get.isRegistered<SleepController>()
-        ? Get.find<SleepController>()
-        : Get.put(SleepController());
+    final SleepController controller = Get.find<SleepController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

@@ -12,7 +12,7 @@ class ForgetPasswordEmailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ForgetPasswordController());
+    final controller = Get.find<ForgetPasswordController>();
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(
