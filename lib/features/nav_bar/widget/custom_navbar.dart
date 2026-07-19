@@ -9,7 +9,7 @@ class CustomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NavController controller = Get.put(NavController());
+    final NavController controller = Get.find<NavController>();
     final double bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Padding(

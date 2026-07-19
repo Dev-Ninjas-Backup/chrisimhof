@@ -16,7 +16,7 @@ class PulsingRhythmBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(PulsingRhythmBadgeController());
+    final controller = Get.find<PulsingRhythmBadgeController>();
     controller.updateState(isSleepPrep: isSleepPrep);
 
     final badge = Container(

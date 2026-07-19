@@ -138,6 +138,7 @@ class GroupedRecommendations {
   List<RecommendationItem>? Sport;
   List<RecommendationItem>? Nutrition;
   List<RecommendationItem>? Fatigue;
+  List<RecommendationItem>? Work;
 
   GroupedRecommendations({
     this.Sleep,
@@ -146,6 +147,7 @@ class GroupedRecommendations {
     this.Sport,
     this.Nutrition,
     this.Fatigue,
+    this.Work,
   });
 
   factory GroupedRecommendations.fromJson(Map<String, dynamic> json) {
@@ -162,6 +164,7 @@ class GroupedRecommendations {
       Sport: parseList(json['sport']),
       Nutrition: parseList(json['nutrition']),
       Fatigue: parseList(json['fatigue']),
+      Work: parseList(json['work']),
     );
   }
 
@@ -172,6 +175,7 @@ class GroupedRecommendations {
         'Sport': Sport?.map((e) => e.toJson()).toList(),
         'Nutrition': Nutrition?.map((e) => e.toJson()).toList(),
         'Fatigue': Fatigue?.map((e) => e.toJson()).toList(),
+        'Work': Work?.map((e) => e.toJson()).toList(),
       };
 }
 

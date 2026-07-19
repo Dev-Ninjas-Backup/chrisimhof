@@ -19,15 +19,10 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use putOrFind to avoid re-creating controllers on every rebuild
-    final controller = Get.isRegistered<DashboardController>()
-        ? Get.find<DashboardController>()
-        : Get.put(DashboardController());
-    // Register shared controllers so they persist across route changes
-    // and receive socket updates from DashboardController.
-    if (!Get.isRegistered<RecommendationController>())
-      Get.put(RecommendationController());
-    if (!Get.isRegistered<SleepController>()) Get.put(SleepController());
+    final controller = Get.find<DashboardController>();
+    // Access the shared controllers so they are instantiated and can receive socket updates
+    Get.find<RecommendationController>();
+    Get.find<SleepController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

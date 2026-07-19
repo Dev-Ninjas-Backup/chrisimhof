@@ -12,7 +12,7 @@ class SubscriptionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SubscriptionsController());
+    final controller = Get.find<SubscriptionsController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

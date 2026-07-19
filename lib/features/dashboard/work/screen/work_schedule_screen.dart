@@ -14,7 +14,7 @@ class WorkScheduleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(WorkController());
+    final controller = Get.find<WorkController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

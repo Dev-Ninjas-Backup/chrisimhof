@@ -64,7 +64,7 @@ class ConsentSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ConsentSettingsController());
+    final controller = Get.find<ConsentSettingsController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

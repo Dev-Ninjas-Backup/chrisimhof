@@ -24,9 +24,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SettingsController controller = Get.isRegistered<SettingsController>()
-        ? Get.find<SettingsController>()
-        : Get.put(SettingsController());
+    final SettingsController controller = Get.find<SettingsController>();
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
@@ -120,9 +118,7 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Sleep target',
                       trailing: sleepDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(
-                          BaselineSetupController(),
-                        );
+                        final baselineController = Get.find<BaselineSetupController>();
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
@@ -149,9 +145,7 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Chronotype',
                       trailing: chronoDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(
-                          BaselineSetupController(),
-                        );
+                        final baselineController = Get.find<BaselineSetupController>();
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
@@ -174,9 +168,7 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Caffeine sensitivity',
                       trailing: caffeineDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(
-                          BaselineSetupController(),
-                        );
+                        final baselineController = Get.find<BaselineSetupController>();
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 
@@ -199,9 +191,7 @@ class SettingsScreen extends StatelessWidget {
                       label: 'Sport profile',
                       trailing: sportDisplay,
                       onTap: () async {
-                        final baselineController = Get.put(
-                          BaselineSetupController(),
-                        );
+                        final baselineController = Get.find<BaselineSetupController>();
                         baselineController.isFromSettings = true;
                         await baselineController.fetchBaselineData();
 

@@ -11,7 +11,7 @@ class NutritionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NutritionController controller = Get.put(NutritionController());
+    final NutritionController controller = Get.find<NutritionController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

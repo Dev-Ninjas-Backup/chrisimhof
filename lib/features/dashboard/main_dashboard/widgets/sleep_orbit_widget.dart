@@ -138,7 +138,7 @@ class SleepOrbitWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SleepOrbitController());
+    final controller = Get.find<SleepOrbitController>();
     controller.updateState(
       isSleepLogged: isSleepLogged,
       isSleepPrep: isSleepPrep,

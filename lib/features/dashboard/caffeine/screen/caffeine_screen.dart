@@ -15,7 +15,7 @@ class CaffeineScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CaffeineController controller = Get.put(CaffeineController());
+    final CaffeineController controller = Get.find<CaffeineController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
