@@ -183,14 +183,14 @@ class SleepHistoryList extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          GestureDetector(
-            onTap: () => showSleepEntryDialog(context, controller, log: log),
-            child: const Icon(
-              Icons.edit_outlined,
-              color: AppColors.selectionGray,
-              size: 20,
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () => showSleepEntryDialog(context, controller, log: log),
+          //   child: const Icon(
+          //     Icons.edit_outlined,
+          //     color: AppColors.selectionGray,
+          //     size: 20,
+          //   ),
+          // ),
         ],
       ),
     );
