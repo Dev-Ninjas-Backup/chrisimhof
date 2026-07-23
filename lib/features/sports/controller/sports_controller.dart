@@ -418,7 +418,10 @@ class SportsController extends GetxController {
         todaySport.value = 'Rest day';
       }
 
-      if (sportTab['recoveryLoadScore'] != null) {
+      if (sportTab['recoveryScore'] != null) {
+        recoveryScore.value = (sportTab['recoveryScore'] as num).toInt();
+        _updateRecoveryText();
+      } else if (sportTab['recoveryLoadScore'] != null) {
         recoveryScore.value = (sportTab['recoveryLoadScore'] as num).toInt();
         _updateRecoveryText();
       }
@@ -430,10 +433,13 @@ class SportsController extends GetxController {
   }
 
   /// Called with cards.sport from the live scores payload.
-  /// Provides recoveryLoadScore and readinessNote.
+  /// Provides recoveryScore/recoveryLoadScore and readinessNote.
   void updateFromSportCard(Map<String, dynamic> sportCard) {
     try {
-      if (sportCard['recoveryLoadScore'] != null) {
+      if (sportCard['recoveryScore'] != null) {
+        recoveryScore.value = (sportCard['recoveryScore'] as num).toInt();
+        _updateRecoveryText();
+      } else if (sportCard['recoveryLoadScore'] != null) {
         recoveryScore.value = (sportCard['recoveryLoadScore'] as num).toInt();
         _updateRecoveryText();
       }
