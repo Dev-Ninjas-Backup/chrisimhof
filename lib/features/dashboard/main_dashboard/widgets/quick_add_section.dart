@@ -138,6 +138,9 @@ class QuickAddSection extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: getTextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,

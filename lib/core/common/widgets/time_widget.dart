@@ -12,6 +12,7 @@ class TimeWidget extends StatelessWidget {
   final VoidCallback onHourDown;
   final VoidCallback onMinuteUp;
   final VoidCallback onMinuteDown;
+  final void Function(int hour, int minute)? onTimeSelected;
 
   const TimeWidget({
     super.key,
@@ -24,7 +25,23 @@ class TimeWidget extends StatelessWidget {
     required this.onHourDown,
     required this.onMinuteUp,
     required this.onMinuteDown,
+    this.onTimeSelected,
   });
+
+  Future<void> _pickTime(BuildContext context) async {
+    if (onTimeSelected == null) return;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: hour, minute: minute),
+      builder: (context, child) {
+        return Theme(data: Theme.of(context).copyWith(), child: child!);
+      },
+    );
+
+    if (picked != null) {
+      onTimeSelected!(picked.hour, picked.minute);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,32 +57,39 @@ class TimeWidget extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (iconPath != null)
-                Image.asset(
-                  iconPath!,
-                  height: 14,
-                  width: 14,
-                  color: AppColors.selectionGray,
-                )
-              else if (icon != null)
-                Icon(
-                  icon!,
-                  size: 14,
-                  color: AppColors.selectionGray,
+          GestureDetector(
+            onTap: onTimeSelected != null ? () => _pickTime(context) : null,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (iconPath != null)
+                  Image.asset(
+                    iconPath!,
+                    height: 14,
+                    width: 14,
+                    color: AppColors.selectionGray,
+                  )
+                else if (icon != null)
+                  Icon(icon!, size: 14, color: AppColors.selectionGray),
+                const SizedBox(width: 6),
+                Text(
+                  title.toUpperCase(),
+                  style: getTextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.selectionGray,
+                  ).copyWith(letterSpacing: 1.1),
                 ),
-              const SizedBox(width: 6),
-              Text(
-                title.toUpperCase(),
-                style: getTextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.selectionGray,
-                ).copyWith(letterSpacing: 1.1),
-              ),
-            ],
+                if (onTimeSelected != null) ...[
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.edit_calendar_rounded,
+                    size: 12,
+                    color: AppColors.selectionGray,
+                  ),
+                ],
+              ],
+            ),
           ),
           const SizedBox(height: 8),
           Row(
@@ -76,15 +100,21 @@ class TimeWidget extends StatelessWidget {
                 value: hour.toString().padLeft(2, '0'),
                 onIncrement: onHourUp,
                 onDecrement: onHourDown,
+                onTapText: onTimeSelected != null
+                    ? () => _pickTime(context)
+                    : null,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  ':',
-                  style: getTextStyle2(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.white,
+              GestureDetector(
+                onTap: onTimeSelected != null ? () => _pickTime(context) : null,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    ':',
+                    style: getTextStyle2(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.white,
+                    ),
                   ),
                 ),
               ),
@@ -92,6 +122,9 @@ class TimeWidget extends StatelessWidget {
                 value: minute.toString().padLeft(2, '0'),
                 onIncrement: onMinuteUp,
                 onDecrement: onMinuteDown,
+                onTapText: onTimeSelected != null
+                    ? () => _pickTime(context)
+                    : null,
               ),
             ],
           ),
@@ -105,11 +138,13 @@ class _SwipeDigitColumn extends StatefulWidget {
   final String value;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
+  final VoidCallback? onTapText;
 
   const _SwipeDigitColumn({
     required this.value,
     required this.onIncrement,
     required this.onDecrement,
+    this.onTapText,
   });
 
   @override
@@ -153,12 +188,16 @@ class _SwipeDigitColumnState extends State<_SwipeDigitColumn> {
               ),
             ),
           ),
-          Text(
-            widget.value,
-            style: getTextStyle2(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: AppColors.white,
+          GestureDetector(
+            onTap: widget.onTapText,
+            behavior: HitTestBehavior.opaque,
+            child: Text(
+              widget.value,
+              style: getTextStyle2(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: AppColors.white,
+              ),
             ),
           ),
           GestureDetector(

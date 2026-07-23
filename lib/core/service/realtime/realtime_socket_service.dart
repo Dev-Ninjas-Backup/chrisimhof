@@ -39,11 +39,21 @@ class RealtimeSocketService {
 
       if (_socket != null && _socket!.connected) {
         debugPrint('Socket.io: Already connected.');
-        if (_currentSessionId != sessionId && sessionId != null) {
-          _joinSession(sessionId);
-          _currentSessionId = sessionId;
+        final latestSessionId = sessionId ?? _currentSessionId;
+        if (latestSessionId != null && latestSessionId.isNotEmpty) {
+          if (_currentSessionId != latestSessionId) {
+            _currentSessionId = latestSessionId;
+          }
+          _joinSession(latestSessionId);
         }
         return;
+      }
+
+      // Dispose stale disconnected socket before recreating
+      if (_socket != null) {
+        _socket!.clearListeners();
+        _socket!.dispose();
+        _socket = null;
       }
 
       _currentSessionId = sessionId;
@@ -55,16 +65,23 @@ class RealtimeSocketService {
             .setTransports(['websocket'])
             .setAuth({'token': token})
             .enableAutoConnect()
+            .enableReconnection()
+            .setReconnectionAttempts(999999)
+            .setReconnectionDelay(1000)
+            .setReconnectionDelayMax(5000)
             .enableForceNew()
             .build(),
       );
 
-      _socket!.onConnect((_) {
+      _socket!.onConnect((_) async {
         debugPrint(
           'Socket.io: Connected successfully, socket ID: ${_socket!.id}',
         );
-        if (_currentSessionId != null) {
-          _joinSession(_currentSessionId!);
+        final activeSessionId =
+            await SharedPreferencesHelper.getSessionId() ?? _currentSessionId;
+        if (activeSessionId != null && activeSessionId.isNotEmpty) {
+          _currentSessionId = activeSessionId;
+          _joinSession(activeSessionId);
         }
       });
 
@@ -76,11 +93,18 @@ class RealtimeSocketService {
         debugPrint('Socket.io: Disconnected, reason: $reason');
       });
 
-      _socket!.on('reconnect', (_) {
-        debugPrint('Socket.io: Reconnecting...');
-        if (_currentSessionId != null) {
-          _joinSession(_currentSessionId!);
+      _socket!.on('reconnect', (_) async {
+        debugPrint('Socket.io: Reconnected');
+        final activeSessionId =
+            await SharedPreferencesHelper.getSessionId() ?? _currentSessionId;
+        if (activeSessionId != null && activeSessionId.isNotEmpty) {
+          _currentSessionId = activeSessionId;
+          _joinSession(activeSessionId);
         }
+      });
+
+      _socket!.on('reconnect_attempt', (attempt) {
+        debugPrint('Socket.io: Reconnect attempt #$attempt');
       });
 
       // Events from server

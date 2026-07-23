@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddSportSessionBottomsheet extends StatelessWidget {
-  const AddSportSessionBottomsheet({
+  AddSportSessionBottomsheet({
     super.key,
     required this.activity,
     required this.type,
@@ -19,7 +19,8 @@ class AddSportSessionBottomsheet extends StatelessWidget {
     required this.distanceController,
     required this.startTime,
     required this.endTime,
-  });
+    Rx<DateTime>? selectedDate,
+  }) : selectedDate = selectedDate ?? DateTime.now().obs;
 
   final RxString activity;
   final RxString type;
@@ -29,6 +30,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
   final TextEditingController distanceController;
   final RxString startTime;
   final RxString endTime;
+  final Rx<DateTime> selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +110,10 @@ class AddSportSessionBottomsheet extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
+            // Day selector row (Yesterday / Today / Tomorrow / Other)
+            _buildDaySelector(context),
+            const SizedBox(height: 16),
+
             // Time range row
             TimeRangeSelector(
               startTime: startTime,
@@ -148,6 +154,7 @@ class AddSportSessionBottomsheet extends StatelessWidget {
                   endTime: endTime.value,
                   effort: effort.value,
                   type: type.value,
+                  selectedDate: selectedDate.value,
                   distance: activity.value == 'Rest day'
                       ? null
                       : distanceController.text,
@@ -156,6 +163,161 @@ class AddSportSessionBottomsheet extends StatelessWidget {
               },
             ),
             const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDaySelector(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final tomorrow = today.add(const Duration(days: 1));
+
+    bool isSameDay(DateTime a, DateTime b) {
+      return a.year == b.year && a.month == b.month && a.day == b.day;
+    }
+
+    return Obx(() {
+      final current = selectedDate.value;
+      final isYesterday = isSameDay(current, yesterday);
+      final isToday = isSameDay(current, today);
+      final isTomorrow = isSameDay(current, tomorrow);
+      final isCustom = !isYesterday && !isToday && !isTomorrow;
+
+      final formattedCustom =
+          '${current.day}/${current.month}/${current.year}';
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'DAY'.tr,
+            style: getTextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF4C1D95),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              _buildDayChip(
+                label: 'Yesterday'.tr,
+                isSelected: isYesterday,
+                onTap: () => selectedDate.value = yesterday,
+              ),
+              const SizedBox(width: 8),
+              _buildDayChip(
+                label: 'Today'.tr,
+                isSelected: isToday,
+                onTap: () => selectedDate.value = today,
+              ),
+              const SizedBox(width: 8),
+              _buildDayChip(
+                label: 'Tomorrow'.tr,
+                isSelected: isTomorrow,
+                onTap: () => selectedDate.value = tomorrow,
+              ),
+              const SizedBox(width: 8),
+              _buildCustomDateChip(
+                context: context,
+                label: isCustom ? formattedCustom : 'Other'.tr,
+                isSelected: isCustom,
+              ),
+            ],
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildDayChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF4C1D95) : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? const Color(0xFF4C1D95)
+                  : const Color(0xFFC4B5FD),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            label,
+            style: getTextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+              color: isSelected ? Colors.white : const Color(0xFF4C1D95),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomDateChip({
+    required BuildContext context,
+    required String label,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () async {
+        final date = await showDatePicker(
+          context: context,
+          initialDate: selectedDate.value,
+          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)),
+        );
+        if (date != null) {
+          selectedDate.value = date;
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF4C1D95) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF4C1D95)
+                : const Color(0xFFC4B5FD),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.calendar_month_rounded,
+              size: 14,
+              color: isSelected ? Colors.white : const Color(0xFF4C1D95),
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: getTextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ],
         ),
       ),

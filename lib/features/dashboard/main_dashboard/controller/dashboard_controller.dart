@@ -9,7 +9,7 @@ import 'package:chrisimhof/features/recomendations/controller/recomendations_con
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +20,7 @@ import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.da
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 
-class DashboardController extends GetxController {
+class DashboardController extends GetxController with WidgetsBindingObserver {
   final _dashboardService = DashboardService();
   final _profileService = ProfileService();
 
@@ -72,6 +72,8 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+    RealtimeSocketService().connectSocket();
     fetchDashboardData();
     _updateTimer = Timer.periodic(
       const Duration(minutes: 1),
@@ -81,8 +83,18 @@ class DashboardController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _updateTimer?.cancel();
     super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint('DashboardController: App resumed, checking socket connection...');
+      RealtimeSocketService().connectSocket();
+      fetchDashboardData();
+    }
   }
 
   Map<String, dynamic> normalizeDashboardPayload(Map<String, dynamic> payload) {
@@ -158,8 +170,11 @@ class DashboardController extends GetxController {
       }
     }
 
-    // Parse cards
+    // Parse cards, scoreBreakdown, derived
     final cards = apiData['cards'] as Map<String, dynamic>?;
+    final scoreBreakdown = apiData['scoreBreakdown'] as Map<String, dynamic>?;
+    final derived = apiData['derived'] as Map<String, dynamic>?;
+
     final sleepCard =
         cards?['sleep'] as Map<String, dynamic>? ??
         apiData['lastSleepInfo'] as Map<String, dynamic>?;
@@ -187,6 +202,12 @@ class DashboardController extends GetxController {
     double sleepProgress = 0.0;
     if (cards?['sleep']?['score'] != null) {
       sleepProgress = ((cards!['sleep']!['score'] as num).toDouble() / 100.0)
+          .clamp(0.0, 1.0);
+    } else if (scoreBreakdown?['sleepScore'] != null) {
+      sleepProgress = ((scoreBreakdown!['sleepScore'] as num).toDouble() / 100.0)
+          .clamp(0.0, 1.0);
+    } else if (derived?['sleepScore'] != null) {
+      sleepProgress = ((derived!['sleepScore'] as num).toDouble() / 100.0)
           .clamp(0.0, 1.0);
     } else if (isSleepLogged) {
       try {
@@ -280,6 +301,18 @@ class DashboardController extends GetxController {
             0.0,
             1.0,
           );
+    } else if (scoreBreakdown?['hydrationScore'] != null) {
+      hydrationProgress =
+          ((scoreBreakdown!['hydrationScore'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
+    } else if (derived?['hydrationScore'] != null) {
+      hydrationProgress =
+          ((derived!['hydrationScore'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
     }
 
     double caffeineProgress = 0.0;
@@ -289,10 +322,34 @@ class DashboardController extends GetxController {
             0.0,
             1.0,
           );
+    } else if (scoreBreakdown?['caffeineScore'] != null) {
+      caffeineProgress =
+          ((scoreBreakdown!['caffeineScore'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
+    } else if (derived?['caffeineScore'] != null) {
+      caffeineProgress =
+          ((derived!['caffeineScore'] as num).toDouble() / 100.0).clamp(
+            0.0,
+            1.0,
+          );
     }
 
     double recoveryProgress = 0.0;
-    if (cards?['sport']?['recoveryLoadScore'] != null) {
+    if (cards?['sport']?['recoveryScore'] != null) {
+      recoveryProgress =
+          ((cards!['sport']!['recoveryScore'] as num).toDouble() / 100.0)
+              .clamp(0.0, 1.0);
+    } else if (cards?['recovery']?['recoveryScore'] != null) {
+      recoveryProgress =
+          ((cards!['recovery']!['recoveryScore'] as num).toDouble() / 100.0)
+              .clamp(0.0, 1.0);
+    } else if (derived?['recoveryScore'] != null) {
+      recoveryProgress =
+          ((derived!['recoveryScore'] as num).toDouble() / 100.0)
+              .clamp(0.0, 1.0);
+    } else if (cards?['sport']?['recoveryLoadScore'] != null) {
       recoveryProgress =
           ((cards!['sport']!['recoveryLoadScore'] as num).toDouble() / 100.0)
               .clamp(0.0, 1.0);
@@ -313,7 +370,6 @@ class DashboardController extends GetxController {
 
     // Parse quickAddSummary
     final quickAdd = apiData['quickAddSummary'] as Map<String, dynamic>?;
-    final derived = apiData['derived'] as Map<String, dynamic>?;
 
     double waterLiters = 0.0;
     if (quickAdd?['water']?['totalMl'] != null) {
