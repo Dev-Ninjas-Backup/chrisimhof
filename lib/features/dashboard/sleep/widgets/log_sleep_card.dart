@@ -107,6 +107,10 @@ class LogSleepCard extends StatelessWidget {
                     onHourDown: controller.decrementBedtimeHour,
                     onMinuteUp: controller.incrementBedtimeMinute,
                     onMinuteDown: controller.decrementBedtimeMinute,
+                    onTimeSelected: (h, m) {
+                      controller.bedtimeHour.value = h;
+                      controller.bedtimeMinute.value = m;
+                    },
                   ),
                 ),
               ),
@@ -122,6 +126,10 @@ class LogSleepCard extends StatelessWidget {
                     onHourDown: controller.decrementWakeupHour,
                     onMinuteUp: controller.incrementWakeupMinute,
                     onMinuteDown: controller.decrementWakeupMinute,
+                    onTimeSelected: (h, m) {
+                      controller.wakeupHour.value = h;
+                      controller.wakeupMinute.value = m;
+                    },
                   ),
                 ),
               ),

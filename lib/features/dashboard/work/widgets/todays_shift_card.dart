@@ -83,6 +83,10 @@ class TodaysShiftCard extends StatelessWidget {
                     onHourDown: controller.decrementStartHour,
                     onMinuteUp: controller.incrementStartMinute,
                     onMinuteDown: controller.decrementStartMinute,
+                    onTimeSelected: (h, m) {
+                      controller.startHour.value = h;
+                      controller.startMinute.value = m;
+                    },
                   ),
                 ),
               ),
@@ -98,6 +102,10 @@ class TodaysShiftCard extends StatelessWidget {
                     onHourDown: controller.decrementEndHour,
                     onMinuteUp: controller.incrementEndMinute,
                     onMinuteDown: controller.decrementEndMinute,
+                    onTimeSelected: (h, m) {
+                      controller.endHour.value = h;
+                      controller.endMinute.value = m;
+                    },
                   ),
                 ),
               ),

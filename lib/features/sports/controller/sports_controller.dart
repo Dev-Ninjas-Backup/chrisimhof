@@ -157,9 +157,13 @@ class SportsController extends GetxController {
     required String endTime,
     required String effort,
     required String type,
+    required DateTime selectedDate,
     String? distance,
   }) async {
     final bool isRest = activity == 'Rest day';
+
+    final localDate =
+        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
 
     // Save previous state for rollback if API fails
     final oldSessionsList = List<SportSession>.from(sessionsList);
@@ -174,6 +178,21 @@ class SportsController extends GetxController {
     final oldTodayDistance = todayDistance.value;
     final oldRecoveryScore = recoveryScore.value;
 
+    // Determine Day Prefix for subtitle
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final inputDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final diffDays = inputDay.difference(today).inDays;
+
+    String dayPrefix = 'Today';
+    if (diffDays == -1) {
+      dayPrefix = 'Yesterday';
+    } else if (diffDays == 1) {
+      dayPrefix = 'Tomorrow';
+    } else if (diffDays != 0) {
+      dayPrefix = '${selectedDate.day}/${selectedDate.month}';
+    }
+
     // Optimistic Update
     String timeStr = '${duration}m';
     if (activity == 'Rest day') {
@@ -184,47 +203,53 @@ class SportsController extends GetxController {
 
     final newSession = SportSession(
       title: activity,
-      subtitle: activity == 'Rest day' ? 'Today · —' : 'Today · $timeStr',
+      subtitle: activity == 'Rest day' ? '$dayPrefix · —' : '$dayPrefix · $timeStr',
       iconPath: _getIconPathForActivity(activity),
     );
 
-    // Update old "Today" to "Yesterday"
-    for (int i = 0; i < sessionsList.length; i++) {
-      final s = sessionsList[i];
-      if (s.subtitle.startsWith('Today')) {
-        sessionsList[i] = SportSession(
-          title: s.title,
-          subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
-          iconPath: s.iconPath,
-        );
-      } else if (s.subtitle.startsWith('Yesterday')) {
-        sessionsList[i] = SportSession(
-          title: s.title,
-          subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
-          iconPath: s.iconPath,
-        );
+    // Update old "Today" to "Yesterday" only if adding a session for Today
+    if (diffDays == 0) {
+      for (int i = 0; i < sessionsList.length; i++) {
+        final s = sessionsList[i];
+        if (s.subtitle.startsWith('Today')) {
+          sessionsList[i] = SportSession(
+            title: s.title,
+            subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
+            iconPath: s.iconPath,
+          );
+        } else if (s.subtitle.startsWith('Yesterday')) {
+          sessionsList[i] = SportSession(
+            title: s.title,
+            subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
+            iconPath: s.iconPath,
+          );
+        }
       }
     }
 
     sessionsList.insert(0, newSession);
 
     if (activity == 'Rest day') {
-      hasTodaySession.value = false;
+      if (diffDays == 0) {
+        hasTodaySession.value = false;
+      }
       recoveryScore.value = (recoveryScore.value + 15).clamp(0, 100);
       _updateRecoveryText();
     } else {
-      hasTodaySession.value = true;
-      todaySport.value = activity;
-      todayDuration.value = duration;
-      todayZone.value = zone;
-      todayStartTime.value = startTime;
-      todayEndTime.value = endTime;
-      todayEffort.value = effort;
-      todayType.value = type;
-      if (distance != null && distance.isNotEmpty) {
-        todayDistance.value = distance;
-      } else {
-        todayDistance.value = '';
+      if (diffDays == 0) {
+        hasTodaySession.value = true;
+        todaySport.value = activity;
+        todayDuration.value = duration;
+        todayZone.value = zone;
+        todayStartTime.value = startTime;
+        todayEndTime.value = endTime;
+        todayEffort.value = effort;
+        todayType.value = type;
+        if (distance != null && distance.isNotEmpty) {
+          todayDistance.value = distance;
+        } else {
+          todayDistance.value = '';
+        }
       }
 
       int impact = 10;
@@ -304,6 +329,7 @@ class SportsController extends GetxController {
             sessionId: sessionId,
             newSportSessions: [
               {
+                'localDate': localDate,
                 'timestampStart': startTime,
                 'durationMinutes': duration,
                 'intensity': intensity,
@@ -371,19 +397,68 @@ class SportsController extends GetxController {
     }
   }
 
+  String _getDayLabelFromSession(Map<String, dynamic> s) {
+    final localDateStr = s['localDate'] as String?;
+    if (localDateStr != null && localDateStr.isNotEmpty) {
+      try {
+        final parsed = DateTime.parse(localDateStr);
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final target = DateTime(parsed.year, parsed.month, parsed.day);
+        final diffDays = target.difference(today).inDays;
+
+        if (diffDays == 0) return 'Today';
+        if (diffDays == -1) return 'Yesterday';
+        if (diffDays == 1) return 'Tomorrow';
+
+        const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        final weekdayStr = weekdays[parsed.weekday - 1];
+        return '$weekdayStr ${parsed.day}';
+      } catch (_) {}
+    }
+
+    final dateStr = s['date'] as String?;
+    if (dateStr != null && dateStr.isNotEmpty) {
+      try {
+        final parsed = DateTime.parse(dateStr).toLocal();
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final target = DateTime(parsed.year, parsed.month, parsed.day);
+        final diffDays = target.difference(today).inDays;
+
+        if (diffDays == 0) return 'Today';
+        if (diffDays == -1) return 'Yesterday';
+        if (diffDays == 1) return 'Tomorrow';
+
+        const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        final weekdayStr = weekdays[parsed.weekday - 1];
+        return '$weekdayStr ${parsed.day}';
+      } catch (_) {}
+    }
+
+    final dayLabel = s['dayLabel'] as String?;
+    if (dayLabel != null && dayLabel.isNotEmpty) {
+      return dayLabel;
+    }
+
+    return 'Today';
+  }
+
   void updateFromLiveScoresTab(Map<String, dynamic> sportTab) {
     try {
       final sessions = sportTab['sessions'] as List? ?? [];
       final mappedSessions = sessions.map((s) {
-        final title = s['displayType'] ?? s['sportType'] ?? 'Workout';
-        final duration = s['displayDuration'] ?? '${s['durationMinutes']} min';
-        final zone = s['zoneLabel'] as String? ?? '';
+        final sessionMap = s is Map<String, dynamic> ? s : <String, dynamic>{};
+        final title = sessionMap['displayType'] ?? sessionMap['sportType'] ?? 'Workout';
+        final duration = sessionMap['displayDuration'] ?? '${sessionMap['durationMinutes'] ?? 0} min';
+        final zone = sessionMap['zoneLabel'] as String? ?? '';
+        final dayPrefix = _getDayLabelFromSession(sessionMap);
         final subtitle =
-            'Today · $duration${zone.isNotEmpty ? ' · $zone' : ''}';
+            '$dayPrefix · $duration${zone.isNotEmpty ? ' · $zone' : ''}';
         return SportSession(
           title: title,
           subtitle: subtitle,
-          iconPath: _getIconPathForActivity(title),
+          iconPath: _getIconPathForActivity(title.toString()),
         );
       }).toList();
 
