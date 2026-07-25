@@ -233,19 +233,22 @@ class CaffeineController extends GetxController {
           final titleStr = item['drinkLabel'] as String? ?? 'Espresso';
 
           DateTime logTime = now;
-          final parts = timeStr.split(':');
-          if (parts.length == 2) {
-            final h = int.tryParse(parts[0]) ?? now.hour;
-            final m = int.tryParse(parts[1]) ?? now.minute;
-            // Parse as UTC first, then convert to local to avoid timezone offset issues
-            final utcLogTime = DateTime.utc(now.year, now.month, now.day, h, m);
-            var localTime = utcLogTime.toLocal();
-            // If the converted local time is in the future, it means the log actually
-            // occurred yesterday UTC/local, so we adjust it by subtracting 1 day.
-            if (localTime.isAfter(now)) {
-              localTime = localTime.subtract(const Duration(days: 1));
+          if (timeStr.contains('T') || timeStr.contains('-')) {
+            final parsed = DateTime.tryParse(timeStr);
+            if (parsed != null) {
+              logTime = parsed.toLocal();
             }
-            logTime = localTime;
+          } else {
+            final parts = timeStr.split(':');
+            if (parts.length >= 2) {
+              final h = int.tryParse(parts[0]) ?? now.hour;
+              final m = int.tryParse(parts[1]) ?? now.minute;
+              var localTime = DateTime(now.year, now.month, now.day, h, m);
+              if (localTime.isAfter(now)) {
+                localTime = localTime.subtract(const Duration(days: 1));
+              }
+              logTime = localTime;
+            }
           }
 
           return CaffeineEntry(
