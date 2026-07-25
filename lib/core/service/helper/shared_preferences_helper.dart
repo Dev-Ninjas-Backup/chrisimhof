@@ -176,4 +176,25 @@ class SharedPreferencesHelper {
       'recoveryScore': prefs.getInt('sportsRecoveryScore') ?? 0,
     };
   }
+
+  // --- Timezone Settings ---
+  static Future<void> saveTimezone(String timezone) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userTimezone', timezone);
+  }
+
+  static Future<String?> getTimezone() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userTimezone');
+  }
+
+  static Future<void> saveTimezoneDisplay(String display) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userTimezoneDisplay', display);
+  }
+
+  static Future<String?> getTimezoneDisplay() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userTimezoneDisplay');
+  }
 }

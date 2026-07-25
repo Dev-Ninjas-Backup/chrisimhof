@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:chrisimhof/core/service/end_points.dart';
@@ -502,10 +503,19 @@ class WorkController extends GetxController {
         }
       }
 
-      String tz = 'Europe/Zurich';
-      if (timeZone.value.contains('New York')) tz = 'America/New_York';
-      else if (timeZone.value.contains('London')) tz = 'Europe/London';
-      else if (timeZone.value.contains('Sydney')) tz = 'Australia/Sydney';
+      String tz = await SharedPreferencesHelper.getTimezone() ?? '';
+      if (tz.isEmpty) {
+        try {
+          final tzInfo = await FlutterTimezone.getLocalTimezone();
+          tz = tzInfo.identifier;
+        } catch (_) {}
+      }
+      if (tz.isEmpty) {
+        if (timeZone.value.contains('New York')) tz = 'America/New_York';
+        else if (timeZone.value.contains('London')) tz = 'Europe/London';
+        else if (timeZone.value.contains('Sydney')) tz = 'Australia/Sydney';
+        else tz = 'Europe/Zurich';
+      }
 
       final body = {
         "defaultRotation": defaultRotation.value,

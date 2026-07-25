@@ -12,12 +12,15 @@ import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
 import 'package:chrisimhof/core/common/controller/language_controller.dart';
 
+import 'package:chrisimhof/core/service/work_settings_service.dart';
+
 const double kNavBarTotalHeight = 86;
 
 class NavbarScreen extends StatelessWidget {
   const NavbarScreen({super.key});
 
   static bool _languageApplied = false;
+  static bool _timezoneSynced = false;
 
   static const List<Widget> _screens = [
     DashboardScreen(),
@@ -29,6 +32,13 @@ class NavbarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<NavController>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_timezoneSynced) {
+        _timezoneSynced = true;
+        WorkSettingsService.syncTimezoneSilently();
+      }
+    });
 
     if (!_languageApplied) {
       _languageApplied = true;
