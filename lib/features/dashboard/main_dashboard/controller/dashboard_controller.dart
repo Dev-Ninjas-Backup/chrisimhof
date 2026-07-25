@@ -527,6 +527,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       if (Get.isRegistered<SportsController>()) {
         Get.find<SportsController>().updateFromSportCard(sportCard);
       }
+    } else {
+      sportCardData.value = null;
     }
     // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) to CaffeineController
     final caffeineCard = cards?['caffeine'] as Map<String, dynamic>?;
@@ -535,6 +537,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       if (Get.isRegistered<CaffeineController>()) {
         Get.find<CaffeineController>().updateFromCaffeineCard(caffeineCard);
       }
+    } else {
+      caffeineCardData.value = null;
     }
     if (apiData['tabs']?['work'] != null) {
       if (Get.isRegistered<WorkController>()) {
@@ -823,6 +827,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
     // Clear recommendations preview cache and active controllers immediately
     forYouPreviewData.value = null;
+    caffeineCardData.value = null;
+    sportCardData.value = null;
     if (Get.isRegistered<RecommendationController>()) {
       Get.find<RecommendationController>().forYouPreview.clear();
     }
@@ -838,6 +844,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       final caffeineCtrl = Get.find<CaffeineController>();
       caffeineCtrl.forYouCaffeineBody.value = null;
       caffeineCtrl.forYouCaffeineCutoff.value = null;
+      caffeineCtrl.entriesList.clear();
+      caffeineCtrl.activeCaffeine.value = 0.0;
+      caffeineCtrl.todayTotalCaffeine.value = 0.0.toInt();
     }
 
     String? newSessionId;

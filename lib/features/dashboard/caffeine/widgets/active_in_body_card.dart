@@ -46,7 +46,9 @@ class ActiveInBodyCard extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  '${activeVal.round()}',
+                  activeVal % 1 == 0
+                      ? '${activeVal.toInt()}'
+                      : activeVal.toStringAsFixed(1),
                   style: getTextStyle2(
                     fontSize: 45,
                     fontWeight: FontWeight.w600,
@@ -77,7 +79,10 @@ class ActiveInBodyCard extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final double width = constraints.maxWidth;
-                final double progress = (totalValDouble / maxVal).clamp(0.0, 1.0);
+                final double progress = (totalValDouble / maxVal).clamp(
+                  0.0,
+                  1.0,
+                );
                 final double knobPosition = progress * width;
                 return Stack(
                   alignment: Alignment.centerLeft,
