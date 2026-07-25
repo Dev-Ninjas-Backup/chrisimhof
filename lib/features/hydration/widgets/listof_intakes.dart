@@ -53,66 +53,50 @@ class ListofIntakes extends StatelessWidget {
           ),
           itemBuilder: (context, index) {
             final log = logs[index];
-            return Dismissible(
-              key: Key(log.id),
-              direction: controller.isSelectedDayToday
-                  ? DismissDirection.endToStart
-                  : DismissDirection.none,
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.delete_outline, color: AppColors.red),
-              ),
-              onDismissed: (_) => controller.deleteLog(log.id),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  children: [
-                    // Time
-                    Text(
-                      log.time,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.greyAlt,
-                      ),
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  // Time
+                  Text(
+                    log.time,
+                    style: getTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.greyAlt,
                     ),
-                    const SizedBox(width: 14),
-                    // Blue bullet dot
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppColors.blue2,
-                        shape: BoxShape.circle,
-                      ),
+                  ),
+                  const SizedBox(width: 14),
+                  // Blue bullet dot
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.blue2,
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(width: 10),
-                    // Log type/name
-                    Text(
-                      log.type.tr,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryTextColor,
-                      ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Log type/name
+                  Text(
+                    log.type.tr,
+                    style: getTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryTextColor,
                     ),
-                    const Spacer(),
-                    // Log amount
-                    Text(
-                      '${log.amountMl} ml',
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.blue2,
-                      ),
+                  ),
+                  const Spacer(),
+                  // Log amount
+                  Text(
+                    '${log.amountMl} ml',
+                    style: getTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.blue2,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

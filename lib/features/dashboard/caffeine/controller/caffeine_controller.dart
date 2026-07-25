@@ -98,7 +98,16 @@ class CaffeineController extends GetxController {
       (sum, entry) => sum + entry.amountMg,
     );
 
-    activeCaffeine.value = _calculateDecayedCaffeine();
+    if (Get.isRegistered<DashboardController>()) {
+      final cachedCard = Get.find<DashboardController>().caffeineCardData.value;
+      if (cachedCard != null && cachedCard['activeMg'] != null) {
+        activeCaffeine.value = (cachedCard['activeMg'] as num).toDouble();
+      } else {
+        activeCaffeine.value = _calculateDecayedCaffeine();
+      }
+    } else {
+      activeCaffeine.value = _calculateDecayedCaffeine();
+    }
 
     _syncWithDashboard();
   }
@@ -122,9 +131,18 @@ class CaffeineController extends GetxController {
     try {
       final dashboardController = Get.find<DashboardController>();
       final currentData = dashboardController.dashboardData.value;
+
+      double progress = currentData.caffeineProgress;
+      final cachedCard = dashboardController.caffeineCardData.value;
+      if (cachedCard != null && cachedCard['score'] != null) {
+        progress = ((cachedCard['score'] as num).toDouble() / 100.0).clamp(0.0, 1.0);
+      } else if (progress == 0.0 && todayTotalCaffeine.value > 0) {
+        progress = (todayTotalCaffeine.value / 400.0).clamp(0.0, 1.0);
+      }
+
       dashboardController.dashboardData.value = currentData.copyWith(
         caffeineMg: activeCaffeine.value.round(),
-        caffeineProgress: (todayTotalCaffeine.value / 400.0).clamp(0.0, 1.0),
+        caffeineProgress: progress,
       );
     } catch (e) {
       // Safe fallback if dashboard is not loaded or during unit tests
@@ -325,6 +343,7 @@ class CaffeineController extends GetxController {
       if (caffeineCard['activeMg'] != null) {
         activeCaffeine.value = (caffeineCard['activeMg'] as num).toDouble();
       }
+      _syncWithDashboard();
     } catch (e) {
       debugPrint('CaffeineController: Error updating from caffeine card: $e');
     }
