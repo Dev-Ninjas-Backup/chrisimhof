@@ -1,24 +1,14 @@
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_calendar_model.dart';
+import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_preset_model.dart';
+import 'package:chrisimhof/features/work_schedule_settings/service/work_schedule_settings_service.dart';
+import 'package:chrisimhof/features/work_schedule_settings/widgets/template_selection_sheet.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
-class RotationTemplate {
-  final String title;
-  final String description;
-  final int weeks;
-  final List<String> pattern;
-
-  const RotationTemplate({
-    required this.title,
-    required this.description,
-    required this.weeks,
-    required this.pattern,
-  });
-}
-
 class WorkScheduleSettingsController extends GetxController {
-  final isEnabled = true.obs;
+  final isEnabled = false.obs;
   final weeks = 1.obs;
   final startDate = DateTime.now().obs;
   final shiftTimes = <String, Map<String, String>>{
@@ -29,58 +19,126 @@ class WorkScheduleSettingsController extends GetxController {
   final pattern = <String>[].obs;
   final overrides = <String, String>{}.obs;
 
-  // Selected template index for bottom sheet template picker
+  // Selected preset index for bottom sheet template picker
   final selectedTemplateIndex = 0.obs;
+  final isLoadingPresets = false.obs;
+  final isRotationLoading = false.obs;
+  final isLoadingCalendar = false.obs;
+  final apiPresets = <WorkRotationPresetModel>[].obs;
+  final upcomingScheduleDays = <WorkRotationCalendarDayModel>[].obs;
+
+  // Calendar query parameters selected by user
+  final calendarFromDate = DateTime.now().obs;
+  final calendarDaysLimit = 7.obs;
+
+  final WorkScheduleSettingsService _service = WorkScheduleSettingsService();
 
   // Currently expanding/editing day in Upcoming Schedule
   final editingDateStr = ''.obs;
 
-  // List of available rotation templates
-  final List<RotationTemplate> templates = [
-    const RotationTemplate(
-      title: '3-2-2 Night',
-      description: '3 nights, 3 off, 2 evenings — repeats weekly',
-      weeks: 1,
-      pattern: ['N', 'N', 'N', 'Off', 'Off', 'E', 'E'],
-    ),
-    const RotationTemplate(
-      title: '2-2-3 Panama',
-      description: '2 on, 3 off, 3 on, alternating weekends',
-      weeks: 2,
-      pattern: [
-        'D', 'D', 'Off', 'Off', 'D', 'D', 'D',
-        'Off', 'Off', 'D', 'D', 'Off', 'Off', 'Off',
-      ],
-    ),
-    const RotationTemplate(
-      title: 'DuPont',
-      description: '4-on/4-off, 7-day break every cycle',
-      weeks: 4,
-      pattern: [
-        'N', 'N', 'N', 'N', 'Off', 'Off', 'Off',
-        'D', 'D', 'D', 'Off', 'Off', 'Off', 'Off',
-        'N', 'N', 'N', 'Off', 'Off', 'Off', 'Off',
-        'D', 'D', 'D', 'D', 'Off', 'Off', 'Off',
-      ],
-    ),
-    // const RotationTemplate(
-    //   title: '4-On 4-Off',
-    //   description: '4 working days followed by 4 days off',
-    //   weeks: 2,
-    //   pattern: [
-    //     'D', 'D', 'D', 'D', 'Off', 'Off', 'Off', 'Off',
-    //     'D', 'D', 'D', 'D', 'Off', 'Off',
-    //   ],
-    // ),
-  ];
-
   @override
   void onInit() {
     super.onInit();
-    // Initialize default pattern if empty
     if (pattern.isEmpty) {
       pattern.assignAll(List.generate(7 * weeks.value, (_) => 'Off'));
     }
+    fetchMyWorkRotation();
+    loadPresetsFromApi();
+  }
+
+  Future<void> fetchMyWorkRotation() async {
+    try {
+      isRotationLoading.value = true;
+      final rotation = await _service.fetchMyWorkRotation();
+
+      if (rotation == null) {
+        // data is null => toggle OFF
+        isEnabled.value = false;
+      } else {
+        // has data => toggle ON & populate rotation data
+        isEnabled.value = true;
+        weeks.value = rotation.cycleWeeks;
+        if (rotation.startDate.isNotEmpty) {
+          startDate.value =
+              DateTime.tryParse(rotation.startDate) ?? DateTime.now();
+        }
+        shiftTimes.assignAll(rotation.shiftTimes);
+        pattern.assignAll(rotation.pattern);
+        overrides.assignAll(rotation.overrides);
+        await fetchUpcomingSchedule();
+      }
+    } catch (e) {
+      debugPrint('Error fetching my work rotation: $e');
+    } finally {
+      isRotationLoading.value = false;
+    }
+  }
+
+  Future<void> fetchUpcomingSchedule({String? fromDate, int? daysCount}) async {
+    try {
+      isLoadingCalendar.value = true;
+      final targetFrom = fromDate ?? _formatDate(calendarFromDate.value);
+      final targetDays = daysCount ?? calendarDaysLimit.value;
+
+      final calendar = await _service.fetchWorkRotationCalendar(
+        from: targetFrom,
+        days: targetDays,
+      );
+      if (calendar != null) {
+        upcomingScheduleDays.assignAll(calendar.days);
+      }
+    } catch (e) {
+      debugPrint('Error fetching upcoming schedule calendar: $e');
+    } finally {
+      isLoadingCalendar.value = false;
+    }
+  }
+
+  Future<void> updateCalendarRange(DateTime newFromDate, int newDaysLimit) async {
+    calendarFromDate.value = newFromDate;
+    calendarDaysLimit.value = newDaysLimit;
+    await fetchUpcomingSchedule(
+      fromDate: _formatDate(newFromDate),
+      daysCount: newDaysLimit,
+    );
+  }
+
+  String _formatDate(DateTime dt) {
+    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> loadPresetsFromApi() async {
+    try {
+      isLoadingPresets.value = true;
+      final presets = await _service.fetchRotationPresets();
+      if (presets.isNotEmpty) {
+        apiPresets.assignAll(presets);
+      }
+    } catch (e) {
+      debugPrint('Error loading rotation presets: $e');
+    } finally {
+      isLoadingPresets.value = false;
+    }
+  }
+
+  Future<void> onToggleChanged(bool value, BuildContext context) async {
+    isEnabled.value = value;
+    if (value) {
+      openTemplateSheet(context);
+      fetchUpcomingSchedule();
+    }
+  }
+
+  void openTemplateSheet(BuildContext context) {
+    if (apiPresets.isEmpty && !isLoadingPresets.value) {
+      loadPresetsFromApi();
+    }
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => TemplateSelectionSheet(controller: this),
+    );
   }
 
   void setWeeks(int newWeeks) {
@@ -95,21 +153,26 @@ class WorkScheduleSettingsController extends GetxController {
     } else if (currentPattern.length > targetLength) {
       pattern.assignAll(currentPattern.sublist(0, targetLength));
       weeks.value = newWeeks;
+      fetchUpcomingSchedule();
       return;
     }
     pattern.assignAll(currentPattern);
     weeks.value = newWeeks;
+    fetchUpcomingSchedule();
   }
 
   void updateDayPattern(int dayIndex, String shiftCode) {
     if (dayIndex >= 0 && dayIndex < pattern.length) {
       pattern[dayIndex] = shiftCode;
+      fetchUpcomingSchedule();
     }
   }
 
-  void applyTemplate(RotationTemplate tmpl) {
-    weeks.value = tmpl.weeks;
-    pattern.assignAll(tmpl.pattern);
+  void applyPreset(WorkRotationPresetModel preset) {
+    weeks.value = preset.cycleWeeks;
+    pattern.assignAll(preset.pattern);
+    shiftTimes.assignAll(preset.shiftTimes);
+    fetchUpcomingSchedule();
   }
 
   int getPatternIndexForDate(DateTime date) {
@@ -133,17 +196,17 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   Future<void> applyDayOverride(DateTime date, String shiftCode) async {
-    final dateStr =
-        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final dateStr = _formatDate(date);
     overrides[dateStr] = shiftCode;
 
-    // Auto-reflect in BUILD YOUR ROTATION
     final idx = getPatternIndexForDate(date);
     if (idx >= 0 && idx < pattern.length) {
       pattern[idx] = shiftCode;
     }
 
     editingDateStr.value = '';
+
+    await fetchUpcomingSchedule();
 
     try {
       final workCtrl = Get.find<WorkController>();
@@ -152,10 +215,11 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   Future<void> revertDayOverride(DateTime date) async {
-    final dateStr =
-        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final dateStr = _formatDate(date);
     overrides.remove(dateStr);
     editingDateStr.value = '';
+
+    await fetchUpcomingSchedule();
 
     try {
       final workCtrl = Get.find<WorkController>();
@@ -167,9 +231,6 @@ class WorkScheduleSettingsController extends GetxController {
     try {
       EasyLoading.show(status: 'Saving work schedule...'.tr);
 
-      // Save logic ready for future API integration (currently in-memory)
-
-      // Refresh WorkController schedule logic
       try {
         final workCtrl = Get.find<WorkController>();
         await loadCustomRotationSchedule(workCtrl);
@@ -203,8 +264,7 @@ class WorkScheduleSettingsController extends GetxController {
 
     for (int i = 0; i < 7; i++) {
       final date = monday.add(Duration(days: i));
-      final dateStr =
-          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final dateStr = _formatDate(date);
 
       String shift = 'Off';
       if (overridesMap.containsKey(dateStr)) {
@@ -232,7 +292,6 @@ class WorkScheduleSettingsController extends GetxController {
 
     workCtrl.weeklyPattern.assignAll(computedPattern);
 
-    // Update selectedShiftType and times for today
     final todayIndex = now.weekday - 1;
     final todayShift = computedPattern[todayIndex]['shift']!;
     workCtrl.selectedShiftType.value = todayShift == 'D'
@@ -265,10 +324,8 @@ class WorkScheduleSettingsController extends GetxController {
     }
   }
 
-  // Get computed shift code for any given DateTime based on rotation pattern & overrides
   String getShiftForDate(DateTime date) {
-    final dateStr =
-        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final dateStr = _formatDate(date);
     if (overrides.containsKey(dateStr)) {
       return overrides[dateStr]!;
     }

@@ -30,64 +30,87 @@ class WorkScheduleSettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const CustomAppBar(
-                title: 'Work schedule',
-                showBackButton: true,
-                showMoreButton: false,
-              ),
-              const SizedBox(height: 16),
-              _buildHeaderSection(),
-              const SizedBox(height: 24),
+        child: RefreshIndicator(
+          onRefresh: () => controller.fetchMyWorkRotation(),
+          color: AppColors.secondaryButtonColor,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomAppBar(
+                  title: 'Work schedule',
+                  showBackButton: true,
+                  showMoreButton: false,
+                ),
+                const SizedBox(height: 16),
+                _buildHeaderSection(),
+                const SizedBox(height: 24),
 
-              // Enable Custom Rotation toggle card
-              CustomRotationToggleCard(controller: controller),
-              const SizedBox(height: 20),
+                Obx(() {
+                  if (controller.isRotationLoading.value) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 60.0),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.secondaryButtonColor,
+                        ),
+                      ),
+                    );
+                  }
 
-              Obx(() {
-                if (!controller.isEnabled.value) {
-                  return const SizedBox.shrink();
-                }
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionTitle('SHIFT TIMES'.tr),
-                    const SizedBox(height: 8),
-                    ShiftTimesCard(controller: controller),
-                    const SizedBox(height: 24),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Enable Custom Rotation toggle card
+                      CustomRotationToggleCard(controller: controller),
+                      const SizedBox(height: 20),
 
-                    _buildSectionTitle('ROTATION CYCLE'.tr),
-                    const SizedBox(height: 8),
-                    RotationCycleCard(controller: controller),
-                    const SizedBox(height: 24),
+                      Obx(() {
+                        if (!controller.isEnabled.value) {
+                          return const SizedBox.shrink();
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle('SHIFT TIMES'.tr),
+                            const SizedBox(height: 8),
+                            ShiftTimesCard(controller: controller),
+                            const SizedBox(height: 24),
 
-                    _buildSectionTitle('BUILD YOUR ROTATION'.tr),
-                    const SizedBox(height: 8),
-                    RotationBuilderCard(
-                      controller: controller,
-                      daysOfWeek: daysOfWeek,
-                    ),
-                    const SizedBox(height: 24),
+                            _buildSectionTitle('ROTATION CYCLE'.tr),
+                            const SizedBox(height: 8),
+                            RotationCycleCard(controller: controller),
+                            const SizedBox(height: 24),
 
-                    _buildSectionTitle('UPCOMING SCHEDULE'.tr),
-                    const SizedBox(height: 8),
-                    UpcomingScheduleCard(controller: controller),
-                    const SizedBox(height: 32),
-                  ],
-                );
-              }),
+                            _buildSectionTitle('BUILD YOUR ROTATION'.tr),
+                            const SizedBox(height: 8),
+                            RotationBuilderCard(
+                              controller: controller,
+                              daysOfWeek: daysOfWeek,
+                            ),
+                            const SizedBox(height: 24),
 
-              CustomButton(
-                text: 'Save Rotation'.tr,
-                onTap: controller.saveSettings,
-                icon: null,
-              ),
-              const SizedBox(height: 40),
-            ],
+                            _buildSectionTitle('UPCOMING SCHEDULE'.tr),
+                            const SizedBox(height: 8),
+                            UpcomingScheduleCard(controller: controller),
+                            const SizedBox(height: 32),
+                          ],
+                        );
+                      }),
+
+                      CustomButton(
+                        text: 'Save Rotation'.tr,
+                        onTap: controller.saveSettings,
+                        icon: null,
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),
