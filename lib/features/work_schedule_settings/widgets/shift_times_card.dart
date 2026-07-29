@@ -19,7 +19,7 @@ class ShiftTimesCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderSoft),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.02),
+            color: AppColors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -44,10 +44,10 @@ class ShiftTimesCard extends StatelessWidget {
               icon: Icons.wb_sunny_rounded,
               iconPath: null,
               color: AppColors.amber,
+              bgColor: AppColors.amberSoft3.withValues(alpha: 0.4),
               start: dayTimes['start']!,
               end: dayTimes['end']!,
-              onTapStart: () => _pickTime(context, 'Day', 'start'),
-              onTapEnd: () => _pickTime(context, 'Day', 'end'),
+              shiftName: 'Day',
               showDivider: true,
             ),
             _buildShiftTimeRow(
@@ -56,10 +56,10 @@ class ShiftTimesCard extends StatelessWidget {
               icon: Icons.auto_awesome_rounded,
               iconPath: null,
               color: AppColors.violet,
+              bgColor: AppColors.lavenderSoft,
               start: eveningTimes['start']!,
               end: eveningTimes['end']!,
-              onTapStart: () => _pickTime(context, 'Evening', 'start'),
-              onTapEnd: () => _pickTime(context, 'Evening', 'end'),
+              shiftName: 'Evening',
               showDivider: true,
             ),
             _buildShiftTimeRow(
@@ -68,10 +68,10 @@ class ShiftTimesCard extends StatelessWidget {
               icon: null,
               iconPath: IconPath.sleep,
               color: AppColors.indigo,
+              bgColor: AppColors.indigoSoft,
               start: nightTimes['start']!,
               end: nightTimes['end']!,
-              onTapStart: () => _pickTime(context, 'Night', 'start'),
-              onTapEnd: () => _pickTime(context, 'Night', 'end'),
+              shiftName: 'Night',
               showDivider: false,
             ),
           ],
@@ -86,10 +86,10 @@ class ShiftTimesCard extends StatelessWidget {
     required IconData? icon,
     required String? iconPath,
     required Color color,
+    required Color bgColor,
     required String start,
     required String end,
-    required VoidCallback onTapStart,
-    required VoidCallback onTapEnd,
+    required String shiftName,
     required bool showDivider,
   }) {
     return Container(
@@ -101,10 +101,16 @@ class ShiftTimesCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          if (iconPath != null)
-            Image.asset(iconPath, color: color, width: 20, height: 20),
-          if (iconPath == null && icon != null)
-            Icon(icon, color: color, size: 20),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: iconPath != null
+                ? Image.asset(iconPath, color: color, width: 18, height: 18)
+                : Icon(icon, color: color, size: 18),
+          ),
           const SizedBox(width: 12),
           Text(
             title,
@@ -115,50 +121,66 @@ class ShiftTimesCard extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          GestureDetector(
-            onTap: onTapStart,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.gray50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.borderSoft),
-              ),
-              child: Text(
-                start,
-                style: getTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryTextColor,
+          // Time badge matching Image 2 design
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => _pickTime(context, shiftName, 'start'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.gray50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.borderSoft),
+                  ),
+                  child: Text(
+                    start,
+                    style: getTextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              'to'.tr,
-              style: getTextStyle(fontSize: 12, color: AppColors.textSoft),
-            ),
-          ),
-          GestureDetector(
-            onTap: onTapEnd,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.gray50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.borderSoft),
-              ),
-              child: Text(
-                end,
-                style: getTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryTextColor,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                child: Text(
+                  '–',
+                  style: getTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSoft,
+                  ),
                 ),
               ),
-            ),
+              GestureDetector(
+                onTap: () => _pickTime(context, shiftName, 'end'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.gray50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.borderSoft),
+                  ),
+                  child: Text(
+                    end,
+                    style: getTextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

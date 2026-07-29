@@ -1,8 +1,21 @@
-import 'package:chrisimhof/core/service/helper/custom_rotation_prefs.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+
+class RotationTemplate {
+  final String title;
+  final String description;
+  final int weeks;
+  final List<String> pattern;
+
+  const RotationTemplate({
+    required this.title,
+    required this.description,
+    required this.weeks,
+    required this.pattern,
+  });
+}
 
 class WorkScheduleSettingsController extends GetxController {
   final isEnabled = true.obs;
@@ -14,35 +27,59 @@ class WorkScheduleSettingsController extends GetxController {
     'Night': {'start': '22:00', 'end': '06:00'},
   }.obs;
   final pattern = <String>[].obs;
+  final overrides = <String, String>{}.obs;
+
+  // Selected template index for bottom sheet template picker
+  final selectedTemplateIndex = 0.obs;
+
+  // Currently expanding/editing day in Upcoming Schedule
+  final editingDateStr = ''.obs;
+
+  // List of available rotation templates
+  final List<RotationTemplate> templates = [
+    const RotationTemplate(
+      title: '3-2-2 Night',
+      description: '3 nights, 3 off, 2 evenings — repeats weekly',
+      weeks: 1,
+      pattern: ['N', 'N', 'N', 'Off', 'Off', 'E', 'E'],
+    ),
+    const RotationTemplate(
+      title: '2-2-3 Panama',
+      description: '2 on, 3 off, 3 on, alternating weekends',
+      weeks: 2,
+      pattern: [
+        'D', 'D', 'Off', 'Off', 'D', 'D', 'D',
+        'Off', 'Off', 'D', 'D', 'Off', 'Off', 'Off',
+      ],
+    ),
+    const RotationTemplate(
+      title: 'DuPont',
+      description: '4-on/4-off, 7-day break every cycle',
+      weeks: 4,
+      pattern: [
+        'N', 'N', 'N', 'N', 'Off', 'Off', 'Off',
+        'D', 'D', 'D', 'Off', 'Off', 'Off', 'Off',
+        'N', 'N', 'N', 'Off', 'Off', 'Off', 'Off',
+        'D', 'D', 'D', 'D', 'Off', 'Off', 'Off',
+      ],
+    ),
+    // const RotationTemplate(
+    //   title: '4-On 4-Off',
+    //   description: '4 working days followed by 4 days off',
+    //   weeks: 2,
+    //   pattern: [
+    //     'D', 'D', 'D', 'D', 'Off', 'Off', 'Off', 'Off',
+    //     'D', 'D', 'D', 'D', 'Off', 'Off',
+    //   ],
+    // ),
+  ];
 
   @override
   void onInit() {
     super.onInit();
-    loadSettings();
-  }
-
-  Future<void> loadSettings() async {
-    try {
-      final savedEnabled = await CustomRotationPrefs.isEnabled();
-      isEnabled.value = savedEnabled;
-
-      final savedWeeks = await CustomRotationPrefs.getWeeks();
-      weeks.value = savedWeeks;
-
-      final startStr = await CustomRotationPrefs.getStartDate();
-      if (startStr.isNotEmpty) {
-        startDate.value = DateTime.tryParse(startStr) ?? DateTime.now();
-      }
-
-      final times = await CustomRotationPrefs.getShiftTimes();
-      shiftTimes.assignAll(times);
-
-      final pat = await CustomRotationPrefs.getPattern(weeks.value);
-      pattern.assignAll(pat);
-    } catch (e) {
-      debugPrint(
-        'Error loading settings in WorkScheduleSettingsController: $e',
-      );
+    // Initialize default pattern if empty
+    if (pattern.isEmpty) {
+      pattern.assignAll(List.generate(7 * weeks.value, (_) => 'Off'));
     }
   }
 
@@ -70,22 +107,72 @@ class WorkScheduleSettingsController extends GetxController {
     }
   }
 
+  void applyTemplate(RotationTemplate tmpl) {
+    weeks.value = tmpl.weeks;
+    pattern.assignAll(tmpl.pattern);
+  }
+
+  int getPatternIndexForDate(DateTime date) {
+    final startDateClean = DateTime(
+      startDate.value.year,
+      startDate.value.month,
+      startDate.value.day,
+    );
+    final dateClean = DateTime(date.year, date.month, date.day);
+    final diffDays = dateClean.difference(startDateClean).inDays;
+
+    final cycleLength = 7 * weeks.value;
+    if (cycleLength <= 0 || pattern.isEmpty) return -1;
+
+    final patternIndex =
+        ((diffDays % cycleLength) + cycleLength) % cycleLength;
+    if (patternIndex >= 0 && patternIndex < pattern.length) {
+      return patternIndex;
+    }
+    return -1;
+  }
+
+  Future<void> applyDayOverride(DateTime date, String shiftCode) async {
+    final dateStr =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    overrides[dateStr] = shiftCode;
+
+    // Auto-reflect in BUILD YOUR ROTATION
+    final idx = getPatternIndexForDate(date);
+    if (idx >= 0 && idx < pattern.length) {
+      pattern[idx] = shiftCode;
+    }
+
+    editingDateStr.value = '';
+
+    try {
+      final workCtrl = Get.find<WorkController>();
+      await loadCustomRotationSchedule(workCtrl);
+    } catch (_) {}
+  }
+
+  Future<void> revertDayOverride(DateTime date) async {
+    final dateStr =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    overrides.remove(dateStr);
+    editingDateStr.value = '';
+
+    try {
+      final workCtrl = Get.find<WorkController>();
+      await loadCustomRotationSchedule(workCtrl);
+    } catch (_) {}
+  }
+
   Future<void> saveSettings() async {
     try {
       EasyLoading.show(status: 'Saving work schedule...'.tr);
-      await CustomRotationPrefs.setEnabled(isEnabled.value);
-      await CustomRotationPrefs.setWeeks(weeks.value);
 
-      final dateStr =
-          '${startDate.value.year}-${startDate.value.month.toString().padLeft(2, '0')}-${startDate.value.day.toString().padLeft(2, '0')}';
-      await CustomRotationPrefs.setStartDate(dateStr);
-      await CustomRotationPrefs.setShiftTimes(shiftTimes);
-      await CustomRotationPrefs.setPattern(pattern);
+      // Save logic ready for future API integration (currently in-memory)
 
       // Refresh WorkController schedule logic
       try {
         final workCtrl = Get.find<WorkController>();
-        await workCtrl.loadCustomRotationSchedule();
+        await loadCustomRotationSchedule(workCtrl);
       } catch (_) {}
 
       EasyLoading.showSuccess('Work schedule saved!'.tr);
@@ -97,14 +184,12 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   Future<void> loadCustomRotationSchedule(WorkController workCtrl) async {
-    final customEnabled = await CustomRotationPrefs.isEnabled();
-    if (!customEnabled) return;
+    if (!isEnabled.value) return;
 
-    final startStr = await CustomRotationPrefs.getStartDate();
-    final startDate = DateTime.tryParse(startStr) ?? DateTime.now();
-    final weeks = await CustomRotationPrefs.getWeeks();
-    final pattern = await CustomRotationPrefs.getPattern(weeks);
-    final overrides = await CustomRotationPrefs.getOverrides();
+    final startDateVal = startDate.value;
+    final weeksVal = weeks.value;
+    final patternList = pattern;
+    final overridesMap = overrides;
 
     final now = DateTime.now();
     final monday = DateTime(
@@ -122,21 +207,25 @@ class WorkScheduleSettingsController extends GetxController {
           '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
       String shift = 'Off';
-      if (overrides.containsKey(dateStr)) {
-        shift = overrides[dateStr]!;
+      if (overridesMap.containsKey(dateStr)) {
+        shift = overridesMap[dateStr]!;
       } else {
         final startDateClean = DateTime(
-          startDate.year,
-          startDate.month,
-          startDate.day,
+          startDateVal.year,
+          startDateVal.month,
+          startDateVal.day,
         );
         final dateClean = DateTime(date.year, date.month, date.day);
         final diffDays = dateClean.difference(startDateClean).inDays;
 
-        final cycleLength = 7 * weeks;
-        final patternIndex =
-            ((diffDays % cycleLength) + cycleLength) % cycleLength;
-        shift = pattern[patternIndex];
+        final cycleLength = 7 * weeksVal;
+        if (cycleLength > 0 && patternList.isNotEmpty) {
+          final patternIndex =
+              ((diffDays % cycleLength) + cycleLength) % cycleLength;
+          if (patternIndex < patternList.length) {
+            shift = patternList[patternIndex];
+          }
+        }
       }
       computedPattern.add({'day': days[i], 'shift': shift});
     }
@@ -154,7 +243,7 @@ class WorkScheduleSettingsController extends GetxController {
         ? 'Night'
         : 'Off';
 
-    final times = await CustomRotationPrefs.getShiftTimes();
+    final times = shiftTimes;
     final shiftName = workCtrl.selectedShiftType.value;
     if (times.containsKey(shiftName)) {
       final start = times[shiftName]!['start']!;
@@ -174,5 +263,32 @@ class WorkScheduleSettingsController extends GetxController {
             int.tryParse(endParts[1]) ?? workCtrl.endMinute.value;
       }
     }
+  }
+
+  // Get computed shift code for any given DateTime based on rotation pattern & overrides
+  String getShiftForDate(DateTime date) {
+    final dateStr =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    if (overrides.containsKey(dateStr)) {
+      return overrides[dateStr]!;
+    }
+
+    final startDateClean = DateTime(
+      startDate.value.year,
+      startDate.value.month,
+      startDate.value.day,
+    );
+    final dateClean = DateTime(date.year, date.month, date.day);
+    final diffDays = dateClean.difference(startDateClean).inDays;
+
+    final cycleLength = 7 * weeks.value;
+    if (cycleLength <= 0 || pattern.isEmpty) return 'Off';
+
+    final patternIndex =
+        ((diffDays % cycleLength) + cycleLength) % cycleLength;
+    if (patternIndex < pattern.length) {
+      return pattern[patternIndex];
+    }
+    return 'Off';
   }
 }

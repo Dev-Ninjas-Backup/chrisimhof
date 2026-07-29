@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
+import 'package:chrisimhof/features/work_schedule_settings/widgets/template_selection_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,7 +25,7 @@ class RotationBuilderCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderSoft),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.02),
+            color: AppColors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -39,28 +40,70 @@ class RotationBuilderCard extends StatelessWidget {
               children: [
                 if (weekIdx > 0) const SizedBox(height: 24),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Week Badge
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 4,
+                        vertical: 5,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.mintSoft,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Week ${weekIdx + 1}'.tr.toUpperCase(),
+                        'WEEK ${weekIdx + 1}'.tr,
                         style: getTextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: FontWeight.w800,
                           color: AppColors.secondaryButtonColor,
                         ).copyWith(letterSpacing: 1.0),
                       ),
                     ),
+
+                    // "Use a template" button on Week 1 header (Matching image 2)
+                    if (weekIdx == 0)
+                      InkWell(
+                        onTap: () => _openTemplateSheet(context),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.secondaryButtonColor,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.auto_awesome_outlined,
+                                size: 13,
+                                color: AppColors.secondaryButtonColor,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Use a template'.tr,
+                                style: getTextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.secondaryButtonColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 ...List.generate(7, (dayIdx) {
                   final overallDayIdx = (weekIdx * 7) + dayIdx;
                   if (overallDayIdx >= controller.pattern.length) {
@@ -71,16 +114,16 @@ class RotationBuilderCard extends StatelessWidget {
                   final currentShift = controller.pattern[overallDayIdx];
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
                     child: Row(
                       children: [
                         SizedBox(
-                          width: 80,
+                          width: 82,
                           child: Text(
                             dayName.tr,
                             style: getTextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.primaryTextColor,
                             ),
                           ),
@@ -93,7 +136,7 @@ class RotationBuilderCard extends StatelessWidget {
                               return Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 2.0,
+                                    horizontal: 3.0,
                                   ),
                                   child: GestureDetector(
                                     onTap: () => controller.updateDayPattern(
@@ -102,9 +145,9 @@ class RotationBuilderCard extends StatelessWidget {
                                     ),
                                     child: AnimatedContainer(
                                       duration: const Duration(
-                                        milliseconds: 150,
+                                        milliseconds: 160,
                                       ),
-                                      height: 34,
+                                      height: 36,
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? _getShiftColor(
@@ -112,18 +155,16 @@ class RotationBuilderCard extends StatelessWidget {
                                                 bg: true,
                                               )
                                             : AppColors.gray100,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: isSelected
-                                            ? Border.all(
-                                                color: _getShiftColor(
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? _getShiftColor(
                                                   shiftCode,
                                                   bg: false,
-                                                ),
-                                                width: 1,
-                                              )
-                                            : Border.all(
-                                                color: AppColors.transparent,
-                                              ),
+                                                )
+                                              : AppColors.transparent,
+                                          width: isSelected ? 1.5 : 1,
+                                        ),
                                       ),
                                       alignment: Alignment.center,
                                       child: Text(
@@ -132,7 +173,7 @@ class RotationBuilderCard extends StatelessWidget {
                                           fontSize: 12,
                                           fontWeight: isSelected
                                               ? FontWeight.w800
-                                              : FontWeight.w500,
+                                              : FontWeight.w600,
                                           color: isSelected
                                               ? _getShiftColor(
                                                   shiftCode,
@@ -160,6 +201,15 @@ class RotationBuilderCard extends StatelessWidget {
     );
   }
 
+  void _openTemplateSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => TemplateSelectionSheet(controller: controller),
+    );
+  }
+
   Color _getShiftColor(String code, {required bool bg}) {
     if (code == 'D') {
       return bg ? AppColors.amberSoft3 : AppColors.orangeAccent2;
@@ -169,7 +219,7 @@ class RotationBuilderCard extends StatelessWidget {
       return bg ? AppColors.indigoSoft : AppColors.indigo;
     } else {
       // Off
-      return bg ? AppColors.mintSoft2 : AppColors.secondaryButtonColor;
+      return bg ? AppColors.mintSoft : AppColors.secondaryButtonColor;
     }
   }
 }

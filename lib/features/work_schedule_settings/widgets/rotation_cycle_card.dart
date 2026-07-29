@@ -19,13 +19,14 @@ class RotationCycleCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderSoft),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.02),
+            color: AppColors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Start date picker row
           Row(
@@ -43,6 +44,7 @@ class RotationCycleCard extends StatelessWidget {
                         color: AppColors.primaryTextColor,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       'App aligns rotation week to dates'.tr,
                       style: getTextStyle(
@@ -91,6 +93,7 @@ class RotationCycleCard extends StatelessWidget {
           ),
           const Divider(height: 24, color: AppColors.borderSoft),
 
+          // Rotation length row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -106,6 +109,7 @@ class RotationCycleCard extends StatelessWidget {
                         color: AppColors.primaryTextColor,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       'Number of weeks in cycle'.tr,
                       style: getTextStyle(
@@ -145,6 +149,44 @@ class RotationCycleCard extends StatelessWidget {
               ),
             ],
           ),
+
+          // Dynamic explanation text matching design image 1
+          Obx(() {
+            final w = controller.weeks.value;
+            if (w <= 1) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(top: 14.0),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.mintSoft3,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.mintSoft),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      size: 16,
+                      color: AppColors.secondaryButtonColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Rotation length = $w weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.'
+                            .tr,
+                        style: getTextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.mintSoftText,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
