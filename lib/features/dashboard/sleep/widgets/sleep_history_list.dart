@@ -2,7 +2,6 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/model/sleep_log.dart';
-import 'package:chrisimhof/features/dashboard/sleep/widgets/sleep_entry_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

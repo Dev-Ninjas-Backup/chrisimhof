@@ -31,7 +31,7 @@ class CustomSwitch extends StatelessWidget {
             borderRadius: BorderRadius.circular(height / 2),
             boxShadow: [
               BoxShadow(
-                color: AppColors.black.withOpacity(0.04),
+                color: AppColors.black.withValues(alpha: 0.04),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -55,7 +55,7 @@ class CustomSwitch extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.black.withOpacity(0.06),
+                        color: AppColors.black.withValues(alpha: 0.06),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
