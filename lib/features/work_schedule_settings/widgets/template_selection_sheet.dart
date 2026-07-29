@@ -58,11 +58,38 @@ class TemplateSelectionSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Template Cards list
+          // Template Cards list from REST API
           Obx(() {
+            if (controller.isLoadingPresets.value) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 40.0),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.secondaryButtonColor,
+                  ),
+                ),
+              );
+            }
+
+            final presets = controller.apiPresets;
+            if (presets.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Center(
+                  child: Text(
+                    'No presets available'.tr,
+                    style: getTextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSoft,
+                    ),
+                  ),
+                ),
+              );
+            }
+
             return Column(
-              children: List.generate(controller.templates.length, (index) {
-                final tmpl = controller.templates[index];
+              children: List.generate(presets.length, (index) {
+                final tmpl = presets[index];
                 final isSelected =
                     controller.selectedTemplateIndex.value == index;
 
@@ -75,9 +102,7 @@ class TemplateSelectionSheet extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.mintSoft3
-                          : AppColors.white,
+                      color: isSelected ? AppColors.mintSoft3 : AppColors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isSelected
@@ -116,12 +141,14 @@ class TemplateSelectionSheet extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    tmpl.title.tr,
-                                    style: getTextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primaryTextColor,
+                                  Expanded(
+                                    child: Text(
+                                      tmpl.label.tr,
+                                      style: getTextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryTextColor,
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -136,7 +163,7 @@ class TemplateSelectionSheet extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      '${tmpl.weeks} ${'wk'.tr}',
+                                      '${tmpl.cycleWeeks} ${'wk'.tr}',
                                       style: getTextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
@@ -205,9 +232,10 @@ class TemplateSelectionSheet extends StatelessWidget {
             height: 52,
             child: ElevatedButton(
               onPressed: () {
+                final presets = controller.apiPresets;
                 final idx = controller.selectedTemplateIndex.value;
-                if (idx >= 0 && idx < controller.templates.length) {
-                  controller.applyTemplate(controller.templates[idx]);
+                if (presets.isNotEmpty && idx >= 0 && idx < presets.length) {
+                  controller.applyPreset(presets[idx]);
                 }
                 Get.back();
               },

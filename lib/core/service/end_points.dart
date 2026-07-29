@@ -66,5 +66,13 @@ class Urls {
       '$baseUrl/api/v1/calculator/session/$sessionId/notes';
   static String createWeeklyPattern(String sessionId) =>
       '$baseUrl/api/v1/calculator/work-settings/session/$sessionId/weekly-pattern';
-  static const String createWorkSettings = '$baseUrl/api/v1/calculator/work-settings';
+  static const String createWorkSettings =
+      '$baseUrl/api/v1/calculator/work-settings';
+
+  static const String workRotationPreset =
+      '$baseUrl/api/v1/calculator/work-rotation/presets';
+  static const String myWorkRotation =
+      '$baseUrl/api/v1/calculator/work-rotation';
+  static String workRotationCalendar(String from, int days) =>
+      '$baseUrl/api/v1/calculator/work-rotation/calendar?from=$from&days=$days';
 }

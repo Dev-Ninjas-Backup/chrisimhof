@@ -68,7 +68,7 @@ class CustomRotationToggleCard extends StatelessWidget {
           Obx(
             () => CustomSwitch(
               value: controller.isEnabled.value,
-              onChanged: (val) => controller.isEnabled.value = val,
+              onChanged: (val) => controller.onToggleChanged(val, context),
             ),
           ),
         ],
