@@ -125,4 +125,34 @@ class WorkScheduleSettingsService {
     }
     return null;
   }
+
+  // DELETE /api/v1/calculator/work-rotation
+  Future<bool> deleteWorkRotation() async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Deleting work rotation from API...');
+
+      final response = await http.delete(
+        Uri.parse(Urls.deleteWorkRotation),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('Delete work rotation status: ${response.statusCode}');
+      debugPrint('Delete work rotation body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      } else {
+        debugPrint('Failed to delete work rotation: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('WorkScheduleSettingsService.deleteWorkRotation error: $e');
+    }
+    return false;
+  }
 }
+
