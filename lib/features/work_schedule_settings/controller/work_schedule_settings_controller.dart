@@ -231,6 +231,21 @@ class WorkScheduleSettingsController extends GetxController {
     try {
       EasyLoading.show(status: 'Saving work schedule...'.tr);
 
+      if (!isEnabled.value) {
+        final success = await _service.deleteWorkRotation();
+        if (success) {
+          try {
+            final workCtrl = Get.find<WorkController>();
+            workCtrl.weeklyPattern.clear();
+          } catch (_) {}
+          EasyLoading.showSuccess('Work rotation deleted'.tr);
+          Get.back();
+        } else {
+          EasyLoading.showError('Failed to delete work rotation'.tr);
+        }
+        return;
+      }
+
       try {
         final workCtrl = Get.find<WorkController>();
         await loadCustomRotationSchedule(workCtrl);
