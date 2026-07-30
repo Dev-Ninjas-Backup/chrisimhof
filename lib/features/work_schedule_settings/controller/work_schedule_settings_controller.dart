@@ -21,6 +21,7 @@ class WorkScheduleSettingsController extends GetxController {
 
   // Selected preset index for bottom sheet template picker
   final selectedTemplateIndex = 0.obs;
+  final selectedTemplateKey = ''.obs;
   final isLoadingPresets = false.obs;
   final isRotationLoading = false.obs;
   final isLoadingCalendar = false.obs;
@@ -54,10 +55,12 @@ class WorkScheduleSettingsController extends GetxController {
       if (rotation == null) {
         // data is null => toggle OFF
         isEnabled.value = false;
+        selectedTemplateKey.value = '';
       } else {
         // has data => toggle ON & populate rotation data
         isEnabled.value = true;
         weeks.value = rotation.cycleWeeks;
+        selectedTemplateKey.value = rotation.sourceTemplateKey;
         if (rotation.startDate.isNotEmpty) {
           startDate.value =
               DateTime.tryParse(rotation.startDate) ?? DateTime.now();
@@ -169,6 +172,7 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   void applyPreset(WorkRotationPresetModel preset) {
+    selectedTemplateKey.value = preset.key;
     weeks.value = preset.cycleWeeks;
     pattern.assignAll(preset.pattern);
     shiftTimes.assignAll(preset.shiftTimes);
@@ -246,13 +250,27 @@ class WorkScheduleSettingsController extends GetxController {
         return;
       }
 
-      try {
-        final workCtrl = Get.find<WorkController>();
-        await loadCustomRotationSchedule(workCtrl);
-      } catch (_) {}
+      final success = await _service.saveWorkRotation(
+        cycleWeeks: weeks.value,
+        startDate: _formatDate(startDate.value),
+        shiftTimes: shiftTimes,
+        pattern: pattern,
+        sourceTemplateKey: selectedTemplateKey.value.isNotEmpty
+            ? selectedTemplateKey.value
+            : null,
+      );
 
-      EasyLoading.showSuccess('Work schedule saved!'.tr);
-      Get.back();
+      if (success) {
+        try {
+          final workCtrl = Get.find<WorkController>();
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+
+        EasyLoading.showSuccess('Work schedule saved!'.tr);
+        Get.back();
+      } else {
+        EasyLoading.showError('Failed to save work schedule'.tr);
+      }
     } catch (e) {
       debugPrint('Error saving settings: $e');
       EasyLoading.showError('Failed to save settings'.tr);

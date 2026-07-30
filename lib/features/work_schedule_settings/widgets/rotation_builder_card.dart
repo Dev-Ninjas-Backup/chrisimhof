@@ -113,6 +113,9 @@ class RotationBuilderCard extends StatelessWidget {
                   final dayName = daysOfWeek[dayIdx];
                   final currentShift = controller.pattern[overallDayIdx];
 
+                  final isTemplate =
+                      controller.selectedTemplateKey.value.isNotEmpty;
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6.0),
                     child: Row(
@@ -139,47 +142,53 @@ class RotationBuilderCard extends StatelessWidget {
                                     horizontal: 3.0,
                                   ),
                                   child: GestureDetector(
-                                    onTap: () => controller.updateDayPattern(
-                                      overallDayIdx,
-                                      shiftCode,
-                                    ),
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 160,
-                                      ),
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? _getShiftColor(
-                                                shiftCode,
-                                                bg: true,
-                                              )
-                                            : AppColors.gray100,
-                                        borderRadius: BorderRadius.circular(18),
-                                        border: Border.all(
-                                          color: isSelected
-                                              ? _getShiftColor(
-                                                  shiftCode,
-                                                  bg: false,
-                                                )
-                                              : AppColors.transparent,
-                                          width: isSelected ? 1.5 : 1,
+                                    onTap: isTemplate
+                                        ? null
+                                        : () => controller.updateDayPattern(
+                                              overallDayIdx,
+                                              shiftCode,
+                                            ),
+                                    child: Opacity(
+                                      opacity: isTemplate ? 0.6 : 1.0,
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 160,
                                         ),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        shiftCode.tr,
-                                        style: getTextStyle(
-                                          fontSize: 12,
-                                          fontWeight: isSelected
-                                              ? FontWeight.w800
-                                              : FontWeight.w600,
+                                        height: 36,
+                                        decoration: BoxDecoration(
                                           color: isSelected
                                               ? _getShiftColor(
                                                   shiftCode,
-                                                  bg: false,
+                                                  bg: true,
                                                 )
-                                              : AppColors.textSoft,
+                                              : AppColors.gray100,
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? _getShiftColor(
+                                                    shiftCode,
+                                                    bg: false,
+                                                  )
+                                                : AppColors.transparent,
+                                            width: isSelected ? 1.5 : 1,
+                                          ),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          shiftCode.tr,
+                                          style: getTextStyle(
+                                            fontSize: 12,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w800
+                                                : FontWeight.w600,
+                                            color: isSelected
+                                                ? _getShiftColor(
+                                                    shiftCode,
+                                                    bg: false,
+                                                  )
+                                                : AppColors.textSoft,
+                                          ),
                                         ),
                                       ),
                                     ),

@@ -154,5 +154,96 @@ class WorkScheduleSettingsService {
     }
     return false;
   }
+
+  // PUT /api/v1/calculator/work-rotation
+  Future<bool> saveWorkRotation({
+    required int cycleWeeks,
+    required String startDate,
+    required Map<String, Map<String, String>> shiftTimes,
+    required List<String> pattern,
+    String? sourceTemplateKey,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Saving work rotation via API (PUT)...');
+
+      final dayShift = {
+        'startTime': shiftTimes['Day']?['start'] ?? '06:00',
+        'endTime': shiftTimes['Day']?['end'] ?? '14:00',
+      };
+      final eveningShift = {
+        'startTime': shiftTimes['Evening']?['start'] ?? '14:00',
+        'endTime': shiftTimes['Evening']?['end'] ?? '22:00',
+      };
+      final nightShift = {
+        'startTime': shiftTimes['Night']?['start'] ?? '22:00',
+        'endTime': shiftTimes['Night']?['end'] ?? '06:00',
+      };
+
+      final patternJson = <Map<String, dynamic>>[];
+      for (int w = 0; w < cycleWeeks; w++) {
+        for (int d = 0; d < 7; d++) {
+          final index = w * 7 + d;
+          String shiftCodeStr = 'off';
+          if (index < pattern.length) {
+            final p = pattern[index].toUpperCase();
+            if (p == 'N' || p == 'NIGHT') {
+              shiftCodeStr = 'night';
+            } else if (p == 'E' || p == 'EVENING') {
+              shiftCodeStr = 'evening';
+            } else if (p == 'D' || p == 'DAY') {
+              shiftCodeStr = 'day';
+            } else {
+              shiftCodeStr = 'off';
+            }
+          }
+          patternJson.add({
+            'weekIndex': w,
+            'dayIndex': d,
+            'shiftCode': shiftCodeStr,
+          });
+        }
+      }
+
+      final Map<String, dynamic> bodyMap = {
+        'cycleWeeks': cycleWeeks,
+        'startDate': startDate,
+        'dayShift': dayShift,
+        'eveningShift': eveningShift,
+        'nightShift': nightShift,
+        'patternJson': patternJson,
+      };
+
+      if (sourceTemplateKey != null && sourceTemplateKey.trim().isNotEmpty) {
+        bodyMap['sourceTemplateKey'] = sourceTemplateKey;
+      }
+
+      debugPrint('Save work rotation request body: ${jsonEncode(bodyMap)}');
+
+      final response = await http.put(
+        Uri.parse(Urls.myWorkRotation),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Save work rotation PUT status: ${response.statusCode}');
+      debugPrint('Save work rotation PUT body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      } else {
+        debugPrint('Failed to save work rotation: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('WorkScheduleSettingsService.saveWorkRotation error: $e');
+    }
+    return false;
+  }
 }
+
 
