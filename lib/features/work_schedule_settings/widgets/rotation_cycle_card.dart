@@ -120,33 +120,45 @@ class RotationCycleCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Row(
-                children: [
-                  _buildCycleAdjustBtn(Icons.remove, () {
-                    if (controller.weeks.value > 1) {
-                      controller.setWeeks(controller.weeks.value - 1);
-                    }
-                  }),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Obx(
-                      () => Text(
+              Obx(() {
+                final isTemplate =
+                    controller.selectedTemplateKey.value.isNotEmpty;
+                return Row(
+                  children: [
+                    _buildCycleAdjustBtn(
+                      Icons.remove,
+                      () {
+                        if (controller.weeks.value > 1) {
+                          controller.setWeeks(controller.weeks.value - 1);
+                        }
+                      },
+                      disabled: isTemplate,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                      child: Text(
                         '${controller.weeks.value} ${controller.weeks.value == 1 ? 'Week'.tr : 'Weeks'.tr}',
                         style: getTextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primaryTextColor,
+                          color: isTemplate
+                              ? AppColors.textSoft
+                              : AppColors.primaryTextColor,
                         ),
                       ),
                     ),
-                  ),
-                  _buildCycleAdjustBtn(Icons.add, () {
-                    if (controller.weeks.value < 8) {
-                      controller.setWeeks(controller.weeks.value + 1);
-                    }
-                  }),
-                ],
-              ),
+                    _buildCycleAdjustBtn(
+                      Icons.add,
+                      () {
+                        if (controller.weeks.value < 8) {
+                          controller.setWeeks(controller.weeks.value + 1);
+                        }
+                      },
+                      disabled: isTemplate,
+                    ),
+                  ],
+                );
+              }),
             ],
           ),
 
@@ -173,8 +185,8 @@ class RotationCycleCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Rotation length = $w weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.'
-                            .tr,
+                        'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.'
+                            .trParams({'weeks': w.toString()}),
                         style: getTextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
@@ -192,17 +204,24 @@ class RotationCycleCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCycleAdjustBtn(IconData icon, VoidCallback onTap) {
+  Widget _buildCycleAdjustBtn(
+    IconData icon,
+    VoidCallback onTap, {
+    bool disabled = false,
+  }) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: AppColors.gray50,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.borderSoft),
+      onTap: disabled ? null : onTap,
+      child: Opacity(
+        opacity: disabled ? 0.4 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: AppColors.gray50,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.borderSoft),
+          ),
+          child: Icon(icon, size: 16, color: AppColors.primaryTextColor),
         ),
-        child: Icon(icon, size: 16, color: AppColors.primaryTextColor),
       ),
     );
   }

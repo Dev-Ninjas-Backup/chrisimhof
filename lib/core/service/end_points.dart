@@ -77,4 +77,10 @@ class Urls {
       '$baseUrl/api/v1/calculator/work-rotation/calendar?from=$from&days=$days';
   static const String deleteWorkRotation =
       '$baseUrl/api/v1/calculator/work-rotation';
+  static const String createWorkRotaion =
+      '$baseUrl/api/v1/calculator/work-rotation';
+  static const String overrideWorkRotation =
+      '$baseUrl/api/v1/calculator/work-rotation/overrides';
+  static String deleteOverrideWorkRotation(String date) =>
+      '$baseUrl/api/v1/calculator/work-rotation/overrides/$date';
 }

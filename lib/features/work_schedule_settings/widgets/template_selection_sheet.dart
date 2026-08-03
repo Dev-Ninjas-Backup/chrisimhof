@@ -200,6 +200,7 @@ class TemplateSelectionSheet extends StatelessWidget {
           Center(
             child: TextButton(
               onPressed: () {
+                controller.selectedTemplateKey.value = '';
                 Get.back();
               },
               child: Row(
