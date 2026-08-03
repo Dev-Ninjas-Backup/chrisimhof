@@ -105,12 +105,18 @@ class UserWorkRotationModel {
     final rawOverrides = json['overridesJson'] as Map<String, dynamic>?;
     if (rawOverrides != null) {
       rawOverrides.forEach((dateKey, val) {
-        final code = val.toString().toLowerCase();
-        if (code == 'night') {
+        String codeStr = '';
+        if (val is Map<String, dynamic>) {
+          codeStr = val['shiftCode']?.toString() ?? '';
+        } else if (val != null) {
+          codeStr = val.toString();
+        }
+        final code = codeStr.toLowerCase();
+        if (code == 'night' || code == 'n') {
           overridesMap[dateKey] = 'N';
-        } else if (code == 'evening') {
+        } else if (code == 'evening' || code == 'e') {
           overridesMap[dateKey] = 'E';
-        } else if (code == 'day') {
+        } else if (code == 'day' || code == 'd') {
           overridesMap[dateKey] = 'D';
         } else {
           overridesMap[dateKey] = 'Off';
