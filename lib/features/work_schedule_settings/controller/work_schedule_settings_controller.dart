@@ -201,34 +201,107 @@ class WorkScheduleSettingsController extends GetxController {
 
   Future<void> applyDayOverride(DateTime date, String shiftCode) async {
     final dateStr = _formatDate(date);
-    overrides[dateStr] = shiftCode;
 
-    final idx = getPatternIndexForDate(date);
-    if (idx >= 0 && idx < pattern.length) {
-      pattern[idx] = shiftCode;
+    String apiShiftType;
+    String? shiftStartTime;
+    String? shiftEndTime;
+
+    final lowerCode = shiftCode.toLowerCase();
+    if (lowerCode == 'd' || lowerCode == 'day') {
+      apiShiftType = 'day';
+      shiftStartTime = shiftTimes['Day']?['start'] ?? '07:00';
+      shiftEndTime = shiftTimes['Day']?['end'] ?? '15:00';
+    } else if (lowerCode == 'e' || lowerCode == 'evening') {
+      apiShiftType = 'evening';
+      shiftStartTime = shiftTimes['Evening']?['start'] ?? '15:00';
+      shiftEndTime = shiftTimes['Evening']?['end'] ?? '22:30';
+    } else if (lowerCode == 'n' || lowerCode == 'night') {
+      apiShiftType = 'night';
+      shiftStartTime = shiftTimes['Night']?['start'] ?? '22:30';
+      shiftEndTime = shiftTimes['Night']?['end'] ?? '06:30';
+    } else {
+      apiShiftType = 'off';
+      shiftStartTime = null;
+      shiftEndTime = null;
     }
 
-    editingDateStr.value = '';
-
-    await fetchUpcomingSchedule();
-
     try {
-      final workCtrl = Get.find<WorkController>();
-      await loadCustomRotationSchedule(workCtrl);
-    } catch (_) {}
+      EasyLoading.show(status: 'Saving override...'.tr);
+
+      final success = await _service.saveWorkRotationOverride(
+        date: dateStr,
+        shiftType: apiShiftType,
+        shiftStartTime: shiftStartTime,
+        shiftEndTime: shiftEndTime,
+      );
+
+      if (success) {
+        overrides[dateStr] = shiftCode;
+        editingDateStr.value = '';
+
+        await fetchUpcomingSchedule();
+
+        try {
+          final workCtrl = Get.find<WorkController>();
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+
+        EasyLoading.showSuccess('Day override saved'.tr);
+      } else {
+        EasyLoading.showError('Failed to save day override'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error applying day override: $e');
+      EasyLoading.showError('Failed to save day override'.tr);
+    }
   }
 
   Future<void> revertDayOverride(DateTime date) async {
     final dateStr = _formatDate(date);
-    overrides.remove(dateStr);
-    editingDateStr.value = '';
-
-    await fetchUpcomingSchedule();
-
     try {
-      final workCtrl = Get.find<WorkController>();
-      await loadCustomRotationSchedule(workCtrl);
-    } catch (_) {}
+      EasyLoading.show(status: 'Clearing day override...'.tr);
+
+      final success = await _service.deleteWorkRotationOverride(dateStr);
+
+      if (success) {
+        overrides.remove(dateStr);
+        editingDateStr.value = '';
+
+        await fetchUpcomingSchedule();
+
+        try {
+          final workCtrl = Get.find<WorkController>();
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+
+        EasyLoading.showSuccess('Day override cleared'.tr);
+      } else {
+        EasyLoading.showError('Failed to clear day override'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error deleting day override: $e');
+      EasyLoading.showError('Failed to clear day override'.tr);
+    }
+  }
+
+  String getBaseShiftForDate(DateTime date) {
+    final startDateClean = DateTime(
+      startDate.value.year,
+      startDate.value.month,
+      startDate.value.day,
+    );
+    final dateClean = DateTime(date.year, date.month, date.day);
+    final diffDays = dateClean.difference(startDateClean).inDays;
+
+    final cycleLength = 7 * weeks.value;
+    if (cycleLength <= 0 || pattern.isEmpty) return 'Off';
+
+    final patternIndex =
+        ((diffDays % cycleLength) + cycleLength) % cycleLength;
+    if (patternIndex < pattern.length) {
+      return pattern[patternIndex];
+    }
+    return 'Off';
   }
 
   Future<void> saveSettings() async {

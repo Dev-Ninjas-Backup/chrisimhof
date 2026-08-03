@@ -122,13 +122,13 @@ class UpcomingScheduleDayEditBox extends StatelessWidget {
                 Expanded(
                   child: SizedBox(
                     height: 38,
-                    child: OutlinedButton(
+                    child: OutlinedButton.icon(
                       onPressed: () {
                         controller.revertDayOverride(date);
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(
-                          color: AppColors.textSoft,
+                          color: AppColors.red,
                           width: 1,
                         ),
                         shape: RoundedRectangleBorder(
@@ -136,12 +136,17 @@ class UpcomingScheduleDayEditBox extends StatelessWidget {
                         ),
                         padding: EdgeInsets.zero,
                       ),
-                      child: Text(
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 16,
+                        color: AppColors.red,
+                      ),
+                      label: Text(
                         'Revert to rotation'.tr,
                         style: getTextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textSoft,
+                          color: AppColors.red,
                         ),
                       ),
                     ),

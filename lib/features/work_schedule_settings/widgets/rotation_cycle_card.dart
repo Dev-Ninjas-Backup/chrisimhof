@@ -185,8 +185,8 @@ class RotationCycleCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Rotation length = $w weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.'
-                            .tr,
+                        'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.'
+                            .trParams({'weeks': w.toString()}),
                         style: getTextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,

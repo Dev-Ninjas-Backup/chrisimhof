@@ -244,6 +244,95 @@ class WorkScheduleSettingsService {
     }
     return false;
   }
+
+  // POST /api/v1/calculator/work-rotation/overrides
+  Future<bool> saveWorkRotationOverride({
+    required String date,
+    required String shiftType,
+    String? shiftStartTime,
+    String? shiftEndTime,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Saving work rotation override via API (POST)...');
+
+      final Map<String, dynamic> bodyMap = {
+        'date': date,
+        'shiftType': shiftType,
+      };
+
+      if (shiftType.toLowerCase() != 'off') {
+        if (shiftStartTime != null && shiftStartTime.isNotEmpty) {
+          bodyMap['shiftStartTime'] = shiftStartTime;
+        }
+        if (shiftEndTime != null && shiftEndTime.isNotEmpty) {
+          bodyMap['shiftEndTime'] = shiftEndTime;
+        }
+      }
+
+      debugPrint('Save work rotation override request body: ${jsonEncode(bodyMap)}');
+
+      final response = await http.post(
+        Uri.parse(Urls.overrideWorkRotation),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Save work rotation override status: ${response.statusCode}');
+      debugPrint('Save work rotation override body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      } else {
+        debugPrint(
+          'Failed to save work rotation override: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint(
+        'WorkScheduleSettingsService.saveWorkRotationOverride error: $e',
+      );
+    }
+    return false;
+  }
+
+  // DELETE /api/v1/calculator/work-rotation/overrides/{date}
+  Future<bool> deleteWorkRotationOverride(String date) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Deleting work rotation override for $date via API (DELETE)...');
+
+      final response = await http.delete(
+        Uri.parse(Urls.deleteOverrideWorkRotation(date)),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('Delete work rotation override status: ${response.statusCode}');
+      debugPrint('Delete work rotation override body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      } else {
+        debugPrint(
+          'Failed to delete work rotation override: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint(
+        'WorkScheduleSettingsService.deleteWorkRotationOverride error: $e',
+      );
+    }
+    return false;
+  }
 }
 
 
