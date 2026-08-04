@@ -1,6 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
-import 'package:chrisimhof/features/settings/legal_and_data/consent_settings/widgets/custom_switch.dart';
+import 'package:chrisimhof/core/common/widgets/custom_switch.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

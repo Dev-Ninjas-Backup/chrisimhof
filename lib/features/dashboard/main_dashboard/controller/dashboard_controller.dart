@@ -36,6 +36,10 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   /// Cached cards.caffeine data for late-registering CaffeineController.
   final Rxn<Map<String, dynamic>> caffeineCardData = Rxn<Map<String, dynamic>>();
 
+  /// Active session details
+  final RxnString currentSessionId = RxnString();
+  final RxnString sessionStatus = RxnString();
+
   final Rx<DashboardModel> dashboardData = DashboardModel(
     date: DateTime.now(),
     userName: 'User',
@@ -600,8 +604,13 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
           if (decoded['success'] == true && decoded['data'] != null) {
             final dataMap = decoded['data'] as Map<String, dynamic>;
             final sessionId = dataMap['sessionId'] as String?;
+            final statusStr = dataMap['status'] as String?;
             if (sessionId != null && sessionId.isNotEmpty) {
+              currentSessionId.value = sessionId;
               await SharedPreferencesHelper.saveSessionId(sessionId);
+            }
+            if (statusStr != null && statusStr.isNotEmpty) {
+              sessionStatus.value = statusStr;
             }
             sessionData = decoded;
           }
@@ -868,7 +877,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         debugPrint('End Session POST Body: ${response.body}');
 
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        if (response.statusCode == 200 || response.statusCode == 201) {
+        final bool isSuccess = jsonData['success'] == true;
+        if ((response.statusCode == 200 || response.statusCode == 201) && isSuccess) {
           final calculation =
               jsonData['data']?['calculation'] as Map<String, dynamic>?;
           if (calculation != null) {
@@ -880,7 +890,10 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
           }
           newSessionId = jsonData['data']?['newSession']?['sessionId'] as String?;
         } else {
-          throw Exception(jsonData['message'] ?? 'Failed to end session');
+          final msg = jsonData['message'] as String? ?? 'Failed to end session';
+          EasyLoading.showError(msg);
+          _isEndingDay = false;
+          return;
         }
       }
 
@@ -945,7 +958,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       EasyLoading.showSuccess('Day ended successfully!');
     } catch (e) {
       debugPrint('Error ending day: $e');
-      EasyLoading.showError('Failed to end day.');
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      EasyLoading.showError(msg.isNotEmpty ? msg : 'Failed to end day.');
     } finally {
       _isEndingDay = false;
     }

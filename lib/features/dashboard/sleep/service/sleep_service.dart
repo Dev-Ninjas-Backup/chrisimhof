@@ -8,11 +8,30 @@ class SleepService {
   // POST /api/v1/calculator/session/{sessionId}/sleep
   Future<Map<String, dynamic>> saveSleep({
     required String sessionId,
-    required String sleepStartTime,
-    required String wakeTime,
+    required String sleepStartedAt,
+    required String wakeRecordedAt,
+    bool? isNewMainWake,
+    String? note,
   }) async {
     final uri = Uri.parse(Urls.sleepCalculator(sessionId));
     final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    final Map<String, dynamic> bodyMap = {
+      'sleepStartedAt': sleepStartedAt,
+      'wakeRecordedAt': wakeRecordedAt,
+    };
+
+    if (isNewMainWake != null) {
+      bodyMap['isNewMainWake'] = isNewMainWake;
+    }
+    if (note != null && note.isNotEmpty) {
+      bodyMap['note'] = note;
+    }
+
+    debugPrint('=== SLEEP LOG REQUEST ===');
+    debugPrint('URL: $uri');
+    debugPrint('Headers: Authorization: Bearer $accessToken');
+    debugPrint('Request Body: ${jsonEncode(bodyMap)}');
 
     final response = await http.post(
       uri,
@@ -21,14 +40,12 @@ class SleepService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken',
       },
-      body: jsonEncode({
-        'sleepStartTime': sleepStartTime,
-        'wakeTime': wakeTime,
-      }),
+      body: jsonEncode(bodyMap),
     );
 
-    debugPrint('Sleep Log POST Status: ${response.statusCode}');
-    debugPrint('Sleep Log POST Body: ${response.body}');
+    debugPrint('=== SLEEP LOG RESPONSE ===');
+    debugPrint('Status Code: ${response.statusCode}');
+    debugPrint('Response Body: ${response.body}');
 
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
 

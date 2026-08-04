@@ -1,4 +1,5 @@
 import 'package:chrisimhof/core/common/widgets/custom_button.dart';
+import 'package:chrisimhof/core/common/widgets/custom_switch.dart';
 import 'package:chrisimhof/core/common/widgets/time_widget.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
@@ -136,6 +137,87 @@ class LogSleepCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
+          Obx(
+            () => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: AppColors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Start New Main Wake (Rollover)'.tr,
+                          style: getTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Enable if logging main wake after forgetting End Day'
+                              .tr,
+                          style: getTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.selectionGray,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CustomSwitch(
+                    value: controller.isNewMainWake.value,
+                    onChanged: (val) => controller.isNewMainWake.value = val,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Sleep Note (optional)
+          Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.white.withValues(alpha: 0.12),
+              ),
+            ),
+            child: TextField(
+              controller: controller.noteController,
+              style: getTextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.white,
+              ),
+              maxLines: 2,
+              minLines: 1,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Sleep note (optional)...'.tr,
+                hintStyle: getTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.selectionGray,
+                ),
+                icon: const Icon(
+                  Icons.edit_note_rounded,
+                  color: AppColors.primaryButtonColor,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
 
           // Save sleep button
           CustomButton(
