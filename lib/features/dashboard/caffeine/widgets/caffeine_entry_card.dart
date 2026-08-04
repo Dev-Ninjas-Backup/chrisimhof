@@ -15,90 +15,93 @@ class CaffeineEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.amber.withValues(alpha: .1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Icon(
-                _getIconForEntry(entry.title),
-                color: AppColors.amberDark,
-                size: 24,
+    return GestureDetector(
+      onTap: onEdit,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.borderSoft),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.amber.withValues(alpha: .1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Center(
+                child: Icon(
+                  _getIconForEntry(entry.title),
+                  color: AppColors.amberDark,
+                  size: 24,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.title,
+                    style: getTextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    entry.timeFormatted,
+                    style: getTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSoft,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  entry.title,
+                  '${entry.amountMg}',
                   style: getTextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
                     color: AppColors.primaryTextColor,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(width: 2),
                 Text(
-                  entry.timeFormatted,
+                  'mg',
                   style: getTextStyle(
-                    fontSize: 14,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSoft,
                   ),
                 ),
               ],
             ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                '${entry.amountMg}',
-                style: getTextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primaryTextColor,
-                ),
+            const SizedBox(width: 12),
+            GestureDetector(
+              onTap: onEdit,
+              child: const Icon(
+                Icons.edit_outlined,
+                color: AppColors.textSoft,
+                size: 18,
               ),
-              const SizedBox(width: 2),
-              Text(
-                'mg',
-                style: getTextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSoft,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 12),
-          // GestureDetector(
-          //   onTap: onEdit,
-          //   child: const Icon(
-          //     Icons.edit_outlined,
-          //     color: AppColors.textSoft,
-          //     size: 18,
-          //   ),
-          // ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

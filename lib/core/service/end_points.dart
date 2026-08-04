@@ -83,4 +83,13 @@ class Urls {
       '$baseUrl/api/v1/calculator/work-rotation/overrides';
   static String deleteOverrideWorkRotation(String date) =>
       '$baseUrl/api/v1/calculator/work-rotation/overrides/$date';
+  static String updateHydration(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/hydration/$entryId';
+  static String updateCaffeine(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/caffeine/$entryId';
+  static String updateMeal(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/meals/$entryId';
+  static String updateWorkout(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/workouts/$entryId';
 }
+

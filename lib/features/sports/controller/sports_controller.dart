@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:http/http.dart' as http;
+import 'package:chrisimhof/core/service/end_points.dart';
+import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
@@ -8,11 +11,13 @@ import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_s
 import 'package:get/get.dart';
 
 class SportSession {
+  final String id;
   final String title;
   final String subtitle;
   final String iconPath;
 
   SportSession({
+    this.id = '',
     required this.title,
     required this.subtitle,
     required this.iconPath,
@@ -47,6 +52,160 @@ class SportsController extends GetxController {
 
   // This Week sessions list
   final RxList<SportSession> sessionsList = <SportSession>[].obs;
+
+  Future<void> deleteWorkoutLog(String entryId) async {
+    if (entryId.isEmpty) return;
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+    final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    if (sessionId.isEmpty || token.isEmpty || entryId.isEmpty) {
+      sessionsList.removeWhere((s) => s.id == entryId);
+      await saveSportsData();
+      return;
+    }
+
+    EasyLoading.show(status: 'Deleting workout...');
+    try {
+      final url = Urls.updateWorkout(sessionId, entryId);
+      debugPrint('=== DELETE WORKOUT REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: Authorization: Bearer $token');
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=== DELETE WORKOUT RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          RealtimeSocketService().handleLiveScores(data, useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
+        EasyLoading.showSuccess('Deleted workout session');
+      } else {
+        EasyLoading.showError('Failed to delete workout');
+      }
+    } catch (e) {
+      debugPrint('deleteWorkoutLog API error: $e');
+      EasyLoading.showError('Failed to delete workout');
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> editWorkoutLog(
+    String entryId, {
+    int? durationMinutes,
+    String? intensity,
+    String? sportType,
+    String? heartRateZone,
+    int? heartRateAvgBpm,
+    double? distanceKm,
+    DateTime? occurredAt,
+  }) async {
+    if (entryId.isEmpty) return;
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+    final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+    if (sessionId.isEmpty || token.isEmpty || entryId.isEmpty) {
+      debugPrint('editWorkoutLog aborted: sessionId: $sessionId, token: ${token.isNotEmpty}, entryId: $entryId');
+      EasyLoading.showError('Workout entry ID missing. Refreshing dashboard...');
+      try {
+        if (Get.isRegistered<DashboardController>()) {
+          final db = Get.find<DashboardController>();
+          await db.fetchDashboardData();
+        }
+      } catch (_) {}
+      return;
+    }
+
+    final dt = occurredAt ?? DateTime.now();
+
+    final Map<String, dynamic> body = {
+      'occurredAt': dt.toUtc().toIso8601String(),
+    };
+    if (durationMinutes != null) body['durationMinutes'] = durationMinutes;
+    if (intensity != null && intensity.isNotEmpty) {
+      body['intensity'] = intensity.toLowerCase();
+    }
+    if (sportType != null && sportType.isNotEmpty) {
+      body['sportType'] = sportType.toLowerCase();
+    }
+    if (distanceKm != null) {
+      body['distanceKm'] = distanceKm;
+    }
+
+    int? hrBpm = heartRateAvgBpm;
+    if (hrBpm == null && heartRateZone != null && heartRateZone.isNotEmpty) {
+      final z = heartRateZone.toUpperCase();
+      if (z == 'Z1') hrBpm = 104;
+      else if (z == 'Z2') hrBpm = 123;
+      else if (z == 'Z3') hrBpm = 142;
+      else if (z == 'Z4') hrBpm = 161;
+      else if (z == 'Z5') hrBpm = 180;
+    }
+    if (hrBpm != null) {
+      body['heartRateAvgBpm'] = hrBpm;
+    }
+
+    EasyLoading.show(status: 'Updating workout...');
+    try {
+      final url = Urls.updateWorkout(sessionId, entryId);
+      final bodyJson = jsonEncode(body);
+
+      debugPrint('=== EDIT WORKOUT REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: Authorization: Bearer $token');
+      debugPrint('Request Body: $bodyJson');
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: bodyJson,
+      );
+
+      debugPrint('=== EDIT WORKOUT RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          RealtimeSocketService().handleLiveScores(data, useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
+        EasyLoading.showSuccess('Updated workout session');
+      } else {
+        EasyLoading.showError('Failed to update workout');
+      }
+    } catch (e) {
+      debugPrint('editWorkoutLog API error: $e');
+      EasyLoading.showError('Failed to update workout');
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
 
   @override
   void onInit() {
@@ -96,6 +255,7 @@ class SportsController extends GetxController {
           decoded
               .map(
                 (s) => SportSession(
+                  id: s['id'] ?? '',
                   title: s['title'] ?? '',
                   subtitle: s['subtitle'] ?? '',
                   iconPath: s['iconPath'] ?? '',
@@ -128,6 +288,7 @@ class SportsController extends GetxController {
       final listToSave = sessionsList
           .map(
             (s) => {
+              'id': s.id,
               'title': s.title,
               'subtitle': s.subtitle,
               'iconPath': s.iconPath,
@@ -202,6 +363,7 @@ class SportsController extends GetxController {
     }
 
     final newSession = SportSession(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: activity,
       subtitle: activity == 'Rest day' ? '$dayPrefix · —' : '$dayPrefix · $timeStr',
       iconPath: _getIconPathForActivity(activity),
@@ -213,12 +375,14 @@ class SportsController extends GetxController {
         final s = sessionsList[i];
         if (s.subtitle.startsWith('Today')) {
           sessionsList[i] = SportSession(
+            id: s.id,
             title: s.title,
             subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
             iconPath: s.iconPath,
           );
         } else if (s.subtitle.startsWith('Yesterday')) {
           sessionsList[i] = SportSession(
+            id: s.id,
             title: s.title,
             subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
             iconPath: s.iconPath,
@@ -456,6 +620,7 @@ class SportsController extends GetxController {
         final subtitle =
             '$dayPrefix · $duration${zone.isNotEmpty ? ' · $zone' : ''}';
         return SportSession(
+          id: sessionMap['id'] as String? ?? '',
           title: title,
           subtitle: subtitle,
           iconPath: _getIconPathForActivity(title.toString()),

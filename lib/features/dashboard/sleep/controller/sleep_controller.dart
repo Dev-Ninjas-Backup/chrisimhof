@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
+import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/features/dashboard/sleep/service/sleep_service.dart';
 import 'package:chrisimhof/features/dashboard/sleep/model/sleep_log.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
@@ -184,8 +184,21 @@ class SleepController extends GetxController {
     EasyLoading.showToast('Loaded sleep log to edit');
   }
 
+  final isNewMainWake = false.obs;
+  final TextEditingController noteController = TextEditingController();
+
   void saveSleep() async {
     final oldLogs = List<SleepLog>.from(historyLogs);
+
+    final now = DateTime.now();
+    var wakeDt = DateTime(now.year, now.month, now.day, wakeupHour.value, wakeupMinute.value);
+    var sleepDt = DateTime(now.year, now.month, now.day, bedtimeHour.value, bedtimeMinute.value);
+    if (sleepDt.isAfter(wakeDt)) {
+      sleepDt = sleepDt.subtract(const Duration(days: 1));
+    }
+
+    final sleepStartedAt = sleepDt.toUtc().toIso8601String();
+    final wakeRecordedAt = wakeDt.toUtc().toIso8601String();
 
     // Add to history logs
     final newLog = SleepLog(
@@ -193,7 +206,7 @@ class SleepController extends GetxController {
       date: DateTime.now(),
       bedtime: TimeOfDay(hour: bedtimeHour.value, minute: bedtimeMinute.value),
       wakeupTime: TimeOfDay(hour: wakeupHour.value, minute: wakeupMinute.value),
-      quality: 0, // quality is calculated server-side; local placeholder
+      quality: 0,
     );
 
     final today = DateTime.now();
@@ -212,20 +225,24 @@ class SleepController extends GetxController {
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId();
       if (sessionId != null && sessionId.isNotEmpty) {
-        final startHStr = bedtimeHour.value.toString().padLeft(2, '0');
-        final startMStr = bedtimeMinute.value.toString().padLeft(2, '0');
-        final endHStr = wakeupHour.value.toString().padLeft(2, '0');
-        final endMStr = wakeupMinute.value.toString().padLeft(2, '0');
+        bool sendIsNewMainWake = isNewMainWake.value;
+        if (!sendIsNewMainWake && Get.isRegistered<DashboardController>()) {
+          final currentStatus = Get.find<DashboardController>().sessionStatus.value;
+          if (currentStatus == 'PENDING_WAKE' || currentStatus == 'FINALIZED') {
+            sendIsNewMainWake = true;
+          }
+        }
 
         final result = await SleepService().saveSleep(
           sessionId: sessionId,
-          sleepStartTime: '$startHStr:$startMStr',
-          wakeTime: '$endHStr:$endMStr',
+          sleepStartedAt: sleepStartedAt,
+          wakeRecordedAt: wakeRecordedAt,
+          isNewMainWake: sendIsNewMainWake,
+          note: noteController.text.trim().isNotEmpty ? noteController.text.trim() : null,
         );
 
         final data = result['data'] as Map<String, dynamic>?;
         if (data != null && data['saved'] == false) {
-          // Revert local changes
           historyLogs.assignAll(oldLogs);
           await saveSleepHistory();
 
@@ -234,12 +251,33 @@ class SleepController extends GetxController {
           return;
         }
 
-        await DashboardService().calculateResult(sessionId: sessionId);
+        final returnedSessionId = data?['sessionId'] as String?;
+        final returnedStatus = data?['status'] as String?;
+
+        if (returnedSessionId != null && returnedSessionId.isNotEmpty) {
+          await SharedPreferencesHelper.saveSessionId(returnedSessionId);
+          await RealtimeSocketService().connectSocket();
+        }
+
+        if (data != null && data['liveScores'] != null) {
+          RealtimeSocketService().handleLiveScores(data['liveScores'], useLocalCaches: false);
+        }
 
         try {
-          final dashboardController = Get.find<DashboardController>();
-          await dashboardController.fetchDashboardData();
+          if (Get.isRegistered<DashboardController>()) {
+            final dashboardController = Get.find<DashboardController>();
+            if (returnedSessionId != null && returnedSessionId.isNotEmpty) {
+              dashboardController.currentSessionId.value = returnedSessionId;
+            }
+            if (returnedStatus != null && returnedStatus.isNotEmpty) {
+              dashboardController.sessionStatus.value = returnedStatus;
+            }
+            await dashboardController.fetchDashboardData();
+          }
         } catch (_) {}
+
+        isNewMainWake.value = false;
+        noteController.clear();
 
         EasyLoading.showSuccess('Sleep logged successfully!');
         Get.back();
@@ -247,7 +285,6 @@ class SleepController extends GetxController {
         EasyLoading.showError('No active session found.');
       }
     } catch (e) {
-      // Revert local changes on error
       historyLogs.assignAll(oldLogs);
       await saveSleepHistory();
       debugPrint('Error saving sleep: $e');

@@ -42,6 +42,10 @@ class RealtimeSocketService {
         final latestSessionId = sessionId ?? _currentSessionId;
         if (latestSessionId != null && latestSessionId.isNotEmpty) {
           if (_currentSessionId != latestSessionId) {
+            if (_currentSessionId != null && _currentSessionId!.isNotEmpty) {
+              debugPrint('Socket.io: Leaving old session: $_currentSessionId');
+              _socket!.emit('leave_session', {'sessionId': _currentSessionId});
+            }
             _currentSessionId = latestSessionId;
           }
           _joinSession(latestSessionId);

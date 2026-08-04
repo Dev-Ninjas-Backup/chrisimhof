@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:chrisimhof/core/service/end_points.dart';
+import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
@@ -11,12 +14,14 @@ class HydrationLog {
   final String time;
   final String type; // 'Cup', 'Glass', 'Bottle', 'Large', etc.
   final int amountMl;
+  final String? occurredAt;
 
   HydrationLog({
     required this.id,
     required this.time,
     required this.type,
     required this.amountMl,
+    this.occurredAt,
   });
 }
 
@@ -302,21 +307,126 @@ class HydrationController extends GetxController {
     }
   }
 
-  // Remove water intake from the selected day
-  void deleteLog(String id) async {
+  // Remove water intake from the selected day via API
+  Future<void> deleteLog(String id) async {
     if (!isSelectedDayToday) {
       EasyLoading.showToast('You can edit hydration only for today.');
       return;
     }
 
-    weeklyLogs[selectedDayIndex.value].removeWhere((log) => log.id == id);
-    weeklyDayTotalsMl[todayIndex.value] = weeklyLogs[todayIndex.value].fold(
-      0,
-      (sum, log) => sum + log.amountMl,
-    );
-    weeklyDayTotalsMl.refresh();
-    weeklyLogs.refresh(); // Triggers reactive update in Obx
-    await saveLogsToPrefs();
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+    final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    // If local temporary ID without server sync, delete locally
+    if (sessionId.isEmpty || token.isEmpty || id.startsWith('weekly_total') || id.length < 10) {
+      weeklyLogs[selectedDayIndex.value].removeWhere((log) => log.id == id);
+      weeklyDayTotalsMl[todayIndex.value] = weeklyLogs[todayIndex.value].fold(
+        0,
+        (sum, log) => sum + log.amountMl,
+      );
+      weeklyDayTotalsMl.refresh();
+      weeklyLogs.refresh();
+      await saveLogsToPrefs();
+      return;
+    }
+
+    EasyLoading.show(status: 'Deleting entry...');
+    try {
+      final url = Urls.updateHydration(sessionId, id);
+      debugPrint('=== DELETE HYDRATION REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: Authorization: Bearer $token');
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=== DELETE HYDRATION RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          RealtimeSocketService().handleLiveScores(data, useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
+        EasyLoading.showSuccess('Entry deleted');
+      } else {
+        EasyLoading.showError('Failed to delete entry');
+      }
+    } catch (e) {
+      debugPrint('deleteHydrationLog error: $e');
+      EasyLoading.showError('Failed to delete entry');
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> editHydrationLog(String id, int volumeMl, {DateTime? occurredAt}) async {
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+    final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+    if (sessionId.isEmpty || token.isEmpty || id.isEmpty) return;
+
+    final dt = occurredAt ?? DateTime.now();
+
+    EasyLoading.show(status: 'Updating entry...');
+    try {
+      final url = Urls.updateHydration(sessionId, id);
+      final bodyJson = jsonEncode({
+        'occurredAt': dt.toUtc().toIso8601String(),
+        'volumeMl': volumeMl,
+      });
+
+      debugPrint('=== EDIT HYDRATION REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: Authorization: Bearer $token');
+      debugPrint('Request Body: $bodyJson');
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: bodyJson,
+      );
+
+      debugPrint('=== EDIT HYDRATION RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          RealtimeSocketService().handleLiveScores(data, useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
+        EasyLoading.showSuccess('Entry updated');
+      } else {
+        EasyLoading.showError('Failed to update entry');
+      }
+    } catch (e) {
+      debugPrint('editHydrationLog error: $e');
+      EasyLoading.showError('Failed to update entry');
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
 
   void updateFromLiveScoresTab(Map<String, dynamic> hydrationTab) {
@@ -341,15 +451,17 @@ class HydrationController extends GetxController {
           final timeStr = item['timestamp'] as String? ?? '00:00';
           final volume = (item['volumeMl'] as num?)?.toInt() ?? 0;
           final typeStr = item['label'] as String? ?? 'Glass';
+          final serverId = item['id'] as String? ?? '${timeStr}_$volume';
+          final occurredAtStr = item['occurredAt'] as String? ?? DateTime.now().toUtc().toIso8601String();
           return HydrationLog(
-            id: '${timeStr}_$volume',
+            id: serverId,
             time: timeStr,
             type: typeStr,
             amountMl: volume,
+            occurredAt: occurredAtStr,
           );
         }).toList();
 
-        // Update active day's logs
         weeklyLogs[activeDayIndex].assignAll(mappedLogs);
       }
 

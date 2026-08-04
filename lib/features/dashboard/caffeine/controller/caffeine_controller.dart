@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:http/http.dart' as http;
+import 'package:chrisimhof/core/service/end_points.dart';
+import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
@@ -228,9 +231,69 @@ class CaffeineController extends GetxController {
         amountMg: amountMg,
       );
       entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
       recalculateCaffeine();
       await saveEntriesToPrefs();
+    }
+
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+    final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+    if (sessionId.isEmpty || token.isEmpty || id.isEmpty || id.length < 10) return;
+
+    String drinkType = 'coffee';
+    final t = title.toLowerCase();
+    if (t.contains('tea')) {
+      drinkType = 'tea';
+    } else if (t.contains('energy') || t.contains('soda') || t.contains('coke')) {
+      drinkType = 'energy';
+    } else if (t.contains('espresso')) {
+      drinkType = 'espresso';
+    }
+
+    EasyLoading.show(status: 'Updating caffeine...');
+    try {
+      final url = Urls.updateCaffeine(sessionId, id);
+      final bodyJson = jsonEncode({
+        'occurredAt': timestamp.toUtc().toIso8601String(),
+        'caffeineMg': amountMg,
+        'drinkType': drinkType,
+      });
+
+      debugPrint('=== EDIT CAFFEINE REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: Authorization: Bearer $token');
+      debugPrint('Request Body: $bodyJson');
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: bodyJson,
+      );
+
+      debugPrint('=== EDIT CAFFEINE RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          RealtimeSocketService().handleLiveScores(data, useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
+        EasyLoading.showSuccess('Updated caffeine entry');
+      }
+    } catch (e) {
+      debugPrint('editCaffeineEntry API error: $e');
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 
@@ -238,6 +301,48 @@ class CaffeineController extends GetxController {
     entriesList.removeWhere((e) => e.id == id);
     recalculateCaffeine();
     await saveEntriesToPrefs();
+
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+    final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+    if (sessionId.isEmpty || token.isEmpty || id.isEmpty || id.length < 10) return;
+
+    EasyLoading.show(status: 'Deleting caffeine...');
+    try {
+      final url = Urls.updateCaffeine(sessionId, id);
+      debugPrint('=== DELETE CAFFEINE REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Headers: Authorization: Bearer $token');
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=== DELETE CAFFEINE RESPONSE ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final data = decoded['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          RealtimeSocketService().handleLiveScores(data, useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
+        EasyLoading.showSuccess('Deleted caffeine entry');
+      }
+    } catch (e) {
+      debugPrint('deleteCaffeineEntry API error: $e');
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
 
   void updateFromLiveScoresTab(Map<String, dynamic> caffeineTab) {
@@ -249,6 +354,7 @@ class CaffeineController extends GetxController {
           final timeStr = item['timestamp'] as String? ?? '00:00';
           final amount = (item['caffeineMg'] as num?)?.toInt() ?? 0;
           final titleStr = item['drinkLabel'] as String? ?? 'Espresso';
+          final serverId = item['id'] as String? ?? '${timeStr}_$amount';
 
           DateTime logTime = now;
           if (timeStr.contains('T') || timeStr.contains('-')) {
@@ -270,7 +376,7 @@ class CaffeineController extends GetxController {
           }
 
           return CaffeineEntry(
-            id: '${timeStr}_$amount',
+            id: serverId,
             title: titleStr,
             timestamp: logTime,
             amountMg: amount,
