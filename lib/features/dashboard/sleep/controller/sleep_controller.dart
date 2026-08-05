@@ -59,14 +59,14 @@ class SleepController extends GetxController {
     // Preload tonight's bedtime and note from DashboardController if available
     if (Get.isRegistered<DashboardController>()) {
       final dbController = Get.find<DashboardController>();
+      // Seed bedtime picker from the API's optimal bedtime
+      _initBedtimeFromDashboard(dbController);
       if (dbController.sleepTabData.value != null) {
         updateFromLiveScoresTab(dbController.sleepTabData.value!);
       }
       // Seed forYouPreview sleep entry if DashboardController already has it
       final preview = dbController.forYouPreviewData.value;
       if (preview != null) updateFromForYouPreview(preview);
-      // Seed bedtime picker from the API's optimal bedtime
-      _initBedtimeFromDashboard(dbController);
     }
   }
 
@@ -191,8 +191,18 @@ class SleepController extends GetxController {
     final oldLogs = List<SleepLog>.from(historyLogs);
 
     final now = DateTime.now();
-    var wakeDt = DateTime(now.year, now.month, now.day, wakeupHour.value, wakeupMinute.value);
-    var sleepDt = DateTime(now.year, now.month, now.day, bedtimeHour.value, bedtimeMinute.value);
+    DateTime baseDate = now;
+    final idx = selectedDebtIndex.value;
+    if (idx != -1 && sleepDebtChartData.isNotEmpty) {
+      final todayIndex = sleepDebtChartData.indexWhere((d) => d['isToday'] == true);
+      if (todayIndex != -1) {
+        final offsetDays = idx - todayIndex;
+        baseDate = now.add(Duration(days: offsetDays));
+      }
+    }
+
+    var wakeDt = DateTime(baseDate.year, baseDate.month, baseDate.day, wakeupHour.value, wakeupMinute.value);
+    var sleepDt = DateTime(baseDate.year, baseDate.month, baseDate.day, bedtimeHour.value, bedtimeMinute.value);
     if (sleepDt.isAfter(wakeDt)) {
       sleepDt = sleepDt.subtract(const Duration(days: 1));
     }
@@ -361,6 +371,30 @@ class SleepController extends GetxController {
 
   void updateFromLiveScoresTab(Map<String, dynamic> tabData) {
     try {
+      if (tabData['sleepStartTime'] != null && tabData['sleepStartTime'] is String) {
+        final parts = (tabData['sleepStartTime'] as String).split(':');
+        if (parts.length == 2) {
+          final h = int.tryParse(parts[0]);
+          final m = int.tryParse(parts[1]);
+          if (h != null && m != null) {
+            bedtimeHour.value = h;
+            bedtimeMinute.value = m;
+          }
+        }
+      }
+
+      if (tabData['wakeTime'] != null && tabData['wakeTime'] is String) {
+        final parts = (tabData['wakeTime'] as String).split(':');
+        if (parts.length == 2) {
+          final h = int.tryParse(parts[0]);
+          final m = int.tryParse(parts[1]);
+          if (h != null && m != null) {
+            wakeupHour.value = h;
+            wakeupMinute.value = m;
+          }
+        }
+      }
+
       if (tabData['tonightBedtime'] != null) {
         tonightBedtime.value = Map<String, dynamic>.from(tabData['tonightBedtime']);
       } else {
