@@ -13,7 +13,14 @@ class SleepDebtCard extends StatelessWidget {
     return Obx(() {
       final chartData = controller.sleepDebtChartData;
       final selectedIndex = controller.selectedDebtIndex.value;
-      final displayDebt = controller.sleepDebtTotalDisplay.value;
+      
+      String displayDebt = controller.sleepDebtTotalDisplay.value;
+      if (selectedIndex >= 0 && selectedIndex < chartData.length) {
+        final dayDebt = chartData[selectedIndex]['debtDisplay'] as String?;
+        if (dayDebt != null && dayDebt.isNotEmpty) {
+          displayDebt = dayDebt;
+        }
+      }
 
       return Container(
         width: double.infinity,

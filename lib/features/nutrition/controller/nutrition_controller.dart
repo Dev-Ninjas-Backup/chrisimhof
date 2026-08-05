@@ -160,7 +160,7 @@ class NutritionController extends GetxController {
         name: cleanName,
         type: heaviness[0].toUpperCase() + heaviness.substring(1),
         time: newTimeStr,
-        occurredAt: dt.toIso8601String(),
+        occurredAt: dt.toUtc().toIso8601String(),
       );
     }
 
