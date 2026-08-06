@@ -82,7 +82,7 @@ class EditProfileScreen extends StatelessWidget {
                   text: controller.isLoading.value
                       ? 'Updating...'.tr
                       : 'Update Profile'.tr,
-                      icon: null,
+                  icon: null,
                   onTap: controller.isLoading.value
                       ? null
                       : controller.updateProfile,
