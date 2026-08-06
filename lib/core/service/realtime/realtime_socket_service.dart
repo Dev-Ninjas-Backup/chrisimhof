@@ -287,7 +287,7 @@ class RealtimeSocketService {
     try {
       if (Get.isRegistered<DashboardController>()) {
         final dashboardController = Get.find<DashboardController>();
-        dashboardController.endMyDay();
+        dashboardController.fetchDashboardData();
       }
     } catch (e) {
       debugPrint('Socket.io: Error handling session_ended: $e');
