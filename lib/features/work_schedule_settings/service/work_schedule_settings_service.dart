@@ -167,18 +167,22 @@ class WorkScheduleSettingsService {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
       debugPrint('Saving work rotation via API (PUT)...');
 
-      final dayShift = {
-        'startTime': shiftTimes['Day']?['start'] ?? '06:00',
-        'endTime': shiftTimes['Day']?['end'] ?? '14:00',
-      };
-      final eveningShift = {
-        'startTime': shiftTimes['Evening']?['start'] ?? '14:00',
-        'endTime': shiftTimes['Evening']?['end'] ?? '22:00',
-      };
-      final nightShift = {
-        'startTime': shiftTimes['Night']?['start'] ?? '22:00',
-        'endTime': shiftTimes['Night']?['end'] ?? '06:00',
-      };
+      final shiftTimesJson = <String, Map<String, String>>{};
+      shiftTimes.forEach((key, val) {
+        String apiKey = key;
+        final lower = key.toLowerCase();
+        if (lower == 'day') {
+          apiKey = 'day';
+        } else if (lower == 'evening') {
+          apiKey = 'evening';
+        } else if (lower == 'night') {
+          apiKey = 'night';
+        }
+        shiftTimesJson[apiKey] = {
+          'startTime': val['start'] ?? '00:00',
+          'endTime': val['end'] ?? '00:00',
+        };
+      });
 
       final patternJson = <Map<String, dynamic>>[];
       for (int w = 0; w < cycleWeeks; w++) {
@@ -186,15 +190,20 @@ class WorkScheduleSettingsService {
           final index = w * 7 + d;
           String shiftCodeStr = 'off';
           if (index < pattern.length) {
-            final p = pattern[index].toUpperCase();
-            if (p == 'N' || p == 'NIGHT') {
-              shiftCodeStr = 'night';
-            } else if (p == 'E' || p == 'EVENING') {
-              shiftCodeStr = 'evening';
-            } else if (p == 'D' || p == 'DAY') {
-              shiftCodeStr = 'day';
-            } else {
+            final p = pattern[index];
+            final lowerP = p.toLowerCase();
+            if (lowerP == 'off') {
               shiftCodeStr = 'off';
+            } else {
+              if (lowerP == 'day' || lowerP == 'd') {
+                shiftCodeStr = 'day';
+              } else if (lowerP == 'evening' || lowerP == 'e') {
+                shiftCodeStr = 'evening';
+              } else if (lowerP == 'night' || lowerP == 'n') {
+                shiftCodeStr = 'night';
+              } else {
+                shiftCodeStr = p;
+              }
             }
           }
           patternJson.add({
@@ -208,11 +217,28 @@ class WorkScheduleSettingsService {
       final Map<String, dynamic> bodyMap = {
         'cycleWeeks': cycleWeeks,
         'startDate': startDate,
-        'dayShift': dayShift,
-        'eveningShift': eveningShift,
-        'nightShift': nightShift,
+        'shiftTimesJson': shiftTimesJson,
         'patternJson': patternJson,
       };
+
+      if (shiftTimes.containsKey('Day')) {
+        bodyMap['dayShift'] = {
+          'startTime': shiftTimes['Day']?['start'] ?? '06:00',
+          'endTime': shiftTimes['Day']?['end'] ?? '14:00',
+        };
+      }
+      if (shiftTimes.containsKey('Evening')) {
+        bodyMap['eveningShift'] = {
+          'startTime': shiftTimes['Evening']?['start'] ?? '14:00',
+          'endTime': shiftTimes['Evening']?['end'] ?? '22:00',
+        };
+      }
+      if (shiftTimes.containsKey('Night')) {
+        bodyMap['nightShift'] = {
+          'startTime': shiftTimes['Night']?['start'] ?? '22:00',
+          'endTime': shiftTimes['Night']?['end'] ?? '06:00',
+        };
+      }
 
       if (sourceTemplateKey != null && sourceTemplateKey.trim().isNotEmpty) {
         bodyMap['sourceTemplateKey'] = sourceTemplateKey;

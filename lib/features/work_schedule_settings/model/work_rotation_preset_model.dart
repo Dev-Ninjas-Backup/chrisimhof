@@ -22,41 +22,35 @@ class WorkRotationPresetModel {
     final int cycleWeeks = json['cycleWeeks'] as int? ?? 1;
 
     // Parse shiftTimesJson
-    final shiftTimesMap = <String, Map<String, String>>{
-      'Day': {'start': '06:00', 'end': '14:00'},
-      'Evening': {'start': '14:00', 'end': '22:00'},
-      'Night': {'start': '22:00', 'end': '06:00'},
-    };
+    final shiftTimesMap = <String, Map<String, String>>{};
 
     final rawShiftTimes = json['shiftTimesJson'] as Map<String, dynamic>?;
     if (rawShiftTimes != null) {
-      if (rawShiftTimes.containsKey('day')) {
-        final dayMap = rawShiftTimes['day'] as Map<String, dynamic>?;
-        if (dayMap != null) {
-          shiftTimesMap['Day'] = {
-            'start': dayMap['startTime']?.toString() ?? '06:00',
-            'end': dayMap['endTime']?.toString() ?? '14:00',
+      rawShiftTimes.forEach((key, val) {
+        if (val is Map<String, dynamic>) {
+          String cleanKey = key;
+          final lower = key.toLowerCase();
+          if (lower == 'day') {
+            cleanKey = 'Day';
+          } else if (lower == 'evening') {
+            cleanKey = 'Evening';
+          } else if (lower == 'night') {
+            cleanKey = 'Night';
+          }
+          shiftTimesMap[cleanKey] = {
+            'start': val['startTime']?.toString() ?? '00:00',
+            'end': val['endTime']?.toString() ?? '00:00',
           };
         }
-      }
-      if (rawShiftTimes.containsKey('evening')) {
-        final eveningMap = rawShiftTimes['evening'] as Map<String, dynamic>?;
-        if (eveningMap != null) {
-          shiftTimesMap['Evening'] = {
-            'start': eveningMap['startTime']?.toString() ?? '14:00',
-            'end': eveningMap['endTime']?.toString() ?? '22:00',
-          };
-        }
-      }
-      if (rawShiftTimes.containsKey('night')) {
-        final nightMap = rawShiftTimes['night'] as Map<String, dynamic>?;
-        if (nightMap != null) {
-          shiftTimesMap['Night'] = {
-            'start': nightMap['startTime']?.toString() ?? '22:00',
-            'end': nightMap['endTime']?.toString() ?? '06:00',
-          };
-        }
-      }
+      });
+    }
+
+    if (shiftTimesMap.isEmpty) {
+      shiftTimesMap.addAll({
+        'Day': {'start': '06:00', 'end': '14:00'},
+        'Evening': {'start': '14:00', 'end': '22:00'},
+        'Night': {'start': '22:00', 'end': '06:00'},
+      });
     }
 
     // Parse patternJson
@@ -76,15 +70,21 @@ class WorkRotationPresetModel {
       });
 
       for (final item in sortedItems) {
-        final code = (item['shiftCode'] as String? ?? 'off').toLowerCase();
-        if (code == 'night') {
-          patternList.add('N');
-        } else if (code == 'evening') {
-          patternList.add('E');
-        } else if (code == 'day') {
-          patternList.add('D');
-        } else {
+        final code = (item['shiftCode'] as String? ?? 'off');
+        final lower = code.toLowerCase();
+        if (lower == 'off') {
           patternList.add('Off');
+        } else {
+          final matchKey = shiftTimesMap.keys.firstWhere(
+            (k) => k.toLowerCase() == lower,
+            orElse: () {
+              if (lower == 'day') return 'Day';
+              if (lower == 'evening') return 'Evening';
+              if (lower == 'night') return 'Night';
+              return code;
+            },
+          );
+          patternList.add(matchKey);
         }
       }
     }

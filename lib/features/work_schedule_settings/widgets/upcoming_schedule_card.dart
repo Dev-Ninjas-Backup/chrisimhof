@@ -130,9 +130,10 @@ class UpcomingScheduleCard extends StatelessWidget {
 
   String _mapShiftTypeToCode(String type) {
     final lower = type.toLowerCase();
-    if (lower == 'day') return 'D';
-    if (lower == 'evening') return 'E';
-    if (lower == 'night') return 'N';
-    return 'Off';
+    if (lower == 'day') return 'Day';
+    if (lower == 'evening') return 'Evening';
+    if (lower == 'night') return 'Night';
+    if (lower == 'off') return 'Off';
+    return type;
   }
 }
