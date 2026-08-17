@@ -28,6 +28,7 @@ class ShiftTimesCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Obx(() {
+        final isEditable = !controller.hasRotationData.value;
         final isCustom = controller.selectedTemplateKey.value.isEmpty;
         final shiftKeys = controller.shiftTimes.keys.toList();
 
@@ -73,11 +74,12 @@ class ShiftTimesCard extends StatelessWidget {
                 start: times['start']!,
                 end: times['end']!,
                 shiftName: key,
-                showDivider: !isLast || isCustom,
-                isCustom: isCustom,
+                showDivider: !isLast || (isCustom && isEditable),
+                isCustom: isCustom && isEditable,
+                isEditable: isEditable,
               );
             }),
-            if (isCustom) _buildAddShiftButton(context),
+            if (isCustom && isEditable) _buildAddShiftButton(context),
           ],
         );
       }),
@@ -96,6 +98,7 @@ class ShiftTimesCard extends StatelessWidget {
     required String shiftName,
     required bool showDivider,
     required bool isCustom,
+    required bool isEditable,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -118,7 +121,7 @@ class ShiftTimesCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           GestureDetector(
-            onTap: isCustom ? () => _editShiftName(context, shiftName) : null,
+            onTap: (isCustom && isEditable) ? () => _editShiftName(context, shiftName) : null,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -130,7 +133,7 @@ class ShiftTimesCard extends StatelessWidget {
                     color: AppColors.primaryTextColor,
                   ),
                 ),
-                if (isCustom) ...[
+                if (isCustom && isEditable) ...[
                   const SizedBox(width: 6),
                   const Icon(
                     Icons.edit_rounded,
@@ -146,7 +149,7 @@ class ShiftTimesCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
-                onTap: () => _pickTime(context, shiftName, 'start'),
+                onTap: isEditable ? () => _pickTime(context, shiftName, 'start') : null,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -162,7 +165,7 @@ class ShiftTimesCard extends StatelessWidget {
                     style: getTextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryTextColor,
+                      color: isEditable ? AppColors.primaryTextColor : AppColors.textSoft,
                     ),
                   ),
                 ),
@@ -179,7 +182,7 @@ class ShiftTimesCard extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () => _pickTime(context, shiftName, 'end'),
+                onTap: isEditable ? () => _pickTime(context, shiftName, 'end') : null,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -195,14 +198,14 @@ class ShiftTimesCard extends StatelessWidget {
                     style: getTextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryTextColor,
+                      color: isEditable ? AppColors.primaryTextColor : AppColors.textSoft,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          if (isCustom) ...[
+          if (isCustom && isEditable) ...[
             const SizedBox(width: 12),
             GestureDetector(
               onTap: () => _deleteShift(context, shiftName),

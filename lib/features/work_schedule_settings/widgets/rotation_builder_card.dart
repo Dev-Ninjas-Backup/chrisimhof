@@ -64,43 +64,48 @@ class RotationBuilderCard extends StatelessWidget {
 
                     // "Use a template" button on Week 1 header (Matching image 2)
                     if (weekIdx == 0)
-                      InkWell(
-                        onTap: () => _openTemplateSheet(context),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: AppColors.secondaryButtonColor,
-                              width: 1.2,
+                      Obx(() {
+                        final isEditable = !controller.hasRotationData.value;
+                        if (!isEditable) return const SizedBox.shrink();
+
+                        return InkWell(
+                          onTap: () => _openTemplateSheet(context),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 5,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.auto_awesome_outlined,
-                                size: 13,
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
                                 color: AppColors.secondaryButtonColor,
+                                width: 1.2,
                               ),
-                              const SizedBox(width: 5),
-                              Text(
-                                'Use a template'.tr,
-                                style: getTextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.auto_awesome_outlined,
+                                  size: 13,
                                   color: AppColors.secondaryButtonColor,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Use a template'.tr,
+                                  style: getTextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.secondaryButtonColor,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -115,6 +120,8 @@ class RotationBuilderCard extends StatelessWidget {
 
                   final isTemplate =
                       controller.selectedTemplateKey.value.isNotEmpty;
+                  final isEditable = !controller.hasRotationData.value;
+                  final isDisabled = isTemplate || !isEditable;
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -147,14 +154,14 @@ class RotationBuilderCard extends StatelessWidget {
                                     horizontal: 3.0,
                                   ),
                                   child: GestureDetector(
-                                    onTap: isTemplate
+                                    onTap: isDisabled
                                         ? null
                                         : () => controller.updateDayPattern(
                                               overallDayIdx,
                                               shiftOption,
                                             ),
                                     child: Opacity(
-                                      opacity: isTemplate ? 0.6 : 1.0,
+                                      opacity: isDisabled ? 0.6 : 1.0,
                                       child: AnimatedContainer(
                                         duration: const Duration(
                                           milliseconds: 160,
