@@ -155,6 +155,15 @@ class WorkScheduleSettingsService {
     return false;
   }
 
+  String _toApiKey(String key) {
+    final lower = key.toLowerCase();
+    if (lower == 'day' || lower == 'd') return 'day';
+    if (lower == 'evening' || lower == 'e') return 'evening';
+    if (lower == 'night' || lower == 'n') return 'night';
+    if (lower == 'off') return 'off';
+    return lower.replaceAll(RegExp(r'[\s\-]+'), '_').replaceAll(RegExp(r'[^a-z0-9_]'), '');
+  }
+
   // PUT /api/v1/calculator/work-rotation
   Future<bool> saveWorkRotation({
     required int cycleWeeks,
@@ -169,15 +178,7 @@ class WorkScheduleSettingsService {
 
       final shiftTimesJson = <String, Map<String, String>>{};
       shiftTimes.forEach((key, val) {
-        String apiKey = key;
-        final lower = key.toLowerCase();
-        if (lower == 'day') {
-          apiKey = 'day';
-        } else if (lower == 'evening') {
-          apiKey = 'evening';
-        } else if (lower == 'night') {
-          apiKey = 'night';
-        }
+        final apiKey = _toApiKey(key);
         shiftTimesJson[apiKey] = {
           'startTime': val['start'] ?? '00:00',
           'endTime': val['end'] ?? '00:00',
@@ -191,20 +192,7 @@ class WorkScheduleSettingsService {
           String shiftCodeStr = 'off';
           if (index < pattern.length) {
             final p = pattern[index];
-            final lowerP = p.toLowerCase();
-            if (lowerP == 'off') {
-              shiftCodeStr = 'off';
-            } else {
-              if (lowerP == 'day' || lowerP == 'd') {
-                shiftCodeStr = 'day';
-              } else if (lowerP == 'evening' || lowerP == 'e') {
-                shiftCodeStr = 'evening';
-              } else if (lowerP == 'night' || lowerP == 'n') {
-                shiftCodeStr = 'night';
-              } else {
-                shiftCodeStr = p;
-              }
-            }
+            shiftCodeStr = _toApiKey(p);
           }
           patternJson.add({
             'weekIndex': w,
@@ -284,7 +272,7 @@ class WorkScheduleSettingsService {
 
       final Map<String, dynamic> bodyMap = {
         'date': date,
-        'shiftType': shiftType,
+        'shiftType': _toApiKey(shiftType),
       };
 
       if (shiftType.toLowerCase() != 'off') {
