@@ -18,6 +18,7 @@ class WorkScheduleSettingsController extends GetxController {
   }.obs;
   final pattern = <String>[].obs;
   final overrides = <String, String>{}.obs;
+  final hasRotationData = false.obs;
 
   // Selected preset index for bottom sheet template picker
   final selectedTemplateIndex = 0.obs;
@@ -56,9 +57,11 @@ class WorkScheduleSettingsController extends GetxController {
         // data is null => toggle OFF
         isEnabled.value = false;
         selectedTemplateKey.value = '';
+        hasRotationData.value = false;
       } else {
         // has data => toggle ON & populate rotation data
         isEnabled.value = true;
+        hasRotationData.value = true;
         weeks.value = rotation.cycleWeeks;
         selectedTemplateKey.value = rotation.sourceTemplateKey;
         if (rotation.startDate.isNotEmpty) {
@@ -424,6 +427,7 @@ class WorkScheduleSettingsController extends GetxController {
             final workCtrl = Get.find<WorkController>();
             workCtrl.weeklyPattern.clear();
           } catch (_) {}
+          hasRotationData.value = false;
           EasyLoading.showSuccess('Work rotation deleted'.tr);
           Get.back();
         } else {
@@ -447,7 +451,7 @@ class WorkScheduleSettingsController extends GetxController {
           final workCtrl = Get.find<WorkController>();
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
-
+        hasRotationData.value = true;
         EasyLoading.showSuccess('Work schedule saved!'.tr);
         Get.back();
       } else {
