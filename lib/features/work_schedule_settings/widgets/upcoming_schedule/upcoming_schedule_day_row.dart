@@ -74,12 +74,16 @@ class UpcomingScheduleDayRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
 
-            Text(
-              _getShiftFullName(currentShift),
-              style: getTextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryTextColor,
+            Flexible(
+              child: Text(
+                _getShiftFullName(currentShift),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: getTextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTextColor,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -97,52 +101,59 @@ class UpcomingScheduleDayRow extends StatelessWidget {
             const Spacer(),
 
             // Badge: TODAY or EDITED
-            if (isToday)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 7,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.mintSoft,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'TODAY'.tr,
-                  style: getTextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.secondaryButtonColor,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isToday) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.mintSoft,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'TODAY'.tr,
+                      style: getTextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.secondaryButtonColor,
+                      ),
+                    ),
                   ),
-                ),
-              )
-            else if (isOverride)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 7,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.gray100,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'EDITED'.tr,
-                  style: getTextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textSoft,
+                  if (isOverride) const SizedBox(width: 4),
+                ],
+                if (isOverride)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.gray100,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'EDITED'.tr,
+                      style: getTextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textSoft,
+                      ),
+                    ),
                   ),
-                ),
-              )
-            else
-              Icon(
-                isEditing
-                    ? Icons.keyboard_arrow_up_rounded
-                    : Icons.chevron_right_rounded,
-                color: AppColors.grey,
-                size: 18,
-              ),
+                if (!isToday && !isOverride)
+                  Icon(
+                    isEditing
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.chevron_right_rounded,
+                    color: AppColors.grey,
+                    size: 18,
+                  ),
+              ],
+            ),
           ],
         ),
       ),
