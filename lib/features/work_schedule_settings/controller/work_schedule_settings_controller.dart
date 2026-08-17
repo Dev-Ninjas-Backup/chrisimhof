@@ -179,6 +179,104 @@ class WorkScheduleSettingsController extends GetxController {
     fetchUpcomingSchedule();
   }
 
+  String formatShiftName(String key) {
+    if (key.isEmpty) return '';
+    final lower = key.toLowerCase();
+    if (lower == 'day') return 'Day'.tr;
+    if (lower == 'evening') return 'Evening'.tr;
+    if (lower == 'night') return 'Night'.tr;
+    if (lower == 'off') return 'Off'.tr;
+
+    return key.split('_').map((word) {
+      if (word.isEmpty) return '';
+      return word[0].toUpperCase() + word.substring(1);
+    }).join(' ');
+  }
+
+  String getShiftAbbreviation(String key) {
+    final lower = key.toLowerCase();
+    if (lower == 'day' || lower == 'd') return 'D';
+    if (lower == 'evening' || lower == 'e') return 'E';
+    if (lower == 'night' || lower == 'n') return 'N';
+    if (lower == 'off') return 'Off';
+
+    if (key.length <= 3) return key.toUpperCase();
+
+    final numberMatch = RegExp(r'\d+').firstMatch(key);
+    final numberStr = numberMatch != null ? numberMatch.group(0) : '';
+
+    final parts = key.split(RegExp(r'[-_ ]+'));
+    if (parts.length > 1) {
+      final firstChar = parts[0].isNotEmpty ? parts[0][0].toUpperCase() : '';
+      final secondChar = parts[1].isNotEmpty ? parts[1][0].toUpperCase() : '';
+
+      if (numberStr != null && numberStr.isNotEmpty) {
+        return '$firstChar$numberStr';
+      }
+      return '$firstChar$secondChar';
+    }
+
+    if (numberStr != null && numberStr.isNotEmpty) {
+      return '${key[0].toUpperCase()}$numberStr';
+    }
+    return key.substring(0, 3).toUpperCase();
+  }
+
+  void addCustomShift(String key, String start, String end) {
+    final updated = Map<String, Map<String, String>>.from(shiftTimes);
+    updated[key] = {'start': start, 'end': end};
+    shiftTimes.assignAll(updated);
+  }
+
+  void renameCustomShift(String oldKey, String newKey) {
+    if (oldKey == newKey) return;
+    final updated = Map<String, Map<String, String>>.from(shiftTimes);
+    if (!updated.containsKey(oldKey)) return;
+    final val = updated.remove(oldKey);
+    if (val != null) {
+      updated[newKey] = val;
+    }
+    shiftTimes.assignAll(updated);
+
+    final updatedPattern = List<String>.from(pattern);
+    for (int i = 0; i < updatedPattern.length; i++) {
+      if (updatedPattern[i] == oldKey) {
+        updatedPattern[i] = newKey;
+      }
+    }
+    pattern.assignAll(updatedPattern);
+
+    final updatedOverrides = Map<String, String>.from(overrides);
+    updatedOverrides.forEach((date, shift) {
+      if (shift == oldKey) {
+        updatedOverrides[date] = newKey;
+      }
+    });
+    overrides.assignAll(updatedOverrides);
+
+    fetchUpcomingSchedule();
+  }
+
+  void deleteCustomShift(String key) {
+    final updated = Map<String, Map<String, String>>.from(shiftTimes);
+    updated.remove(key);
+    shiftTimes.assignAll(updated);
+
+    final updatedPattern = List<String>.from(pattern);
+    for (int i = 0; i < updatedPattern.length; i++) {
+      if (updatedPattern[i] == key) {
+        updatedPattern[i] = 'Off';
+      }
+    }
+    pattern.assignAll(updatedPattern);
+
+    final updatedOverrides = Map<String, String>.from(overrides);
+    updatedOverrides.removeWhere((date, shift) => shift == key);
+    overrides.assignAll(updatedOverrides);
+
+    fetchUpcomingSchedule();
+  }
+
   int getPatternIndexForDate(DateTime date) {
     final startDateClean = DateTime(
       startDate.value.year,
@@ -207,22 +305,33 @@ class WorkScheduleSettingsController extends GetxController {
     String? shiftEndTime;
 
     final lowerCode = shiftCode.toLowerCase();
-    if (lowerCode == 'd' || lowerCode == 'day') {
-      apiShiftType = 'day';
-      shiftStartTime = shiftTimes['Day']?['start'] ?? '07:00';
-      shiftEndTime = shiftTimes['Day']?['end'] ?? '15:00';
-    } else if (lowerCode == 'e' || lowerCode == 'evening') {
-      apiShiftType = 'evening';
-      shiftStartTime = shiftTimes['Evening']?['start'] ?? '15:00';
-      shiftEndTime = shiftTimes['Evening']?['end'] ?? '22:30';
-    } else if (lowerCode == 'n' || lowerCode == 'night') {
-      apiShiftType = 'night';
-      shiftStartTime = shiftTimes['Night']?['start'] ?? '22:30';
-      shiftEndTime = shiftTimes['Night']?['end'] ?? '06:30';
-    } else {
+    if (lowerCode == 'off') {
       apiShiftType = 'off';
       shiftStartTime = null;
       shiftEndTime = null;
+    } else {
+      final matchKey = shiftTimes.keys.firstWhere(
+        (k) {
+          final lK = k.toLowerCase();
+          return lK == lowerCode ||
+              (lK == 'day' && lowerCode == 'd') ||
+              (lK == 'evening' && lowerCode == 'e') ||
+              (lK == 'night' && lowerCode == 'n');
+        },
+        orElse: () => shiftCode,
+      );
+
+      apiShiftType = matchKey.toLowerCase() == 'day'
+          ? 'day'
+          : matchKey.toLowerCase() == 'evening'
+              ? 'evening'
+              : matchKey.toLowerCase() == 'night'
+                  ? 'night'
+                  : matchKey;
+
+      final times = shiftTimes[matchKey];
+      shiftStartTime = times?['start'] ?? '00:00';
+      shiftEndTime = times?['end'] ?? '00:00';
     }
 
     try {
@@ -400,13 +509,23 @@ class WorkScheduleSettingsController extends GetxController {
 
     final todayIndex = now.weekday - 1;
     final todayShift = computedPattern[todayIndex]['shift']!;
-    workCtrl.selectedShiftType.value = todayShift == 'D'
-        ? 'Day'
-        : todayShift == 'E'
-        ? 'Evening'
-        : todayShift == 'N'
-        ? 'Night'
-        : 'Off';
+    final lowerToday = todayShift.toLowerCase();
+
+    if (lowerToday == 'd' || lowerToday == 'day') {
+      workCtrl.selectedShiftType.value = 'Day';
+    } else if (lowerToday == 'e' || lowerToday == 'evening') {
+      workCtrl.selectedShiftType.value = 'Evening';
+    } else if (lowerToday == 'n' || lowerToday == 'night') {
+      workCtrl.selectedShiftType.value = 'Night';
+    } else if (lowerToday == 'off') {
+      workCtrl.selectedShiftType.value = 'Off';
+    } else {
+      final matchKey = shiftTimes.keys.firstWhere(
+        (k) => k.toLowerCase() == lowerToday,
+        orElse: () => todayShift,
+      );
+      workCtrl.selectedShiftType.value = matchKey;
+    }
 
     final times = shiftTimes;
     final shiftName = workCtrl.selectedShiftType.value;
