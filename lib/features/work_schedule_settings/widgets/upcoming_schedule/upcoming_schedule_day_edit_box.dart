@@ -22,7 +22,19 @@ class UpcomingScheduleDayEditBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedDateStr = DateFormat('EEE, d MMM').format(date);
-    final tempShift = currentShift.obs;
+    final initialShift = currentShift == 'D'
+        ? 'Day'
+        : currentShift == 'E'
+        ? 'Evening'
+        : currentShift == 'N'
+        ? 'Night'
+        : currentShift;
+    final tempShift = initialShift.obs;
+
+    final shiftOptions = [
+      ...controller.shiftTimes.keys,
+      'Off',
+    ];
 
     return Container(
       margin: const EdgeInsets.only(top: 10, bottom: 6),
@@ -45,11 +57,13 @@ class UpcomingScheduleDayEditBox extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // Shift buttons D E N Off
+          // Dynamic Shift buttons
           Obx(() {
             return Row(
-              children: ['D', 'E', 'N', 'Off'].map((code) {
-                final isSelected = tempShift.value == code;
+              children: shiftOptions.map((code) {
+                final isSelected = tempShift.value.toLowerCase() == code.toLowerCase();
+                final abbrev = controller.getShiftAbbreviation(code);
+
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -71,7 +85,7 @@ class UpcomingScheduleDayEditBox extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          code.tr,
+                          abbrev.tr,
                           style: getTextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,

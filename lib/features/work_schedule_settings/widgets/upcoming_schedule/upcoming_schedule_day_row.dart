@@ -150,16 +150,34 @@ class UpcomingScheduleDayRow extends StatelessWidget {
   }
 
   Color _getShiftDotColor(String code) {
-    if (code == 'D') return AppColors.orangeAccent2;
-    if (code == 'E') return AppColors.violet;
-    if (code == 'N') return AppColors.indigo;
-    return AppColors.grey;
+    final lower = code.toLowerCase();
+    if (lower == 'day' || lower == 'd') return AppColors.orangeAccent2;
+    if (lower == 'evening' || lower == 'e') return AppColors.violet;
+    if (lower == 'night' || lower == 'n') return AppColors.indigo;
+    if (lower == 'off') return AppColors.grey;
+
+    if (lower.contains('morning') || lower.contains('day')) {
+      return AppColors.orangeAccent2;
+    }
+    if (lower.contains('evening') || lower.contains('afternoon')) {
+      return AppColors.violet;
+    }
+    if (lower.contains('night')) {
+      return AppColors.indigo;
+    }
+    return AppColors.secondaryButtonColor;
   }
 
   String _getShiftFullName(String code) {
-    if (code == 'D') return 'Day'.tr;
-    if (code == 'E') return 'Evening'.tr;
-    if (code == 'N') return 'Night'.tr;
-    return 'Off'.tr;
+    final lower = code.toLowerCase();
+    if (lower == 'day' || lower == 'd') return 'Day'.tr;
+    if (lower == 'evening' || lower == 'e') return 'Evening'.tr;
+    if (lower == 'night' || lower == 'n') return 'Night'.tr;
+    if (lower == 'off') return 'Off'.tr;
+
+    return code.split('_').map((word) {
+      if (word.isEmpty) return '';
+      return word[0].toUpperCase() + word.substring(1);
+    }).join(' ');
   }
 }

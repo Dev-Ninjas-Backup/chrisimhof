@@ -134,8 +134,13 @@ class RotationBuilderCard extends StatelessWidget {
                         Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: ['D', 'E', 'N', 'Off'].map((shiftCode) {
-                              final isSelected = currentShift == shiftCode;
+                            children: [
+                              ...controller.shiftTimes.keys,
+                              'Off',
+                            ].map((shiftOption) {
+                              final isSelected = currentShift == shiftOption;
+                              final abbrev = controller.getShiftAbbreviation(shiftOption);
+
                               return Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -146,7 +151,7 @@ class RotationBuilderCard extends StatelessWidget {
                                         ? null
                                         : () => controller.updateDayPattern(
                                               overallDayIdx,
-                                              shiftCode,
+                                              shiftOption,
                                             ),
                                     child: Opacity(
                                       opacity: isTemplate ? 0.6 : 1.0,
@@ -158,7 +163,7 @@ class RotationBuilderCard extends StatelessWidget {
                                         decoration: BoxDecoration(
                                           color: isSelected
                                               ? _getShiftColor(
-                                                  shiftCode,
+                                                  shiftOption,
                                                   bg: true,
                                                 )
                                               : AppColors.gray100,
@@ -167,7 +172,7 @@ class RotationBuilderCard extends StatelessWidget {
                                           border: Border.all(
                                             color: isSelected
                                                 ? _getShiftColor(
-                                                    shiftCode,
+                                                    shiftOption,
                                                     bg: false,
                                                   )
                                                 : AppColors.transparent,
@@ -176,15 +181,15 @@ class RotationBuilderCard extends StatelessWidget {
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
-                                          shiftCode.tr,
+                                          abbrev.tr,
                                           style: getTextStyle(
-                                            fontSize: 12,
+                                            fontSize: 11,
                                             fontWeight: isSelected
                                                 ? FontWeight.w800
                                                 : FontWeight.w600,
                                             color: isSelected
                                                 ? _getShiftColor(
-                                                    shiftCode,
+                                                    shiftOption,
                                                     bg: false,
                                                   )
                                                 : AppColors.textSoft,
@@ -219,16 +224,27 @@ class RotationBuilderCard extends StatelessWidget {
     );
   }
 
-  Color _getShiftColor(String code, {required bool bg}) {
-    if (code == 'D') {
+  Color _getShiftColor(String key, {required bool bg}) {
+    final lower = key.toLowerCase();
+    if (lower == 'day' || lower == 'd') {
       return bg ? AppColors.amberSoft3 : AppColors.orangeAccent2;
-    } else if (code == 'E') {
+    } else if (lower == 'evening' || lower == 'e') {
       return bg ? AppColors.lavenderSoft : AppColors.violet;
-    } else if (code == 'N') {
+    } else if (lower == 'night' || lower == 'n') {
       return bg ? AppColors.indigoSoft : AppColors.indigo;
-    } else {
-      // Off
+    } else if (lower == 'off') {
       return bg ? AppColors.mintSoft : AppColors.secondaryButtonColor;
+    } else {
+      if (lower.contains('morning') || lower.contains('day')) {
+        return bg ? AppColors.amberSoft3 : AppColors.orangeAccent2;
+      }
+      if (lower.contains('evening') || lower.contains('afternoon')) {
+        return bg ? AppColors.lavenderSoft : AppColors.violet;
+      }
+      if (lower.contains('night')) {
+        return bg ? AppColors.indigoSoft : AppColors.indigo;
+      }
+      return bg ? AppColors.mintSoft3 : AppColors.secondaryButtonColor;
     }
   }
 }
