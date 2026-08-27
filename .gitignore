@@ -46,8 +46,8 @@ app.*.map.json
 /android/local.properties
 ios/build
 /ios/Pods
-#branch_structure.json
-#temp_auto_push.bat
-#temp_interactive_push.bat
 .gitignore
 .agents
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
