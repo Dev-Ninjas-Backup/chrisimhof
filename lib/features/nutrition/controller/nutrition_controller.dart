@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 
@@ -156,19 +157,21 @@ class NutritionController extends GetxController {
       final currentName = mealsList[index].name;
       final cleanName = (currentName.isEmpty || currentName.toLowerCase().contains('undefined')) ? 'Meal' : currentName;
 
+      final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
       mealsList[index] = mealsList[index].copyWith(
         name: cleanName,
         type: heaviness[0].toUpperCase() + heaviness.substring(1),
         time: newTimeStr,
-        occurredAt: dt.toUtc().toIso8601String(),
+        occurredAt: isoString,
       );
     }
 
     EasyLoading.show(status: 'Updating meal...');
     try {
       final url = Urls.updateMeal(sessionId, entryId);
+      final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
       final bodyJson = jsonEncode({
-        'occurredAt': dt.toUtc().toIso8601String(),
+        'occurredAt': isoString,
         'heaviness': heaviness.toLowerCase(),
       });
 

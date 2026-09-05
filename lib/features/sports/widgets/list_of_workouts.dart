@@ -117,8 +117,14 @@ class ListOfWorkouts extends StatelessWidget {
     final selectedType = initialType.obs;
     final selectedIntensity = 'medium'.obs;
     final selectedZone = initialZone.obs;
-    final selectedDate = DateTime.now().obs;
-    final selectedTime = TimeOfDay.now().obs;
+    DateTime initialDt = DateTime.now();
+    if (session.occurredAt != null && session.occurredAt!.isNotEmpty) {
+      try {
+        initialDt = DateTime.parse(session.occurredAt!);
+      } catch (_) {}
+    }
+    final selectedDate = initialDt.obs;
+    final selectedTime = TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
 
     Get.dialog(
       Obx(

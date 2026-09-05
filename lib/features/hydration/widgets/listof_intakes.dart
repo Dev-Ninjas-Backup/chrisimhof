@@ -116,8 +116,22 @@ class ListofIntakes extends StatelessWidget {
 
   void _showEditDeleteDialog(BuildContext context, HydrationLog log) {
     final volumeCtrl = TextEditingController(text: '${log.amountMl}');
-    final selectedDate = DateTime.now().obs;
-    final selectedTime = TimeOfDay.now().obs;
+    DateTime initialDt = DateTime.now();
+    if (log.time.contains(':') && !log.time.contains('--')) {
+      try {
+        final parts = log.time.split(':');
+        final h = int.parse(parts[0].trim());
+        final m = int.parse(parts[1].trim());
+        final now = DateTime.now();
+        initialDt = DateTime(now.year, now.month, now.day, h, m);
+      } catch (_) {}
+    } else if (log.occurredAt != null && log.occurredAt!.isNotEmpty) {
+      try {
+        initialDt = DateTime.parse(log.occurredAt!);
+      } catch (_) {}
+    }
+    final selectedDate = initialDt.obs;
+    final selectedTime = TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
 
     Get.dialog(
       Obx(

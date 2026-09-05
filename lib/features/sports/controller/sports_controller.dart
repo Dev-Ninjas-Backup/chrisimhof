@@ -6,6 +6,7 @@ import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:get/get.dart';
@@ -15,12 +16,14 @@ class SportSession {
   final String title;
   final String subtitle;
   final String iconPath;
+  final String? occurredAt;
 
   SportSession({
     this.id = '',
     required this.title,
     required this.subtitle,
     required this.iconPath,
+    this.occurredAt,
   });
 }
 
@@ -132,9 +135,10 @@ class SportsController extends GetxController {
     }
 
     final dt = occurredAt ?? DateTime.now();
+    final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
 
     final Map<String, dynamic> body = {
-      'occurredAt': dt.toUtc().toIso8601String(),
+      'occurredAt': isoString,
     };
     if (durationMinutes != null) body['durationMinutes'] = durationMinutes;
     if (intensity != null && intensity.isNotEmpty) {
@@ -619,11 +623,15 @@ class SportsController extends GetxController {
         final dayPrefix = _getDayLabelFromSession(sessionMap);
         final subtitle =
             '$dayPrefix · $duration${zone.isNotEmpty ? ' · $zone' : ''}';
+        final occurredAtStr = sessionMap['occurredAt'] as String? ??
+            sessionMap['timestampStart'] as String? ??
+            sessionMap['date'] as String?;
         return SportSession(
           id: sessionMap['id'] as String? ?? '',
           title: title,
           subtitle: subtitle,
           iconPath: _getIconPathForActivity(title.toString()),
+          occurredAt: occurredAtStr,
         );
       }).toList();
 

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
+import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 
@@ -382,8 +383,9 @@ class HydrationController extends GetxController {
     EasyLoading.show(status: 'Updating entry...');
     try {
       final url = Urls.updateHydration(sessionId, id);
+      final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
       final bodyJson = jsonEncode({
-        'occurredAt': dt.toUtc().toIso8601String(),
+        'occurredAt': isoString,
         'volumeMl': volumeMl,
       });
 

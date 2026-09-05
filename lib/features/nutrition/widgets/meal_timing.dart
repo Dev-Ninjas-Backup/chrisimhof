@@ -141,8 +141,25 @@ class MealTiming extends StatelessWidget {
 
   void _showEditMealDialog(BuildContext context, MealItem item) {
     final selectedHeaviness = (item.type.isNotEmpty ? item.type : 'Light').obs;
-    final selectedDate = DateTime.now().obs;
-    final selectedTime = TimeOfDay.now().obs;
+    DateTime initialDt = DateTime.now();
+    if (item.time.contains(':') && !item.time.contains('--')) {
+      try {
+        final cleanTime = item.time.contains('·') ? item.time.split('·').last.trim() : item.time;
+        final parts = cleanTime.replaceAll(RegExp(r'[^0-9:]'), '').split(':');
+        if (parts.length >= 2) {
+          final h = int.parse(parts[0]);
+          final m = int.parse(parts[1]);
+          final now = DateTime.now();
+          initialDt = DateTime(now.year, now.month, now.day, h, m);
+        }
+      } catch (_) {}
+    } else if (item.occurredAt != null && item.occurredAt!.isNotEmpty) {
+      try {
+        initialDt = DateTime.parse(item.occurredAt!);
+      } catch (_) {}
+    }
+    final selectedDate = initialDt.obs;
+    final selectedTime = TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
 
     Get.dialog(
       Obx(
