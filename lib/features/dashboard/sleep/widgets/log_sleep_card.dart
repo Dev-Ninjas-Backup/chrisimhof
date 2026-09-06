@@ -100,7 +100,7 @@ class LogSleepCard extends StatelessWidget {
               Expanded(
                 child: Obx(
                   () => TimeWidget(
-                    title: 'Bedtime',
+                    title: 'Bedtime'.tr,
                     iconPath: IconPath.moon,
                     hour: controller.bedtimeHour.value,
                     minute: controller.bedtimeMinute.value,
@@ -119,7 +119,7 @@ class LogSleepCard extends StatelessWidget {
               Expanded(
                 child: Obx(
                   () => TimeWidget(
-                    title: 'Wake-up',
+                    title: 'Wake-up'.tr,
                     iconPath: IconPath.sun,
                     hour: controller.wakeupHour.value,
                     minute: controller.wakeupMinute.value,
@@ -153,7 +153,7 @@ class LogSleepCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Start New Main Wake (Rollover)'.tr,
+                          'Start a New Day'.tr,
                           style: getTextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -162,7 +162,7 @@ class LogSleepCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Enable if logging main wake after forgetting End Day'
+                          'Turn on if you forgot to tap \'End My Day\' before sleeping'
                               .tr,
                           style: getTextStyle(
                             fontSize: 12,
@@ -221,7 +221,7 @@ class LogSleepCard extends StatelessWidget {
 
           // Save sleep button
           CustomButton(
-            text: 'Save Sleep',
+            text: 'Save Sleep'.tr,
             onTap: controller.saveSleep,
             textColor: AppColors.black,
             backgroundColor: AppColors.primaryButtonColor,

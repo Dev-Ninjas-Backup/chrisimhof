@@ -26,7 +26,7 @@ class SignInScreen extends StatelessWidget {
           child: Column(
             children: [
               CustomAppBar(
-                title: title,
+                title: title.tr,
                 showBackButton: true,
                 showSettingsButton: true,
               ),
@@ -107,7 +107,7 @@ class SignInScreen extends StatelessWidget {
 
                     Obx(
                       () => CustomButton(
-                        text: 'Log in',
+                        text: 'Log in'.tr,
                         textColor: AppColors.white,
                         onTap: controller.isLoading.value
                             ? null

@@ -370,7 +370,7 @@ class WorkController extends GetxController {
   }
 
   void saveShift() async {
-    EasyLoading.show(status: 'Saving work shift...');
+    EasyLoading.show(status: 'Saving work shift...'.tr);
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId();
       if (sessionId != null && sessionId.isNotEmpty) {
@@ -408,14 +408,14 @@ class WorkController extends GetxController {
           await dashboardController.fetchDashboardData();
         } catch (_) {}
 
-        EasyLoading.showSuccess('Shift saved successfully!');
+        EasyLoading.showSuccess('Shift saved successfully!'.tr);
         Get.back();
       } else {
-        EasyLoading.showError('No active session found.');
+        EasyLoading.showError('No active session found.'.tr);
       }
     } catch (e) {
       debugPrint('Error saving work shift: $e');
-      EasyLoading.showError('Failed to save shift.');
+      EasyLoading.showError('Failed to save shift.'.tr);
     }
   }
 

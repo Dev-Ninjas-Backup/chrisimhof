@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SubscriptionPlanWidget extends StatelessWidget {
   final String planName;
@@ -64,7 +65,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              description,
+              description.tr,
               style: getTextStyle2(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
@@ -83,7 +84,7 @@ class SubscriptionPlanWidget extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          feature,
+                          feature.tr,
                           style: getTextStyle2(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

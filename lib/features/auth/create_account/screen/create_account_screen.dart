@@ -30,7 +30,7 @@ class CreateAccountScreen extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
             child: Column(
               children: [
-                CustomAppBar(title: title, showBackButton: true, showSettingsButton: true),
+                CustomAppBar(title: title.tr, showBackButton: true, showSettingsButton: true),
                 const SizedBox(height: 30),
                 const PrivacyByDesignCard(),
                 Form(
@@ -38,7 +38,7 @@ class CreateAccountScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       CustomTextField(
-                        label: 'Name',
+                        label: 'Full Name',
                         hintText: 'Enter your full name',
                         controller: controller.fullNameController,
                         textInputAction: TextInputAction.next,
@@ -78,7 +78,7 @@ class CreateAccountScreen extends StatelessWidget {
 
                       Obx(
                         () => CustomButton(
-                          text: 'Create account',
+                          text: 'Create account'.tr,
                           onTap: controller.isLoading.value
                               ? null
                               : () {

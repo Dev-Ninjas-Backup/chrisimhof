@@ -76,7 +76,7 @@ class EditProfileController extends GetxController {
           await SharedPreferencesHelper.getAccessToken();
 
       if (accessToken == null || accessToken.trim().isEmpty) {
-        EasyLoading.showError('Unauthorized. Please sign in again.');
+        EasyLoading.showError('Unauthorized. Please sign in again.'.tr);
         return;
       }
 
@@ -116,7 +116,7 @@ class EditProfileController extends GetxController {
     } catch (e) {
       String errorMessage = e.toString().replaceFirst('Exception: ', '');
       EasyLoading.showError(
-        errorMessage.isEmpty ? 'Failed to update profile' : errorMessage,
+        errorMessage.isEmpty ? 'Failed to update profile'.tr : errorMessage,
       );
     } finally {
       isLoading.value = false;

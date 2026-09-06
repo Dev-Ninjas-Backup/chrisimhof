@@ -55,7 +55,7 @@ class ShiftTypePill extends StatelessWidget {
           Text(
             formattedShiftName == 'Off'
                 ? 'Off'.tr
-                : '$formattedShiftName · $duration',
+                : '${formattedShiftName.tr} · $duration',
             style: getTextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,

@@ -40,7 +40,7 @@ class SafetyController extends GetxController {
         checkedIndices.clear();
       }
     } catch (e) {
-      EasyLoading.showError('Failed to load safety requirements: $e');
+      EasyLoading.showError('Failed to load safety requirements.'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -85,10 +85,10 @@ class SafetyController extends GetxController {
         EasyLoading.dismiss();
         Get.toNamed(AppRoutes.baselineSetupScreen);
       } else {
-        EasyLoading.showError('Could not proceed with safety acknowledgment.');
+        EasyLoading.showError('Could not proceed with safety acknowledgment.'.tr);
       }
     } catch (e) {
-      EasyLoading.showError('Failed to acknowledge safety requirements: $e');
+      EasyLoading.showError('Failed to acknowledge safety requirements.'.tr);
     }
   }
 }

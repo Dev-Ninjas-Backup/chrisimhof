@@ -131,4 +131,29 @@ class RecommendationController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> refetchRecommendations({bool silent = true}) async {
+    final currentLocale = Get.locale?.languageCode ?? 'en';
+    final localeCode = currentLocale.toLowerCase() == 'fr' ? 'fr' : 'en';
+    final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+
+    if (sessionId.isEmpty) return;
+
+    try {
+      if (!silent && recommendationResponse.value == null) {
+        isLoading.value = true;
+      }
+      final res = await _service.getRecommendations(
+        sessionId: sessionId,
+        locale: localeCode,
+      );
+      recommendationResponse.value = res;
+    } catch (e) {
+      Get.log('RecommendationController refetch error: $e');
+    } finally {
+      if (!silent) {
+        isLoading.value = false;
+      }
+    }
+  }
 }

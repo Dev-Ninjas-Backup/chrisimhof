@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SleepImpactCard extends StatelessWidget {
   const SleepImpactCard({
@@ -42,7 +43,7 @@ class SleepImpactCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'SLEEP IMPACT',
+                  'SLEEP IMPACT'.tr,
                   style: getTextStyle2(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -55,20 +56,20 @@ class SleepImpactCard extends StatelessWidget {
                     style: getTextStyle2(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color:AppColors.textMid,
+                      color: AppColors.textMid,
                     ),
                     children: [
-                      const TextSpan(text: 'Keep night meal '),
+                      TextSpan(text: 'Keep night meal '.tr),
                       TextSpan(
-                        text: 'Light',
+                        text: 'Light'.tr,
                         style: getTextStyle2(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: AppColors.secondaryTextColor,
                         ),
                       ),
-                      const TextSpan(
-                        text: ' — Heavy meals after 02:00 reduce deep sleep by ~15%.',
+                      TextSpan(
+                        text: ' — Heavy meals after 02:00 reduce deep sleep by ~15%.'.tr,
                       ),
                     ],
                   ),

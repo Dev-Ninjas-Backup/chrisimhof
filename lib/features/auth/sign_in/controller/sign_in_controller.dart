@@ -35,20 +35,20 @@ class SignInController extends GetxController {
 
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+      return 'Email is required'.tr;
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim())) {
-      return 'Please enter a valid email';
+      return 'Please enter a valid email'.tr;
     }
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Password is required';
+      return 'Password is required'.tr;
     }
     if (value.trim().length < 6) {
-      return 'Password must be at least 6 characters';
+      return 'Password must be at least 6 characters'.tr;
     }
     return null;
   }
@@ -117,7 +117,7 @@ class SignInController extends GetxController {
         EasyLoading.showError(response.message);
       }
     } catch (e) {
-      EasyLoading.showError('Login failed. Please try again.');
+      EasyLoading.showError('Login failed. Please try again.'.tr);
       debugPrint('Login error: $e');
     } finally {
       isLoading.value = false;
@@ -134,7 +134,7 @@ class SignInController extends GetxController {
   Future<void> signInWithGoogle() async {
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Signing in...');
+      EasyLoading.show(status: 'Signing in...'.tr);
 
       UserModel? user = await _googleService.signIn();
 
@@ -157,7 +157,7 @@ class SignInController extends GetxController {
           await RealtimeSocketService().connectSocket();
 
           EasyLoading.dismiss();
-          EasyLoading.showSuccess('Login successful');
+          EasyLoading.showSuccess('Login successful'.tr);
 
           if (apiResponse.isNewUser) {
             Get.offAllNamed(AppRoutes.safetyScreen);
@@ -166,12 +166,12 @@ class SignInController extends GetxController {
           }
         } else {
           EasyLoading.dismiss();
-          EasyLoading.showError(apiResponse.message ?? 'API login failed');
+          EasyLoading.showError(apiResponse.message ?? 'Login failed. Please try again.'.tr);
           debugPrint('API login failed: ${apiResponse.message}');
         }
       } else {
         EasyLoading.dismiss();
-        EasyLoading.showInfo('Google sign-in cancelled');
+        EasyLoading.showInfo('Google sign-in cancelled'.tr);
         debugPrint('Google sign-in cancelled by user');
       }
     } catch (e) {
@@ -203,7 +203,7 @@ class SignInController extends GetxController {
   Future<void> signInWithMicrosoft() async {
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Signing in with Microsoft...');
+      EasyLoading.show(status: 'Signing in with Microsoft...'.tr);
 
       microsoft_user.UserModel? user = await _microsoftService.signIn();
 
@@ -226,7 +226,7 @@ class SignInController extends GetxController {
           await RealtimeSocketService().connectSocket();
 
           EasyLoading.dismiss();
-          EasyLoading.showSuccess('Login successful');
+          EasyLoading.showSuccess('Login successful'.tr);
 
           if (apiResponse.isNewUser) {
             Get.offAllNamed(AppRoutes.safetyScreen);
@@ -236,18 +236,18 @@ class SignInController extends GetxController {
         } else {
           EasyLoading.dismiss();
           EasyLoading.showError(
-            apiResponse.message ?? 'Microsoft login failed',
+            apiResponse.message ?? 'Login failed. Please try again.'.tr,
           );
           debugPrint('Microsoft login failed: ${apiResponse.message}');
         }
       } else {
         EasyLoading.dismiss();
-        EasyLoading.showInfo('Microsoft sign-in cancelled');
+        EasyLoading.showInfo('Microsoft sign-in cancelled'.tr);
         debugPrint('Microsoft sign-in cancelled by user');
       }
     } on TimeoutException {
       EasyLoading.dismiss();
-      EasyLoading.showError('Microsoft sign-in timed out. Please try again.');
+      EasyLoading.showError('Microsoft sign-in timed out. Please try again.'.tr);
       debugPrint('Microsoft Sign-In Controller timed out');
     } catch (e) {
       EasyLoading.dismiss();

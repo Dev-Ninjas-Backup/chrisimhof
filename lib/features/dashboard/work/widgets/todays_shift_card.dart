@@ -75,7 +75,7 @@ class TodaysShiftCard extends StatelessWidget {
               Expanded(
                 child: Obx(
                   () => TimeWidget(
-                    title: 'START',
+                    title: 'START'.tr,
                     icon: Icons.access_time_outlined,
                     hour: controller.startHour.value,
                     minute: controller.startMinute.value,
@@ -94,7 +94,7 @@ class TodaysShiftCard extends StatelessWidget {
               Expanded(
                 child: Obx(
                   () => TimeWidget(
-                    title: 'END',
+                    title: 'END'.tr,
                     icon: Icons.flag_outlined,
                     hour: controller.endHour.value,
                     minute: controller.endMinute.value,
@@ -115,7 +115,7 @@ class TodaysShiftCard extends StatelessWidget {
 
           // Save Shift Button
           CustomButton(
-            text: 'Save Shift',
+            text: 'Save Shift'.tr,
             onTap: controller.saveShift,
             textColor: AppColors.black,
             backgroundColor: AppColors.primaryButtonColor,
@@ -130,23 +130,41 @@ class TodaysShiftCard extends StatelessWidget {
 
   String _formattedDate() {
     final now = DateTime.now();
-    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    final isFrench = (Get.locale?.languageCode ?? 'en') == 'fr';
+    final weekdays = isFrench
+        ? ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+        : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final months = isFrench
+        ? [
+            'Janv',
+            'Févr',
+            'Mars',
+            'Avr',
+            'Mai',
+            'Juin',
+            'Juil',
+            'Août',
+            'Sept',
+            'Oct',
+            'Nov',
+            'Déc',
+          ]
+        : [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ];
     final weekday = weekdays[now.weekday - 1];
     final month = months[now.month - 1];
-    return '$weekday · ${now.day} $month · drag or tap to adjust'.tr;
+    return '$weekday · ${now.day} $month · ${'drag or tap to adjust'.tr}';
   }
 }

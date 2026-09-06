@@ -112,7 +112,7 @@ class SettingsController extends GetxController {
           refreshToken == null ||
           refreshToken.trim().isEmpty) {
         await SharedPreferencesHelper.clearAuthData();
-        EasyLoading.showInfo('You are already logged out.');
+        EasyLoading.showInfo('You are already logged out.'.tr);
         Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
@@ -124,7 +124,7 @@ class SettingsController extends GetxController {
 
       if (isSuccess) {
         await SharedPreferencesHelper.clearAuthData();
-        EasyLoading.showSuccess('Logged out successfully');
+        EasyLoading.showSuccess('Logged out successfully'.tr);
         Get.offAllNamed(AppRoutes.signInScreen);
       }
     } catch (e) {
@@ -134,14 +134,14 @@ class SettingsController extends GetxController {
       if (errorMessage.toLowerCase().contains('invalid or expired token') ||
           errorMessage.toLowerCase().contains('unauthorized')) {
         await SharedPreferencesHelper.clearAuthData();
-        EasyLoading.showInfo('Session expired. Please sign in again.');
+        EasyLoading.showInfo('Session expired. Please sign in again.'.tr);
         Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
 
       EasyLoading.showError(
         errorMessage.isEmpty
-            ? 'Logout failed. Please try again.'
+            ? 'Logout failed. Please try again.'.tr
             : errorMessage,
       );
     } finally {

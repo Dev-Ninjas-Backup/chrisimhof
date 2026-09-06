@@ -67,7 +67,7 @@ class SportsController extends GetxController {
       return;
     }
 
-    EasyLoading.show(status: 'Deleting workout...');
+    EasyLoading.show(status: 'Deleting workout...'.tr);
     try {
       final url = Urls.updateWorkout(sessionId, entryId);
       debugPrint('=== DELETE WORKOUT REQUEST ===');
@@ -97,13 +97,13 @@ class SportsController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Deleted workout session');
+        EasyLoading.showSuccess('Deleted workout session'.tr);
       } else {
-        EasyLoading.showError('Failed to delete workout');
+        EasyLoading.showError('Failed to delete workout'.tr);
       }
     } catch (e) {
       debugPrint('deleteWorkoutLog API error: $e');
-      EasyLoading.showError('Failed to delete workout');
+      EasyLoading.showError('Failed to delete workout'.tr);
     } finally {
       EasyLoading.dismiss();
     }
@@ -124,7 +124,7 @@ class SportsController extends GetxController {
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
     if (sessionId.isEmpty || token.isEmpty || entryId.isEmpty) {
       debugPrint('editWorkoutLog aborted: sessionId: $sessionId, token: ${token.isNotEmpty}, entryId: $entryId');
-      EasyLoading.showError('Workout entry ID missing. Refreshing dashboard...');
+      EasyLoading.showError('Workout entry ID missing. Refreshing dashboard...'.tr);
       try {
         if (Get.isRegistered<DashboardController>()) {
           final db = Get.find<DashboardController>();
@@ -164,7 +164,7 @@ class SportsController extends GetxController {
       body['heartRateAvgBpm'] = hrBpm;
     }
 
-    EasyLoading.show(status: 'Updating workout...');
+    EasyLoading.show(status: 'Updating workout...'.tr);
     try {
       final url = Urls.updateWorkout(sessionId, entryId);
       final bodyJson = jsonEncode(body);
@@ -199,13 +199,13 @@ class SportsController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Updated workout session');
+        EasyLoading.showSuccess('Updated workout session'.tr);
       } else {
-        EasyLoading.showError('Failed to update workout');
+        EasyLoading.showError('Failed to update workout'.tr);
       }
     } catch (e) {
       debugPrint('editWorkoutLog API error: $e');
-      EasyLoading.showError('Failed to update workout');
+      EasyLoading.showError('Failed to update workout'.tr);
     } finally {
       EasyLoading.dismiss();
     }
@@ -258,12 +258,20 @@ class SportsController extends GetxController {
         sessionsList.assignAll(
           decoded
               .map(
-                (s) => SportSession(
-                  id: s['id'] ?? '',
-                  title: s['title'] ?? '',
-                  subtitle: s['subtitle'] ?? '',
-                  iconPath: s['iconPath'] ?? '',
-                ),
+                (s) {
+                  final title = s['title'] ?? '';
+                  final savedIcon = s['iconPath'] ?? '';
+                  final isRest = title.toLowerCase().contains('rest') || title.toLowerCase().contains('repos');
+                  final iconPath = (savedIcon.isNotEmpty && (isRest || savedIcon != IconPath.restDay))
+                      ? savedIcon
+                      : _getIconPathForActivity(title);
+                  return SportSession(
+                    id: s['id'] ?? '',
+                    title: title,
+                    subtitle: s['subtitle'] ?? '',
+                    iconPath: iconPath,
+                  );
+                },
               )
               .toList(),
         );
@@ -438,7 +446,7 @@ class SportsController extends GetxController {
     }
 
     if (!isRest) {
-      EasyLoading.show(status: 'Saving session...');
+      EasyLoading.show(status: 'Saving session...'.tr);
     }
 
     bool apiSuccess = isRest; // Rest day doesn't call API
@@ -550,19 +558,43 @@ class SportsController extends GetxController {
   }
 
   String _getIconPathForActivity(String activity) {
-    switch (activity.toLowerCase()) {
-      case 'mobility':
-        return IconPath.running;
-      case 'strength':
-        return IconPath.strength;
-      case 'cardio':
-        return IconPath.yoga;
-      case 'mixed':
-        return IconPath.yoga;
-      case 'rest day':
-      default:
-        return IconPath.restDay;
+    final act = activity.toLowerCase().trim();
+    if (act.isEmpty) return IconPath.sport;
+
+    if (act.contains('rest') || act.contains('repos') || act == 'none') {
+      return IconPath.restDay;
     }
+    if (act.contains('strength') ||
+        act.contains('force') ||
+        act.contains('renforcement') ||
+        act.contains('musculation') ||
+        act.contains('weight') ||
+        act.contains('dumbbell') ||
+        act.contains('haltère')) {
+      return IconPath.strength;
+    }
+    if (act.contains('cardio')) {
+      return IconPath.yoga;
+    }
+    if (act.contains('run') ||
+        act.contains('course') ||
+        act.contains('jogging') ||
+        act.contains('sprint')) {
+      return IconPath.running;
+    }
+    if (act.contains('mobility') ||
+        act.contains('mobilité') ||
+        act.contains('yoga') ||
+        act.contains('stretch') ||
+        act.contains('étirement') ||
+        act.contains('pilates') ||
+        act.contains('souplesse')) {
+      return IconPath.yoga;
+    }
+    if (act.contains('mixed') || act.contains('mixte')) {
+      return IconPath.mixed;
+    }
+    return IconPath.sport;
   }
 
   String _getDayLabelFromSession(Map<String, dynamic> s) {

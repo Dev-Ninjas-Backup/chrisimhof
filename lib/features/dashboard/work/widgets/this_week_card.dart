@@ -60,14 +60,20 @@ class ThisWeekCard extends StatelessWidget {
           // Monday - Sunday Row
           Obx(() {
             // weekday: 1=Mon, 2=Tue, ..., 7=Sun  →  index 0–6
+            final isFrench = (Get.locale?.languageCode ?? 'en') == 'fr';
+            final dayLetters = isFrench
+                ? ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+                : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
             final todayIndex = DateTime.now().weekday - 1;
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(7, (index) {
-                final dayData = controller.weeklyPattern[index];
+                final dayData = controller.weeklyPattern.length > index
+                    ? controller.weeklyPattern[index]
+                    : {'day': dayLetters[index], 'shift': 'Off'};
                 return DayBubble(
                   index: index,
-                  dayLabel: dayData['day']!,
+                  dayLabel: dayLetters[index],
                   shift: dayData['shift']!,
                   isToday: index == todayIndex,
                   onTap: () => controller.toggleDayShift(index),

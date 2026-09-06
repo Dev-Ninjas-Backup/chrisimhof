@@ -250,7 +250,7 @@ class HydrationController extends GetxController {
   // Log water intake for the selected day
   void addIntake(int amountMl, String type) async {
     if (!isSelectedDayToday) {
-      EasyLoading.showToast('You can log hydration only for today.');
+      EasyLoading.showToast('You can log hydration only for today.'.tr);
       return;
     }
 
@@ -275,7 +275,7 @@ class HydrationController extends GetxController {
     weeklyDayTotalsMl.refresh();
     weeklyLogs.refresh();
 
-    EasyLoading.show(status: 'Logging water...');
+    EasyLoading.show(status: 'Logging water...'.tr);
     bool apiSuccess = false;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
@@ -311,7 +311,7 @@ class HydrationController extends GetxController {
   // Remove water intake from the selected day via API
   Future<void> deleteLog(String id) async {
     if (!isSelectedDayToday) {
-      EasyLoading.showToast('You can edit hydration only for today.');
+      EasyLoading.showToast('You can edit hydration only for today.'.tr);
       return;
     }
 
@@ -331,7 +331,7 @@ class HydrationController extends GetxController {
       return;
     }
 
-    EasyLoading.show(status: 'Deleting entry...');
+    EasyLoading.show(status: 'Deleting entry...'.tr);
     try {
       final url = Urls.updateHydration(sessionId, id);
       debugPrint('=== DELETE HYDRATION REQUEST ===');
@@ -361,13 +361,13 @@ class HydrationController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Entry deleted');
+        EasyLoading.showSuccess('Entry deleted'.tr);
       } else {
-        EasyLoading.showError('Failed to delete entry');
+        EasyLoading.showError('Failed to delete entry'.tr);
       }
     } catch (e) {
       debugPrint('deleteHydrationLog error: $e');
-      EasyLoading.showError('Failed to delete entry');
+      EasyLoading.showError('Failed to delete entry'.tr);
     } finally {
       EasyLoading.dismiss();
     }
@@ -380,7 +380,7 @@ class HydrationController extends GetxController {
 
     final dt = occurredAt ?? DateTime.now();
 
-    EasyLoading.show(status: 'Updating entry...');
+    EasyLoading.show(status: 'Updating entry...'.tr);
     try {
       final url = Urls.updateHydration(sessionId, id);
       final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
@@ -419,13 +419,13 @@ class HydrationController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Entry updated');
+        EasyLoading.showSuccess('Entry updated'.tr);
       } else {
-        EasyLoading.showError('Failed to update entry');
+        EasyLoading.showError('Failed to update entry'.tr);
       }
     } catch (e) {
       debugPrint('editHydrationLog error: $e');
-      EasyLoading.showError('Failed to update entry');
+      EasyLoading.showError('Failed to update entry'.tr);
     } finally {
       EasyLoading.dismiss();
     }

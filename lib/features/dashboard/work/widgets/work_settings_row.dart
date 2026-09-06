@@ -59,7 +59,7 @@ class WorkSettingsRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Obx(() => Text(
-                  value.value,
+                  value.value.tr,
                   style: getTextStyle(
                     color: AppColors.textSoft,
                     fontSize: 13,

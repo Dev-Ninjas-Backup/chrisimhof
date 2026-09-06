@@ -60,11 +60,11 @@ class RecomendationsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomAppBar(
+                CustomAppBar(
                   showBackButton: true,
                   showSettingsButton: false,
                   showLogo: false,
-                  title: 'Recommendations',
+                  title: 'Recommendations'.tr,
                   showMoreButton: false,
                 ),
 

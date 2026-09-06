@@ -93,7 +93,8 @@ class DashboardScreen extends StatelessWidget {
   }
 
   String _formatDate(DateTime dt) {
-    const weekdays = [
+    final isFrench = Get.locale?.languageCode == 'fr';
+    const weekdaysEn = [
       'Monday',
       'Tuesday',
       'Wednesday',
@@ -102,7 +103,16 @@ class DashboardScreen extends StatelessWidget {
       'Saturday',
       'Sunday',
     ];
-    const months = [
+    const weekdaysFr = [
+      'Lundi',
+      'Mardi',
+      'Mercredi',
+      'Jeudi',
+      'Vendredi',
+      'Samedi',
+      'Dimanche',
+    ];
+    const monthsEn = [
       'January',
       'February',
       'March',
@@ -116,7 +126,25 @@ class DashboardScreen extends StatelessWidget {
       'November',
       'December',
     ];
-    return '${weekdays[dt.weekday - 1]}, ${months[dt.month - 1]} ${dt.day}';
+    const monthsFr = [
+      'janvier',
+      'février',
+      'mars',
+      'avril',
+      'mai',
+      'juin',
+      'juillet',
+      'août',
+      'septembre',
+      'octobre',
+      'novembre',
+      'décembre',
+    ];
+    final weekday = (isFrench ? weekdaysFr : weekdaysEn)[dt.weekday - 1];
+    final month = (isFrench ? monthsFr : monthsEn)[dt.month - 1];
+    return isFrench
+        ? '$weekday ${dt.day} $month'
+        : '$weekday, $month ${dt.day}';
   }
 
   String _getGreeting(String name) {

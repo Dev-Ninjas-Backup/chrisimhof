@@ -103,7 +103,7 @@ class CaffeineEntryDialog extends StatelessWidget {
                 color: AppColors.primaryTextColor,
               ),
               decoration: InputDecoration(
-                hintText: 'e.g. 80',
+                hintText: 'e.g. 80'.tr,
                 hintStyle: getTextStyle(
                   color: AppColors.textSoft.withValues(alpha: 0.5),
                 ),
@@ -213,7 +213,7 @@ class CaffeineEntryDialog extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Delete',
+                        'Delete'.tr,
                         style: getTextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -229,7 +229,7 @@ class CaffeineEntryDialog extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     child: Text(
-                      'Cancel',
+                      'Cancel'.tr,
                       style: getTextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -271,7 +271,7 @@ class CaffeineEntryDialog extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      entry == null ? 'Add' : 'Save',
+                      entry == null ? 'Add'.tr : 'Save'.tr,
                       style: getTextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

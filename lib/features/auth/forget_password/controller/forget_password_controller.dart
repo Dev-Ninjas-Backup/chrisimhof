@@ -98,7 +98,7 @@ class ForgetPasswordController extends GetxController {
 
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Verifying OTP...');
+      EasyLoading.show(status: 'Verifying OTP...'.tr);
 
       final response = await _verifyOtpService.verifyOtp(
         email: _email!,

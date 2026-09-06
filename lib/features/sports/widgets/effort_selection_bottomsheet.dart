@@ -21,7 +21,7 @@ class EffortSelectionBottomsheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Select Effort',
+            'Select Effort'.tr,
             style: getTextStyle2(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -46,7 +46,7 @@ class EffortSelectionBottomsheet extends StatelessWidget {
                   border: isSelected ? Border.all(color: const Color(0xFF10B981)) : null,
                 ),
                 child: Text(
-                  opt,
+                  opt.tr,
                   style: getTextStyle(
                     fontSize: 15,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,

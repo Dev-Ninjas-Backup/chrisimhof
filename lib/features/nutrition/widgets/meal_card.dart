@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MealCard extends StatelessWidget {
   const MealCard({
@@ -50,7 +51,7 @@ class MealCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                type,
+                type.tr,
                 style: getTextStyle2(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -59,7 +60,7 @@ class MealCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                subtext,
+                subtext.tr,
                 textAlign: TextAlign.center,
                 style: getTextStyle2(
                   fontSize: 12,

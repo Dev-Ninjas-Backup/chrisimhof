@@ -64,7 +64,7 @@ class ConsentSettingsController extends GetxController {
         }
       }
     } catch (e) {
-      EasyLoading.showError('Failed to load consent settings: $e');
+      EasyLoading.showError('Failed to load consent settings.'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -88,10 +88,10 @@ class ConsentSettingsController extends GetxController {
         EasyLoading.showSuccess('Consent settings saved successfully'.tr);
         Get.offAllNamed(AppRoutes.navbarScreen);
       } else {
-        EasyLoading.showError('Could not save consent settings.');
+        EasyLoading.showError('Could not save consent settings.'.tr);
       }
     } catch (e) {
-      EasyLoading.showError('Failed to save consent settings: $e');
+      EasyLoading.showError('Failed to save consent settings.'.tr);
     }
   }
 }

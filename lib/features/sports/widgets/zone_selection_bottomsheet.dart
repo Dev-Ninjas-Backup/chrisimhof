@@ -60,7 +60,7 @@ class ZoneSelectionBottomsheet extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           CustomButton(
-            text: 'Save Details',
+            text: 'Save Details'.tr,
             icon: null,
             backgroundColor: const Color(0xFF4C1D95),
             textColor: Colors.white,

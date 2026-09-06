@@ -39,9 +39,9 @@ class DistanceCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'DISTANCE',
-                    style: TextStyle(
+                  Text(
+                    'DISTANCE'.tr,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF8B5CF6),

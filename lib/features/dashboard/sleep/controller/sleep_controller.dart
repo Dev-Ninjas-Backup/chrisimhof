@@ -181,7 +181,7 @@ class SleepController extends GetxController {
     bedtimeMinute.value = log.bedtime.minute;
     wakeupHour.value = log.wakeupTime.hour;
     wakeupMinute.value = log.wakeupTime.minute;
-    EasyLoading.showToast('Loaded sleep log to edit');
+    EasyLoading.showToast('Loaded sleep log to edit'.tr);
   }
 
   final isNewMainWake = false.obs;
@@ -231,7 +231,7 @@ class SleepController extends GetxController {
     
     await saveSleepHistory();
 
-    EasyLoading.show(status: 'Saving sleep...');
+    EasyLoading.show(status: 'Saving sleep...'.tr);
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId();
       if (sessionId != null && sessionId.isNotEmpty) {
@@ -289,16 +289,16 @@ class SleepController extends GetxController {
         isNewMainWake.value = false;
         noteController.clear();
 
-        EasyLoading.showSuccess('Sleep logged successfully!');
+        EasyLoading.showSuccess('Sleep logged successfully!'.tr);
         Get.back();
       } else {
-        EasyLoading.showError('No active session found.');
+        EasyLoading.showError('No active session found.'.tr);
       }
     } catch (e) {
       historyLogs.assignAll(oldLogs);
       await saveSleepHistory();
       debugPrint('Error saving sleep: $e');
-      EasyLoading.showError('Failed to save sleep log.');
+      EasyLoading.showError('Failed to save sleep log.'.tr);
     }
   }
 
@@ -318,7 +318,7 @@ class SleepController extends GetxController {
     historyLogs.insert(0, newLog);
     historyLogs.sort((a, b) => b.date.compareTo(a.date));
     await saveSleepHistory();
-    EasyLoading.showSuccess('Sleep log added!');
+    EasyLoading.showSuccess('Sleep log added!'.tr);
   }
 
   void updateSleepLog({
@@ -339,14 +339,14 @@ class SleepController extends GetxController {
       );
       historyLogs.sort((a, b) => b.date.compareTo(a.date));
       await saveSleepHistory();
-      EasyLoading.showSuccess('Sleep log updated!');
+      EasyLoading.showSuccess('Sleep log updated!'.tr);
     }
   }
 
   void deleteLog(String id) async {
     historyLogs.removeWhere((log) => log.id == id);
     await saveSleepHistory();
-    EasyLoading.showSuccess('Sleep log deleted!');
+    EasyLoading.showSuccess('Sleep log deleted!'.tr);
   }
 
   /// Called with the top-level liveScores payload to extract forYouPreview sleep entry.

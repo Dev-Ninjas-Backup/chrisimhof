@@ -147,7 +147,7 @@ class MicrosoftAuthService {
         throw Exception('Microsoft access token missing from token response');
       }
 
-      return _fetchUserProfile(accessToken);
+      return await _fetchUserProfile(accessToken);
     } on TimeoutException catch (e) {
       debugPrint('Microsoft Sign-In timeout: $e');
       rethrow;

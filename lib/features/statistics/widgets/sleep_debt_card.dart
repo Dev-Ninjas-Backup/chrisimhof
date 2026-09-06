@@ -27,7 +27,7 @@ class SleepDebtCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'SLEEP DEBT - ${controller.selectedPeriod.value.toUpperCase()} ROLLING'.tr,
+              '${'SLEEP DEBT'.tr} - ${controller.selectedPeriod.value.toUpperCase()} ${'ROLLING'.tr}',
               style: getTextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

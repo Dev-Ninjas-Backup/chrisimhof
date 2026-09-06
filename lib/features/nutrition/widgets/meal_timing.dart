@@ -30,12 +30,13 @@ class MealTiming extends StatelessWidget {
             Color statusColor;
             Color badgeBgColor;
             Color badgeTextColor;
-    
-            if (item.type == 'Light') {
+
+            final typeLower = item.type.toLowerCase();
+            if (typeLower == 'light' || typeLower == 'léger') {
               statusColor = const Color(0xFF34D399); // mint
               badgeBgColor = const Color(0xFFECFDF5);
               badgeTextColor = const Color(0xFF059669);
-            } else if (item.type == 'Medium') {
+            } else if (typeLower == 'medium' || typeLower == 'moyen') {
               statusColor = const Color(0xFFF59E0B); // orange
               badgeBgColor = const Color(0xFFFFFBEB);
               badgeTextColor = const Color(0xFFD97706);
@@ -44,7 +45,15 @@ class MealTiming extends StatelessWidget {
               badgeBgColor = const Color(0xFFFEF2F2);
               badgeTextColor = const Color(0xFFE11D48);
             }
-    
+
+            String displayMealName = item.name;
+            if (displayMealName.toLowerCase().startsWith('meal')) {
+              final number = displayMealName.replaceAll(RegExp(r'[^0-9]'), '');
+              displayMealName = number.isNotEmpty ? '${'Meal'.tr} $number' : 'Meal'.tr;
+            } else {
+              displayMealName = displayMealName.tr;
+            }
+
             return Padding(
               padding: EdgeInsets.only(bottom: isLast ? 0 : 16.0),
               child: InkWell(
@@ -79,7 +88,7 @@ class MealTiming extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              item.name,
+                              displayMealName,
                               style: getTextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -88,7 +97,7 @@ class MealTiming extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              item.isLogged ? item.time : '${item.time} • planned',
+                              item.isLogged ? item.time : '${item.time} · ${'planned'.tr}',
                               style: getTextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
@@ -112,7 +121,7 @@ class MealTiming extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              item.type,
+                              item.type.tr,
                               style: getTextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
@@ -140,7 +149,16 @@ class MealTiming extends StatelessWidget {
   }
 
   void _showEditMealDialog(BuildContext context, MealItem item) {
-    final selectedHeaviness = (item.type.isNotEmpty ? item.type : 'Light').obs;
+    String initialType = 'Light';
+    final tLower = item.type.toLowerCase();
+    if (tLower == 'medium' || tLower == 'moyen') {
+      initialType = 'Medium';
+    } else if (tLower == 'heavy' || tLower == 'lourd') {
+      initialType = 'Heavy';
+    } else {
+      initialType = 'Light';
+    }
+    final selectedHeaviness = initialType.obs;
     DateTime initialDt = DateTime.now();
     if (item.time.contains(':') && !item.time.contains('--')) {
       try {

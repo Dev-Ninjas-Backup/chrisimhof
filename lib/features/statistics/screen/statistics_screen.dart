@@ -27,11 +27,11 @@ class StatisticsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CustomAppBar(
+              CustomAppBar(
                 showBackButton: false,
                 showSettingsButton: false,
                 showLogo: false,
-                title: 'Statistics',
+                title: 'Statistics'.tr,
                 showMoreButton: false,
               ),
               const SizedBox(height: 18.0),

@@ -24,8 +24,8 @@ class WorkScheduleScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CustomAppBar(
-                title: 'Work schedule',
+              CustomAppBar(
+                title: 'Work schedule'.tr,
                 showBackButton: true,
                 showMoreButton: false,
               ),

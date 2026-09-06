@@ -21,7 +21,7 @@ class TypeSelectionBottomsheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Select Type',
+            'Select Type'.tr,
             style: getTextStyle2(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -46,7 +46,7 @@ class TypeSelectionBottomsheet extends StatelessWidget {
                   border: isSelected ? Border.all(color: const Color(0xFF10B981)) : null,
                 ),
                 child: Text(
-                  opt,
+                  opt.tr,
                   style: getTextStyle(
                     fontSize: 15,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,

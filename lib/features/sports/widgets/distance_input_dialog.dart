@@ -20,7 +20,7 @@ class DistanceInputDialog extends StatelessWidget {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Text(
-        'Enter Distance',
+        'Enter Distance'.tr,
         style: getTextStyle2(
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -30,15 +30,15 @@ class DistanceInputDialog extends StatelessWidget {
       content: TextField(
         controller: textController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        decoration: const InputDecoration(
-          hintText: 'e.g. 6.8 km',
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          hintText: 'e.g. 6.8 km'.tr,
+          border: const OutlineInputBorder(),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Get.back(),
-          child: Text('Cancel', style: getTextStyle(color: AppColors.textSoft)),
+          child: Text('Cancel'.tr, style: getTextStyle(color: AppColors.textSoft)),
         ),
         TextButton(
           onPressed: () {
@@ -48,9 +48,9 @@ class DistanceInputDialog extends StatelessWidget {
             }
             Get.back();
           },
-          child: const Text(
-            'Save',
-            style: TextStyle(
+          child: Text(
+            'Save'.tr,
+            style: const TextStyle(
               color: Color(0xFF4C1D95),
               fontWeight: FontWeight.bold,
             ),

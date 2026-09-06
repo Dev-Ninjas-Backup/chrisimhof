@@ -49,12 +49,12 @@ class VerifyCodeScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              CustomAppBar(title: 'Verify OTP', showBackButton: true),
+              CustomAppBar(title: 'Verify OTP'.tr, showBackButton: true),
 
               const SizedBox(height: 28),
 
               Text(
-                'Enter The Code',
+                'Enter The Code'.tr,
                 style: getTextStyle2(
                   fontSize: 36,
                   fontWeight: FontWeight.w600,
@@ -65,7 +65,7 @@ class VerifyCodeScreen extends StatelessWidget {
               const SizedBox(height: 12),
 
               Text(
-                'Check your e-mail and enter the code below.',
+                'Check your e-mail and enter the code below.'.tr,
                 style: getTextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,

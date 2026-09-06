@@ -71,16 +71,16 @@ class CreateAccountController extends GetxController {
 
   String? validateFullName(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Full name is required';
+      return 'Full name is required'.tr;
     }
 
     if (value.trim().length < 3) {
-      return 'Full name must be at least 3 characters';
+      return 'Full name must be at least 3 characters'.tr;
     }
 
     // Only letters and spaces allowed
     if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
-      return 'Full name can only contain letters';
+      return 'Full name can only contain letters'.tr;
     }
 
     return null;
@@ -88,20 +88,20 @@ class CreateAccountController extends GetxController {
 
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+      return 'Email is required'.tr;
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim())) {
-      return 'Please enter a valid email';
+      return 'Please enter a valid email'.tr;
     }
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Password is required';
+      return 'Password is required'.tr;
     }
     if (value.trim().length < 8) {
-      return 'Password must be at least 8 characters';
+      return 'Password must be at least 8 characters'.tr;
     }
     return null;
   }
@@ -109,7 +109,7 @@ class CreateAccountController extends GetxController {
   Future<void> createAccount() async {
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Creating account...');
+      EasyLoading.show(status: 'Creating account...'.tr);
 
       final response = await _createAccountService.registerUser(
         name: fullNameController.text,
@@ -134,7 +134,7 @@ class CreateAccountController extends GetxController {
 
       if (response.success) {
         EasyLoading.dismiss();
-        EasyLoading.showSuccess("Registration Successful");
+        EasyLoading.showSuccess("Registration Successful".tr);
 
         Get.offNamed(
           AppRoutes.verifyCodeScreen,
@@ -149,7 +149,7 @@ class CreateAccountController extends GetxController {
       }
     } catch (e) {
       EasyLoading.dismiss();
-      EasyLoading.showError('Failed to create account: ${e.toString()}');
+      EasyLoading.showError('Failed to create account.'.tr);
     } finally {
       isLoading.value = false;
     }

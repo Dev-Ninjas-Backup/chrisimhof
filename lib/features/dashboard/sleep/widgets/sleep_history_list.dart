@@ -59,7 +59,7 @@ class SleepHistoryList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 24.0),
               child: Center(
                 child: Text(
-                  'No sleep logged for this day.',
+                  'No sleep logged for this day.'.tr,
                   style: getTextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -88,7 +88,10 @@ class SleepHistoryList extends StatelessWidget {
     SleepLog log,
     SleepController controller,
   ) {
-    final weekdaysShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final isFrench = (Get.locale?.languageCode ?? 'en') == 'fr';
+    final weekdaysShort = isFrench
+        ? ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+        : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final weekdayStr = weekdaysShort[log.date.weekday - 1];
     final dayStr = log.date.day.toString();
 
@@ -171,7 +174,7 @@ class SleepHistoryList extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'quality ${log.quality}',
+                '${'quality'.tr} ${log.quality}',
                 style: getTextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

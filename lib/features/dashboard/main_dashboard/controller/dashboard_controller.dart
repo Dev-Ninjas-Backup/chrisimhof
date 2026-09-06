@@ -558,6 +558,14 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       );
     }
 
+    if (Get.isRegistered<RecommendationController>()) {
+      final recController = Get.find<RecommendationController>();
+      if (forYouPreviewData.value != null) {
+        recController.updateFromForYouPreview(forYouPreviewData.value!);
+      }
+      recController.refetchRecommendations();
+    }
+
     updateSleepPrepStatus();
   }
 
@@ -804,8 +812,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     dashboardData.value = current.copyWith(isSleepPrep: !current.isSleepPrep);
     EasyLoading.showToast(
       dashboardData.value.isSleepPrep
-          ? 'Sleep Prep Mode Enabled'
-          : 'Sleep Prep Mode Disabled',
+          ? 'Sleep Prep Mode Enabled'.tr
+          : 'Sleep Prep Mode Disabled'.tr,
     );
   }
 
@@ -832,7 +840,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   void endMyDay() async {
     if (_isEndingDay) return;
     _isEndingDay = true;
-    EasyLoading.show(status: 'Ending day...');
+    EasyLoading.show(status: 'Ending day...'.tr);
 
     // Clear recommendations preview cache and active controllers immediately
     forYouPreviewData.value = null;
@@ -955,11 +963,11 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         }
       }
 
-      EasyLoading.showSuccess('Day ended successfully!');
+      EasyLoading.showSuccess('Day ended successfully!'.tr);
     } catch (e) {
       debugPrint('Error ending day: $e');
       final msg = e.toString().replaceFirst('Exception: ', '');
-      EasyLoading.showError(msg.isNotEmpty ? msg : 'Failed to end day.');
+      EasyLoading.showError(msg.isNotEmpty ? msg : 'Failed to end day.'.tr);
     } finally {
       _isEndingDay = false;
     }

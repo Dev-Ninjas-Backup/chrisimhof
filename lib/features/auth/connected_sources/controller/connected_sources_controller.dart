@@ -51,7 +51,7 @@ class ConnectedSourcesController extends GetxController {
         }
       }
     } catch (e) {
-      EasyLoading.showError('Failed to load connected sources: $e');
+      EasyLoading.showError('Failed to load connected sources.'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -81,10 +81,10 @@ class ConnectedSourcesController extends GetxController {
         EasyLoading.dismiss();
         Get.toNamed(AppRoutes.consentSettingsScreen);
       } else {
-        EasyLoading.showError('Could not save connected sources.');
+        EasyLoading.showError('Could not save connected sources.'.tr);
       }
     } catch (e) {
-      EasyLoading.showError('Failed to save connected sources: $e');
+      EasyLoading.showError('Failed to save connected sources.'.tr);
     }
   }
 }

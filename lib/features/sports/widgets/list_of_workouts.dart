@@ -1,14 +1,12 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ListOfWorkouts extends StatelessWidget {
-  const ListOfWorkouts({
-    super.key,
-    required this.controller,
-  });
+  const ListOfWorkouts({super.key, required this.controller});
 
   final SportsController controller;
 
@@ -38,23 +36,12 @@ class ListOfWorkouts extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       padding: const EdgeInsets.all(10.0),
-                      child: Image.asset(
-                        session.iconPath,
-                        width: 20,
-                        height: 20,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                          Icons.directions_run,
-                          size: 20,
-                          color: AppColors.textSoft,
-                        ),
-                      ),
+                      child: _buildWorkoutIcon(session),
                     ),
                     const SizedBox(width: 14.0),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             session.title.tr,
@@ -91,26 +78,189 @@ class ListOfWorkouts extends StatelessWidget {
     });
   }
 
+  Widget _buildWorkoutIcon(SportSession session) {
+    final title = session.title.toLowerCase().trim();
+    final isRest = title.contains('rest') || title.contains('repos');
+
+    if (isRest) {
+      return Image.asset(
+        IconPath.restDay,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.bedtime_rounded,
+          size: 20,
+          color: AppColors.textSoft,
+        ),
+      );
+    }
+
+    if (title.contains('strength') ||
+        title.contains('force') ||
+        title.contains('renforcement') ||
+        title.contains('musculation') ||
+        title.contains('weight') ||
+        title.contains('dumbbell') ||
+        title.contains('haltère')) {
+      return Image.asset(
+        IconPath.strength,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.fitness_center_rounded,
+          size: 20,
+          color: Color(0xFF7C3AED),
+        ),
+      );
+    }
+
+    if (title.contains('cycl') ||
+        title.contains('vélo') ||
+        title.contains('velo') ||
+        title.contains('bike')) {
+      return const Icon(
+        Icons.directions_bike_rounded,
+        size: 22,
+        color: Color(0xFF7C3AED),
+      );
+    }
+
+    if (title.contains('swim') ||
+        title.contains('natation') ||
+        title.contains('nage')) {
+      return const Icon(Icons.pool_rounded, size: 22, color: Color(0xFF0284C7));
+    }
+
+    if (title.contains('walk') || title.contains('marche')) {
+      return const Icon(
+        Icons.directions_walk_rounded,
+        size: 22,
+        color: Color(0xFF059669),
+      );
+    }
+
+    if (title.contains('cardio')) {
+      return Image.asset(
+        IconPath.yoga,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.self_improvement_rounded,
+          size: 22,
+          color: Color(0xFF7C3AED),
+        ),
+      );
+    }
+
+    if (title.contains('run') ||
+        title.contains('course') ||
+        title.contains('jogging') ||
+        title.contains('sprint')) {
+      return Image.asset(
+        IconPath.running,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.directions_run_rounded,
+          size: 22,
+          color: Color(0xFF7C3AED),
+        ),
+      );
+    }
+
+    if (title.contains('mobility') ||
+        title.contains('mobilité') ||
+        title.contains('yoga') ||
+        title.contains('stretch') ||
+        title.contains('étirement') ||
+        title.contains('pilates')) {
+      return Image.asset(
+        IconPath.running,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.self_improvement_rounded,
+          size: 22,
+          color: Color(0xFF7C3AED),
+        ),
+      );
+    }
+
+    if (title.contains('mixed') || title.contains('mixte')) {
+      return Image.asset(
+        IconPath.mixed,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.sports_gymnastics_rounded,
+          size: 20,
+          color: Color(0xFF7C3AED),
+        ),
+      );
+    }
+
+    if (session.iconPath.isNotEmpty && session.iconPath != IconPath.restDay) {
+      return Image.asset(
+        session.iconPath,
+        width: 22,
+        height: 22,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.sports_gymnastics_rounded,
+          size: 20,
+          color: Color(0xFF7C3AED),
+        ),
+      );
+    }
+
+    return Image.asset(
+      IconPath.sport,
+      width: 22,
+      height: 22,
+      errorBuilder: (_, __, ___) => const Icon(
+        Icons.sports_gymnastics_rounded,
+        size: 20,
+        color: Color(0xFF7C3AED),
+      ),
+    );
+  }
+
   void _showEditDeleteDialog(BuildContext context, SportSession session) {
     final titleLower = session.title.toLowerCase();
     String initialType = 'cardio';
-    if (titleLower.contains('strength')) {
+    if (titleLower.contains('strength') ||
+        titleLower.contains('force') ||
+        titleLower.contains('renforcement') ||
+        titleLower.contains('musculation')) {
       initialType = 'strength';
-    } else if (titleLower.contains('mobility') || titleLower.contains('walk')) {
+    } else if (titleLower.contains('mobility') ||
+        titleLower.contains('mobilité') ||
+        titleLower.contains('walk') ||
+        titleLower.contains('marche')) {
       initialType = 'mobility';
     } else if (titleLower.contains('mixed')) {
       initialType = 'mixed';
-    } else if (!titleLower.contains('cardio') && !titleLower.contains('run') && !titleLower.contains('cycl')) {
+    } else if (!titleLower.contains('cardio') &&
+        !titleLower.contains('run') &&
+        !titleLower.contains('course') &&
+        !titleLower.contains('cycl') &&
+        !titleLower.contains('vélo') &&
+        !titleLower.contains('swim') &&
+        !titleLower.contains('natation')) {
       initialType = 'other';
     }
 
     String initialZone = 'Z3';
     final subUpper = session.subtitle.toUpperCase();
-    if (subUpper.contains('Z1')) initialZone = 'Z1';
-    else if (subUpper.contains('Z2')) initialZone = 'Z2';
-    else if (subUpper.contains('Z3')) initialZone = 'Z3';
-    else if (subUpper.contains('Z4')) initialZone = 'Z4';
-    else if (subUpper.contains('Z5')) initialZone = 'Z5';
+    if (subUpper.contains('Z1'))
+      initialZone = 'Z1';
+    else if (subUpper.contains('Z2'))
+      initialZone = 'Z2';
+    else if (subUpper.contains('Z3'))
+      initialZone = 'Z3';
+    else if (subUpper.contains('Z4'))
+      initialZone = 'Z4';
+    else if (subUpper.contains('Z5'))
+      initialZone = 'Z5';
 
     final durationCtrl = TextEditingController(text: '45');
     final distanceCtrl = TextEditingController();
@@ -124,7 +274,10 @@ class ListOfWorkouts extends StatelessWidget {
       } catch (_) {}
     }
     final selectedDate = initialDt.obs;
-    final selectedTime = TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
+    final selectedTime = TimeOfDay(
+      hour: initialDt.hour,
+      minute: initialDt.minute,
+    ).obs;
 
     Get.dialog(
       Obx(
@@ -139,7 +292,7 @@ class ListOfWorkouts extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  session.title,
+                  session.title.tr,
                   style: getTextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -148,7 +301,7 @@ class ListOfWorkouts extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  session.subtitle,
+                  session.subtitle.tr,
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
@@ -173,15 +326,22 @@ class ListOfWorkouts extends StatelessWidget {
                           final picked = await showDatePicker(
                             context: context,
                             initialDate: selectedDate.value,
-                            firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                            lastDate: DateTime.now().add(const Duration(days: 365)),
+                            firstDate: DateTime.now().subtract(
+                              const Duration(days: 365),
+                            ),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
                           );
                           if (picked != null) {
                             selectedDate.value = picked;
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -189,7 +349,11 @@ class ListOfWorkouts extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textSoft),
+                              const Icon(
+                                Icons.calendar_today_outlined,
+                                size: 14,
+                                color: AppColors.textSoft,
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -219,7 +383,10 @@ class ListOfWorkouts extends StatelessWidget {
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -227,7 +394,11 @@ class ListOfWorkouts extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time_outlined, size: 14, color: AppColors.textSoft),
+                              const Icon(
+                                Icons.access_time_outlined,
+                                size: 14,
+                                color: AppColors.textSoft,
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -259,30 +430,41 @@ class ListOfWorkouts extends StatelessWidget {
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
-                  children: ['cardio', 'strength', 'mobility', 'mixed', 'other'].map((typeVal) {
-                    final isSel = selectedType.value == typeVal;
-                    return GestureDetector(
-                      onTap: () => selectedType.value = typeVal,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSel ? const Color(0xFFECFDF5) : Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: isSel ? const Color(0xFF34D399) : AppColors.borderSoft,
+                  children: ['cardio', 'strength', 'mobility', 'mixed', 'other']
+                      .map((typeVal) {
+                        final isSel = selectedType.value == typeVal;
+                        return GestureDetector(
+                          onTap: () => selectedType.value = typeVal,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSel
+                                  ? const Color(0xFFECFDF5)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSel
+                                    ? const Color(0xFF34D399)
+                                    : AppColors.borderSoft,
+                              ),
+                            ),
+                            child: Text(
+                              typeVal.tr,
+                              style: getTextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: isSel
+                                    ? const Color(0xFF059669)
+                                    : AppColors.primaryTextColor,
+                              ),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          typeVal,
-                          style: getTextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: isSel ? const Color(0xFF059669) : AppColors.primaryTextColor,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      })
+                      .toList(),
                 ),
                 const SizedBox(height: 14),
                 Text(
@@ -336,7 +518,7 @@ class ListOfWorkouts extends StatelessWidget {
                           ),
                           child: Center(
                             child: Text(
-                              val.toUpperCase(),
+                              val.tr.toUpperCase(),
                               style: getTextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -371,10 +553,14 @@ class ListOfWorkouts extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 2),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: isSel ? const Color(0xFFF3E8FF) : Colors.white,
+                            color: isSel
+                                ? const Color(0xFFF3E8FF)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: isSel ? const Color(0xFF9333EA) : AppColors.borderSoft,
+                              color: isSel
+                                  ? const Color(0xFF9333EA)
+                                  : AppColors.borderSoft,
                             ),
                           ),
                           child: Center(
@@ -383,7 +569,9 @@ class ListOfWorkouts extends StatelessWidget {
                               style: getTextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: isSel ? const Color(0xFF9333EA) : AppColors.primaryTextColor,
+                                color: isSel
+                                    ? const Color(0xFF9333EA)
+                                    : AppColors.primaryTextColor,
                               ),
                             ),
                           ),
@@ -405,9 +593,11 @@ class ListOfWorkouts extends StatelessWidget {
                   const SizedBox(height: 6),
                   TextField(
                     controller: distanceCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
-                      hintText: 'e.g. 5.0',
+                      hintText: 'e.g. 5.0'.tr,
                       suffixText: 'km',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -425,21 +615,29 @@ class ListOfWorkouts extends StatelessWidget {
                   Get.back();
                   controller.deleteWorkoutLog(session.id);
                 },
-                child: Text('Delete'.tr, style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  'Delete'.tr,
+                  style: const TextStyle(color: Colors.red),
+                ),
               ),
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text('Cancel'.tr),
-            ),
+            TextButton(onPressed: () => Get.back(), child: Text('Cancel'.tr)),
             ElevatedButton(
               onPressed: () {
                 final dur = int.tryParse(durationCtrl.text) ?? 45;
-                final dist = selectedType.value != 'cardio' && distanceCtrl.text.isNotEmpty
+                final dist =
+                    selectedType.value != 'cardio' &&
+                        distanceCtrl.text.isNotEmpty
                     ? double.tryParse(distanceCtrl.text)
                     : null;
                 final d = selectedDate.value;
                 final t = selectedTime.value;
-                final fullDateTime = DateTime(d.year, d.month, d.day, t.hour, t.minute);
+                final fullDateTime = DateTime(
+                  d.year,
+                  d.month,
+                  d.day,
+                  t.hour,
+                  t.minute,
+                );
                 Get.back();
                 controller.editWorkoutLog(
                   session.id,
@@ -454,7 +652,10 @@ class ListOfWorkouts extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryTextColor,
               ),
-              child: Text('Save'.tr, style: const TextStyle(color: Colors.white)),
+              child: Text(
+                'Save'.tr,
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

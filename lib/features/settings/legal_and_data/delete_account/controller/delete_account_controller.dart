@@ -33,7 +33,7 @@ class DeleteAccountController extends GetxController {
 
       if (accessToken == null || accessToken.trim().isEmpty) {
         await SharedPreferencesHelper.clearAuthData();
-        EasyLoading.showInfo('Session expired. Please sign in again.');
+        EasyLoading.showInfo('Session expired. Please sign in again.'.tr);
         Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
@@ -62,7 +62,7 @@ class DeleteAccountController extends GetxController {
 
       if (isSuccess) {
         await SharedPreferencesHelper.clearAuthData();
-        EasyLoading.showSuccess('Account deleted successfully');
+        EasyLoading.showSuccess('Account deleted successfully'.tr);
         Get.offAllNamed(AppRoutes.signInScreen);
       }
     } catch (e) {
@@ -72,14 +72,14 @@ class DeleteAccountController extends GetxController {
       if (errorMessage.toLowerCase().contains('invalid or expired token') ||
           errorMessage.toLowerCase().contains('unauthorized')) {
         await SharedPreferencesHelper.clearAuthData();
-        EasyLoading.showInfo('Session expired. Please sign in again.');
+        EasyLoading.showInfo('Session expired. Please sign in again.'.tr);
         Get.offAllNamed(AppRoutes.signInScreen);
         return;
       }
 
       EasyLoading.showError(
         errorMessage.isEmpty
-            ? 'Delete account failed. Please try again.'
+            ? 'Delete account failed. Please try again.'.tr
             : errorMessage,
       );
     } finally {

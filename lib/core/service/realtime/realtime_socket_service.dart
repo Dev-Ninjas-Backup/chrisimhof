@@ -259,12 +259,15 @@ class RealtimeSocketService {
         );
       }
 
-      // Forward forYouPreview to RecommendationController
-      if (Get.isRegistered<RecommendationController>() &&
-          data['forYouPreview'] is List) {
-        Get.find<RecommendationController>().updateFromForYouPreview(
-          data['forYouPreview'] as List<dynamic>,
-        );
+      // Forward forYouPreview to RecommendationController and trigger refetch
+      if (Get.isRegistered<RecommendationController>()) {
+        final recController = Get.find<RecommendationController>();
+        if (data['forYouPreview'] is List) {
+          recController.updateFromForYouPreview(
+            data['forYouPreview'] as List<dynamic>,
+          );
+        }
+        recController.refetchRecommendations();
       }
     } catch (e) {
       debugPrint('Socket.io: Error handling live_scores payload: $e');
@@ -277,6 +280,9 @@ class RealtimeSocketService {
       if (Get.isRegistered<DashboardController>()) {
         final dashboardController = Get.find<DashboardController>();
         dashboardController.updateFromDashboardEvent(data);
+      }
+      if (Get.isRegistered<RecommendationController>()) {
+        Get.find<RecommendationController>().refetchRecommendations();
       }
     } catch (e) {
       debugPrint('Socket.io: Error handling dashboard payload: $e');

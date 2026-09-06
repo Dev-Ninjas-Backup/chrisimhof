@@ -23,9 +23,9 @@ class ActivityTypeSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'ACTIVITY TYPE',
-          style: TextStyle(
+        Text(
+          'ACTIVITY TYPE'.tr,
+          style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w800,
             color: Color(0xFF8B5CF6),

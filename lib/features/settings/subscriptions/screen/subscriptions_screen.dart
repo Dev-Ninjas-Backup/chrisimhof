@@ -121,7 +121,7 @@ class SubscriptionsScreen extends StatelessWidget {
                           controller.activePlanId.value;
 
                       return CustomButton(
-                        text: isCurrentPlan ? 'Current Plan' : 'Subscribe',
+                        text: isCurrentPlan ? 'Current Plan'.tr : 'Subscribe'.tr,
                         icon: null,
                         onTap: isCurrentPlan
                             ? null

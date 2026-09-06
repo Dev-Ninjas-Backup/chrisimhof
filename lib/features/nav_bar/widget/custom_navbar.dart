@@ -30,7 +30,7 @@ class CustomNavBar extends StatelessWidget {
           final int activeIndex = controller.currentIndex.value;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(controller.items.length, (index) {
@@ -73,11 +73,11 @@ class _NavItem extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
           constraints: BoxConstraints(
-            minWidth: isActive ? 88 : 46,
-            maxWidth: isActive ? 125 : 46,
+            minWidth: isActive ? 72 : 44,
+            maxWidth: isActive ? 135 : 44,
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: isActive ? 16 : 0,
+            horizontal: isActive ? 12 : 0,
             vertical: 8,
           ),
           decoration: BoxDecoration(
@@ -101,15 +101,18 @@ class _NavItem extends StatelessWidget {
                 child: isActive
                     ? Padding(
                         padding: const EdgeInsets.only(left: 6),
-                        child: Text(
-                          item.label.tr,
-                          maxLines: 1,
-                          overflow: TextOverflow.fade,
-                          softWrap: false,
-                          style: getTextStyle(
-                            color: AppColors.darkGreen,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            item.label.tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            style: getTextStyle(
+                              color: AppColors.darkGreen,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       )

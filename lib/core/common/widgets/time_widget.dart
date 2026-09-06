@@ -46,7 +46,7 @@ class TimeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
@@ -61,6 +61,7 @@ class TimeWidget extends StatelessWidget {
             onTap: onTimeSelected != null ? () => _pickTime(context) : null,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 if (iconPath != null)
                   Image.asset(
@@ -71,14 +72,19 @@ class TimeWidget extends StatelessWidget {
                   )
                 else if (icon != null)
                   Icon(icon!, size: 14, color: AppColors.selectionGray),
-                const SizedBox(width: 6),
-                Text(
-                  title.toUpperCase(),
-                  style: getTextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.selectionGray,
-                  ).copyWith(letterSpacing: 1.1),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      title.toUpperCase(),
+                      style: getTextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.selectionGray,
+                      ).copyWith(letterSpacing: 0.8),
+                    ),
+                  ),
                 ),
                 if (onTimeSelected != null) ...[
                   const SizedBox(width: 4),

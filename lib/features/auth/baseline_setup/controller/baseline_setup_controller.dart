@@ -28,7 +28,7 @@ class BaselineSetupController extends GetxController {
   Future<void> fetchBaselineData() async {
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Loading...');
+      EasyLoading.show(status: 'Loading...'.tr);
       final response = await _service.getBaseline();
       if (response['success'] == true) {
         final data = response['data'];
@@ -50,7 +50,7 @@ class BaselineSetupController extends GetxController {
         );
       }
     } catch (e) {
-      EasyLoading.showError('Failed to load baseline data: $e');
+      EasyLoading.showError('Failed to load baseline data.'.tr);
     } finally {
       isLoading.value = false;
       EasyLoading.dismiss();
@@ -59,7 +59,7 @@ class BaselineSetupController extends GetxController {
 
   Future<void> saveBaselineData() async {
     try {
-      EasyLoading.show(status: 'Saving...');
+      EasyLoading.show(status: 'Saving...'.tr);
       final totalMinutes = _normalizedSleepTargetMinutes;
 
       final response = await _service.updateBaseline(
@@ -72,7 +72,7 @@ class BaselineSetupController extends GetxController {
       );
 
       if (response['success'] == true) {
-        EasyLoading.showSuccess('Baseline saved successfully');
+        EasyLoading.showSuccess('Baseline saved successfully'.tr);
         if (isFromSettings) {
           if (Get.isRegistered<SettingsController>()) {
             Get.find<SettingsController>().getProfile();
@@ -82,7 +82,7 @@ class BaselineSetupController extends GetxController {
         }
       }
     } catch (e) {
-      EasyLoading.showError('Failed to save baseline: $e');
+      EasyLoading.showError('Failed to save baseline.'.tr);
     } finally {
       EasyLoading.dismiss();
     }

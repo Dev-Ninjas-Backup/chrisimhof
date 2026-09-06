@@ -76,7 +76,7 @@ class BedtimeCard extends StatelessWidget {
                           if (data.isMissedBedtime && !data.isSleepLogged) ...[
                             const SizedBox(height: 3),
                             Text(
-                              'Still a great time to rest.',
+                              'Still a great time to rest.'.tr,
                               style: getTextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w400,

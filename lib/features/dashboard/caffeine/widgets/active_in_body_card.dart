@@ -66,7 +66,7 @@ class ActiveInBodyCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  'half-life ~5h',
+                  'half-life ~5h'.tr,
                   style: getTextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

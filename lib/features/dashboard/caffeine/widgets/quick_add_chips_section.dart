@@ -3,7 +3,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
+import 'package:get/get.dart';
 
 class QuickAddChipsSection extends StatelessWidget {
   final CaffeineController controller;
@@ -116,7 +116,7 @@ class QuickAddChipsSection extends StatelessWidget {
                   color: AppColors.primaryTextColor,
                 ),
                 children: [
-                  TextSpan(text: name),
+                  TextSpan(text: name.tr),
                   const TextSpan(text: ' '),
                   TextSpan(
                     text: '${amount}mg',

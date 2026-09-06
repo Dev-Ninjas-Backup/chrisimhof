@@ -170,7 +170,7 @@ class CaffeineController extends GetxController {
     entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     recalculateCaffeine();
 
-    EasyLoading.show(status: 'Logging caffeine...');
+    EasyLoading.show(status: 'Logging caffeine...'.tr);
     bool apiSuccess = false;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
@@ -250,7 +250,7 @@ class CaffeineController extends GetxController {
       drinkType = 'espresso';
     }
 
-    EasyLoading.show(status: 'Updating caffeine...');
+    EasyLoading.show(status: 'Updating caffeine...'.tr);
     try {
       final url = Urls.updateCaffeine(sessionId, id);
       final isoString = await TimezoneHelper.formatToSessionUtcIso(timestamp);
@@ -290,7 +290,7 @@ class CaffeineController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Updated caffeine entry');
+        EasyLoading.showSuccess('Updated caffeine entry'.tr);
       }
     } catch (e) {
       debugPrint('editCaffeineEntry API error: $e');
@@ -308,7 +308,7 @@ class CaffeineController extends GetxController {
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
     if (sessionId.isEmpty || token.isEmpty || id.isEmpty || id.length < 10) return;
 
-    EasyLoading.show(status: 'Deleting caffeine...');
+    EasyLoading.show(status: 'Deleting caffeine...'.tr);
     try {
       final url = Urls.updateCaffeine(sessionId, id);
       debugPrint('=== DELETE CAFFEINE REQUEST ===');
@@ -338,7 +338,7 @@ class CaffeineController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Deleted caffeine entry');
+        EasyLoading.showSuccess('Deleted caffeine entry'.tr);
       }
     } catch (e) {
       debugPrint('deleteCaffeineEntry API error: $e');

@@ -50,6 +50,7 @@ class IconPath {
   static const String running = 'assets/icons/running.png';
   static const String strength = 'assets/icons/strength.png';
   static const String yoga = 'assets/icons/yoga.png';
+  static const String mixed = 'assets/icons/mixed_training.png';
   static const String restDay = 'assets/icons/rest_day.png';
   static const String moon1 = 'assets/icons/moon1.png';
   static const String sun = 'assets/icons/sun.png';

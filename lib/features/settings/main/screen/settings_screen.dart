@@ -43,7 +43,7 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomAppBar(title: 'Settings', showBackButton: false),
+                CustomAppBar(title: 'Settings'.tr, showBackButton: false),
                 const SizedBox(height: 28),
                 Obx(() {
                   if (controller.isProfileLoading.value) {
@@ -253,8 +253,8 @@ class SettingsScreen extends StatelessWidget {
                       Obx(
                         () => CustomButton(
                           text: controller.isLoading.value
-                              ? 'Logging out...'
-                              : 'Log out',
+                              ? 'Logging out...'.tr
+                              : 'Log out'.tr,
                           onTap: controller.isLoading.value ? null : controller.logout,
                           textColor: AppColors.rose,
                           backgroundColor: AppColors.transparent,

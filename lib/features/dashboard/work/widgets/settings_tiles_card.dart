@@ -31,10 +31,10 @@ class SettingsTilesCard extends StatelessWidget {
           WorkSettingsRow(
             icon: Icons.sync_alt_rounded,
             iconBg: AppColors.subtle,
-            label: 'Default rotation',
+            label: 'Default rotation'.tr,
             value: controller.defaultRotation,
             onTap: () => _showOptionsDialog(
-              title: 'Default rotation',
+              title: 'Default rotation'.tr,
               options: ['3-2-2 night', '2-2-3 schedule', '4-4 split', 'None (Fixed)'],
               selectedVal: controller.defaultRotation,
             ),
@@ -43,10 +43,10 @@ class SettingsTilesCard extends StatelessWidget {
           WorkSettingsRow(
             icon: Icons.alarm_rounded,
             iconBg: AppColors.subtle,
-            label: 'Shift reminders',
+            label: 'Shift reminders'.tr,
             value: controller.shiftReminders,
             onTap: () => _showOptionsDialog(
-              title: 'Shift reminders',
+              title: 'Shift reminders'.tr,
               options: ['On · 30 min before', 'On · 1 hour before', 'On · 2 hours before', 'Off'],
               selectedVal: controller.shiftReminders,
             ),
@@ -55,10 +55,10 @@ class SettingsTilesCard extends StatelessWidget {
           WorkSettingsRow(
             icon: Icons.public_rounded,
             iconBg: AppColors.subtle,
-            label: 'Time zone',
+            label: 'Time zone'.tr,
             value: controller.timeZone,
             onTap: () => _showOptionsDialog(
-              title: 'Time zone',
+              title: 'Time zone'.tr,
               options: ['CET · Geneva', 'EST · New York', 'GMT · London', 'AEST · Sydney'],
               selectedVal: controller.timeZone,
             ),
@@ -87,7 +87,7 @@ class SettingsTilesCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              title.tr,
               style: getTextStyle2(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -97,7 +97,7 @@ class SettingsTilesCard extends StatelessWidget {
             const SizedBox(height: 16),
             ...options.map((option) => ListTile(
                   title: Text(
-                    option,
+                    option.tr,
                     style: getTextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,

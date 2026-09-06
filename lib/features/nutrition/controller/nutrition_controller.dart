@@ -88,7 +88,7 @@ class NutritionController extends GetxController {
       return;
     }
 
-    EasyLoading.show(status: 'Deleting meal...');
+    EasyLoading.show(status: 'Deleting meal...'.tr);
     try {
       final url = Urls.updateMeal(sessionId, entryId);
       debugPrint('=== DELETE MEAL REQUEST ===');
@@ -118,13 +118,13 @@ class NutritionController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Deleted meal entry');
+        EasyLoading.showSuccess('Deleted meal entry'.tr);
       } else {
-        EasyLoading.showError('Failed to delete meal');
+        EasyLoading.showError('Failed to delete meal'.tr);
       }
     } catch (e) {
       debugPrint('deleteMealLog API error: $e');
-      EasyLoading.showError('Failed to delete meal');
+      EasyLoading.showError('Failed to delete meal'.tr);
     } finally {
       EasyLoading.dismiss();
     }
@@ -138,6 +138,17 @@ class NutritionController extends GetxController {
 
     final dt = occurredAt ?? DateTime.now();
 
+    String canonicalHeaviness = 'light';
+    final hLower = heaviness.toLowerCase();
+    if (hLower == 'heavy' || hLower == 'lourd') {
+      canonicalHeaviness = 'heavy';
+    } else if (hLower == 'medium' || hLower == 'moyen') {
+      canonicalHeaviness = 'medium';
+    } else {
+      canonicalHeaviness = 'light';
+    }
+    final capType = canonicalHeaviness[0].toUpperCase() + canonicalHeaviness.substring(1);
+
     final index = mealsList.indexWhere((m) => m.id == entryId);
     if (index != -1) {
       final now = DateTime.now();
@@ -148,7 +159,7 @@ class NutritionController extends GetxController {
 
       String newTimeStr = timeOnly;
       if (diffDays == -1) {
-        newTimeStr = 'Yesterday $timeOnly';
+        newTimeStr = '${'Yesterday'.tr} $timeOnly';
       } else if (diffDays != 0) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         newTimeStr = '${dt.day} ${months[dt.month - 1]} · $timeOnly';
@@ -160,19 +171,19 @@ class NutritionController extends GetxController {
       final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
       mealsList[index] = mealsList[index].copyWith(
         name: cleanName,
-        type: heaviness[0].toUpperCase() + heaviness.substring(1),
+        type: capType,
         time: newTimeStr,
         occurredAt: isoString,
       );
     }
 
-    EasyLoading.show(status: 'Updating meal...');
+    EasyLoading.show(status: 'Updating meal...'.tr);
     try {
       final url = Urls.updateMeal(sessionId, entryId);
       final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
       final bodyJson = jsonEncode({
         'occurredAt': isoString,
-        'heaviness': heaviness.toLowerCase(),
+        'heaviness': canonicalHeaviness,
       });
 
       debugPrint('=== EDIT MEAL REQUEST ===');
@@ -205,13 +216,13 @@ class NutritionController extends GetxController {
             await db.fetchDashboardData();
           } catch (_) {}
         }
-        EasyLoading.showSuccess('Updated meal entry');
+        EasyLoading.showSuccess('Updated meal entry'.tr);
       } else {
-        EasyLoading.showError('Failed to update meal');
+        EasyLoading.showError('Failed to update meal'.tr);
       }
     } catch (e) {
       debugPrint('editMealLog API error: $e');
-      EasyLoading.showError('Failed to update meal');
+      EasyLoading.showError('Failed to update meal'.tr);
     } finally {
       EasyLoading.dismiss();
     }
@@ -312,11 +323,18 @@ class NutritionController extends GetxController {
   }
 
   void selectMealType(String type) {
-    selectedMealType.value = type;
+    final lower = type.toLowerCase();
+    if (lower == 'medium' || lower == 'moyen') {
+      selectedMealType.value = 'Medium';
+    } else if (lower == 'heavy' || lower == 'lourd') {
+      selectedMealType.value = 'Heavy';
+    } else {
+      selectedMealType.value = 'Light';
+    }
   }
 
   void incrementTarget() async {
-    EasyLoading.show(status: 'Updating target...');
+    EasyLoading.show(status: 'Updating target...'.tr);
     try {
       dailyTarget.value++;
 
@@ -362,7 +380,7 @@ class NutritionController extends GetxController {
 
   void decrementTarget() async {
     if (dailyTarget.value > 1) {
-      EasyLoading.show(status: 'Updating target...');
+      EasyLoading.show(status: 'Updating target...'.tr);
       try {
         dailyTarget.value--;
 
@@ -397,11 +415,21 @@ class NutritionController extends GetxController {
     final formattedTime =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
+    String canonicalType = 'Light';
+    final tLower = selectedMealType.value.toLowerCase();
+    if (tLower == 'medium' || tLower == 'moyen') {
+      canonicalType = 'Medium';
+    } else if (tLower == 'heavy' || tLower == 'lourd') {
+      canonicalType = 'Heavy';
+    } else {
+      canonicalType = 'Light';
+    }
+
     final oldMeal = firstUnloggedIdx != -1 ? mealsList[firstUnloggedIdx] : null;
     final newIndex = mealsList.length + 1;
     final tempMeal = oldMeal != null
         ? oldMeal.copyWith(
-            type: selectedMealType.value,
+            type: canonicalType,
             isLogged: true,
             isPlanned: false,
             time: formattedTime,
@@ -409,7 +437,7 @@ class NutritionController extends GetxController {
         : MealItem(
             name: 'Meal $newIndex',
             time: formattedTime,
-            type: selectedMealType.value,
+            type: canonicalType,
             isLogged: true,
             isPlanned: false,
           );
@@ -421,12 +449,12 @@ class NutritionController extends GetxController {
       mealsList.add(tempMeal);
     }
 
-    EasyLoading.show(status: 'Saving meal...');
+    EasyLoading.show(status: 'Saving meal...'.tr);
     bool apiSuccess = false;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       if (sessionId.isNotEmpty) {
-        final heaviness = selectedMealType.value.toLowerCase();
+        final heaviness = canonicalType.toLowerCase();
         final order = firstUnloggedIdx != -1
             ? firstUnloggedIdx + 1
             : mealsList.length + 1;
@@ -456,7 +484,9 @@ class NutritionController extends GetxController {
       } else {
         mealsList.removeLast();
       }
+      EasyLoading.showError('Failed to log meal'.tr);
     } else {
+      EasyLoading.showSuccess('Meal logged successfully'.tr);
       await saveNutritionData();
     }
   }
@@ -504,9 +534,15 @@ class NutritionController extends GetxController {
               m['heavinessLabel'] as String? ??
               m['heaviness'] as String? ??
               'Light';
-          final capType = typeStr.isNotEmpty
-              ? typeStr[0].toUpperCase() + typeStr.substring(1)
-              : 'Light';
+          String capType = 'Light';
+          final tLower = typeStr.toLowerCase();
+          if (tLower == 'medium' || tLower == 'moyen') {
+            capType = 'Medium';
+          } else if (tLower == 'heavy' || tLower == 'lourd') {
+            capType = 'Heavy';
+          } else {
+            capType = 'Light';
+          }
 
           final rawName = (m['label'] ?? m['name'] ?? m['displayName'] ?? '').toString();
           String mealName = rawName;
@@ -529,7 +565,7 @@ class NutritionController extends GetxController {
               if (diffDays == 0) {
                 displayTime = timeOnly;
               } else if (diffDays == -1) {
-                displayTime = 'Yesterday $timeOnly';
+                displayTime = '${'Yesterday'.tr} $timeOnly';
               } else {
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 final monthStr = months[parsed.month - 1];

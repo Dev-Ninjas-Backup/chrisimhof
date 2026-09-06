@@ -1,8 +1,7 @@
 import 'package:chrisimhof/features/settings/change_password/service/change_password_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/route_manager.dart';
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
 
 class ChangePasswordController extends GetxController {
   final ChangePasswordService _service = ChangePasswordService();
@@ -30,27 +29,27 @@ class ChangePasswordController extends GetxController {
 
   String? validateOldPassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Old password is required';
+      return 'Old password is required'.tr;
     }
     return null;
   }
 
   String? validateNewPassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'New password is required';
+      return 'New password is required'.tr;
     }
     if (value.trim().length < 6) {
-      return 'New password must be at least 6 characters';
+      return 'New password must be at least 6 characters'.tr;
     }
     return null;
   }
 
   String? validateConfirmPassword(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Confirm password is required';
+      return 'Confirm password is required'.tr;
     }
     if (value.trim() != newPasswordController.text.trim()) {
-      return 'Passwords do not match';
+      return 'Passwords do not match'.tr;
     }
     return null;
   }
@@ -60,7 +59,7 @@ class ChangePasswordController extends GetxController {
 
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Updating password...');
+      EasyLoading.show(status: 'Updating password...'.tr);
 
       await _service.changePassword(
         currentPassword: oldPasswordController.text.trim(),
@@ -69,7 +68,7 @@ class ChangePasswordController extends GetxController {
       );
 
       EasyLoading.dismiss();
-      EasyLoading.showSuccess('Password updated successfully');
+      EasyLoading.showSuccess('Password updated successfully'.tr);
 
       // Clear fields and go back
       oldPasswordController.clear();

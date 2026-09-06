@@ -63,7 +63,7 @@ class NutritionScreen extends StatelessWidget {
                             ),
                             TextSpan(
                               text:
-                                  ' / ${controller.dailyTarget.value} planned',
+                                  ' / ${controller.dailyTarget.value} ${'planned'.tr}',
                               style: getTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -571,7 +571,7 @@ class NutritionScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancel',
+              'Cancel'.tr,
               style: getTextStyle(color: AppColors.textSoft),
             ),
           ),
@@ -583,7 +583,7 @@ class NutritionScreen extends StatelessWidget {
               Navigator.pop(context);
             },
             child: Text(
-              'Add',
+              'Add'.tr,
               style: getTextStyle(
                 color: AppColors.secondaryButtonColor,
                 fontWeight: FontWeight.w700,

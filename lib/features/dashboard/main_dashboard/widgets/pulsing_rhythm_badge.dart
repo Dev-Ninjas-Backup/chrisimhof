@@ -39,7 +39,7 @@ class PulsingRhythmBadge extends StatelessWidget {
           ),
           const SizedBox(width: 7),
           Text(
-            'Rhythm score $score',
+            '${'Rhythm score'.tr} $score',
             style: getTextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,

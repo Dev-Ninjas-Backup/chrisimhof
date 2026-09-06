@@ -47,7 +47,7 @@ class SetMealTarget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Daily target',
+                    'Daily target'.tr,
                     style: getTextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -56,7 +56,7 @@ class SetMealTarget extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'How many meals per day?',
+                    'How many meals per day?'.tr,
                     style: getTextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

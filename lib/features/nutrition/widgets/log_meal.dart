@@ -33,7 +33,7 @@ class LogMeal extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'LOG A MEAL',
+                  'LOG A MEAL'.tr,
                   style: getTextStyle2(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -45,7 +45,7 @@ class LogMeal extends StatelessWidget {
                     const Icon(Icons.access_time, size: 14, color: Color(0xFF9CA3AF)),
                     const SizedBox(width: 4),
                     Text(
-                      'now - $formattedTime',
+                      '${'now'.tr} - $formattedTime',
                       style: getTextStyle2(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -58,7 +58,7 @@ class LogMeal extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'How heavy was it (no food names — only heaviness matters for sleep & recovery)',
+              'How heavy was it (no food names — only heaviness matters for sleep & recovery)'.tr,
               style: getTextStyle2(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
@@ -77,7 +77,7 @@ class LogMeal extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             CustomButton(
-              text: 'Save meal',
+              text: 'Save meal'.tr,
               onTap: controller.saveMeal,
               backgroundColor: const Color(0xFF111827), // Slate 900
               textColor: Colors.white,

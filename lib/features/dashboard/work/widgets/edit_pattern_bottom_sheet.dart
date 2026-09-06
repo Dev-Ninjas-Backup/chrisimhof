@@ -23,7 +23,7 @@ class EditPatternBottomSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Select shift rotation pattern',
+            'Select shift rotation pattern'.tr,
             style: getTextStyle2(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -32,7 +32,7 @@ class EditPatternBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.',
+            'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.'.tr,
             style: getTextStyle(
               fontSize: 13,
               color: AppColors.textSoft,
@@ -54,7 +54,7 @@ class EditPatternBottomSheet extends StatelessWidget {
                 onTap: () {
                   controller.applyRotationPattern(option);
                   Get.back();
-                  EasyLoading.showSuccess('Applied $option rotation!');
+                  EasyLoading.showSuccess('${'Applied'.tr} ${option.tr} ${'rotation!'.tr}');
                 },
               )),
           const SizedBox(height: 12),

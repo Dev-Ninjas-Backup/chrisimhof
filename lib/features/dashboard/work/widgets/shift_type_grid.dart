@@ -77,7 +77,10 @@ class ShiftTypeGrid extends StatelessWidget {
                         minWidth: 80,
                         maxWidth: 96,
                       ),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected ? selectedBg : AppColors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -102,13 +105,17 @@ class ShiftTypeGrid extends StatelessWidget {
                             color: isSelected ? AppColors.gray700 : color,
                             size: 24,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            name.tr,
-                            style: getTextStyle(
-                              fontSize: 13,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? AppColors.gray700 : AppColors.textSoft,
+                          const SizedBox(height: 6),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              name.tr,
+                              maxLines: 1,
+                              style: getTextStyle(
+                                fontSize: 13,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                color: isSelected ? AppColors.gray700 : AppColors.textSoft,
+                              ),
                             ),
                           ),
                         ],
