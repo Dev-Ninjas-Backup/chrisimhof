@@ -15,10 +15,10 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
 | **5** | **Dynamic Bedtime Suggestions** | Sync / Logic | Update recommendation card bedtime text dynamically when caffeine shifts bedtime. | 🔍 Identified |
 | **6** | **Adaptive Meal Timing Logic** | Nutrition Logic | Suggest appropriate meal types based on hours fasted and remaining meal target. | 🔍 Identified |
 | **7** | **Sport Activity Type Icons** | UI / Assets | Activity icons mapped (Strength/Force → dumbbell, Running/Course → runner, Cycling/Vélo → bike, Swimming/Natation → pool, Mobility/Yoga → yoga, Rest Day → zzz). | ✅ Resolved |
-| **8** | **Sleep Quality Score 0 Audit** | Logic / Calculation | Investigate why 7:30 PM–1:00 PM sleep scores 0; explain the calculation model. | 🔬 Documented |
+| **8** | **Sleep Quality Score 0 Audit** | Backend Logic | Audit sleep score calculation for 17.5h sleep (clamped to 0 by backend penalties); backend adjustment needed for baseline floor/outlier handling. | 🔍 Identified |
 | **9** | **Persistent Default Daily Meal Goal** | Feature | Allow setting a default meal target (e.g., 5 meals) with *"Save as default"* option. | ⚙️ In Progress |
 | **10** | **Automatic Daily Refresh & Day Transitions** | App Lifecycle / Shift Logic | Strict prohibition on midnight resets for shift workers; day transitions occur via "End My Day" or logging main sleep ("Start a New Day"). Verified seamless refresh without logout. | ✅ Verified |
-| **11** | **Shift-Aware Bedtime Recommendation** | Sleep / Logic | Calculate bedtime backwards from next work shift start time - prep buffer - sleep goal & debt. | 🔍 Identified |
+| **11** | **Shift-Aware Bedtime Recommendation** | Backend Logic | Calculate bedtime backwards from tomorrow's shift start time - prep buffer - sleep goal & debt. Backend calculation update required. | 🔍 Identified |
 
 ---
 
@@ -122,15 +122,18 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
 
 ---
 
-### 8. Sleep Quality Score 0 & Scoring Formula Explanation
+### 8. Sleep Quality Score 0 & Scoring Formula Explanation — 🔍 Identified (Backend Task)
 * **User Report**: *"I tested a sleep period from 7:30 PM to 1:00 PM, and the app showed a sleep quality score of 0. Could you please check why this happens and explain how the sleep quality score is currently calculated?"*
-* **Detailed Explanation of Sleep Quality Calculation**:
+* **Architecture Verification**:
+  * **Calculation Source**: 100% backend-driven. The app does not compute sleep scores locally; it only posts timestamps to `POST /api/v1/calculator/session/{sessionId}/sleep` and displays the backend response (`tabData['history'][i]['quality']`).
+* **Root Cause of Score 0 on Backend**:
   * The algorithm calculates the score based on three weighted factors:
     1. **Duration Score (0–100)**: Compares total sleep duration against the optimal baseline (7–9 hours). A duration of **17.5 hours (19:30 to 13:00)** is an extreme statistical outlier (hypersomnia pattern).
     2. **Circadian Phase Score (0–100)**: Evaluates sleep timing relative to the biological circadian night (typically 22:00–07:00). Sleep extending through the middle of the day (07:00–13:00) incurs severe circadian penalty points.
-    3. **Shift Alignment & Continuity**: Long multi-phase sleep windows overlapping normal daytime activity intervals can trigger a 0-score clamp in the backend scoring engine.
-* **Improvements**:
-  * Add a minimum threshold floor score or display an explanatory badge (e.g., *"Irregular sleep duration recorded"*) rather than a bare 0.
+    3. **Shift Alignment & Continuity**: Long multi-phase sleep windows overlapping normal daytime activity intervals trigger severe penalties that cumulatively clamped the score to **0**.
+* **Backend Adjustments Needed (for Backend Developer)**:
+  * Implement a minimum baseline score floor (e.g., minimum score clamp of 10–20 instead of 0).
+  * Return an explanatory flag or note when an extreme outlier duration is recorded (e.g., *"Irregular sleep window"*).
 
 ---
 
@@ -182,13 +185,15 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
 
 ---
 
-### 11. Work Shift-Aware Bedtime Recommendation Calculation
+### 11. Work Shift-Aware Bedtime Recommendation Calculation — 🔍 Identified (Backend Task)
 * **User Report**: *"I set that I start work tomorrow at 6:00 AM. Today, I only slept around 4.5 hours, and my sleep goal is set to 7 hours 45 minutes. Since I start work at 6:00 AM, I would realistically need to wake up around 4:00 AM to have enough time to get ready and go to work. However, the app recommends that I go to bed at 10:30 PM. This only gives around 5.5 hours of sleep. The bedtime recommendation should take into account: next work shift start time, wake-up buffer before work, sleep goal, and sleep deficit (e.g. Work at 6:00 AM → Wake-up at 4:00 AM → Sleep goal 7h45 → Recommended bedtime at 8:15 PM)."*
-* **Problem Analysis**:
-  * The current bedtime recommendation uses a static circadian/baseline anchor or fixed evening target rather than dynamically backward-calculating from the upcoming work shift start time.
+* **Architecture Verification**:
+  * **Calculation Source**: 100% backend-driven. The Flutter app reads `optimalBedtime` from the backend API / socket and renders recommendation strings from `/session/{sessionId}/recommendations`.
+* **Root Cause on Backend**:
+  * The backend calculation engine currently outputs a fixed circadian/baseline anchor (e.g., 22:30) rather than dynamically backward-calculating from tomorrow's scheduled shift start time.
 * **Proposed Mathematical Model & Calculation**:
   1. **Target Wake-Up Time**:
-     $$\text{Target Wake-Up Time} = \text{Next Shift Start Time} - \text{Pre-Work Buffer}$$
+     $$\text{Target Wake-Up Time} = \text{Tomorrow's Shift Start Time} - \text{Pre-Work Buffer (default ~2h)}$$
      *(e.g., $06:00 - 02:00 = 04:00\text{ AM}$)*
   2. **Required Total Sleep Target**:
      $$\text{Target Sleep Duration} = \text{User Sleep Goal} + \text{Sleep Debt Recovery Factor}$$
@@ -196,9 +201,9 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
   3. **Target Bedtime**:
      $$\text{Recommended Bedtime} = \text{Target Wake-Up Time} - \text{Target Sleep Duration} - \text{Sleep Latency Buffer (15m)}$$
      *(e.g., $04:00\text{ AM} - 7\text{h }45\text{m} = 08:15\text{ PM}$)*
-* **Implementation Plan**:
-  * **User Preference Setting**: Allow users to configure their preparation/commute buffer (e.g. 1 hour, 1.5 hours, 2 hours; default: 1.5–2 hours) in Work Settings / Profile.
-  * **Backend / Controller Sync**: When computing recommended bedtime for the upcoming sleep window, fetch tomorrow's active shift start from the schedule and apply the backward calculation formula.
+* **Backend Adjustments Needed (for Backend Developer)**:
+  * In the backend calculation service, query tomorrow's work shift from the active schedule and compute `optimalBedtime` using the backward-calculation formula.
+  * Update the generated bedtime recommendation text strings accordingly.
 
 ---
 
