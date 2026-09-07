@@ -252,13 +252,43 @@ class SleepController extends GetxController {
         );
 
         final data = result['data'] as Map<String, dynamic>?;
-        if (data != null && data['saved'] == false) {
+
+        // Inspect conflicts returned by backend validation
+        final dynamic rawConflicts = result['conflicts'] ?? data?['conflicts'];
+        final List<dynamic>? conflictsList = rawConflicts is List ? rawConflicts : null;
+        bool hasHardConflict = false;
+        String? conflictMessage;
+        String? softWarningMessage;
+
+        if (conflictsList != null && conflictsList.isNotEmpty) {
+          for (final c in conflictsList) {
+            if (c is Map<String, dynamic>) {
+              final isHard = c['isHard'] == true;
+              final msg = c['message'] as String? ?? '';
+              if (isHard) {
+                hasHardConflict = true;
+                conflictMessage = msg;
+                break;
+              } else if (softWarningMessage == null && msg.isNotEmpty) {
+                softWarningMessage = msg;
+              }
+            }
+          }
+        }
+
+        if (hasHardConflict || (data != null && data['saved'] == false)) {
           historyLogs.assignAll(oldLogs);
           await saveSleepHistory();
 
-          final conflictMessage = data['message'] as String? ?? 'Sleep overlap conflict detected. Please adjust.';
-          EasyLoading.showError(conflictMessage);
+          final conflictMsg = conflictMessage ??
+              (data?['message'] as String?) ??
+              'Sleep overlap conflict detected. Please adjust.'.tr;
+          EasyLoading.showError(conflictMsg);
           return;
+        }
+
+        if (softWarningMessage != null && softWarningMessage.isNotEmpty) {
+          EasyLoading.showInfo(softWarningMessage);
         }
 
         final returnedSessionId = data?['sessionId'] as String?;
@@ -358,14 +388,46 @@ class SleepController extends GetxController {
 
       if (sleepEntry != null) {
         forYouSleepBody.value = sleepEntry['body'] as String?;
-        final bodyParams = sleepEntry['bodyParams'] as Map<String, dynamic>?;
-        forYouSleepBedtime.value = bodyParams?['bedtime'] as String?;
+        final bodyParams = (sleepEntry['bodyParams'] ?? sleepEntry['params']) as Map<String, dynamic>?;
+        forYouSleepBedtime.value = (bodyParams?['bedtime'] ?? bodyParams?['time']) as String?;
       } else {
         forYouSleepBody.value = null;
         forYouSleepBedtime.value = null;
       }
     } catch (e) {
       debugPrint('SleepController forYouPreview parse error: $e');
+    }
+  }
+
+  /// Updates bedtime and wakeup window from work.nextSleepWindow (shift-aware calculation)
+  void updateFromNextSleepWindow(Map<String, dynamic> sleepWindow) {
+    try {
+      final start = (sleepWindow['sleepStart'] ?? sleepWindow['time']) as String?;
+      final end = (sleepWindow['sleepEnd'] ?? sleepWindow['wakeTime']) as String?;
+
+      if (start != null && start.isNotEmpty) {
+        final currentMap = tonightBedtime.value != null
+            ? Map<String, dynamic>.from(tonightBedtime.value!)
+            : <String, dynamic>{};
+        currentMap['sleepStart'] = start;
+        if (end != null && end.isNotEmpty) {
+          currentMap['wakeTime'] = end;
+          final wParts = end.split(':');
+          if (wParts.length == 2) {
+            wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
+            wakeupMinute.value = int.tryParse(wParts[1]) ?? wakeupMinute.value;
+          }
+        }
+        tonightBedtime.value = currentMap;
+
+        final bParts = start.split(':');
+        if (bParts.length == 2) {
+          bedtimeHour.value = int.tryParse(bParts[0]) ?? bedtimeHour.value;
+          bedtimeMinute.value = int.tryParse(bParts[1]) ?? bedtimeMinute.value;
+        }
+      }
+    } catch (e) {
+      debugPrint('SleepController updateFromNextSleepWindow error: $e');
     }
   }
 
@@ -395,11 +457,44 @@ class SleepController extends GetxController {
         }
       }
 
+      // Handle tonightBedtime (supports String e.g. "20:15" or Map e.g. {"sleepStart": "20:15", "wakeTime": "04:00"})
+      String? parsedBedtimeStr;
       if (tabData['tonightBedtime'] != null) {
-        tonightBedtime.value = Map<String, dynamic>.from(tabData['tonightBedtime']);
+        if (tabData['tonightBedtime'] is Map) {
+          final map = Map<String, dynamic>.from(tabData['tonightBedtime']);
+          tonightBedtime.value = map;
+          parsedBedtimeStr = (map['sleepStart'] ?? map['time']) as String?;
+          if (map['wakeTime'] != null && map['wakeTime'] is String) {
+            final wParts = (map['wakeTime'] as String).split(':');
+            if (wParts.length == 2) {
+              wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
+              wakeupMinute.value = int.tryParse(wParts[1]) ?? wakeupMinute.value;
+            }
+          }
+        } else if (tabData['tonightBedtime'] is String) {
+          parsedBedtimeStr = tabData['tonightBedtime'] as String;
+          final currentMap = tonightBedtime.value != null
+              ? Map<String, dynamic>.from(tonightBedtime.value!)
+              : <String, dynamic>{};
+          currentMap['sleepStart'] = parsedBedtimeStr;
+          tonightBedtime.value = currentMap;
+        }
       } else {
         tonightBedtime.value = null;
       }
+
+      if (parsedBedtimeStr != null && parsedBedtimeStr.isNotEmpty) {
+        final parts = parsedBedtimeStr.split(':');
+        if (parts.length == 2) {
+          final h = int.tryParse(parts[0]);
+          final m = int.tryParse(parts[1]);
+          if (h != null && m != null) {
+            bedtimeHour.value = h;
+            bedtimeMinute.value = m;
+          }
+        }
+      }
+
       tonightNote.value = tabData['tonightNote'] as String?;
 
       if (tabData['sleepDebt7d'] != null) {

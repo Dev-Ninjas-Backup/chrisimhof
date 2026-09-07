@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,9 +13,28 @@ class TonightBedtimeCard extends StatelessWidget {
     final controller = Get.find<SleepController>();
     return Obx(() {
       // --- Primary source: live sleep tab data from socket/API ---
-      final apiSleepStart = controller.tonightBedtime.value?['sleepStart'] as String?;
-      final apiWakeTime   = controller.tonightBedtime.value?['wakeTime']   as String?;
-      final apiNote       = controller.tonightNote.value;
+      final bedtimeMap = controller.tonightBedtime.value;
+      String? apiSleepStart = (bedtimeMap?['sleepStart'] ?? bedtimeMap?['time']) as String?;
+      String? apiWakeTime   = (bedtimeMap?['wakeTime'] ?? bedtimeMap?['sleepEnd']) as String?;
+      final apiNote         = controller.tonightNote.value;
+
+      // Fallback to shift-aware optimal bedtime from DashboardController if not yet in map
+      if (apiSleepStart == null || apiSleepStart.isEmpty || apiSleepStart == '--:--') {
+        if (Get.isRegistered<DashboardController>()) {
+          final optimal = Get.find<DashboardController>().dashboardData.value.optimalBedtime;
+          if (optimal.isNotEmpty && optimal != '--:--') {
+            apiSleepStart = optimal;
+          }
+        }
+      }
+
+      // Fallback to controller's calculated/parsed wakeup time if wakeTime not in map
+      if (apiWakeTime == null || apiWakeTime.isEmpty || apiWakeTime == '--:--') {
+        if (controller.wakeupHour.value != 0 || controller.wakeupMinute.value != 0) {
+          apiWakeTime =
+              '${controller.wakeupHour.value.toString().padLeft(2, '0')}:${controller.wakeupMinute.value.toString().padLeft(2, '0')}';
+        }
+      }
 
       String bedtime = apiSleepStart ?? '--:--';
       String wakeup  = apiWakeTime  ?? '--:--';

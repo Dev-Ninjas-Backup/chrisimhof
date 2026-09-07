@@ -115,7 +115,9 @@ class RecommendationItem {
       bodyKey: json['bodyKey'],
       bodyParams: json['bodyParams'] != null
           ? Map<String, dynamic>.from(json['bodyParams'])
-          : null,
+          : (json['params'] != null
+              ? Map<String, dynamic>.from(json['params'])
+              : null),
     );
   }
 

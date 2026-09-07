@@ -512,7 +512,7 @@ class HydrationController extends GetxController {
       }
 
       hydrationPreviewBody.value = hydrationEntry['body'] as String?;
-      final bodyParams = hydrationEntry['bodyParams'] as Map<String, dynamic>?;
+      final bodyParams = (hydrationEntry['bodyParams'] ?? hydrationEntry['params']) as Map<String, dynamic>?;
       final goalL = (bodyParams?['goalL'] as num?)?.toDouble();
       final deficitMl = (bodyParams?['deficitMl'] as num?)?.toInt();
 

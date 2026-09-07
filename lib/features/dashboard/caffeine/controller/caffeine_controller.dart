@@ -435,8 +435,8 @@ class CaffeineController extends GetxController {
 
       if (caffeineEntry != null) {
         forYouCaffeineBody.value = caffeineEntry['body'] as String?;
-        final bodyParams = caffeineEntry['bodyParams'] as Map<String, dynamic>?;
-        forYouCaffeineCutoff.value = bodyParams?['cutoffTime'] as String?;
+        final bodyParams = (caffeineEntry['bodyParams'] ?? caffeineEntry['params']) as Map<String, dynamic>?;
+        forYouCaffeineCutoff.value = (bodyParams?['cutoffTime'] ?? bodyParams?['cutoff'] ?? bodyParams?['time']) as String?;
       } else {
         forYouCaffeineBody.value = null;
         forYouCaffeineCutoff.value = null;

@@ -171,10 +171,17 @@ class RealtimeSocketService {
         );
       }
 
-      if (Get.isRegistered<SleepController>() &&
-          data['tabs']?['sleep'] != null) {
+      final sleepTabData = (data['tabs']?['sleep'] ?? data['sleep']) as Map<String, dynamic>?;
+      if (Get.isRegistered<SleepController>() && sleepTabData != null) {
         final sleepController = Get.find<SleepController>();
-        sleepController.updateFromLiveScoresTab(data['tabs']['sleep']);
+        sleepController.updateFromLiveScoresTab(sleepTabData);
+      }
+
+      final nextSleepWindow = (data['work']?['nextSleepWindow'] ??
+              data['tabs']?['work']?['nextSleepWindow'] ??
+              data['nextSleepWindow']) as Map<String, dynamic>?;
+      if (Get.isRegistered<SleepController>() && nextSleepWindow != null) {
+        Get.find<SleepController>().updateFromNextSleepWindow(nextSleepWindow);
       }
 
       // Forward forYouPreview sleep entry via socket updates

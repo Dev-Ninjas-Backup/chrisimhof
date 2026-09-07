@@ -458,13 +458,21 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       hoursUntilBed: hoursUntilBed,
     );
 
-    if (apiData['tabs']?['sleep'] != null) {
-      sleepTabData.value = Map<String, dynamic>.from(apiData['tabs']['sleep']);
+    final sleepMap = (apiData['tabs']?['sleep'] ?? apiData['sleep']) as Map<String, dynamic>?;
+    if (sleepMap != null) {
+      sleepTabData.value = Map<String, dynamic>.from(sleepMap);
       if (Get.isRegistered<SleepController>()) {
         Get.find<SleepController>().updateFromLiveScoresTab(
           sleepTabData.value!,
         );
       }
+    }
+
+    final nextSleepWindow = (apiData['work']?['nextSleepWindow'] ??
+            apiData['tabs']?['work']?['nextSleepWindow'] ??
+            apiData['nextSleepWindow']) as Map<String, dynamic>?;
+    if (Get.isRegistered<SleepController>() && nextSleepWindow != null) {
+      Get.find<SleepController>().updateFromNextSleepWindow(nextSleepWindow);
     }
 
     // Cache forYouPreview for late-registering controllers

@@ -541,6 +541,13 @@ class AppTranslations extends Translations {
       'Your inputs': 'Your inputs',
       'Your password has been changed successfully': 'Your password has been changed successfully',
       'Your rhythm, rebuilt around real life.': 'Your rhythm, rebuilt around real life.',
+      'nutrition.title.mealTiming': 'Meal Timing',
+      'nutrition.substantialMeal': 'It\'s been a while since your last meal. Have a substantial, balanced meal now to stay on track.',
+      'nutrition.preSleepLightMeal': 'Bedtime is approaching. Opt for a lighter, protein-rich meal that won\'t disrupt your sleep quality.',
+      'nutrition.postWorkoutRecovery': 'Great workout! Prioritize a recovery meal with protein and complex carbohydrates.',
+      'nutrition.lightSnack': 'Have a light snack to maintain energy until your next regular meal.',
+      'IRREGULAR_SLEEP_WINDOW': 'Logged sleep duration is unusually long (> 12 hours). Please verify your entry.',
+      'Unusually long sleep detected.': 'Unusually long sleep detected.',
     },
     'fr_FR': {
       ' — protect tonight\'s sleep window.': ' — protégez votre fenêtre de sommeil de ce soir.',
@@ -1080,6 +1087,13 @@ class AppTranslations extends Translations {
       'Your inputs': 'Vos données',
       'Your password has been changed successfully': 'Votre mot de passe a été modifié avec succès',
       'Your rhythm, rebuilt around real life.': 'Votre rythme, réinventé pour la vraie vie.',
+      'nutrition.title.mealTiming': 'Timing des repas',
+      'nutrition.substantialMeal': 'Votre dernier repas remonte à longtemps. Prenez un repas copieux et équilibré pour rester sur la bonne voie.',
+      'nutrition.preSleepLightMeal': 'L\'heure du coucher approche. Privilégiez un repas léger et riche en protéines qui ne perturbera pas votre sommeil.',
+      'nutrition.postWorkoutRecovery': 'Bravo pour votre séance ! Priorisez un repas de récupération avec des protéines et des glucides complexes.',
+      'nutrition.lightSnack': 'Prenez une collation légère pour maintenir votre énergie jusqu\'au prochain repas.',
+      'IRREGULAR_SLEEP_WINDOW': 'La durée de sommeil enregistrée est anormalement longue (> 12 heures). Veuillez vérifier votre saisie.',
+      'Unusually long sleep detected.': 'Sommeil anormalement long détecté.',
     },
   };
 }
