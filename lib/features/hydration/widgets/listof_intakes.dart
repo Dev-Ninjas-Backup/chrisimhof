@@ -176,6 +176,7 @@ class ListofIntakes extends StatelessWidget {
                   children: [
                     Expanded(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () async {
                           final picked = await showDatePicker(
                             context: context,
@@ -216,6 +217,7 @@ class ListofIntakes extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () async {
                           final picked = await showTimePicker(
                             context: context,

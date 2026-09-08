@@ -94,6 +94,7 @@ class QuickAddSection extends StatelessWidget {
   }) {
     return Expanded(
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Stack(
           clipBehavior: Clip.none,

@@ -123,7 +123,13 @@ class DashboardService {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonData;
     } else {
-      throw Exception(jsonData['message'] ?? 'Failed to log quick add data');
+      String errorMessage = 'Failed to log quick add data';
+      if (jsonData['message'] is List && (jsonData['message'] as List).isNotEmpty) {
+        errorMessage = (jsonData['message'] as List).join(', ');
+      } else if (jsonData['message'] != null) {
+        errorMessage = jsonData['message'].toString();
+      }
+      throw Exception(errorMessage);
     }
   }
 }

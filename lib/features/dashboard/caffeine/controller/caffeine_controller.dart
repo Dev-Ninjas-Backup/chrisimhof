@@ -153,39 +153,57 @@ class CaffeineController extends GetxController {
     }
   }
 
-  void addCaffeineEntry(String title, int amountMg, DateTime timestamp) async {
+  static String resolveCaffeineDrinkType(String title) {
+    final t = title.toLowerCase().trim();
+    if (t == 'espresso' || t.contains('espresso')) {
+      return 'espresso';
+    } else if (t == 'coffee' ||
+        t.contains('coffee') ||
+        t == 'café' ||
+        t.contains('café') ||
+        t == 'cafe') {
+      return 'coffee';
+    } else if (t == 'energy' ||
+        t.contains('energy') ||
+        t == 'énergie' ||
+        t.contains('énergie') ||
+        t == 'energie') {
+      return 'energy';
+    } else if (t == 'tea' ||
+        t.contains('tea') ||
+        t == 'thé' ||
+        t.contains('thé') ||
+        t == 'the') {
+      return 'tea';
+    } else if (t == 'custom' ||
+        t.contains('custom') ||
+        t == 'personnalisé' ||
+        t.contains('personnalisé') ||
+        t == 'personnalise') {
+      return 'custom';
+    } else {
+      // Do not hardcode coffee. Send user input directly so backend can validate
+      // and return the enum error if it does not match.
+      return t;
+    }
+  }
+
+  Future<bool> addCaffeineEntry(
+    String title,
+    int amountMg,
+    DateTime timestamp,
+  ) async {
     final formattedTime =
         '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
 
     final tempId = DateTime.now().millisecondsSinceEpoch.toString();
-    final newEntry = CaffeineEntry(
-      id: tempId,
-      title: title,
-      timestamp: timestamp,
-      amountMg: amountMg,
-    );
-
-    // Optimistic update
-    entriesList.add(newEntry);
-    entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    recalculateCaffeine();
+    final drinkType = resolveCaffeineDrinkType(title);
 
     EasyLoading.show(status: 'Logging caffeine...'.tr);
     bool apiSuccess = false;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       if (sessionId.isNotEmpty) {
-        String drinkType = 'coffee';
-        final t = title.toLowerCase();
-        if (t.contains('tea')) {
-          drinkType = 'tea';
-        } else if (t.contains('energy') ||
-            t.contains('soda') ||
-            t.contains('coke')) {
-          drinkType = 'energy';
-        } else if (t.contains('espresso')) {
-          drinkType = 'espresso';
-        }
         await DashboardService().patchQuickAddLog(
           sessionId: sessionId,
           newCaffeineLogs: [
@@ -200,57 +218,59 @@ class CaffeineController extends GetxController {
       }
     } catch (e) {
       debugPrint('Caffeine API quickAdd error: $e');
+      final errStr = e.toString().toLowerCase();
+      if (errStr.contains('drinktype') ||
+          errStr.contains('must be one of the following values')) {
+        EasyLoading.showError(
+          'Drink type must be one of the following values: espresso, coffee, energy, tea, custom'.tr,
+          duration: const Duration(seconds: 4),
+        );
+      } else {
+        EasyLoading.showError('Failed to log caffeine'.tr);
+      }
     } finally {
-      EasyLoading.dismiss();
+      if (apiSuccess) {
+        EasyLoading.dismiss();
+      }
     }
 
     if (!apiSuccess) {
-      // Revert if API failed
-      entriesList.removeWhere((e) => e.id == tempId);
-      recalculateCaffeine();
-    } else {
-      await saveEntriesToPrefs();
+      return false;
     }
+
+    final newEntry = CaffeineEntry(
+      id: tempId,
+      title: title,
+      timestamp: timestamp,
+      amountMg: amountMg,
+    );
+    entriesList.add(newEntry);
+    entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    recalculateCaffeine();
+    await saveEntriesToPrefs();
+    return true;
   }
 
   void quickAdd(String title, int amountMg) {
     addCaffeineEntry(title, amountMg, DateTime.now());
   }
 
-  void editCaffeineEntry(
+  Future<bool> editCaffeineEntry(
     String id,
     String title,
     int amountMg,
     DateTime timestamp,
   ) async {
-    final index = entriesList.indexWhere((e) => e.id == id);
-    if (index != -1) {
-      entriesList[index] = CaffeineEntry(
-        id: id,
-        title: title,
-        timestamp: timestamp,
-        amountMg: amountMg,
-      );
-      entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      recalculateCaffeine();
-      await saveEntriesToPrefs();
-    }
-
     final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
-    if (sessionId.isEmpty || token.isEmpty || id.isEmpty || id.length < 10) return;
-
-    String drinkType = 'coffee';
-    final t = title.toLowerCase();
-    if (t.contains('tea')) {
-      drinkType = 'tea';
-    } else if (t.contains('energy') || t.contains('soda') || t.contains('coke')) {
-      drinkType = 'energy';
-    } else if (t.contains('espresso')) {
-      drinkType = 'espresso';
+    if (sessionId.isEmpty || token.isEmpty || id.isEmpty || id.length < 10) {
+      return false;
     }
 
+    final drinkType = resolveCaffeineDrinkType(title);
+
     EasyLoading.show(status: 'Updating caffeine...'.tr);
+    bool apiSuccess = false;
     try {
       final url = Urls.updateCaffeine(sessionId, id);
       final isoString = await TimezoneHelper.formatToSessionUtcIso(timestamp);
@@ -280,6 +300,7 @@ class CaffeineController extends GetxController {
       debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        apiSuccess = true;
         final decoded = jsonDecode(response.body) as Map<String, dynamic>;
         final data = decoded['data'] as Map<String, dynamic>?;
         if (data != null) {
@@ -291,12 +312,61 @@ class CaffeineController extends GetxController {
           } catch (_) {}
         }
         EasyLoading.showSuccess('Updated caffeine entry'.tr);
+      } else {
+        String msg = '';
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded is Map && decoded['message'] != null) {
+            if (decoded['message'] is List &&
+                (decoded['message'] as List).isNotEmpty) {
+              msg = (decoded['message'] as List).join(', ');
+            } else {
+              msg = decoded['message'].toString();
+            }
+          }
+        } catch (_) {}
+        if (msg.toLowerCase().contains('drinktype') ||
+            msg.toLowerCase().contains('must be one of the following values')) {
+          EasyLoading.showError(
+            'Drink type must be one of the following values: espresso, coffee, energy, tea, custom'.tr,
+            duration: const Duration(seconds: 4),
+          );
+        } else {
+          EasyLoading.showError(
+            msg.isNotEmpty ? msg : 'Failed to update caffeine entry'.tr,
+          );
+        }
       }
     } catch (e) {
       debugPrint('editCaffeineEntry API error: $e');
-    } finally {
-      EasyLoading.dismiss();
+      final errStr = e.toString().toLowerCase();
+      if (errStr.contains('drinktype') ||
+          errStr.contains('must be one of the following values')) {
+        EasyLoading.showError(
+          'Drink type must be one of the following values: espresso, coffee, energy, tea, custom'.tr,
+          duration: const Duration(seconds: 4),
+        );
+      } else {
+        EasyLoading.showError('Failed to update caffeine entry'.tr);
+      }
     }
+
+    if (apiSuccess) {
+      final index = entriesList.indexWhere((e) => e.id == id);
+      if (index != -1) {
+        entriesList[index] = CaffeineEntry(
+          id: id,
+          title: title,
+          timestamp: timestamp,
+          amountMg: amountMg,
+        );
+        entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        recalculateCaffeine();
+        await saveEntriesToPrefs();
+      }
+      return true;
+    }
+    return false;
   }
 
   void deleteCaffeineEntry(String id) async {
@@ -355,7 +425,19 @@ class CaffeineController extends GetxController {
         final mappedLogs = logsList.map((item) {
           final timeStr = item['timestamp'] as String? ?? '00:00';
           final amount = (item['caffeineMg'] as num?)?.toInt() ?? 0;
-          final titleStr = item['drinkLabel'] as String? ?? 'Espresso';
+          final typeStr = item['drinkType'] as String? ?? '';
+          final titleStr = item['drinkLabel'] as String? ??
+              (typeStr.isNotEmpty
+                  ? (typeStr == 'custom'
+                      ? 'Custom'
+                      : typeStr == 'tea'
+                          ? 'Tea'
+                          : typeStr == 'energy'
+                              ? 'Energy'
+                              : typeStr == 'espresso'
+                                  ? 'Espresso'
+                                  : 'Coffee')
+                  : 'Coffee');
           final serverId = item['id'] as String? ?? '${timeStr}_$amount';
 
           DateTime logTime = now;

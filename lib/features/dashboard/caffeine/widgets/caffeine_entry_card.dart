@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CaffeineEntryCard extends StatelessWidget {
   final CaffeineEntry entry;
@@ -16,6 +17,7 @@ class CaffeineEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onEdit,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -48,7 +50,7 @@ class CaffeineEntryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entry.title,
+                    entry.title.tr,
                     style: getTextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -92,13 +94,10 @@ class CaffeineEntryCard extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 12),
-            GestureDetector(
-              onTap: onEdit,
-              child: const Icon(
-                Icons.edit_outlined,
-                color: AppColors.textSoft,
-                size: 18,
-              ),
+            const Icon(
+              Icons.edit_outlined,
+              color: AppColors.textSoft,
+              size: 18,
             ),
           ],
         ),
@@ -108,11 +107,19 @@ class CaffeineEntryCard extends StatelessWidget {
 
   IconData _getIconForEntry(String title) {
     final lower = title.toLowerCase();
-    if (lower.contains('espresso') || lower.contains('coffee')) {
+    if (lower.contains('espresso') ||
+        lower.contains('coffee') ||
+        lower.contains('café') ||
+        lower == 'cafe') {
       return Icons.local_cafe_rounded;
-    } else if (lower.contains('energy') || lower.contains('bolt')) {
+    } else if (lower.contains('energy') ||
+        lower.contains('bolt') ||
+        lower.contains('énergie') ||
+        lower.contains('energie')) {
       return Icons.flash_on_rounded;
-    } else if (lower.contains('tea')) {
+    } else if (lower.contains('tea') ||
+        lower.contains('thé') ||
+        lower == 'the') {
       return Icons.emoji_food_beverage_rounded;
     }
     return Icons.local_drink_rounded;

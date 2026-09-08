@@ -44,7 +44,7 @@ class EffortAndTypeRow extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      effort.value,
+                      effort.value.tr,
                       style: getTextStyle2(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -79,7 +79,7 @@ class EffortAndTypeRow extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      type.value,
+                      type.value.tr.capitalizeFirst ?? type.value.tr,
                       style: getTextStyle2(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

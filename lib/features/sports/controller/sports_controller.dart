@@ -145,7 +145,8 @@ class SportsController extends GetxController {
       body['intensity'] = intensity.toLowerCase();
     }
     if (sportType != null && sportType.isNotEmpty) {
-      body['sportType'] = sportType.toLowerCase();
+      final st = sportType.toLowerCase().trim();
+      body['sportType'] = (st == 'force' || st == 'renforcement') ? 'strength' : st;
     }
     if (distanceKm != null) {
       body['distanceKm'] = distanceKm;
@@ -470,7 +471,9 @@ class SportsController extends GetxController {
           }
 
           String sportType = type.toLowerCase().trim();
-          if (sportType != 'cardio' &&
+          if (sportType == 'force' || sportType == 'renforcement') {
+            sportType = 'strength';
+          } else if (sportType != 'cardio' &&
               sportType != 'strength' &&
               sportType != 'mobility' &&
               sportType != 'mixed' &&

@@ -49,11 +49,12 @@ class QuickAddChipsSection extends StatelessWidget {
               onTap: () => controller.quickAdd('Tea', 45),
             ),
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => showCaffeineEntryDialog(context, controller),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
+                  horizontal: 16,
+                  vertical: 9,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryTextColor,
@@ -88,6 +89,7 @@ class QuickAddChipsSection extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

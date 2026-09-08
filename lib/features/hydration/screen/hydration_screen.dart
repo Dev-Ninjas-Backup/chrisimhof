@@ -47,6 +47,7 @@ class _HydrationScreenState extends State<HydrationScreen> {
                 children: controller.quickOptions.map((option) {
                   return Expanded(
                     child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () => controller.addIntake(
                         option.amountMl,
                         option.typeName,

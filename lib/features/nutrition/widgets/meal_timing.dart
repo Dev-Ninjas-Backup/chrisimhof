@@ -206,6 +206,7 @@ class MealTiming extends StatelessWidget {
                         selectedHeaviness.value.toLowerCase() == h.toLowerCase();
                     return Expanded(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () => selectedHeaviness.value = h,
                         child: Container(
                           margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -250,6 +251,7 @@ class MealTiming extends StatelessWidget {
                   children: [
                     Expanded(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () async {
                           final picked = await showDatePicker(
                             context: context,
@@ -290,6 +292,7 @@ class MealTiming extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () async {
                           final picked = await showTimePicker(
                             context: context,

@@ -14,7 +14,9 @@ class CaffeineEntryDialog extends StatelessWidget {
   late final Rx<DateTime> selectedTime;
 
   CaffeineEntryDialog({super.key, this.entry, required this.controller}) {
-    titleCtrl = TextEditingController(text: entry?.title ?? 'Coffee');
+    titleCtrl = TextEditingController(
+      text: entry != null ? entry!.title.tr : 'Custom'.tr,
+    );
     amountCtrl = TextEditingController(
       text: entry?.amountMg.toString() ?? '80',
     );
@@ -71,6 +73,10 @@ class CaffeineEntryDialog extends StatelessWidget {
                   vertical: 14,
                 ),
                 border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
@@ -139,6 +145,7 @@ class CaffeineEntryDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () async {
                 final timeOfDay = await showTimePicker(
                   context: context,
@@ -192,19 +199,23 @@ class CaffeineEntryDialog extends StatelessWidget {
             const SizedBox(height: 24),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: entry != null
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.end,
               children: [
-                if (entry != null) ...[
+                if (entry != null)
                   GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       controller.deleteCaffeineEntry(entry!.id);
                       Navigator.pop(context);
                     },
                     child: Container(
+                      height: 44,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 12,
                       ),
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: AppColors.roseSoft2,
                         borderRadius: BorderRadius.circular(12),
@@ -222,63 +233,81 @@ class CaffeineEntryDialog extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Spacer(),
-                ],
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Text(
-                      'Cancel'.tr,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textSoft,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.subtle,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Cancel'.tr,
+                          style: getTextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSoft,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    final title = titleCtrl.text.trim();
-                    final amount = int.tryParse(amountCtrl.text.trim()) ?? 0;
-                    if (title.isNotEmpty && amount > 0) {
-                      if (entry == null) {
-                        controller.addCaffeineEntry(
-                          title,
-                          amount,
-                          selectedTime.value,
-                        );
-                      } else {
-                        controller.editCaffeineEntry(
-                          entry!.id,
-                          title,
-                          amount,
-                          selectedTime.value,
-                        );
-                      }
-                    }
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryTextColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      entry == null ? 'Add'.tr : 'Save'.tr,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.white,
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () async {
+                        final title = titleCtrl.text.trim();
+                        final amount =
+                            int.tryParse(amountCtrl.text.trim()) ?? 0;
+                        if (title.isNotEmpty && amount > 0) {
+                          bool success = false;
+                          if (entry == null) {
+                            success = await controller.addCaffeineEntry(
+                              title,
+                              amount,
+                              selectedTime.value,
+                            );
+                          } else {
+                            success = await controller.editCaffeineEntry(
+                              entry!.id,
+                              title,
+                              amount,
+                              selectedTime.value,
+                            );
+                          }
+                          if (success) {
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
+                      child: Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryTextColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          entry == null ? 'Add'.tr : 'Save'.tr,
+                          style: getTextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
