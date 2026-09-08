@@ -11,12 +11,12 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
 | **1** | **Meal Logging & Update Inconsistency** | Bug Fix | Meal heaviness values normalized to canonical types; French translations & status toasts localized; false error messages fixed. | ✅ Resolved |
 | **2** | **French / English Localization** | i18n / Audit | App-wide audit completed with 100% dictionary key parity (537 keys in en_US and fr_FR); all toasts, dialogs, controllers, and UI overflow edge cases resolved. | ✅ Resolved |
 | **3** | **Unclear UI Button / Function (Sleep Rollover Toggle)** | UX / Clarity | Replaced internal jargon ("Start New Main Wake (Rollover)") with intuitive labels ("Start a New Day" / "Démarrer une nouvelle journée") across UI and i18n dictionaries. | ✅ Resolved |
-| **4** | **Named Custom Work Schedules** | Work Feature | Allow custom names (e.g. *"Syngenta"*), show them in shift options, verify auto-progression. | ⚙️ In Progress |
+| **4** | **Named Custom Work Schedules** | Work Feature | Allow custom names (e.g. *"Syngenta"*), show them in shift options, verify auto-progression. | 📋 Next Phase (See FUTURE_SCOPE.md #5) |
 | **5** | **Dynamic Bedtime Suggestions** | Sync / Logic | Bedtime in recommendation strings updates dynamically when caffeine shifts bedtime (Backend calculation & Socket sync verified). | ✅ Resolved |
 | **6** | **Adaptive Meal Timing Logic** | Nutrition Logic | Backend fasting-aware logic suggests meal heaviness dynamically based on fasted hours and meal deficit; rendered seamlessly by frontend. | ✅ Resolved |
 | **7** | **Sport Activity Type Icons** | UI / Assets | Activity icons mapped (Strength/Force → dumbbell, Running/Course → runner, Cycling/Vélo → bike, Swimming/Natation → pool, Mobility/Yoga → yoga, Rest Day → zzz). | ✅ Resolved |
 | **8** | **Sleep Quality Score 0 Audit** | Backend Logic | Backend baseline floor score and outlier handling active; prevents 0-score clamps for hypersomnia/irregular sleep windows. | ✅ Resolved |
-| **9** | **Persistent Default Daily Meal Goal** | Feature | Allow setting a default meal target (e.g., 5 meals) with *"Save as default"* option. | ⚙️ In Progress |
+| **9** | **Persistent Default Daily Meal Goal** | Feature | Allow setting a default meal target (e.g., 5 meals) with *"Save as default"* option. | 📋 Next Phase (See FUTURE_SCOPE.md #6) |
 | **10** | **Automatic Daily Refresh & Day Transitions** | App Lifecycle / Shift Logic | Strict prohibition on midnight resets for shift workers; day transitions occur via "End My Day" or logging main sleep ("Start a New Day"). Verified seamless refresh without logout. | ✅ Verified |
 | **11** | **Shift-Aware Bedtime Recommendation** | Backend Logic | Bedtime calculated backwards from tomorrow's shift start time - buffer - sleep goal & debt; consumed by Dashboard and Sleep cards. | ✅ Resolved |
 
@@ -63,7 +63,7 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
 
 ---
 
-### 4. Work Schedule: Named Custom Rotations & Cycle Auto-Progression
+### 4. Work Schedule: Named Custom Rotations & Cycle Auto-Progression *(Deferred to Next Phase — See [FUTURE_SCOPE.md](FUTURE_SCOPE.md) #5)*
 * **User Report**:
   1. Allow custom work schedules to have user-defined names (e.g., *"Syngenta"*).
   2. Show the saved custom schedule by name in the Work Schedule selection list alongside predefined templates (prevent defaulting to *"None"*).
@@ -145,7 +145,7 @@ This document consolidates all reported feedback, bugs, UX clarifications, and r
 
 ---
 
-### 9. Save Default Daily Meal Goal
+### 9. Save Default Daily Meal Goal *(Deferred to Next Phase — See [FUTURE_SCOPE.md](FUTURE_SCOPE.md) #6)*
 * **User Report**: *"Allow users to save their preferred daily meal goal as the default (e.g., 5 meals instead of 3 with 'Save as default') so it doesn't reset every day."*
 * **Solution**:
   * Add `defaultDailyMealTarget` to `SharedPreferencesHelper`.
