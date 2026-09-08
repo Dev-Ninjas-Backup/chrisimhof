@@ -206,6 +206,11 @@ class SleepController extends GetxController {
     if (sleepDt.isAfter(wakeDt)) {
       sleepDt = sleepDt.subtract(const Duration(days: 1));
     }
+    // Waking up cannot be in the future; if wakeDt is after current time, it refers to the past wake cycle
+    if (wakeDt.isAfter(now)) {
+      wakeDt = wakeDt.subtract(const Duration(days: 1));
+      sleepDt = sleepDt.subtract(const Duration(days: 1));
+    }
 
     final sleepStartedAt = sleepDt.toUtc().toIso8601String();
     final wakeRecordedAt = wakeDt.toUtc().toIso8601String();
@@ -276,12 +281,13 @@ class SleepController extends GetxController {
           }
         }
 
-        if (hasHardConflict || (data != null && data['saved'] == false)) {
+        if (result['success'] == false || hasHardConflict || (data != null && data['saved'] == false)) {
           historyLogs.assignAll(oldLogs);
           await saveSleepHistory();
 
           final conflictMsg = conflictMessage ??
               (data?['message'] as String?) ??
+              (result['message'] as String?) ??
               'Sleep overlap conflict detected. Please adjust.'.tr;
           EasyLoading.showError(conflictMsg);
           return;
@@ -328,7 +334,8 @@ class SleepController extends GetxController {
       historyLogs.assignAll(oldLogs);
       await saveSleepHistory();
       debugPrint('Error saving sleep: $e');
-      EasyLoading.showError('Failed to save sleep log.'.tr);
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      EasyLoading.showError(msg.isNotEmpty ? msg : 'Failed to save sleep log.'.tr);
     }
   }
 

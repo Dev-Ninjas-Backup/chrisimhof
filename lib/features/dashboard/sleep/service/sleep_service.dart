@@ -50,6 +50,13 @@ class SleepService {
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
+      if (jsonData['success'] == false) {
+        if (jsonData.containsKey('conflicts') ||
+            (jsonData['data'] is Map && (jsonData['data'] as Map).containsKey('conflicts'))) {
+          return jsonData;
+        }
+        throw Exception(jsonData['message'] ?? 'Failed to log sleep');
+      }
       return jsonData;
     } else {
       if (jsonData.containsKey('conflicts') ||
