@@ -66,7 +66,7 @@ class BedtimeCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            data.timeUntilBedtime,
+                            _formatTimeUntilBedtime(data.timeUntilBedtime),
                             style: getTextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
@@ -189,5 +189,14 @@ class BedtimeCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatTimeUntilBedtime(String timeUntil) {
+    if (timeUntil.startsWith('in ')) {
+      return '${'in'.tr} ${timeUntil.substring(3)}';
+    } else if (timeUntil.startsWith('In ')) {
+      return '${'In'.tr} ${timeUntil.substring(3)}';
+    }
+    return timeUntil.tr;
   }
 }

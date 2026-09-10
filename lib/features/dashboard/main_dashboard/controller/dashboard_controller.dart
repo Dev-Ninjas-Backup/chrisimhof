@@ -744,12 +744,12 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
         String timeUntil;
         if (diff > 0) {
-          timeUntil = 'in ${diff ~/ 60}h ${diff % 60}m';
+          timeUntil = '${'in'.tr} ${diff ~/ 60}h ${diff % 60}m';
         } else if (diff == 0) {
-          timeUntil = 'bedtime now';
+          timeUntil = 'bedtime now'.tr;
         } else {
           timeUntil =
-              '${-diff ~/ 60 > 0 ? "${-diff ~/ 60}h " : ""}${(-diff) % 60}m past bedtime';
+              '${-diff ~/ 60 > 0 ? "${-diff ~/ 60}h " : ""}${(-diff) % 60}m ${'past bedtime'.tr}';
         }
 
         dashboardData.value = current.copyWith(
@@ -797,12 +797,12 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
         String timeUntil;
         if (diff > 0) {
-          timeUntil = 'in ${diff ~/ 60}h ${diff % 60}m';
+          timeUntil = '${'in'.tr} ${diff ~/ 60}h ${diff % 60}m';
         } else if (diff == 0) {
-          timeUntil = 'bedtime now';
+          timeUntil = 'bedtime now'.tr;
         } else {
           timeUntil =
-              '${-diff ~/ 60 > 0 ? "${-diff ~/ 60}h " : ""}${(-diff) % 60}m past bedtime';
+              '${-diff ~/ 60 > 0 ? "${-diff ~/ 60}h " : ""}${(-diff) % 60}m ${'past bedtime'.tr}';
         }
 
         dashboardData.value = current.copyWith(
