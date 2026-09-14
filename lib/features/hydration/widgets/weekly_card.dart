@@ -28,17 +28,17 @@ class WeeklyCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'WEEKLY'.tr,
+                  'This week'.tr,
                   style: getTextStyle2(
-                    fontSize: 14,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryTextColor,
                   ),
                 ),
                 Text(
-                  '${'avg'.tr} ${controller.weeklyAverage.toStringAsFixed(1)} L',
+                  '${'Average'.tr} · ${controller.weeklyAverage.toStringAsFixed(1).replaceAll('.', ',')} L',
                   style: getTextStyle(
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: AppColors.greyAlt,
                   ),
@@ -53,6 +53,10 @@ class WeeklyCard extends StatelessWidget {
               ) {
                 final int index = entry.key;
                 final day = entry.value;
+
+                final bool isFrench = Get.locale?.languageCode == 'fr';
+                const frenchLabels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+                final displayLabel = isFrench ? frenchLabels[index] : day.label;
 
                 // Define colors depending on if it is selected
                 final bool isSelected =
@@ -85,7 +89,7 @@ class WeeklyCard extends StatelessWidget {
                         const SizedBox(height: 12),
                         // Day name label
                         Text(
-                          day.label,
+                          displayLabel,
                           style: getTextStyle(
                             fontSize: 11,
                             fontWeight: fontW,

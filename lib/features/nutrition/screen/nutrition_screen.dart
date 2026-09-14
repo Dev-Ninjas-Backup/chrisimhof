@@ -6,14 +6,28 @@ import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.da
 import 'package:chrisimhof/features/nutrition/widgets/meal_timing.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
-class NutritionScreen extends StatelessWidget {
+class NutritionScreen extends StatefulWidget {
   const NutritionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final NutritionController controller = Get.find<NutritionController>();
+  State<NutritionScreen> createState() => _NutritionScreenState();
+}
 
+class _NutritionScreenState extends State<NutritionScreen> {
+  late final NutritionController controller;
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<NutritionController>();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
@@ -25,462 +39,361 @@ class NutritionScreen extends StatelessWidget {
               CustomAppBar(
                 title: 'Nutrition'.tr,
                 showBackButton: true,
-                showMoreButton: true,
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 16),
 
-              // TODAY'S MEALS CARD
+              // 1. COMBINED REPAS DU JOUR & OBJECTIF QUOTIDIEN CARD
               Obx(() {
+                final loggedCount = controller.loggedMealsCount;
+                final target = controller.dailyTarget.value;
+
                 return Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.mintSoft2, // Light mint soft green
-                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFFF0FDF4), // soft green
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFD1FAE5)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "TODAY'S MEALS".tr,
-                        style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.secondaryButtonColor,
-                        ),
+                      // Header Row: Title + Icon
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'REPAS DU JOUR'.tr,
+                            style: getTextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF047857),
+                            ),
+                          ),
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE6F9F0),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                IconPath.homeScreenMealIcon,
+                                width: 20,
+                                height: 20,
+                                color: const Color(0xFF047857),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
+
+                      // Counter: e.g. "3 / 5 prévus"
                       RichText(
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: '${controller.loggedMealsCount}',
+                              text: '$loggedCount ',
                               style: getTextStyle2(
-                                fontSize: 40,
+                                fontSize: 38,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.secondaryButtonColor,
+                                color: const Color(0xFF047857),
                               ),
                             ),
                             TextSpan(
-                              text:
-                                  ' / ${controller.dailyTarget.value} ${'planned'.tr}',
+                              text: '/ $target ${'planned'.tr}',
                               style: getTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.mint,
+                                color: const Color(0xFF10B981),
                               ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // Segmented horizontal progress bars
                       Row(
                         children: List.generate(
-                          controller.dailyTarget.value,
+                          target > 0 ? target : 1,
                           (index) => Expanded(
                             child: Container(
                               height: 8,
                               margin: EdgeInsets.only(
-                                right: index == controller.dailyTarget.value - 1
-                                    ? 0
-                                    : 6,
+                                right: index == target - 1 ? 0 : 6,
                               ),
                               decoration: BoxDecoration(
-                                color: index < controller.loggedMealsCount
-                                    ? AppColors.secondaryButtonColor
-                                    : AppColors.mint.withValues(alpha: 0.3),
+                                color: index < loggedCount
+                                    ? const Color(0xFF059669)
+                                    : const Color(0xFFD1FAE5),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-              // DAILY TARGET CARD
-              Obx(() {
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.borderSoft),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.mintSoft2,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Center(
-                          child: Image(
-                            image: AssetImage(IconPath.nutrition),
-                            width: 24,
-                            height: 24,
-                            color: AppColors.secondaryButtonColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Daily target'.tr,
-                              style: getTextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primaryTextColor,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'How many meals per day?'.tr,
-                              style: getTextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textSoft,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: controller.decrementTarget,
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.gray200),
-                              ),
-                              child: const Icon(
-                                Icons.remove,
-                                size: 16,
-                                color: AppColors.textSoft,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${controller.dailyTarget.value}',
-                            style: getTextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryTextColor,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          GestureDetector(
-                            onTap: controller.incrementTarget,
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: AppColors.secondaryButtonColor,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                size: 16,
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 20),
+                      const Divider(height: 1, color: Color(0xFFD1FAE5)),
+                      const SizedBox(height: 14),
 
-              // LOG A MEAL CARD
-              Obx(() {
-                final formattedTime =
-                    '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
-                return Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.borderSoft),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      // Daily goal stepper: Objectif quotidien [-] 5 [+]
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'LOG A MEAL'.tr,
+                            'Daily goal'.tr,
                             style: getTextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.primaryTextColor,
                             ),
                           ),
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
-                                Icons.access_time,
-                                size: 14,
-                                color: AppColors.textSoft,
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: controller.decrementTarget,
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: AppColors.gray200),
+                                  ),
+                                  child: const Icon(
+                                    Icons.remove_rounded,
+                                    size: 18,
+                                    color: AppColors.textSoft,
+                                  ),
+                                ),
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'now - $formattedTime',
-                                style: getTextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textSoft,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                                child: Text(
+                                  '$target',
+                                  style: getTextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primaryTextColor,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: controller.incrementTarget,
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF059669),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.add_rounded,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'How heavy was it (no food names — only heaviness matters for sleep & recovery)'
-                            .tr,
-                        style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSoft,
-                        ),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 24),
+
+              // 2. AJOUTER UN REPAS (ADD A MEAL) CARD
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.subtle, width: 1.5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Add a meal'.tr,
+                      style: getTextStyle2(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryTextColor,
                       ),
-                      const SizedBox(height: 20),
-                      Row(
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Meal consistency'.tr,
+                      style: getTextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSoft,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 3 Choices: Léger, Moyen, Lourd
+                    Obx(() {
+                      final selected = controller.selectedMealType.value;
+                      return Row(
                         children: [
-                          _buildMealSelectionCard(
-                            type: 'Light'.tr,
+                          _buildMealChoiceCard(
+                            label: 'Light'.tr,
                             iconPath: IconPath.lightMeal,
-                            subtext: 'salad • fruit • snack'.tr,
-                            isSelected:
-                                controller.selectedMealType.value == 'Light',
-                            activeColor: AppColors.secondaryButtonColor,
-                            bgColor: AppColors.mintSoft2,
-                            textColor: AppColors.emerald,
-                            subtextColor: AppColors.mintSoftText,
+                            isSelected: selected == 'Light',
                             onTap: () => controller.selectMealType('Light'),
                           ),
-                          const SizedBox(width: 8),
-                          _buildMealSelectionCard(
-                            type: 'Medium'.tr,
+                          const SizedBox(width: 10),
+                          _buildMealChoiceCard(
+                            label: 'Medium'.tr,
                             iconPath: IconPath.mediumMeal,
-                            subtext: 'standard • balanced'.tr,
-                            isSelected:
-                                controller.selectedMealType.value == 'Medium',
-                            activeColor: AppColors.amber,
-                            bgColor: AppColors.amberSoft,
-                            textColor: AppColors.amberDarker,
-                            subtextColor: AppColors.amberDarkest,
+                            isSelected: selected == 'Medium',
                             onTap: () => controller.selectMealType('Medium'),
                           ),
-                          const SizedBox(width: 8),
-                          _buildMealSelectionCard(
-                            type: 'Heavy'.tr,
+                          const SizedBox(width: 10),
+                          _buildMealChoiceCard(
+                            label: 'Heavy'.tr,
                             iconPath: IconPath.heavyMeal,
-                            subtext: 'rich • fatty • large'.tr,
-                            isSelected:
-                                controller.selectedMealType.value == 'Heavy',
-                            activeColor: AppColors.rose,
-                            bgColor: AppColors.roseSoft2,
-                            textColor: AppColors.roseDark,
-                            subtextColor: AppColors.roseDarkest,
+                            isSelected: selected == 'Heavy',
                             onTap: () => controller.selectMealType('Heavy'),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: controller.saveMeal,
-                        child: Container(
-                          width: double.infinity,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryTextColor, // Slate 900
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.add,
-                                color: AppColors.white,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Save meal'.tr,
-                                style: getTextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 30),
+                      );
+                    }),
+                    const SizedBox(height: 16),
 
-              // TODAY'S TIMING HEADER
-              Text(
-                "TODAY'S TIMING".tr,
-                style: getTextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.secondaryTextColor,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // TIMELINE CARD
-              MealTiming(controller: controller),
-              const SizedBox(height: 20),
-
-              // SLEEP IMPACT ALERT CARD
-              Obx(() {
-                final note = controller.sleepImpactNote.value;
-                if (note == null || note.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                return Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 234, 236, 244),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(width: 1, color: AppColors.indigoSoft),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
+                    // Date & Time Picker Row: [Cal icon] Aujourd'hui · 13:17 [Edit icon]
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _pickDateTime,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
                         decoration: BoxDecoration(
-                          color: AppColors.indigoSoft,
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppColors.borderColor, width: 1.2),
                         ),
-                        child: const Center(
-                          child: Image(
-                            image: AssetImage(IconPath.sleep),
-                            width: 24,
-                            height: 24,
-                            color: AppColors.indigo,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'SLEEP IMPACT'.tr,
-                              style: getTextStyle2(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.blue,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              note,
-                              style: getTextStyle2(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.blueDark,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 20),
-
-              // DAILY NOTES CARD
-              Obx(() {
-                return Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.borderSoft),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'DAILY NOTES'.tr,
-                        style: getTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textSoft,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      ...controller.notesList.map(
-                        (note) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text(
-                            '"$note"',
-                            style: getTextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryTextColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () => _showAddNoteDialog(context, controller),
                         child: Row(
                           children: [
                             const Icon(
-                              Icons.add,
-                              size: 16,
-                              color: AppColors.secondaryButtonColor,
+                              Icons.calendar_today_outlined,
+                              size: 18,
+                              color: AppColors.textSoft,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _getFormattedSelectedDateTime(),
+                                style: getTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTextColor,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.edit_outlined,
+                              size: 18,
+                              color: AppColors.textSoft,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Save Button: + Enregistrer le repas
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        final fullDateTime = DateTime(
+                          selectedDate.year,
+                          selectedDate.month,
+                          selectedDate.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        );
+                        controller.saveMeal(occurredAt: fullDateTime);
+                        // Reset date/time to now for next entry
+                        setState(() {
+                          selectedDate = DateTime.now();
+                          selectedTime = TimeOfDay.now();
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF059669),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.add_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
                             Text(
-                              'Add note'.tr,
+                              'Save meal'.tr,
                               style: getTextStyle(
-                                fontSize: 14,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.secondaryButtonColor,
+                                color: Colors.white,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 26),
+
+              // 3. AUJOURD'HUI (TODAY'S LOGGED MEALS) HEADER & LIST
+              Obx(() {
+                final count = controller.loggedMealsCount;
+                final countText = count > 1 ? '$count ${'meals'.tr}' : '$count ${'meal'.tr}';
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Today'.tr,
+                      style: getTextStyle2(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    if (count > 0)
+                      Text(
+                        countText,
+                        style: getTextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.greyAlt,
+                        ),
+                      ),
+                  ],
                 );
               }),
+              const SizedBox(height: 12),
+
+              MealTiming(controller: controller),
             ],
           ),
         ),
@@ -488,51 +401,65 @@ class NutritionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMealSelectionCard({
-    required String type,
+  Widget _buildMealChoiceCard({
+    required String label,
     required String iconPath,
-    required String subtext,
     required bool isSelected,
-    required Color activeColor,
-    required Color bgColor,
-    required Color textColor,
-    required Color subtextColor,
     required VoidCallback onTap,
   }) {
     return Expanded(
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
           decoration: BoxDecoration(
-            color: bgColor,
+            color: isSelected ? const Color(0xFFECFDF5) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? activeColor : AppColors.transparent,
-              width: 2,
+              color: isSelected ? const Color(0xFF059669) : AppColors.subtle,
+              width: isSelected ? 1.5 : 1.2,
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: Stack(
             children: [
-              Image.asset(iconPath, height: 24, width: 24),
-              const SizedBox(height: 8),
-              Text(
-                type,
-                style: getTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: textColor,
+              if (isSelected)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF059669),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      size: 12,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtext,
-                textAlign: TextAlign.center,
-                style: getTextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w500,
-                  color: subtextColor,
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      iconPath,
+                      width: 32,
+                      height: 32,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      label,
+                      style: getTextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -542,56 +469,61 @@ class NutritionScreen extends StatelessWidget {
     );
   }
 
-  void _showAddNoteDialog(
-    BuildContext context,
-    NutritionController controller,
-  ) {
-    final textController = TextEditingController();
-    showDialog(
+  String _getFormattedSelectedDateTime() {
+    final now = DateTime.now();
+    final isToday = selectedDate.year == now.year &&
+        selectedDate.month == now.month &&
+        selectedDate.day == now.day;
+    final dateStr = isToday
+        ? 'Today'.tr
+        : DateFormat('d MMM', Get.locale?.toString()).format(selectedDate);
+    final timeStr =
+        '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
+    return '$dateStr · $timeStr';
+  }
+
+  Future<void> _pickDateTime() async {
+    final pickedDate = await showDatePicker(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Add Note'.tr,
-          style: getTextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.primaryTextColor,
-          ),
-        ),
-        content: TextField(
-          controller: textController,
-          decoration: InputDecoration(
-            hintText: 'Enter your note here...'.tr,
-            border: const OutlineInputBorder(),
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel'.tr,
-              style: getTextStyle(color: AppColors.textSoft),
+      initialDate: selectedDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF047857),
+              onPrimary: Colors.white,
+              onSurface: AppColors.primaryTextColor,
             ),
           ),
-          TextButton(
-            onPressed: () {
-              if (textController.text.trim().isNotEmpty) {
-                controller.addNote(textController.text);
-              }
-              Navigator.pop(context);
-            },
-            child: Text(
-              'Add'.tr,
-              style: getTextStyle(
-                color: AppColors.secondaryButtonColor,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
+          child: child!,
+        );
+      },
     );
+    if (pickedDate == null || !mounted) return;
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF047857),
+              onPrimary: Colors.white,
+              onSurface: AppColors.primaryTextColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedTime == null || !mounted) return;
+
+    setState(() {
+      selectedDate = pickedDate;
+      selectedTime = pickedTime;
+    });
   }
 }

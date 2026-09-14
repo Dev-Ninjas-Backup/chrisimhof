@@ -24,10 +24,10 @@ class HydrationProgressCard extends StatelessWidget {
 
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
         decoration: BoxDecoration(
-          color: AppColors.blueSoft2.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(32),
+          color: const Color(0xFFF0F8FE),
+          borderRadius: BorderRadius.circular(28),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -64,11 +64,11 @@ class HydrationProgressCard extends StatelessWidget {
                       const Icon(
                         Icons.water_drop_rounded,
                         color: AppColors.blue2,
-                        size: 26,
+                        size: 28,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
-                        '${controller.selectedDayIntake.toStringAsFixed(1)} L',
+                        '${controller.selectedDayIntake} L',
                         style: getTextStyle2(
                           fontSize: 38,
                           fontWeight: FontWeight.w700,
@@ -77,9 +77,9 @@ class HydrationProgressCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'of ${controller.dailyGoal.value.toStringAsFixed(1)} L',
+                        '${'of'.tr} ${controller.dailyGoal.value.toStringAsFixed(1).replaceAll('.', ',')} L',
                         style: getTextStyle(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: AppColors.greyMedium,
                         ),
@@ -89,43 +89,19 @@ class HydrationProgressCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 28),
-            // Dynamic Left sub-indicator text
-            if (previewBody != null && previewBody.isNotEmpty)
-              Text(
-                previewBody,
-                textAlign: TextAlign.center,
-                style: getTextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.greyMedium,
-                ),
-              )
-            else
-              RichText(
-                text: TextSpan(
-                  style: getTextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.greyMedium,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: '${controller.selectedDayLeftIntakeMl} ml ',
-                      style: getTextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.blue2,
-                      ),
-                    ),
-                    TextSpan(
-                      text: controller.isSelectedDayToday
-                          ? 'left for today'.tr
-                          : 'left'.tr,
-                    ),
-                  ],
-                ),
+            const SizedBox(height: 22),
+            // Dynamic or Target adjusted note
+            Text(
+              (previewBody != null && previewBody.isNotEmpty)
+                  ? previewBody
+                  : 'Target adjusted for activity'.tr,
+              textAlign: TextAlign.center,
+              style: getTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.greyMedium,
               ),
+            ),
           ],
         ),
       );

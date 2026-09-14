@@ -53,7 +53,8 @@ class NavbarScreen extends StatelessWidget {
             accessToken: accessToken,
           );
 
-          final String? lang = resp.data?.language?.toUpperCase();
+          final localLang = await SharedPreferencesHelper.getLanguage();
+          final String? lang = localLang?.toUpperCase() ?? resp.data?.language?.toUpperCase();
           if (lang != null && (lang == 'FR' || lang == 'EN')) {
             if (lang == 'FR') {
               Get.updateLocale(const Locale('fr', 'FR'));

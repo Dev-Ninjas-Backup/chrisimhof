@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -84,48 +83,17 @@ class SleepController extends GetxController {
   Future<void> loadSleepHistory() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final String? jsonStr = prefs.getString('sleepHistoryLogs');
-      if (jsonStr != null) {
-        final List decoded = jsonDecode(jsonStr);
-        historyLogs.assignAll(decoded.map((item) => SleepLog(
-          id: item['id'],
-          date: DateTime.parse(item['date']),
-          bedtime: TimeOfDay(hour: item['bedtimeHour'], minute: item['bedtimeMinute']),
-          wakeupTime: TimeOfDay(hour: item['wakeupHour'], minute: item['wakeupMinute']),
-          quality: item['quality'],
-        )).toList());
-      } else {
-        _initializeMockHistory();
-      }
+      await prefs.remove('sleepHistoryLogs');
     } catch (e) {
-      debugPrint('Error loading sleep history: $e');
-      _initializeMockHistory();
+      debugPrint('Error clearing local sleep history: $e');
     }
+    historyLogs.clear();
   }
 
   Future<void> saveSleepHistory() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final listToSave = historyLogs.map((log) => {
-        'id': log.id,
-        'date': log.date.toIso8601String(),
-        'bedtimeHour': log.bedtime.hour,
-        'bedtimeMinute': log.bedtime.minute,
-        'wakeupHour': log.wakeupTime.hour,
-        'wakeupMinute': log.wakeupTime.minute,
-        'quality': log.quality,
-      }).toList();
-      await prefs.setString('sleepHistoryLogs', jsonEncode(listToSave));
-    } catch (e) {
-      debugPrint('Error saving sleep history: $e');
-    }
+    // Local storage persistence disabled: server is authoritative
   }
 
-  void _initializeMockHistory() async {
-    // No mock data — start with an empty history and save empty state
-    historyLogs.clear();
-    await saveSleepHistory();
-  }
 
   // Bedtime adjusters
   void incrementBedtimeHour() {
@@ -215,26 +183,23 @@ class SleepController extends GetxController {
     final sleepStartedAt = sleepDt.toUtc().toIso8601String();
     final wakeRecordedAt = wakeDt.toUtc().toIso8601String();
 
-    // Add to history logs
+    // Add to in-memory history logs
     final newLog = SleepLog(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      date: DateTime.now(),
+      date: wakeDt,
       bedtime: TimeOfDay(hour: bedtimeHour.value, minute: bedtimeMinute.value),
       wakeupTime: TimeOfDay(hour: wakeupHour.value, minute: wakeupMinute.value),
       quality: 0,
     );
 
-    final today = DateTime.now();
     final index = historyLogs.indexWhere(
-      (log) => log.date.year == today.year && log.date.month == today.month && log.date.day == today.day
+      (log) => log.date.year == wakeDt.year && log.date.month == wakeDt.month && log.date.day == wakeDt.day
     );
     if (index != -1) {
       historyLogs[index] = newLog;
     } else {
       historyLogs.insert(0, newLog);
     }
-    
-    await saveSleepHistory();
 
     EasyLoading.show(status: 'Saving sleep...'.tr);
     try {
@@ -557,8 +522,13 @@ class SleepController extends GetxController {
           }
         }
         
-        // Preserve optimistic logs that are not yet returned by the server on the same day
-        final optimisticLogs = historyLogs.where((log) => int.tryParse(log.id) != null).toList();
+        // Preserve recent optimistic in-memory logs (within last 2 minutes) not yet returned by the server on the same day
+        final nowMs = DateTime.now().millisecondsSinceEpoch;
+        final optimisticLogs = historyLogs.where((log) {
+          final idNum = int.tryParse(log.id);
+          if (idNum == null) return false;
+          return (nowMs - idNum).abs() < 120000;
+        }).toList();
         for (var optLog in optimisticLogs) {
           final hasSameDay = parsedLogs.any((pLog) =>
               pLog.date.year == optLog.date.year &&
@@ -570,7 +540,6 @@ class SleepController extends GetxController {
         }
         parsedLogs.sort((a, b) => b.date.compareTo(a.date));
         historyLogs.assignAll(parsedLogs);
-        saveSleepHistory();
       }
     } catch (e) {
       debugPrint('SleepController socket update error: $e');

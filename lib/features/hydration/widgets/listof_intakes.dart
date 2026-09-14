@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/hydration/controller/hydration_controller.dart';
+import 'package:chrisimhof/features/hydration/widgets/hydration_edit_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -45,64 +46,86 @@ class ListofIntakes extends StatelessWidget {
         child: ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           itemCount: logs.length,
-          separatorBuilder: (context, index) => const Padding(
-            padding: EdgeInsets.symmetric(vertical: 4.0),
-            child: Divider(height: 1.5, color: AppColors.subtle),
+          separatorBuilder: (context, index) => const Divider(
+            height: 1.5,
+            color: AppColors.subtle,
           ),
           itemBuilder: (context, index) {
             final log = logs[index];
+            final bool canEdit = controller.isSelectedDayToday && !log.id.startsWith('weekly_total');
+
             return InkWell(
-              onTap: controller.isSelectedDayToday && !log.id.startsWith('weekly_total')
-                  ? () => _showEditDeleteDialog(context, log)
+              borderRadius: BorderRadius.circular(16),
+              onTap: canEdit
+                  ? () => HydrationEditBottomSheet.show(context, controller: controller, log: log)
                   : null,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                 child: Row(
                   children: [
-                    // Time
-                    Text(
-                      log.time,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.greyAlt,
+                    // Soft blue circle with water droplet icon
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppColors.blueSoft2.withValues(alpha: 0.6),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.water_drop_outlined,
+                        color: AppColors.blue2,
+                        size: 20,
                       ),
                     ),
                     const SizedBox(width: 14),
-                    // Blue bullet dot
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppColors.blue2,
-                        shape: BoxShape.circle,
+
+                    // Log type and time
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            log.type.tr,
+                            style: getTextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryTextColor,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            log.time,
+                            style: getTextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.greyAlt,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    // Log type/name
-                    Text(
-                      log.type.tr,
-                      style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryTextColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    // Log amount
+
+                    // Log amount in bold blue
                     Text(
                       '${log.amountMl} ml',
                       style: getTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.blue2,
                       ),
                     ),
-                    if (controller.isSelectedDayToday && !log.id.startsWith('weekly_total')) ...[
-                      const SizedBox(width: 8),
-                      const Icon(Icons.more_vert_rounded, size: 18, color: AppColors.textSoft),
+
+                    // Pencil edit icon
+                    if (canEdit) ...[
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                        color: AppColors.textSoft,
+                      ),
                     ],
                   ],
                 ),
@@ -112,179 +135,5 @@ class ListofIntakes extends StatelessWidget {
         ),
       );
     });
-  }
-
-  void _showEditDeleteDialog(BuildContext context, HydrationLog log) {
-    final volumeCtrl = TextEditingController(text: '${log.amountMl}');
-    DateTime initialDt = DateTime.now();
-    if (log.time.contains(':') && !log.time.contains('--')) {
-      try {
-        final parts = log.time.split(':');
-        final h = int.parse(parts[0].trim());
-        final m = int.parse(parts[1].trim());
-        final now = DateTime.now();
-        initialDt = DateTime(now.year, now.month, now.day, h, m);
-      } catch (_) {}
-    } else if (log.occurredAt != null && log.occurredAt!.isNotEmpty) {
-      try {
-        initialDt = DateTime.parse(log.occurredAt!);
-      } catch (_) {}
-    }
-    final selectedDate = initialDt.obs;
-    final selectedTime = TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
-
-    Get.dialog(
-      Obx(
-        () => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text('Edit Hydration Entry'.tr),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Volume (ml)'.tr,
-                  style: getTextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSoft,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: volumeCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    suffixText: 'ml',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Date & Time'.tr,
-                  style: getTextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSoft,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate.value,
-                            firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                            lastDate: DateTime.now().add(const Duration(days: 365)),
-                          );
-                          if (picked != null) {
-                            selectedDate.value = picked;
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.borderSoft),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textSoft),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  '${selectedDate.value.day}/${selectedDate.value.month}/${selectedDate.value.year}',
-                                  style: getTextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryTextColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () async {
-                          final picked = await showTimePicker(
-                            context: context,
-                            initialTime: selectedTime.value,
-                          );
-                          if (picked != null) {
-                            selectedTime.value = picked;
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.borderSoft),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.access_time_outlined, size: 14, color: AppColors.textSoft),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  selectedTime.value.format(context),
-                                  style: getTextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryTextColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Get.back();
-                controller.deleteLog(log.id);
-              },
-              child: Text('Delete'.tr, style: const TextStyle(color: Colors.red)),
-            ),
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text('Cancel'.tr),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final vol = int.tryParse(volumeCtrl.text) ?? log.amountMl;
-                final d = selectedDate.value;
-                final t = selectedTime.value;
-                final fullDateTime = DateTime(d.year, d.month, d.day, t.hour, t.minute);
-                Get.back();
-                controller.editHydrationLog(log.id, vol, occurredAt: fullDateTime);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue2),
-              child: Text('Save'.tr, style: const TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

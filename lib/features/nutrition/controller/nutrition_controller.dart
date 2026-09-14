@@ -82,7 +82,7 @@ class NutritionController extends GetxController {
     if (entryId.isEmpty) return;
     final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
-    if (sessionId.isEmpty || token.isEmpty || entryId.length < 10) {
+    if (sessionId.isEmpty || token.isEmpty || entryId.startsWith('local_') || entryId.length < 10) {
       mealsList.removeWhere((m) => m.id == entryId);
       await saveNutritionData();
       return;
@@ -149,13 +149,15 @@ class NutritionController extends GetxController {
     }
     final capType = canonicalHeaviness[0].toUpperCase() + canonicalHeaviness.substring(1);
 
+    final timeOnly =
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+
     final index = mealsList.indexWhere((m) => m.id == entryId);
     if (index != -1) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final target = DateTime(dt.year, dt.month, dt.day);
       final diffDays = target.difference(today).inDays;
-      final timeOnly = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
       String newTimeStr = timeOnly;
       if (diffDays == -1) {
@@ -165,8 +167,7 @@ class NutritionController extends GetxController {
         newTimeStr = '${dt.day} ${months[dt.month - 1]} · $timeOnly';
       }
 
-      final currentName = mealsList[index].name;
-      final cleanName = (currentName.isEmpty || currentName.toLowerCase().contains('undefined')) ? 'Meal' : currentName;
+      final cleanName = 'Meal';
 
       final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
       mealsList[index] = mealsList[index].copyWith(
@@ -184,6 +185,7 @@ class NutritionController extends GetxController {
       final bodyJson = jsonEncode({
         'occurredAt': isoString,
         'heaviness': canonicalHeaviness,
+        'timestamp': timeOnly,
       });
 
       debugPrint('=== EDIT MEAL REQUEST ===');
@@ -268,7 +270,17 @@ class NutritionController extends GetxController {
               .map(
                 (m) {
                   final rawName = (m['name'] ?? '').toString();
-                  final cleanName = (rawName.isEmpty || rawName.toLowerCase().contains('undefined')) ? 'Meal' : rawName;
+                  final lower = rawName.toLowerCase();
+                  final cleanName = (rawName.isEmpty ||
+                          lower.contains('undefined') ||
+                          lower == 'meal' ||
+                          lower.startsWith('meal ') ||
+                          lower == 'snack' ||
+                          lower == 'pre-shift meal' ||
+                          lower == 'night meal' ||
+                          lower == 'post-shift meal')
+                      ? 'Meal'
+                      : rawName;
                   return MealItem(
                     id: m['id'] ?? '',
                     name: cleanName,
@@ -350,7 +362,6 @@ class NutritionController extends GetxController {
         debugPrint('Nutrition API increment target error: $e');
       }
 
-      final newIndex = mealsList.length + 1;
       String nextTime = '22:00';
       if (mealsList.isNotEmpty) {
         final lastTimeStr = mealsList.last.time.split(' ')[0];
@@ -365,7 +376,8 @@ class NutritionController extends GetxController {
       }
       mealsList.add(
         MealItem(
-          name: 'Meal $newIndex',
+          id: 'target_${DateTime.now().millisecondsSinceEpoch}',
+          name: 'Meal',
           time: nextTime,
           type: 'Light',
           isLogged: false,
@@ -409,11 +421,12 @@ class NutritionController extends GetxController {
     }
   }
 
-  void saveMeal() async {
+  void saveMeal({DateTime? occurredAt}) async {
     int firstUnloggedIdx = mealsList.indexWhere((m) => !m.isLogged);
-    final now = DateTime.now();
+    final dt = occurredAt ?? DateTime.now();
     final formattedTime =
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final isoString = await TimezoneHelper.formatToSessionUtcIso(dt);
 
     String canonicalType = 'Light';
     final tLower = selectedMealType.value.toLowerCase();
@@ -426,21 +439,19 @@ class NutritionController extends GetxController {
     }
 
     final oldMeal = firstUnloggedIdx != -1 ? mealsList[firstUnloggedIdx] : null;
-    final newIndex = mealsList.length + 1;
-    final tempMeal = oldMeal != null
-        ? oldMeal.copyWith(
-            type: canonicalType,
-            isLogged: true,
-            isPlanned: false,
-            time: formattedTime,
-          )
-        : MealItem(
-            name: 'Meal $newIndex',
-            time: formattedTime,
-            type: canonicalType,
-            isLogged: true,
-            isPlanned: false,
-          );
+    final localId = (oldMeal?.id.isNotEmpty == true)
+        ? oldMeal!.id
+        : 'local_${DateTime.now().millisecondsSinceEpoch}';
+
+    final tempMeal = MealItem(
+      id: localId,
+      name: 'Meal',
+      time: formattedTime,
+      type: canonicalType,
+      isLogged: true,
+      isPlanned: false,
+      occurredAt: isoString,
+    );
 
     // Optimistic update
     if (firstUnloggedIdx != -1) {
@@ -458,7 +469,7 @@ class NutritionController extends GetxController {
         final order = firstUnloggedIdx != -1
             ? firstUnloggedIdx + 1
             : mealsList.length + 1;
-        await DashboardService().patchQuickAddLog(
+        final res = await DashboardService().patchQuickAddLog(
           sessionId: sessionId,
           newMealLogs: [
             {
@@ -466,10 +477,19 @@ class NutritionController extends GetxController {
               'timestamp': formattedTime,
               'plannedTime': formattedTime,
               'heaviness': heaviness,
+              'occurredAt': isoString,
             },
           ],
         );
         apiSuccess = true;
+        if (res['data'] != null) {
+          RealtimeSocketService().handleLiveScores(res['data'], useLocalCaches: false);
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
       }
     } catch (e) {
       debugPrint('Nutrition API quickAdd error: $e');
@@ -544,32 +564,47 @@ class NutritionController extends GetxController {
             capType = 'Light';
           }
 
+          final isLogged = m['status'] == 'logged' || m['isLogged'] == true;
           final rawName = (m['label'] ?? m['name'] ?? m['displayName'] ?? '').toString();
+          final lower = rawName.toLowerCase();
           String mealName = rawName;
-          if (mealName.isEmpty || mealName == 'null' || mealName.toLowerCase().contains('undefined')) {
+          if (isLogged ||
+              mealName.isEmpty ||
+              mealName == 'null' ||
+              lower.contains('undefined') ||
+              lower == 'meal' ||
+              lower.startsWith('meal ') ||
+              lower == 'snack' ||
+              lower == 'pre-shift meal' ||
+              lower == 'night meal' ||
+              lower == 'post-shift meal') {
             mealName = 'Meal';
           }
 
+          final rawTime = (m['timestamp'] ?? m['displayTime'] ?? m['plannedTime'] ?? '').toString();
+          String displayTime = (rawTime.isNotEmpty && rawTime != 'null') ? rawTime : '00:00';
           final occurredAtStr = (m['occurredAt'] ?? m['createdAt'] ?? m['updatedAt']) as String?;
-          String displayTime = m['timestamp'] ?? m['displayTime'] ?? m['plannedTime'] ?? '';
 
           if (occurredAtStr != null && occurredAtStr.isNotEmpty) {
             try {
-              final parsed = DateTime.parse(occurredAtStr).toLocal();
+              final parsed = TimezoneHelper.parseSessionUtcToLocal(occurredAtStr);
               final now = DateTime.now();
               final today = DateTime(now.year, now.month, now.day);
               final target = DateTime(parsed.year, parsed.month, parsed.day);
               final diffDays = target.difference(today).inDays;
 
-              final timeOnly = '${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}';
-              if (diffDays == 0) {
-                displayTime = timeOnly;
-              } else if (diffDays == -1) {
+              final timeOnly = (displayTime.isNotEmpty && displayTime != '00:00')
+                  ? displayTime
+                  : '${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}';
+
+              if (diffDays == -1) {
                 displayTime = '${'Yesterday'.tr} $timeOnly';
-              } else {
+              } else if (diffDays < -1 || diffDays > 0) {
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 final monthStr = months[parsed.month - 1];
                 displayTime = '${parsed.day} $monthStr · $timeOnly';
+              } else {
+                displayTime = timeOnly;
               }
             } catch (_) {}
           }

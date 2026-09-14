@@ -66,7 +66,8 @@ class SettingsController extends GetxController {
         sportProfile.value = profileData.sportProfile ?? '';
         // Apply language from profile if provided (EN / FR)
         try {
-          final String? lang = profileData.language?.toUpperCase();
+          final localLang = await SharedPreferencesHelper.getLanguage();
+          final String? lang = localLang?.toUpperCase() ?? profileData.language?.toUpperCase();
           if (lang != null && (lang == 'FR' || lang == 'EN')) {
             // Update app locale without calling the backend
             if (lang == 'FR') {
