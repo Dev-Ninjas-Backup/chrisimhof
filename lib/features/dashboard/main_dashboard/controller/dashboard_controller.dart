@@ -27,6 +27,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   final Rxn<Map<String, dynamic>> sleepTabData = Rxn<Map<String, dynamic>>();
   final Rxn<Map<String, dynamic>> nutritionTabData =
       Rxn<Map<String, dynamic>>();
+  final Rxn<Map<String, dynamic>> caffeineTabData =
+      Rxn<Map<String, dynamic>>();
 
   final Rxn<List<dynamic>> forYouPreviewData = Rxn<List<dynamic>>();
 
@@ -103,8 +105,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
   Map<String, dynamic> normalizeDashboardPayload(Map<String, dynamic> payload) {
     Map<String, dynamic> data = payload;
-    if (payload.containsKey('data') && payload['data'] is Map) {
-      data = Map<String, dynamic>.from(payload['data'] as Map);
+    if (payload.containsKey('data') &&
+        payload['data'] is Map<String, dynamic>) {
+      data = payload['data'] as Map<String, dynamic>;
     }
 
     final Map<String, dynamic> flat = {};
@@ -117,16 +120,18 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     });
 
     // 2. If there's a nested liveScores, merge its contents
-    if (data.containsKey('liveScores') && data['liveScores'] is Map) {
-      final liveScores = Map<String, dynamic>.from(data['liveScores'] as Map);
+    if (data.containsKey('liveScores') &&
+        data['liveScores'] is Map<String, dynamic>) {
+      final liveScores = data['liveScores'] as Map<String, dynamic>;
       liveScores.forEach((key, value) {
         flat[key] = value;
       });
     }
 
     // 3. If there's a nested calculation, merge its contents
-    if (data.containsKey('calculation') && data['calculation'] is Map) {
-      final calculation = Map<String, dynamic>.from(data['calculation'] as Map);
+    if (data.containsKey('calculation') &&
+        data['calculation'] is Map<String, dynamic>) {
+      final calculation = data['calculation'] as Map<String, dynamic>;
       calculation.forEach((key, value) {
         flat[key] = value;
       });
@@ -473,15 +478,20 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     // Cache forYouPreview for late-registering controllers
-    if (apiData['forYouPreview'] is List && (apiData['forYouPreview'] as List).isNotEmpty) {
-      forYouPreviewData.value = apiData['forYouPreview'] as List<dynamic>;
+    final previewList = (apiData['forYouPreview'] ??
+            apiData['liveScores']?['forYouPreview'] ??
+            apiData['recommendations']) as List<dynamic>?;
+    if (previewList != null && previewList.isNotEmpty) {
+      forYouPreviewData.value = previewList;
     }
 
     // Forward forYouPreview sleep entry to SleepController
-    if (Get.isRegistered<SleepController>() && forYouPreviewData.value != null) {
-      Get.find<SleepController>().updateFromForYouPreview(
-        forYouPreviewData.value!,
-      );
+    if (forYouPreviewData.value != null && forYouPreviewData.value!.isNotEmpty) {
+      if (Get.isRegistered<SleepController>()) {
+        Get.find<SleepController>().updateFromForYouPreview(
+          forYouPreviewData.value!,
+        );
+      }
     }
     if (apiData['tabs']?['hydration'] != null) {
       if (Get.isRegistered<HydrationController>()) {
@@ -490,24 +500,30 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         );
       }
     }
-    if (Get.isRegistered<HydrationController>() && forYouPreviewData.value != null) {
-      Get.find<HydrationController>().updateFromForYouPreview(
-        forYouPreviewData.value!,
-      );
+    if (forYouPreviewData.value != null && forYouPreviewData.value!.isNotEmpty) {
+      if (Get.isRegistered<HydrationController>()) {
+        Get.find<HydrationController>().updateFromForYouPreview(
+          forYouPreviewData.value!,
+        );
+      }
     }
-    if (apiData['tabs']?['caffeine'] != null) {
+    final caffeineTab = (apiData['tabs']?['caffeine'] ?? apiData['caffeine']) as Map<String, dynamic>?;
+    if (caffeineTab != null) {
+      caffeineTabData.value = Map<String, dynamic>.from(caffeineTab);
       if (Get.isRegistered<CaffeineController>()) {
         Get.find<CaffeineController>().updateFromLiveScoresTab(
-          apiData['tabs']['caffeine'],
+          caffeineTabData.value!,
         );
       }
     }
 
     // Forward forYouPreview caffeine entry to CaffeineController
-    if (Get.isRegistered<CaffeineController>() && forYouPreviewData.value != null) {
-      Get.find<CaffeineController>().updateFromForYouPreview(
-        forYouPreviewData.value!,
-      );
+    if (forYouPreviewData.value != null && forYouPreviewData.value!.isNotEmpty) {
+      if (Get.isRegistered<CaffeineController>()) {
+        Get.find<CaffeineController>().updateFromForYouPreview(
+          forYouPreviewData.value!,
+        );
+      }
     }
     if (apiData['tabs']?['nutrition'] != null) {
       nutritionTabData.value = Map<String, dynamic>.from(
@@ -528,15 +544,17 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     // Forward cards.sport (recoveryLoadScore + readinessNote) to SportsController
-    final sportCard = cards?['sport'] as Map<String, dynamic>?;
+    final sportCard = (cards?['sport'] ?? apiData['cards']?['sport'] ?? apiData['liveScores']?['cards']?['sport']) as Map<String, dynamic>?;
     if (sportCard != null) {
       sportCardData.value = sportCard;
       if (Get.isRegistered<SportsController>()) {
         Get.find<SportsController>().updateFromSportCard(sportCard);
       }
+    } else {
+      sportCardData.value = null;
     }
     // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) to CaffeineController
-    final caffeineCard = cards?['caffeine'] as Map<String, dynamic>?;
+    final caffeineCard = (cards?['caffeine'] ?? apiData['cards']?['caffeine'] ?? apiData['liveScores']?['cards']?['caffeine']) as Map<String, dynamic>?;
     if (caffeineCard != null) {
       caffeineCardData.value = caffeineCard;
       if (Get.isRegistered<CaffeineController>()) {
@@ -844,6 +862,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     // Clear recommendations preview cache and active controllers immediately
     forYouPreviewData.value = null;
     caffeineCardData.value = null;
+    caffeineTabData.value = null;
     sportCardData.value = null;
     if (Get.isRegistered<RecommendationController>()) {
       Get.find<RecommendationController>().forYouPreview.clear();

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class AddCaffeineBottomSheet extends StatefulWidget {
+class AddCaffeineBottomSheet extends StatelessWidget {
   final CaffeineController controller;
   final CaffeineEntry? entry;
 
@@ -16,6 +16,8 @@ class AddCaffeineBottomSheet extends StatefulWidget {
     required this.controller,
     this.entry,
   });
+
+  bool get isEdit => entry != null;
 
   static Future<void> show(
     BuildContext context, {
@@ -34,65 +36,18 @@ class AddCaffeineBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<AddCaffeineBottomSheet> createState() => _AddCaffeineBottomSheetState();
-}
-
-class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _amountController;
-  late int _amountMg;
-  late DateTime _selectedDateTime;
-
-  bool get isEditMode => widget.entry != null;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(
-      text: widget.entry != null ? widget.entry!.title : 'Other'.tr,
-    );
-    _amountMg = widget.entry?.amountMg ?? 80;
-    _amountController = TextEditingController(text: '$_amountMg');
-    _selectedDateTime = widget.entry?.timestamp ?? DateTime.now();
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _amountController.dispose();
-    super.dispose();
-  }
-
-  void _increment() {
-    setState(() {
-      _amountMg = (_amountMg + 10).clamp(0, 1000);
-      _amountController.text = '$_amountMg';
-      _amountController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _amountController.text.length),
-      );
-    });
-  }
-
-  void _decrement() {
-    if (_amountMg > 10) {
-      setState(() {
-        _amountMg = (_amountMg - 10).clamp(0, 1000);
-        _amountController.text = '$_amountMg';
-        _amountController.selection = TextSelection.fromPosition(
-          TextPosition(offset: _amountController.text.length),
-        );
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final timeFormatted =
-        '${_selectedDateTime.hour.toString().padLeft(2, '0')}:${_selectedDateTime.minute.toString().padLeft(2, '0')}';
-    final dateFormatted = DateFormat(
-      'd MMM yyyy',
-      Get.locale?.toString(),
-    ).format(_selectedDateTime);
+    DateTime initialDt = entry?.timestamp ?? DateTime.now();
+    final initialAmount = entry?.amountMg ?? 80;
+    final currentAmount = initialAmount.obs;
+
+    final titleController = TextEditingController(
+      text: entry != null ? entry!.title.tr : 'Custom'.tr,
+    );
+    final amountController = TextEditingController(text: '$initialAmount');
+    final selectedDate = initialDt.obs;
+    final selectedTime =
+        TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
 
     return Container(
       decoration: const BoxDecoration(
@@ -110,7 +65,7 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag handle
+            // Top Drag Handle
             Center(
               child: Container(
                 width: 44,
@@ -123,7 +78,7 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
             ),
             const SizedBox(height: 16),
 
-            // Header: Coffee Cup Icon + Tag + Title + Close Button
+            // Header Row: Soft Coffee Badge + Category/Title + Close Button
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -131,15 +86,14 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF7ED),
+                    color: const Color(0xFFFEF3C7),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFFFEDD5), width: 1),
                   ),
                   child: const Center(
                     child: Icon(
-                      Icons.coffee_rounded,
-                      size: 22,
+                      Icons.coffee_outlined,
                       color: Color(0xFF9A3412),
+                      size: 24,
                     ),
                   ),
                 ),
@@ -150,7 +104,7 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'CAFFEINE'.tr,
+                        'CAFÉINE',
                         style: getTextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -159,9 +113,7 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        isEditMode
-                            ? 'Edit caffeine entry'.tr
-                            : 'Add caffeine'.tr,
+                        isEdit ? 'Modifier la caféine'.tr : 'Ajouter de la caféine'.tr,
                         style: getTextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w700,
@@ -172,7 +124,6 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                   ),
                 ),
                 GestureDetector(
-                  behavior: HitTestBehavior.opaque,
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
                     width: 36,
@@ -194,79 +145,90 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
 
             // Section 1: Nom de la boisson / Drink name
             Text(
-              'Drink name'.tr,
+              'Nom de la boisson'.tr,
               style: getTextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryTextColor,
               ),
             ),
-            const SizedBox(height: 8),
-
+            const SizedBox(height: 10),
             Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.borderColor, width: 1.2),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: _nameController,
+                      controller: titleController,
                       style: getTextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryTextColor,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'e.g. Espresso, Coffee, Tea'.tr,
-                        hintStyle: getTextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSoft.withValues(alpha: 0.6),
-                        ),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
                         border: InputBorder.none,
+                        hintText: 'Nom de la boisson'.tr,
+                        hintStyle: getTextStyle(
+                          color: AppColors.textSoft.withValues(alpha: 0.5),
+                        ),
                       ),
                     ),
                   ),
                   const Icon(
                     Icons.edit_outlined,
-                    size: 18,
                     color: AppColors.textSoft,
+                    size: 20,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
 
             // Section 2: Quantité de caféine / Caffeine amount
             Text(
-              'Caffeine amount'.tr,
+              'Quantité de caféine'.tr,
               style: getTextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryTextColor,
               ),
             ),
             const SizedBox(height: 10),
 
-            // Stepper card with center editable TextField
+            // Stepper Container: (-) Editable Center (+) (10 mg increments)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFFBEB),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFFDBA74), width: 1.4),
+                border: Border.all(
+                  color: const Color(0xFFFED7AA),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Decrement button (-10 mg)
+                  // Minus Button (-10 mg)
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: _decrement,
+                    onTap: () {
+                      if (currentAmount.value > 0) {
+                        currentAmount.value =
+                            (currentAmount.value - 10).clamp(0, 1000);
+                        amountController.text = currentAmount.value.toString();
+                        amountController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: amountController.text.length),
+                        );
+                      }
+                    },
                     child: Container(
                       width: 44,
                       height: 44,
@@ -275,38 +237,33 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: const Color(0xFFFED7AA),
-                          width: 1.2,
+                          width: 1.5,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 4,
-                          ),
-                        ],
                       ),
                       child: const Icon(
-                        Icons.remove,
-                        size: 20,
+                        Icons.remove_rounded,
                         color: Color(0xFF9A3412),
+                        size: 24,
                       ),
                     ),
                   ),
 
-                  // Center directly editable number + "|" divider + "mg"
+                  // Center directly editable quantity
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
                       children: [
                         IntrinsicWidth(
                           child: TextField(
-                            controller: _amountController,
+                            controller: amountController,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
                             textAlign: TextAlign.center,
-                            style: getTextStyle2(
+                            style: getTextStyle(
                               fontSize: 34,
                               fontWeight: FontWeight.w800,
                               color: AppColors.primaryTextColor,
@@ -322,17 +279,12 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                             onChanged: (val) {
                               final parsed = int.tryParse(val);
                               if (parsed != null) {
-                                _amountMg = parsed;
+                                currentAmount.value = parsed;
                               }
                             },
                           ),
                         ),
-                        Container(
-                          height: 24,
-                          width: 1.2,
-                          color: const Color(0xFFFED7AA),
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                        ),
+                        const SizedBox(width: 6),
                         Text(
                           'mg',
                           style: getTextStyle(
@@ -345,10 +297,17 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                     ),
                   ),
 
-                  // Increment button (+10 mg)
+                  // Plus Button (+10 mg)
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: _increment,
+                    onTap: () {
+                      currentAmount.value =
+                          (currentAmount.value + 10).clamp(0, 1000);
+                      amountController.text = currentAmount.value.toString();
+                      amountController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: amountController.text.length),
+                      );
+                    },
                     child: Container(
                       width: 44,
                       height: 44,
@@ -357,193 +316,174 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: const Color(0xFFFED7AA),
-                          width: 1.2,
+                          width: 1.5,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 4,
-                          ),
-                        ],
                       ),
                       child: const Icon(
-                        Icons.add,
-                        size: 20,
+                        Icons.add_rounded,
                         color: Color(0xFF9A3412),
+                        size: 24,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
 
             // Section 3: Date et heure / Date and time
             Text(
               'Date and time'.tr,
               style: getTextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryTextColor,
               ),
             ),
             const SizedBox(height: 10),
 
-            Row(
-              children: [
-                // Date Card
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: _selectedDateTime,
-                        firstDate: DateTime.now().subtract(
-                          const Duration(days: 365),
+            Obx(
+              () => Row(
+                children: [
+                  // Date Picker Box
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate.value,
+                          firstDate: DateTime.now().subtract(
+                            const Duration(days: 365),
+                          ),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 365),
+                          ),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: const ColorScheme.light(
+                                  primary: Color(0xFF9A3412),
+                                  onPrimary: Colors.white,
+                                  onSurface: AppColors.primaryTextColor,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (picked != null) {
+                          selectedDate.value = picked;
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 13,
                         ),
-                        lastDate: DateTime.now().add(
-                          const Duration(days: 365),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: AppColors.borderColor,
+                            width: 1.2,
+                          ),
                         ),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: const ColorScheme.light(
-                                primary: Color(0xFF9A3412),
-                                onPrimary: Colors.white,
-                                onSurface: AppColors.primaryTextColor,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today_outlined,
+                              size: 18,
+                              color: AppColors.textSoft,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                DateFormat(
+                                  'd MMM yyyy',
+                                  Get.locale?.toString(),
+                                ).format(selectedDate.value),
+                                style: getTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTextColor,
+                                ),
                               ),
                             ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          _selectedDateTime = DateTime(
-                            picked.year,
-                            picked.month,
-                            picked.day,
-                            _selectedDateTime.hour,
-                            _selectedDateTime.minute,
-                          );
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 13,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.borderColor,
-                          width: 1.2,
+                          ],
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 16,
-                            color: AppColors.textSoft,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              dateFormatted,
-                              style: getTextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTextColor,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                // Time Card
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-                      final picked = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay(
-                          hour: _selectedDateTime.hour,
-                          minute: _selectedDateTime.minute,
+                  // Time Picker Box
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: selectedTime.value,
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: const ColorScheme.light(
+                                  primary: Color(0xFF9A3412),
+                                  onPrimary: Colors.white,
+                                  onSurface: AppColors.primaryTextColor,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (picked != null) {
+                          selectedTime.value = picked;
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 13,
                         ),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: const ColorScheme.light(
-                                primary: Color(0xFF9A3412),
-                                onPrimary: Colors.white,
-                                onSurface: AppColors.primaryTextColor,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: AppColors.borderColor,
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time_outlined,
+                              size: 18,
+                              color: AppColors.textSoft,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                '${selectedTime.value.hour.toString().padLeft(2, '0')}:${selectedTime.value.minute.toString().padLeft(2, '0')}',
+                                style: getTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTextColor,
+                                ),
                               ),
                             ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          _selectedDateTime = DateTime(
-                            _selectedDateTime.year,
-                            _selectedDateTime.month,
-                            _selectedDateTime.day,
-                            picked.hour,
-                            picked.minute,
-                          );
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 13,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.borderColor,
-                          width: 1.2,
+                          ],
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time_rounded,
-                            size: 16,
-                            color: AppColors.textSoft,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            timeFormatted,
-                            style: getTextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryTextColor,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 28),
 
-            // Action Buttons: [ Annuler ]  [ Ajouter / Enregistrer ]
+            // Action Buttons: [ Annuler ]  [ Ajouter / Save ]
             Row(
               children: [
                 Expanded(
@@ -577,28 +517,39 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      final title = _nameController.text.trim().isNotEmpty
-                          ? _nameController.text.trim()
-                          : 'Other'.tr;
-                      final amount = int.tryParse(_amountController.text) ?? _amountMg;
-                      if (amount <= 0) return;
-                      final dt = _selectedDateTime;
+                      final title = titleController.text.trim();
+                      final amount =
+                          int.tryParse(amountController.text.trim()) ??
+                          currentAmount.value;
+                      if (title.isEmpty || amount <= 0) return;
 
-                      Navigator.of(context).pop();
+                      final d = selectedDate.value;
+                      final t = selectedTime.value;
+                      final fullDateTime = DateTime(
+                        d.year,
+                        d.month,
+                        d.day,
+                        t.hour,
+                        t.minute,
+                      );
 
-                      if (isEditMode) {
-                        await widget.controller.editCaffeineEntry(
-                          widget.entry!.id,
+                      bool success = false;
+                      if (isEdit && entry != null) {
+                        success = await controller.editCaffeineEntry(
+                          entry!.id,
                           title,
                           amount,
-                          dt,
+                          fullDateTime,
                         );
                       } else {
-                        await widget.controller.addCaffeineEntry(
+                        success = await controller.addCaffeineEntry(
                           title,
                           amount,
-                          dt,
+                          fullDateTime,
                         );
+                      }
+                      if (success) {
+                        Navigator.of(context).pop();
                       }
                     },
                     child: Container(
@@ -609,7 +560,7 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        isEditMode ? 'Save'.tr : 'Add'.tr,
+                        isEdit ? 'Save'.tr : 'Add'.tr,
                         style: getTextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -622,15 +573,15 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
               ],
             ),
 
-            // Delete button in edit mode
-            if (isEditMode && widget.entry!.id.isNotEmpty) ...[
+            // Delete entry action (shown only when editing an existing entry)
+            if (isEdit && entry != null) ...[
               const SizedBox(height: 20),
               Center(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
                     Navigator.of(context).pop();
-                    widget.controller.deleteCaffeineEntry(widget.entry!.id);
+                    controller.deleteCaffeineEntry(entry!.id);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -642,16 +593,16 @@ class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
                       children: [
                         const Icon(
                           Icons.delete_outline_rounded,
-                          color: Color(0xFFDC2626),
-                          size: 18,
+                          color: AppColors.red,
+                          size: 20,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Delete caffeine entry'.tr,
+                          'Delete entry'.tr,
                           style: getTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFFDC2626),
+                            color: AppColors.red,
                           ),
                         ),
                       ],

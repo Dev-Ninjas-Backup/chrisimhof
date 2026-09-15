@@ -25,29 +25,29 @@ class QuickAddChipsSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
 
-        // 2x2 Grid of preset drinks
+        // 2x2 Grid of drink presets
         Row(
           children: [
             Expanded(
               child: _buildPresetCard(
                 name: 'Espresso',
                 amount: 75,
-                icon: Icons.coffee_rounded,
+                icon: Icons.coffee_outlined,
                 onTap: () => controller.quickAdd('Espresso', 75),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildPresetCard(
                 name: 'Coffee',
                 amount: 100,
-                icon: Icons.local_cafe_rounded,
+                icon: Icons.local_cafe_outlined,
                 onTap: () => controller.quickAdd('Coffee', 100),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Row(
           children: [
             Expanded(
@@ -58,18 +58,18 @@ class QuickAddChipsSection extends StatelessWidget {
                 onTap: () => controller.quickAdd('Energy', 85),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildPresetCard(
                 name: 'Tea',
                 amount: 45,
-                icon: Icons.emoji_food_beverage_rounded,
+                icon: Icons.emoji_food_beverage_outlined,
                 onTap: () => controller.quickAdd('Tea', 45),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
 
         // Full-width "Personnalisé" / "Custom" card
         GestureDetector(
@@ -79,12 +79,15 @@ class QuickAddChipsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.borderSoft),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFFED7AA),
+                width: 1.4,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 6,
+                  blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -92,21 +95,20 @@ class QuickAddChipsSection extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF7ED),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFFFFEDD5),
-                      width: 1.2,
+                      color: const Color(0xFFFED7AA),
+                      width: 1.5,
                     ),
                   ),
                   child: const Center(
                     child: Icon(
                       Icons.add_rounded,
                       color: Color(0xFF9A3412),
-                      size: 24,
+                      size: 22,
                     ),
                   ),
                 ),
@@ -114,9 +116,10 @@ class QuickAddChipsSection extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Other'.tr,
+                        'Custom'.tr,
                         style: getTextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -125,10 +128,10 @@ class QuickAddChipsSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Name and caffeine quantity'.tr,
+                        'Name and caffeine amount'.tr,
                         style: getTextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.textSoft,
                         ),
                       ),
@@ -137,8 +140,8 @@ class QuickAddChipsSection extends StatelessWidget {
                 ),
                 const Icon(
                   Icons.chevron_right_rounded,
-                  color: AppColors.textSoft,
-                  size: 22,
+                  color: Color(0xFF9A3412),
+                  size: 24,
                 ),
               ],
             ),
@@ -161,8 +164,8 @@ class QuickAddChipsSection extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.borderSoft),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.borderColor, width: 1.2),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.02),
@@ -174,21 +177,17 @@ class QuickAddChipsSection extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF7ED),
+                color: const Color(0xFFFEF3C7),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFFFEDD5),
-                  width: 1,
-                ),
               ),
               child: Center(
                 child: Icon(
                   icon,
-                  size: 20,
                   color: const Color(0xFF9A3412),
+                  size: 20,
                 ),
               ),
             ),
@@ -200,19 +199,19 @@ class QuickAddChipsSection extends StatelessWidget {
                 children: [
                   Text(
                     name.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: getTextStyle(
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primaryTextColor,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${amount} mg',
+                    '$amount mg',
                     style: getTextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSoft,
                     ),
@@ -220,15 +219,11 @@ class QuickAddChipsSection extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              width: 28,
-              height: 28,
-              alignment: Alignment.center,
-              child: const Icon(
-                Icons.add_rounded,
-                size: 20,
-                color: Color(0xFF9A3412),
-              ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.add_rounded,
+              color: Color(0xFF9A3412),
+              size: 22,
             ),
           ],
         ),
