@@ -160,9 +160,14 @@ class RealtimeSocketService {
     }
   }
 
-  void handleLiveScores(dynamic data, {bool useLocalCaches = true}) {
-    if (data == null) return;
+  void handleLiveScores(dynamic rawData, {bool useLocalCaches = true}) {
+    if (rawData == null) return;
     try {
+      dynamic data = rawData;
+      if (data is Map && data['data'] != null && data['data'] is Map) {
+        data = data['data'];
+      }
+
       if (Get.isRegistered<DashboardController>()) {
         final dashboardController = Get.find<DashboardController>();
         dashboardController.updateFromLiveScores(
@@ -171,108 +176,133 @@ class RealtimeSocketService {
         );
       }
 
-      final sleepTabData = (data['tabs']?['sleep'] ?? data['sleep']) as Map<String, dynamic>?;
+      final liveScoresMap = (data is Map && data['liveScores'] is Map)
+          ? Map<String, dynamic>.from(data['liveScores'] as Map)
+          : null;
+
+      final tabsMap = (data is Map && data['tabs'] is Map)
+          ? Map<String, dynamic>.from(data['tabs'] as Map)
+          : (liveScoresMap?['tabs'] is Map
+              ? Map<String, dynamic>.from(liveScoresMap!['tabs'] as Map)
+              : null);
+
+      final cardsMap = (data is Map && data['cards'] is Map)
+          ? Map<String, dynamic>.from(data['cards'] as Map)
+          : (liveScoresMap?['cards'] is Map
+              ? Map<String, dynamic>.from(liveScoresMap!['cards'] as Map)
+              : null);
+
+      final forYouPreviewList = (data is Map && data['forYouPreview'] is List)
+          ? data['forYouPreview'] as List
+          : (liveScoresMap?['forYouPreview'] is List
+              ? liveScoresMap!['forYouPreview'] as List
+              : null);
+
+      final derivedMap = (data is Map && data['derived'] is Map)
+          ? Map<String, dynamic>.from(data['derived'] as Map)
+          : (liveScoresMap?['derived'] is Map
+              ? Map<String, dynamic>.from(liveScoresMap!['derived'] as Map)
+              : null);
+
+      final sleepTabData = (tabsMap?['sleep'] ?? (data is Map ? data['sleep'] : null)) as Map<String, dynamic>?;
       if (Get.isRegistered<SleepController>() && sleepTabData != null) {
         final sleepController = Get.find<SleepController>();
         sleepController.updateFromLiveScoresTab(sleepTabData);
       }
 
-      final nextSleepWindow = (data['work']?['nextSleepWindow'] ??
-              data['tabs']?['work']?['nextSleepWindow'] ??
-              data['nextSleepWindow']) as Map<String, dynamic>?;
+      final nextSleepWindow = (data is Map
+          ? (data['work']?['nextSleepWindow'] ??
+              tabsMap?['work']?['nextSleepWindow'] ??
+              data['nextSleepWindow'] ??
+              liveScoresMap?['nextSleepWindow'])
+          : null) as Map<String, dynamic>?;
       if (Get.isRegistered<SleepController>() && nextSleepWindow != null) {
         Get.find<SleepController>().updateFromNextSleepWindow(nextSleepWindow);
       }
 
       // Forward forYouPreview sleep entry via socket updates
-      if (Get.isRegistered<SleepController>() &&
-          data['forYouPreview'] is List) {
-        Get.find<SleepController>().updateFromForYouPreview(
-          data['forYouPreview'] as List<dynamic>,
-        );
+      if (Get.isRegistered<SleepController>() && forYouPreviewList != null) {
+        Get.find<SleepController>().updateFromForYouPreview(forYouPreviewList);
       }
 
       if (Get.isRegistered<WorkController>()) {
         final workController = Get.find<WorkController>();
-        if (data['tabs']?['work'] != null) {
-          workController.updateFromLiveScoresTab(data['tabs']['work']);
+        if (tabsMap?['work'] != null) {
+          workController.updateFromLiveScoresTab(Map<String, dynamic>.from(tabsMap!['work'] as Map));
         }
-        if (data['workShapesToday'] is List) {
-          workController.updateWorkShapesToday(data['workShapesToday'] as List<dynamic>);
-        } else if (data['shapesToday'] is List) {
-          workController.updateWorkShapesToday(data['shapesToday'] as List<dynamic>);
+        final workShapes = (data is Map ? data['workShapesToday'] : null) ??
+            liveScoresMap?['workShapesToday'] ??
+            (data is Map ? data['shapesToday'] : null) ??
+            tabsMap?['work']?['shapesToday'];
+        if (workShapes is List) {
+          workController.updateWorkShapesToday(workShapes);
         }
       }
 
-      if (Get.isRegistered<HydrationController>() &&
-          data['tabs']?['hydration'] != null) {
+      if (Get.isRegistered<HydrationController>() && tabsMap?['hydration'] != null) {
         Get.find<HydrationController>().updateFromLiveScoresTab(
-          data['tabs']['hydration'],
+          Map<String, dynamic>.from(tabsMap!['hydration'] as Map),
         );
       }
 
-      if (Get.isRegistered<HydrationController>() &&
-          data['forYouPreview'] is List) {
-        Get.find<HydrationController>().updateFromForYouPreview(
-          data['forYouPreview'] as List<dynamic>,
-        );
+      if (Get.isRegistered<HydrationController>() && forYouPreviewList != null) {
+        Get.find<HydrationController>().updateFromForYouPreview(forYouPreviewList);
       }
 
-      if (Get.isRegistered<CaffeineController>() &&
-          data['tabs']?['caffeine'] != null) {
+      if (Get.isRegistered<CaffeineController>() && tabsMap?['caffeine'] != null) {
         Get.find<CaffeineController>().updateFromLiveScoresTab(
-          data['tabs']['caffeine'],
+          Map<String, dynamic>.from(tabsMap!['caffeine'] as Map),
         );
       }
 
       // Forward forYouPreview caffeine entry via socket updates
-      if (Get.isRegistered<CaffeineController>() &&
-          data['forYouPreview'] is List) {
-        Get.find<CaffeineController>().updateFromForYouPreview(
-          data['forYouPreview'] as List<dynamic>,
-        );
+      if (Get.isRegistered<CaffeineController>() && forYouPreviewList != null) {
+        Get.find<CaffeineController>().updateFromForYouPreview(forYouPreviewList);
       }
 
-      if (Get.isRegistered<NutritionController>() &&
-          data['tabs']?['nutrition'] != null) {
+      if (Get.isRegistered<NutritionController>() && tabsMap?['nutrition'] != null) {
         Get.find<NutritionController>().updateFromLiveScoresTab(
-          data['tabs']['nutrition'],
+          Map<String, dynamic>.from(tabsMap!['nutrition'] as Map),
         );
       }
 
-      if (Get.isRegistered<SportsController>() &&
-          data['tabs']?['sport'] != null) {
+      if (Get.isRegistered<SportsController>() && tabsMap?['sport'] != null) {
         Get.find<SportsController>().updateFromLiveScoresTab(
-          data['tabs']['sport'],
+          Map<String, dynamic>.from(tabsMap!['sport'] as Map),
         );
       }
 
       // Forward cards.sport (recoveryLoadScore + readinessNote) via socket updates
-      final socketCards = data['cards'];
       if (Get.isRegistered<SportsController>() &&
-          socketCards is Map &&
-          socketCards['sport'] is Map) {
+          cardsMap != null &&
+          cardsMap['sport'] is Map) {
         Get.find<SportsController>().updateFromSportCard(
-          Map<String, dynamic>.from(socketCards['sport'] as Map),
+          Map<String, dynamic>.from(cardsMap['sport'] as Map),
         );
       }
 
       // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) via socket updates
       if (Get.isRegistered<CaffeineController>() &&
-          socketCards is Map &&
-          socketCards['caffeine'] is Map) {
+          cardsMap != null &&
+          cardsMap['caffeine'] is Map) {
         Get.find<CaffeineController>().updateFromCaffeineCard(
-          Map<String, dynamic>.from(socketCards['caffeine'] as Map),
+          Map<String, dynamic>.from(cardsMap['caffeine'] as Map),
         );
+      }
+
+      // Forward derived caffeine cutoff if available
+      if (Get.isRegistered<CaffeineController>() && derivedMap != null) {
+        final cutoffTime = derivedMap['caffeineCutoffTime']?.toString();
+        if (cutoffTime != null && cutoffTime.isNotEmpty) {
+          Get.find<CaffeineController>().updateCutoffTime(cutoffTime);
+        }
       }
 
       // Forward forYouPreview to RecommendationController and trigger refetch
       if (Get.isRegistered<RecommendationController>()) {
         final recController = Get.find<RecommendationController>();
-        if (data['forYouPreview'] is List) {
-          recController.updateFromForYouPreview(
-            data['forYouPreview'] as List<dynamic>,
-          );
+        if (forYouPreviewList != null) {
+          recController.updateFromForYouPreview(forYouPreviewList);
         }
         recController.refetchRecommendations();
       }
@@ -284,10 +314,7 @@ class RealtimeSocketService {
   void _handleDashboard(dynamic data) {
     if (data == null) return;
     try {
-      if (Get.isRegistered<DashboardController>()) {
-        final dashboardController = Get.find<DashboardController>();
-        dashboardController.updateFromDashboardEvent(data);
-      }
+      handleLiveScores(data);
       if (Get.isRegistered<RecommendationController>()) {
         Get.find<RecommendationController>().refetchRecommendations();
       }

@@ -103,9 +103,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
   Map<String, dynamic> normalizeDashboardPayload(Map<String, dynamic> payload) {
     Map<String, dynamic> data = payload;
-    if (payload.containsKey('data') &&
-        payload['data'] is Map<String, dynamic>) {
-      data = payload['data'] as Map<String, dynamic>;
+    if (payload.containsKey('data') && payload['data'] is Map) {
+      data = Map<String, dynamic>.from(payload['data'] as Map);
     }
 
     final Map<String, dynamic> flat = {};
@@ -118,18 +117,16 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     });
 
     // 2. If there's a nested liveScores, merge its contents
-    if (data.containsKey('liveScores') &&
-        data['liveScores'] is Map<String, dynamic>) {
-      final liveScores = data['liveScores'] as Map<String, dynamic>;
+    if (data.containsKey('liveScores') && data['liveScores'] is Map) {
+      final liveScores = Map<String, dynamic>.from(data['liveScores'] as Map);
       liveScores.forEach((key, value) {
         flat[key] = value;
       });
     }
 
     // 3. If there's a nested calculation, merge its contents
-    if (data.containsKey('calculation') &&
-        data['calculation'] is Map<String, dynamic>) {
-      final calculation = data['calculation'] as Map<String, dynamic>;
+    if (data.containsKey('calculation') && data['calculation'] is Map) {
+      final calculation = Map<String, dynamic>.from(data['calculation'] as Map);
       calculation.forEach((key, value) {
         flat[key] = value;
       });
@@ -476,16 +473,14 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     // Cache forYouPreview for late-registering controllers
-    if (apiData['forYouPreview'] is List) {
+    if (apiData['forYouPreview'] is List && (apiData['forYouPreview'] as List).isNotEmpty) {
       forYouPreviewData.value = apiData['forYouPreview'] as List<dynamic>;
-    } else {
-      forYouPreviewData.value = null;
     }
 
     // Forward forYouPreview sleep entry to SleepController
-    if (Get.isRegistered<SleepController>()) {
+    if (Get.isRegistered<SleepController>() && forYouPreviewData.value != null) {
       Get.find<SleepController>().updateFromForYouPreview(
-        forYouPreviewData.value ?? [],
+        forYouPreviewData.value!,
       );
     }
     if (apiData['tabs']?['hydration'] != null) {
@@ -495,9 +490,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         );
       }
     }
-    if (Get.isRegistered<HydrationController>()) {
+    if (Get.isRegistered<HydrationController>() && forYouPreviewData.value != null) {
       Get.find<HydrationController>().updateFromForYouPreview(
-        forYouPreviewData.value ?? [],
+        forYouPreviewData.value!,
       );
     }
     if (apiData['tabs']?['caffeine'] != null) {
@@ -509,9 +504,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     // Forward forYouPreview caffeine entry to CaffeineController
-    if (Get.isRegistered<CaffeineController>()) {
+    if (Get.isRegistered<CaffeineController>() && forYouPreviewData.value != null) {
       Get.find<CaffeineController>().updateFromForYouPreview(
-        forYouPreviewData.value ?? [],
+        forYouPreviewData.value!,
       );
     }
     if (apiData['tabs']?['nutrition'] != null) {
@@ -539,8 +534,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       if (Get.isRegistered<SportsController>()) {
         Get.find<SportsController>().updateFromSportCard(sportCard);
       }
-    } else {
-      sportCardData.value = null;
     }
     // Forward cards.caffeine (activeMg, cutoffTime, halfLifeLabel, etc) to CaffeineController
     final caffeineCard = cards?['caffeine'] as Map<String, dynamic>?;
@@ -549,8 +542,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       if (Get.isRegistered<CaffeineController>()) {
         Get.find<CaffeineController>().updateFromCaffeineCard(caffeineCard);
       }
-    } else {
-      caffeineCardData.value = null;
     }
     if (apiData['tabs']?['work'] != null) {
       if (Get.isRegistered<WorkController>()) {

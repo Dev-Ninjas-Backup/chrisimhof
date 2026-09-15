@@ -15,20 +15,22 @@ class CaffeineCutOffCard extends StatelessWidget {
       final cutoffTime = controller.forYouCaffeineCutoff.value;
       final fullBody   = controller.forYouCaffeineBody.value;
 
-      // Split body into bold part (before '—') and normal part (after '—') if possible
-      // Falls back to placeholder until API data arrives
       final String boldPart;
       final String normalPart;
-      if (fullBody != null && fullBody.contains('—')) {
-        final idx = fullBody.indexOf('—');
+      final divider = fullBody != null && fullBody.contains('—')
+          ? '—'
+          : (fullBody != null && fullBody.contains(' - ') ? ' - ' : null);
+
+      if (fullBody != null && divider != null) {
+        final idx = fullBody.indexOf(divider);
         boldPart   = fullBody.substring(0, idx).trim();
-        normalPart = ' — ${fullBody.substring(idx + 1).trim()}';
-      } else if (fullBody != null) {
+        normalPart = ' — ${fullBody.substring(idx + divider.length).trim()}';
+      } else if (fullBody != null && fullBody.isNotEmpty) {
         boldPart   = fullBody;
         normalPart = '';
       } else {
         boldPart   = '${'Cut-off'.tr} ${cutoffTime ?? '--:--'}';
-        normalPart = cutoffTime != null ? ' — protect tonight\'s sleep window.'.tr : '';
+        normalPart = cutoffTime != null ? ' — ${'protect tonight\'s sleep window.'.tr}' : '';
       }
 
 

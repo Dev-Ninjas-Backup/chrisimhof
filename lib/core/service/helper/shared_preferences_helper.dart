@@ -93,6 +93,26 @@ class SharedPreferencesHelper {
     return prefs.getString('caffeineLogs');
   }
 
+  static Future<void> saveCaffeineCutoff(String cutoff) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('caffeineCutoff', cutoff);
+  }
+
+  static Future<String?> getCaffeineCutoff() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('caffeineCutoff');
+  }
+
+  static Future<void> saveCaffeineCutoffBody(String body) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('caffeineCutoffBody', body);
+  }
+
+  static Future<String?> getCaffeineCutoffBody() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('caffeineCutoffBody');
+  }
+
   // --- Hydration Logs ---
   static Future<void> saveHydrationLogs(String jsonStr) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

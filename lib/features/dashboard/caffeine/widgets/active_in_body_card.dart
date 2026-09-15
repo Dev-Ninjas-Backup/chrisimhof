@@ -168,9 +168,9 @@ class ActiveInBodyCard extends StatelessWidget {
                   color: AppColors.caffeineTextDark,
                 ),
                 children: [
-                  TextSpan(text: 'Today: '.tr),
+                  TextSpan(text: 'Consumed today: '.tr),
                   TextSpan(
-                    text: '$totalVal',
+                    text: '$totalVal mg',
                     style: getTextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,

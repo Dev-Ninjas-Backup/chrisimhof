@@ -82,7 +82,10 @@ class NutritionController extends GetxController {
     if (entryId.isEmpty) return;
     final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
-    if (sessionId.isEmpty || token.isEmpty || entryId.startsWith('local_') || entryId.length < 10) {
+    if (sessionId.isEmpty ||
+        token.isEmpty ||
+        entryId.startsWith('local_') ||
+        entryId.length < 10) {
       mealsList.removeWhere((m) => m.id == entryId);
       await saveNutritionData();
       return;
@@ -97,10 +100,7 @@ class NutritionController extends GetxController {
 
       final response = await http.delete(
         Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
 
       debugPrint('=== DELETE MEAL RESPONSE ===');
@@ -130,7 +130,11 @@ class NutritionController extends GetxController {
     }
   }
 
-  Future<void> editMealLog(String entryId, String heaviness, {DateTime? occurredAt}) async {
+  Future<void> editMealLog(
+    String entryId,
+    String heaviness, {
+    DateTime? occurredAt,
+  }) async {
     if (entryId.isEmpty) return;
     final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
@@ -147,7 +151,8 @@ class NutritionController extends GetxController {
     } else {
       canonicalHeaviness = 'light';
     }
-    final capType = canonicalHeaviness[0].toUpperCase() + canonicalHeaviness.substring(1);
+    final capType =
+        canonicalHeaviness[0].toUpperCase() + canonicalHeaviness.substring(1);
 
     final timeOnly =
         '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
@@ -163,7 +168,20 @@ class NutritionController extends GetxController {
       if (diffDays == -1) {
         newTimeStr = '${'Yesterday'.tr} $timeOnly';
       } else if (diffDays != 0) {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const months = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
         newTimeStr = '${dt.day} ${months[dt.month - 1]} · $timeOnly';
       }
 
@@ -238,10 +256,7 @@ class NutritionController extends GetxController {
 
       final response = await http.get(
         Uri.parse(Urls.addDailyNotes(sessionId)),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -249,7 +264,10 @@ class NutritionController extends GetxController {
         if (decoded['success'] == true && decoded['data'] is List) {
           final list = decoded['data'] as List;
           notesList.assignAll(
-            list.map((n) => (n['text'] as String? ?? '')).where((t) => t.isNotEmpty).toList(),
+            list
+                .map((n) => (n['text'] as String? ?? ''))
+                .where((t) => t.isNotEmpty)
+                .toList(),
           );
         }
       }
@@ -266,33 +284,30 @@ class NutritionController extends GetxController {
         dailyTarget.value = data['dailyTarget'] ?? 5;
         final List mealsJson = data['meals'] ?? [];
         mealsList.assignAll(
-          mealsJson
-              .map(
-                (m) {
-                  final rawName = (m['name'] ?? '').toString();
-                  final lower = rawName.toLowerCase();
-                  final cleanName = (rawName.isEmpty ||
-                          lower.contains('undefined') ||
-                          lower == 'meal' ||
-                          lower.startsWith('meal ') ||
-                          lower == 'snack' ||
-                          lower == 'pre-shift meal' ||
-                          lower == 'night meal' ||
-                          lower == 'post-shift meal')
-                      ? 'Meal'
-                      : rawName;
-                  return MealItem(
-                    id: m['id'] ?? '',
-                    name: cleanName,
-                    time: m['time'] ?? '',
-                    type: m['type'] ?? 'Light',
-                    isLogged: m['isLogged'] ?? false,
-                    isPlanned: m['isPlanned'] ?? false,
-                    occurredAt: m['occurredAt'],
-                  );
-                },
-              )
-              .toList(),
+          mealsJson.map((m) {
+            final rawName = (m['name'] ?? '').toString();
+            final lower = rawName.toLowerCase();
+            final cleanName =
+                (rawName.isEmpty ||
+                    lower.contains('undefined') ||
+                    lower == 'meal' ||
+                    lower.startsWith('meal ') ||
+                    lower == 'snack' ||
+                    lower == 'pre-shift meal' ||
+                    lower == 'night meal' ||
+                    lower == 'post-shift meal')
+                ? 'Meal'
+                : rawName;
+            return MealItem(
+              id: m['id'] ?? '',
+              name: cleanName,
+              time: m['time'] ?? '',
+              type: m['type'] ?? 'Light',
+              isLogged: m['isLogged'] ?? false,
+              isPlanned: m['isPlanned'] ?? false,
+              occurredAt: m['occurredAt'],
+            );
+          }).toList(),
         );
       } else {
         // No saved data — start empty and persist empty state
@@ -483,7 +498,10 @@ class NutritionController extends GetxController {
         );
         apiSuccess = true;
         if (res['data'] != null) {
-          RealtimeSocketService().handleLiveScores(res['data'], useLocalCaches: false);
+          RealtimeSocketService().handleLiveScores(
+            res['data'],
+            useLocalCaches: false,
+          );
         } else {
           try {
             final db = Get.find<DashboardController>();
@@ -533,11 +551,16 @@ class NutritionController extends GetxController {
           if (decoded['success'] == true && decoded['data'] is List) {
             final list = decoded['data'] as List;
             notesList.assignAll(
-              list.map((n) => (n['text'] as String? ?? '')).where((t) => t.isNotEmpty).toList(),
+              list
+                  .map((n) => (n['text'] as String? ?? ''))
+                  .where((t) => t.isNotEmpty)
+                  .toList(),
             );
           }
         } else {
-          debugPrint('addNote POST failed: ${response.statusCode} ${response.body}');
+          debugPrint(
+            'addNote POST failed: ${response.statusCode} ${response.body}',
+          );
         }
       } catch (e) {
         debugPrint('addNote error: $e');
@@ -565,7 +588,8 @@ class NutritionController extends GetxController {
           }
 
           final isLogged = m['status'] == 'logged' || m['isLogged'] == true;
-          final rawName = (m['label'] ?? m['name'] ?? m['displayName'] ?? '').toString();
+          final rawName = (m['label'] ?? m['name'] ?? m['displayName'] ?? '')
+              .toString();
           final lower = rawName.toLowerCase();
           String mealName = rawName;
           if (isLogged ||
@@ -581,26 +605,47 @@ class NutritionController extends GetxController {
             mealName = 'Meal';
           }
 
-          final rawTime = (m['timestamp'] ?? m['displayTime'] ?? m['plannedTime'] ?? '').toString();
-          String displayTime = (rawTime.isNotEmpty && rawTime != 'null') ? rawTime : '00:00';
-          final occurredAtStr = (m['occurredAt'] ?? m['createdAt'] ?? m['updatedAt']) as String?;
+          final rawTime =
+              (m['timestamp'] ?? m['displayTime'] ?? m['plannedTime'] ?? '')
+                  .toString();
+          String displayTime = (rawTime.isNotEmpty && rawTime != 'null')
+              ? rawTime
+              : '00:00';
+          final occurredAtStr =
+              (m['occurredAt'] ?? m['createdAt'] ?? m['updatedAt']) as String?;
 
           if (occurredAtStr != null && occurredAtStr.isNotEmpty) {
             try {
-              final parsed = TimezoneHelper.parseSessionUtcToLocal(occurredAtStr);
+              final parsed = TimezoneHelper.parseSessionUtcToLocal(
+                occurredAtStr,
+              );
               final now = DateTime.now();
               final today = DateTime(now.year, now.month, now.day);
               final target = DateTime(parsed.year, parsed.month, parsed.day);
               final diffDays = target.difference(today).inDays;
 
-              final timeOnly = (displayTime.isNotEmpty && displayTime != '00:00')
+              final timeOnly =
+                  (displayTime.isNotEmpty && displayTime != '00:00')
                   ? displayTime
                   : '${parsed.hour.toString().padLeft(2, '0')}:${parsed.minute.toString().padLeft(2, '0')}';
 
               if (diffDays == -1) {
                 displayTime = '${'Yesterday'.tr} $timeOnly';
               } else if (diffDays < -1 || diffDays > 0) {
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const months = [
+                  'Jan',
+                  'Feb',
+                  'Mar',
+                  'Apr',
+                  'May',
+                  'Jun',
+                  'Jul',
+                  'Aug',
+                  'Sep',
+                  'Oct',
+                  'Nov',
+                  'Dec',
+                ];
                 final monthStr = months[parsed.month - 1];
                 displayTime = '${parsed.day} $monthStr · $timeOnly';
               } else {

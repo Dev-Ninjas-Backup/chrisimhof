@@ -15,7 +15,7 @@ class CaffeineEntryDialog extends StatelessWidget {
 
   CaffeineEntryDialog({super.key, this.entry, required this.controller}) {
     titleCtrl = TextEditingController(
-      text: entry != null ? entry!.title.tr : 'Custom'.tr,
+      text: entry != null ? entry!.title.tr : 'Other'.tr,
     );
     amountCtrl = TextEditingController(
       text: entry?.amountMg.toString() ?? '80',

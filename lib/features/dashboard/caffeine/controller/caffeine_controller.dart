@@ -10,6 +10,8 @@ import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/model/caffeine_entry.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
+import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:get/get.dart';
 
 class CaffeineController extends GetxController {
@@ -24,16 +26,87 @@ class CaffeineController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _restoreCutoffFromPrefs();
     loadEntries().then((_) {
-      if (Get.isRegistered<DashboardController>()) {
-        final db = Get.find<DashboardController>();
-        final cachedCard = db.caffeineCardData.value;
-        if (cachedCard != null) updateFromCaffeineCard(cachedCard);
-      }
+      _syncCutoffFromAllSources();
     });
+    _syncCutoffFromAllSources();
+  }
+
+  Future<void> _restoreCutoffFromPrefs() async {
+    final cachedCutoff = await SharedPreferencesHelper.getCaffeineCutoff();
+    final cachedBody = await SharedPreferencesHelper.getCaffeineCutoffBody();
+    if (cachedCutoff != null && cachedCutoff.isNotEmpty) {
+      if (forYouCaffeineCutoff.value == null || forYouCaffeineCutoff.value!.isEmpty) {
+        forYouCaffeineCutoff.value = cachedCutoff;
+      }
+    }
+    if (cachedBody != null && cachedBody.isNotEmpty) {
+      if (forYouCaffeineBody.value == null || forYouCaffeineBody.value!.isEmpty) {
+        forYouCaffeineBody.value = cachedBody;
+      }
+    }
+  }
+
+  void _syncCutoffFromAllSources() {
+    // 1. Check DashboardController cached caffeineCardData & forYouPreviewData
     if (Get.isRegistered<DashboardController>()) {
-      final preview = Get.find<DashboardController>().forYouPreviewData.value;
-      if (preview != null) updateFromForYouPreview(preview);
+      final db = Get.find<DashboardController>();
+      final cachedCard = db.caffeineCardData.value;
+      if (cachedCard != null) {
+        updateFromCaffeineCard(cachedCard);
+      }
+      final preview = db.forYouPreviewData.value;
+      if (preview != null && preview.isNotEmpty) {
+        updateFromForYouPreview(preview);
+      }
+    }
+
+    // 2. Check RecommendationController
+    if (Get.isRegistered<RecommendationController>()) {
+      final recCtrl = Get.find<RecommendationController>();
+      if (recCtrl.forYouPreview.isNotEmpty) {
+        for (final item in recCtrl.forYouPreview) {
+          if (item.category?.toLowerCase() == 'caffeine') {
+            updateFromRecommendationItem(item);
+            break;
+          }
+        }
+      }
+      final recs = recCtrl.recommendationResponse.value?.data?.recommendations;
+      if (recs != null && recs.isNotEmpty) {
+        for (final item in recs) {
+          if (item.category?.toLowerCase() == 'caffeine') {
+            updateFromRecommendationItem(item);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  void updateFromRecommendationItem(RecommendationItem item) {
+    final cutoff = (item.bodyParams?['cutoffTime'] ??
+            item.bodyParams?['cutoff'] ??
+            item.bodyParams?['time'])
+        ?.toString();
+    updateCutoffTime(cutoff ?? '', body: item.body);
+  }
+
+  void updateCutoffTime(String cutoff, {String? body}) {
+    if (cutoff.isNotEmpty && cutoff != '--:--') {
+      forYouCaffeineCutoff.value = cutoff;
+      SharedPreferencesHelper.saveCaffeineCutoff(cutoff);
+    }
+    if (body != null && body.isNotEmpty) {
+      forYouCaffeineBody.value = body;
+      SharedPreferencesHelper.saveCaffeineCutoffBody(body);
+    } else if (cutoff.isNotEmpty && cutoff != '--:--') {
+      if (forYouCaffeineBody.value == null || forYouCaffeineBody.value!.isEmpty) {
+        final fallback = 'Cut-off $cutoff — protect tonight\'s sleep window.';
+        forYouCaffeineBody.value = fallback;
+        SharedPreferencesHelper.saveCaffeineCutoffBody(fallback);
+      }
     }
   }
 
@@ -175,16 +248,9 @@ class CaffeineController extends GetxController {
         t.contains('thé') ||
         t == 'the') {
       return 'tea';
-    } else if (t == 'custom' ||
-        t.contains('custom') ||
-        t == 'personnalisé' ||
-        t.contains('personnalisé') ||
-        t == 'personnalise') {
-      return 'custom';
     } else {
-      // Do not hardcode coffee. Send user input directly so backend can validate
-      // and return the enum error if it does not match.
-      return t;
+      // Backend enum must be one of: espresso, coffee, energy, tea, other
+      return 'other';
     }
   }
 
@@ -199,22 +265,65 @@ class CaffeineController extends GetxController {
     final tempId = DateTime.now().millisecondsSinceEpoch.toString();
     final drinkType = resolveCaffeineDrinkType(title);
 
+    // Normalize preset title
+    String normalizedTitle = title;
+    if (drinkType == 'energy') {
+      normalizedTitle = 'Energy';
+    } else if (drinkType == 'espresso') {
+      normalizedTitle = 'Espresso';
+    } else if (drinkType == 'coffee') {
+      normalizedTitle = 'Coffee';
+    } else if (drinkType == 'tea') {
+      normalizedTitle = 'Tea';
+    } else if (drinkType == 'other' &&
+        (title.trim().isEmpty ||
+            title.trim().toLowerCase() == 'other' ||
+            title.trim().toLowerCase() == 'custom' ||
+            title.trim().toLowerCase() == 'personnalisé' ||
+            title.trim().toLowerCase() == 'autre')) {
+      normalizedTitle = 'Other';
+    }
+
+    // Optimistic entry: add immediately so user sees it right away
+    final newEntry = CaffeineEntry(
+      id: tempId,
+      title: normalizedTitle,
+      timestamp: timestamp,
+      amountMg: amountMg,
+    );
+    entriesList.insert(0, newEntry);
+    entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    recalculateCaffeine();
+
     EasyLoading.show(status: 'Logging caffeine...'.tr);
     bool apiSuccess = false;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
       if (sessionId.isNotEmpty) {
-        await DashboardService().patchQuickAddLog(
+        final isoString = await TimezoneHelper.formatToSessionUtcIso(timestamp);
+        final res = await DashboardService().patchQuickAddLog(
           sessionId: sessionId,
           newCaffeineLogs: [
             {
               'timestamp': formattedTime,
               'caffeineMg': amountMg,
               'drinkType': drinkType,
+              'occurredAt': isoString,
             },
           ],
         );
         apiSuccess = true;
+        if (res['data'] != null) {
+          RealtimeSocketService().handleLiveScores(
+            res['data'],
+            useLocalCaches: false,
+          );
+        } else {
+          try {
+            final db = Get.find<DashboardController>();
+            await db.fetchDashboardData();
+          } catch (_) {}
+        }
       }
     } catch (e) {
       debugPrint('Caffeine API quickAdd error: $e');
@@ -222,7 +331,7 @@ class CaffeineController extends GetxController {
       if (errStr.contains('drinktype') ||
           errStr.contains('must be one of the following values')) {
         EasyLoading.showError(
-          'Drink type must be one of the following values: espresso, coffee, energy, tea, custom'.tr,
+          'Drink type must be one of the following values: espresso, coffee, energy, tea, other'.tr,
           duration: const Duration(seconds: 4),
         );
       } else {
@@ -235,19 +344,12 @@ class CaffeineController extends GetxController {
     }
 
     if (!apiSuccess) {
+      entriesList.removeWhere((e) => e.id == tempId);
+      recalculateCaffeine();
       return false;
     }
 
-    final newEntry = CaffeineEntry(
-      id: tempId,
-      title: title,
-      timestamp: timestamp,
-      amountMg: amountMg,
-    );
-    entriesList.add(newEntry);
-    entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    recalculateCaffeine();
-    await saveEntriesToPrefs();
+    await saveEntriesToPrefs(syncWithServer: false);
     return true;
   }
 
@@ -328,7 +430,7 @@ class CaffeineController extends GetxController {
         if (msg.toLowerCase().contains('drinktype') ||
             msg.toLowerCase().contains('must be one of the following values')) {
           EasyLoading.showError(
-            'Drink type must be one of the following values: espresso, coffee, energy, tea, custom'.tr,
+            'Drink type must be one of the following values: espresso, coffee, energy, tea, other'.tr,
             duration: const Duration(seconds: 4),
           );
         } else {
@@ -343,7 +445,7 @@ class CaffeineController extends GetxController {
       if (errStr.contains('drinktype') ||
           errStr.contains('must be one of the following values')) {
         EasyLoading.showError(
-          'Drink type must be one of the following values: espresso, coffee, energy, tea, custom'.tr,
+          'Drink type must be one of the following values: espresso, coffee, energy, tea, other'.tr,
           duration: const Duration(seconds: 4),
         );
       } else {
@@ -425,19 +527,44 @@ class CaffeineController extends GetxController {
         final mappedLogs = logsList.map((item) {
           final timeStr = item['timestamp'] as String? ?? '00:00';
           final amount = (item['caffeineMg'] as num?)?.toInt() ?? 0;
-          final typeStr = item['drinkType'] as String? ?? '';
-          final titleStr = item['drinkLabel'] as String? ??
-              (typeStr.isNotEmpty
-                  ? (typeStr == 'custom'
-                      ? 'Custom'
-                      : typeStr == 'tea'
-                          ? 'Tea'
-                          : typeStr == 'energy'
-                              ? 'Energy'
-                              : typeStr == 'espresso'
-                                  ? 'Espresso'
-                                  : 'Coffee')
-                  : 'Coffee');
+          final typeStr =
+              (item['drinkType'] as String? ?? '').toLowerCase().trim();
+          final rawLabel = (item['drinkLabel'] as String? ?? '').trim();
+
+          String titleStr;
+          if (typeStr == 'energy' ||
+              rawLabel.toLowerCase().contains('energy') ||
+              rawLabel.toLowerCase().contains('énergie') ||
+              rawLabel.toLowerCase().contains('energie')) {
+            titleStr = 'Energy';
+          } else if (typeStr == 'espresso' ||
+              rawLabel.toLowerCase() == 'espresso') {
+            titleStr = 'Espresso';
+          } else if (typeStr == 'coffee' ||
+              rawLabel.toLowerCase() == 'coffee' ||
+              rawLabel.toLowerCase() == 'café' ||
+              rawLabel.toLowerCase() == 'cafe') {
+            titleStr = 'Coffee';
+          } else if (typeStr == 'tea' ||
+              rawLabel.toLowerCase() == 'tea' ||
+              rawLabel.toLowerCase() == 'thé' ||
+              rawLabel.toLowerCase() == 'the') {
+            titleStr = 'Tea';
+          } else if (typeStr == 'other' || typeStr == 'custom') {
+            if (rawLabel.isNotEmpty &&
+                rawLabel.toLowerCase() != 'other' &&
+                rawLabel.toLowerCase() != 'custom' &&
+                rawLabel.toLowerCase() != 'personnalisé' &&
+                rawLabel.toLowerCase() != 'autre') {
+              titleStr = rawLabel;
+            } else {
+              titleStr = 'Other';
+            }
+          } else if (rawLabel.isNotEmpty) {
+            titleStr = rawLabel;
+          } else {
+            titleStr = 'Coffee';
+          }
           final serverId = item['id'] as String? ?? '${timeStr}_$amount';
 
           DateTime logTime = now;
@@ -467,8 +594,31 @@ class CaffeineController extends GetxController {
           );
         }).toList();
 
+        // 1-to-1 reconcile any pending optimistic entries
+        final unmatchedServerLogs = List<CaffeineEntry>.from(mappedLogs);
+        final pendingOptimistic = <CaffeineEntry>[];
+        for (final entry in entriesList) {
+          final isTempId = int.tryParse(entry.id) != null;
+          if (!isTempId) continue;
+          final age = now.difference(entry.timestamp).abs();
+          if (age.inSeconds > 30) continue;
+
+          final matchIndex = unmatchedServerLogs.indexWhere((s) =>
+              s.amountMg == entry.amountMg &&
+              s.timestamp.difference(entry.timestamp).inMinutes.abs() <= 2 &&
+              resolveCaffeineDrinkType(s.title) ==
+                  resolveCaffeineDrinkType(entry.title));
+
+          if (matchIndex != -1) {
+            unmatchedServerLogs.removeAt(matchIndex);
+          } else {
+            pendingOptimistic.add(entry);
+          }
+        }
+
+        mappedLogs.addAll(pendingOptimistic);
+        mappedLogs.sort((a, b) => b.timestamp.compareTo(a.timestamp));
         entriesList.assignAll(mappedLogs);
-        entriesList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
         todayTotalCaffeine.value = entriesList.fold(
           0,
@@ -507,21 +657,34 @@ class CaffeineController extends GetxController {
 
   /// Called with the top-level liveScores forYouPreview list to extract caffeine entry.
   void updateFromForYouPreview(List<dynamic> forYouPreview) {
+    if (forYouPreview.isEmpty) return;
     try {
-      final caffeineEntry =
-          forYouPreview.firstWhereOrNull(
-                (item) =>
-                    (item as Map<String, dynamic>)['category'] == 'caffeine',
-              )
-              as Map<String, dynamic>?;
+      Map<String, dynamic>? caffeineEntry;
+      for (final item in forYouPreview) {
+        if (item is Map) {
+          final map = Map<String, dynamic>.from(item);
+          if (map['category']?.toString().toLowerCase() == 'caffeine') {
+            caffeineEntry = map;
+            break;
+          }
+        }
+      }
 
       if (caffeineEntry != null) {
-        forYouCaffeineBody.value = caffeineEntry['body'] as String?;
-        final bodyParams = (caffeineEntry['bodyParams'] ?? caffeineEntry['params']) as Map<String, dynamic>?;
-        forYouCaffeineCutoff.value = (bodyParams?['cutoffTime'] ?? bodyParams?['cutoff'] ?? bodyParams?['time']) as String?;
-      } else {
-        forYouCaffeineBody.value = null;
-        forYouCaffeineCutoff.value = null;
+        final body = caffeineEntry['body']?.toString();
+        final bodyParams = caffeineEntry['bodyParams'] ?? caffeineEntry['params'];
+        String? cutoff;
+        if (bodyParams is Map) {
+          cutoff = (bodyParams['cutoffTime'] ?? bodyParams['cutoff'] ?? bodyParams['time'])?.toString();
+        }
+        if ((cutoff == null || cutoff.isEmpty) && body != null) {
+          final regex = RegExp(r'(\d{1,2}:\d{2})');
+          final match = regex.firstMatch(body);
+          if (match != null) {
+            cutoff = match.group(1);
+          }
+        }
+        updateCutoffTime(cutoff ?? '', body: body);
       }
     } catch (e) {
       debugPrint('CaffeineController forYouPreview parse error: $e');
@@ -532,6 +695,10 @@ class CaffeineController extends GetxController {
     try {
       if (caffeineCard['activeMg'] != null) {
         activeCaffeine.value = (caffeineCard['activeMg'] as num).toDouble();
+      }
+      final cutoff = caffeineCard['cutoffTime']?.toString();
+      if (cutoff != null && cutoff.isNotEmpty && cutoff != '--:--') {
+        updateCutoffTime(cutoff);
       }
       _syncWithDashboard();
     } catch (e) {
