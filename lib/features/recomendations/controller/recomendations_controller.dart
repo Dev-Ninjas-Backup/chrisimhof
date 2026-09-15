@@ -63,7 +63,6 @@
 // }
 
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
-import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/recomendations/model/recomendation_api_model.dart';
 import 'package:chrisimhof/features/recomendations/service/recomendation_service.dart';
 import 'package:get/get.dart';
@@ -95,14 +94,6 @@ class RecommendationController extends GetxController {
     try {
       final items = data.map((e) => RecommendationItem.fromJson(Map<String, dynamic>.from(e))).toList();
       forYouPreview.assignAll(items);
-      if (Get.isRegistered<CaffeineController>()) {
-        final caffeineItem = items.firstWhereOrNull(
-          (e) => e.category?.toLowerCase() == 'caffeine',
-        );
-        if (caffeineItem != null) {
-          Get.find<CaffeineController>().updateFromRecommendationItem(caffeineItem);
-        }
-      }
     } catch (e) {
       Get.log('RecommendationController parse error: $e');
     }
@@ -136,7 +127,6 @@ class RecommendationController extends GetxController {
         sessionId: sessionId,
         locale: locale,
       );
-      _syncCaffeineCutoff();
     } finally {
       isLoading.value = false;
     }
@@ -158,26 +148,11 @@ class RecommendationController extends GetxController {
         locale: localeCode,
       );
       recommendationResponse.value = res;
-      _syncCaffeineCutoff();
     } catch (e) {
       Get.log('RecommendationController refetch error: $e');
     } finally {
       if (!silent) {
         isLoading.value = false;
-      }
-    }
-  }
-
-  void _syncCaffeineCutoff() {
-    if (Get.isRegistered<CaffeineController>()) {
-      final recs = recommendationResponse.value?.data?.recommendations;
-      if (recs != null && recs.isNotEmpty) {
-        final caffeineItem = recs.firstWhereOrNull(
-          (e) => e.category?.toLowerCase() == 'caffeine',
-        );
-        if (caffeineItem != null) {
-          Get.find<CaffeineController>().updateFromRecommendationItem(caffeineItem);
-        }
       }
     }
   }

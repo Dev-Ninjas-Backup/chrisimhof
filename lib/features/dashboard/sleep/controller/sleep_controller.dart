@@ -6,6 +6,7 @@ import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/features/dashboard/sleep/service/sleep_service.dart';
 import 'package:chrisimhof/features/dashboard/sleep/model/sleep_log.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class SleepController extends GetxController {
@@ -21,8 +22,10 @@ class SleepController extends GetxController {
   List<SleepLog> get filteredHistoryLogs {
     final idx = selectedDebtIndex.value;
     if (idx == -1 || sleepDebtChartData.isEmpty) return historyLogs;
-    
-    final todayIndex = sleepDebtChartData.indexWhere((d) => d['isToday'] == true);
+
+    final todayIndex = sleepDebtChartData.indexWhere(
+      (d) => d['isToday'] == true,
+    );
     if (todayIndex == -1) return historyLogs;
 
     final offsetDays = idx - todayIndex;
@@ -31,8 +34,8 @@ class SleepController extends GetxController {
     return historyLogs.where((log) {
       final localDate = log.date.toLocal();
       return localDate.year == targetDate.year &&
-             localDate.month == targetDate.month &&
-             localDate.day == targetDate.day;
+          localDate.month == targetDate.month &&
+          localDate.day == targetDate.day;
     }).toList();
   }
 
@@ -93,7 +96,6 @@ class SleepController extends GetxController {
   Future<void> saveSleepHistory() async {
     // Local storage persistence disabled: server is authoritative
   }
-
 
   // Bedtime adjusters
   void incrementBedtimeHour() {
@@ -162,15 +164,29 @@ class SleepController extends GetxController {
     DateTime baseDate = now;
     final idx = selectedDebtIndex.value;
     if (idx != -1 && sleepDebtChartData.isNotEmpty) {
-      final todayIndex = sleepDebtChartData.indexWhere((d) => d['isToday'] == true);
+      final todayIndex = sleepDebtChartData.indexWhere(
+        (d) => d['isToday'] == true,
+      );
       if (todayIndex != -1) {
         final offsetDays = idx - todayIndex;
         baseDate = now.add(Duration(days: offsetDays));
       }
     }
 
-    var wakeDt = DateTime(baseDate.year, baseDate.month, baseDate.day, wakeupHour.value, wakeupMinute.value);
-    var sleepDt = DateTime(baseDate.year, baseDate.month, baseDate.day, bedtimeHour.value, bedtimeMinute.value);
+    var wakeDt = DateTime(
+      baseDate.year,
+      baseDate.month,
+      baseDate.day,
+      wakeupHour.value,
+      wakeupMinute.value,
+    );
+    var sleepDt = DateTime(
+      baseDate.year,
+      baseDate.month,
+      baseDate.day,
+      bedtimeHour.value,
+      bedtimeMinute.value,
+    );
     if (sleepDt.isAfter(wakeDt)) {
       sleepDt = sleepDt.subtract(const Duration(days: 1));
     }
@@ -180,8 +196,8 @@ class SleepController extends GetxController {
       sleepDt = sleepDt.subtract(const Duration(days: 1));
     }
 
-    final sleepStartedAt = sleepDt.toUtc().toIso8601String();
-    final wakeRecordedAt = wakeDt.toUtc().toIso8601String();
+    final sleepStartedAt = TimezoneHelper.formatToSessionUtcIso(sleepDt);
+    final wakeRecordedAt = TimezoneHelper.formatToSessionUtcIso(wakeDt);
 
     // Add to in-memory history logs
     final newLog = SleepLog(
@@ -193,7 +209,10 @@ class SleepController extends GetxController {
     );
 
     final index = historyLogs.indexWhere(
-      (log) => log.date.year == wakeDt.year && log.date.month == wakeDt.month && log.date.day == wakeDt.day
+      (log) =>
+          log.date.year == wakeDt.year &&
+          log.date.month == wakeDt.month &&
+          log.date.day == wakeDt.day,
     );
     if (index != -1) {
       historyLogs[index] = newLog;
@@ -207,7 +226,8 @@ class SleepController extends GetxController {
       if (sessionId != null && sessionId.isNotEmpty) {
         bool sendIsNewMainWake = isNewMainWake.value;
         if (!sendIsNewMainWake && Get.isRegistered<DashboardController>()) {
-          final currentStatus = Get.find<DashboardController>().sessionStatus.value;
+          final currentStatus =
+              Get.find<DashboardController>().sessionStatus.value;
           if (currentStatus == 'PENDING_WAKE' || currentStatus == 'FINALIZED') {
             sendIsNewMainWake = true;
           }
@@ -218,14 +238,18 @@ class SleepController extends GetxController {
           sleepStartedAt: sleepStartedAt,
           wakeRecordedAt: wakeRecordedAt,
           isNewMainWake: sendIsNewMainWake,
-          note: noteController.text.trim().isNotEmpty ? noteController.text.trim() : null,
+          note: noteController.text.trim().isNotEmpty
+              ? noteController.text.trim()
+              : null,
         );
 
         final data = result['data'] as Map<String, dynamic>?;
 
         // Inspect conflicts returned by backend validation
         final dynamic rawConflicts = result['conflicts'] ?? data?['conflicts'];
-        final List<dynamic>? conflictsList = rawConflicts is List ? rawConflicts : null;
+        final List<dynamic>? conflictsList = rawConflicts is List
+            ? rawConflicts
+            : null;
         bool hasHardConflict = false;
         String? conflictMessage;
         String? softWarningMessage;
@@ -246,11 +270,14 @@ class SleepController extends GetxController {
           }
         }
 
-        if (result['success'] == false || hasHardConflict || (data != null && data['saved'] == false)) {
+        if (result['success'] == false ||
+            hasHardConflict ||
+            (data != null && data['saved'] == false)) {
           historyLogs.assignAll(oldLogs);
           await saveSleepHistory();
 
-          final conflictMsg = conflictMessage ??
+          final conflictMsg =
+              conflictMessage ??
               (data?['message'] as String?) ??
               (result['message'] as String?) ??
               'Sleep overlap conflict detected. Please adjust.'.tr;
@@ -271,7 +298,10 @@ class SleepController extends GetxController {
         }
 
         if (data != null && data['liveScores'] != null) {
-          RealtimeSocketService().handleLiveScores(data['liveScores'], useLocalCaches: false);
+          RealtimeSocketService().handleLiveScores(
+            data['liveScores'],
+            useLocalCaches: false,
+          );
         }
 
         try {
@@ -300,7 +330,9 @@ class SleepController extends GetxController {
       await saveSleepHistory();
       debugPrint('Error saving sleep: $e');
       final msg = e.toString().replaceFirst('Exception: ', '');
-      EasyLoading.showError(msg.isNotEmpty ? msg : 'Failed to save sleep log.'.tr);
+      EasyLoading.showError(
+        msg.isNotEmpty ? msg : 'Failed to save sleep log.'.tr,
+      );
     }
   }
 
@@ -354,14 +386,19 @@ class SleepController extends GetxController {
   /// Called with the top-level liveScores payload to extract forYouPreview sleep entry.
   void updateFromForYouPreview(List<dynamic> forYouPreview) {
     try {
-      final sleepEntry = forYouPreview.firstWhereOrNull(
-        (item) => (item as Map<String, dynamic>)['category'] == 'sleep',
-      ) as Map<String, dynamic>?;
+      final sleepEntry =
+          forYouPreview.firstWhereOrNull(
+                (item) => (item as Map<String, dynamic>)['category'] == 'sleep',
+              )
+              as Map<String, dynamic>?;
 
       if (sleepEntry != null) {
         forYouSleepBody.value = sleepEntry['body'] as String?;
-        final bodyParams = (sleepEntry['bodyParams'] ?? sleepEntry['params']) as Map<String, dynamic>?;
-        forYouSleepBedtime.value = (bodyParams?['bedtime'] ?? bodyParams?['time']) as String?;
+        final bodyParams =
+            (sleepEntry['bodyParams'] ?? sleepEntry['params'])
+                as Map<String, dynamic>?;
+        forYouSleepBedtime.value =
+            (bodyParams?['bedtime'] ?? bodyParams?['time']) as String?;
       } else {
         forYouSleepBody.value = null;
         forYouSleepBedtime.value = null;
@@ -374,8 +411,10 @@ class SleepController extends GetxController {
   /// Updates bedtime and wakeup window from work.nextSleepWindow (shift-aware calculation)
   void updateFromNextSleepWindow(Map<String, dynamic> sleepWindow) {
     try {
-      final start = (sleepWindow['sleepStart'] ?? sleepWindow['time']) as String?;
-      final end = (sleepWindow['sleepEnd'] ?? sleepWindow['wakeTime']) as String?;
+      final start =
+          (sleepWindow['sleepStart'] ?? sleepWindow['time']) as String?;
+      final end =
+          (sleepWindow['sleepEnd'] ?? sleepWindow['wakeTime']) as String?;
 
       if (start != null && start.isNotEmpty) {
         final currentMap = tonightBedtime.value != null
@@ -405,7 +444,8 @@ class SleepController extends GetxController {
 
   void updateFromLiveScoresTab(Map<String, dynamic> tabData) {
     try {
-      if (tabData['sleepStartTime'] != null && tabData['sleepStartTime'] is String) {
+      if (tabData['sleepStartTime'] != null &&
+          tabData['sleepStartTime'] is String) {
         final parts = (tabData['sleepStartTime'] as String).split(':');
         if (parts.length == 2) {
           final h = int.tryParse(parts[0]);
@@ -440,7 +480,8 @@ class SleepController extends GetxController {
             final wParts = (map['wakeTime'] as String).split(':');
             if (wParts.length == 2) {
               wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
-              wakeupMinute.value = int.tryParse(wParts[1]) ?? wakeupMinute.value;
+              wakeupMinute.value =
+                  int.tryParse(wParts[1]) ?? wakeupMinute.value;
             }
           }
         } else if (tabData['tonightBedtime'] is String) {
@@ -473,13 +514,17 @@ class SleepController extends GetxController {
         final debtData = tabData['sleepDebt7d'];
         sleepDebtLabel.value = debtData['label'] as String? ?? 'rolling 7 days';
         sleepDebtTotalDisplay.value = debtData['display'] as String? ?? '--';
-        
+
         if (debtData['chartData'] != null) {
-          final chartList = List<Map<String, dynamic>>.from(debtData['chartData']);
+          final chartList = List<Map<String, dynamic>>.from(
+            debtData['chartData'],
+          );
           sleepDebtChartData.assignAll(chartList);
-          
+
           // Auto-select today if nothing is selected or if we just loaded
-          final todayIndex = chartList.indexWhere((day) => day['isToday'] == true);
+          final todayIndex = chartList.indexWhere(
+            (day) => day['isToday'] == true,
+          );
           if (todayIndex != -1) {
             selectedDebtIndex.value = todayIndex;
           } else if (chartList.isNotEmpty && selectedDebtIndex.value == -1) {
@@ -493,35 +538,99 @@ class SleepController extends GetxController {
         final List<SleepLog> parsedLogs = [];
         for (var item in historyList) {
           try {
-            final date = DateTime.tryParse(item['date'] ?? '') ?? DateTime.now();
+            DateTime date = DateTime.now();
+            if (item['date'] != null && (item['date'] as String).isNotEmpty) {
+              try {
+                date = TimezoneHelper.parseSessionUtcToLocal(
+                  item['date'] as String,
+                );
+              } catch (_) {
+                date =
+                    DateTime.tryParse(item['date'] as String)?.toLocal() ??
+                    DateTime.now();
+              }
+            }
             final bedTimeStr = item['sleepStartTime'] as String? ?? '23:00';
             final wakeTimeStr = item['wakeTime'] as String? ?? '07:00';
 
             final bedParts = bedTimeStr.split(':');
             final wakeParts = wakeTimeStr.split(':');
 
-            final bedtime = TimeOfDay(
-              hour: bedParts.length == 2 ? int.parse(bedParts[0]) : 23,
-              minute: bedParts.length == 2 ? int.parse(bedParts[1]) : 0,
-            );
+            // Dynamic timezone parsing via TimezoneHelper (device local timezone)
+            DateTime? wakeDt;
+            if (item['wakeRecordedAt'] != null &&
+                (item['wakeRecordedAt'] as String).isNotEmpty) {
+              try {
+                wakeDt = TimezoneHelper.parseSessionUtcToLocal(
+                  item['wakeRecordedAt'] as String,
+                );
+              } catch (_) {}
+            }
+            wakeDt ??=
+                (item['date'] != null && (item['date'] as String).isNotEmpty)
+                ? date
+                : null;
 
-            final wakeupTime = TimeOfDay(
-              hour: wakeParts.length == 2 ? int.parse(wakeParts[0]) : 7,
-              minute: wakeParts.length == 2 ? int.parse(wakeParts[1]) : 0,
-            );
+            DateTime? sleepDt;
+            if (item['sleepStartedAt'] != null &&
+                (item['sleepStartedAt'] as String).isNotEmpty) {
+              try {
+                sleepDt = TimezoneHelper.parseSessionUtcToLocal(
+                  item['sleepStartedAt'] as String,
+                );
+              } catch (_) {}
+            }
 
-            parsedLogs.add(SleepLog(
-              id: item['id'] as String? ?? 'server_${date.millisecondsSinceEpoch}',
-              date: date,
-              bedtime: bedtime,
-              wakeupTime: wakeupTime,
-              quality: (item['quality'] as num?)?.toInt() ?? 85,
-            ));
+            if (sleepDt == null && wakeDt != null) {
+              int durationMinutes = 0;
+              if (item['durationMinutes'] is num) {
+                durationMinutes = (item['durationMinutes'] as num).toInt();
+              } else if (bedParts.length == 2 && wakeParts.length == 2) {
+                final bMin =
+                    (int.tryParse(bedParts[0]) ?? 0) * 60 +
+                    (int.tryParse(bedParts[1]) ?? 0);
+                final wMin =
+                    (int.tryParse(wakeParts[0]) ?? 0) * 60 +
+                    (int.tryParse(wakeParts[1]) ?? 0);
+                int diff = wMin - bMin;
+                if (diff <= 0) diff += 1440;
+                durationMinutes = diff;
+              }
+              if (durationMinutes > 0) {
+                sleepDt = wakeDt.subtract(Duration(minutes: durationMinutes));
+              }
+            }
+
+            final bedtime = sleepDt != null
+                ? TimeOfDay(hour: sleepDt.hour, minute: sleepDt.minute)
+                : TimeOfDay(
+                    hour: int.tryParse(bedParts[0]) ?? 23,
+                    minute: int.tryParse(bedParts[1]) ?? 0,
+                  );
+
+            final wakeupTime = wakeDt != null
+                ? TimeOfDay(hour: wakeDt.hour, minute: wakeDt.minute)
+                : TimeOfDay(
+                    hour: int.tryParse(wakeParts[0]) ?? 7,
+                    minute: int.tryParse(wakeParts[1]) ?? 0,
+                  );
+
+            parsedLogs.add(
+              SleepLog(
+                id:
+                    item['id'] as String? ??
+                    'server_${date.millisecondsSinceEpoch}',
+                date: date,
+                bedtime: bedtime,
+                wakeupTime: wakeupTime,
+                quality: (item['quality'] as num?)?.toInt() ?? 85,
+              ),
+            );
           } catch (e) {
             debugPrint('SleepController socket item parsing error: $e');
           }
         }
-        
+
         // Preserve recent optimistic in-memory logs (within last 2 minutes) not yet returned by the server on the same day
         final nowMs = DateTime.now().millisecondsSinceEpoch;
         final optimisticLogs = historyLogs.where((log) {
@@ -530,10 +639,12 @@ class SleepController extends GetxController {
           return (nowMs - idNum).abs() < 120000;
         }).toList();
         for (var optLog in optimisticLogs) {
-          final hasSameDay = parsedLogs.any((pLog) =>
-              pLog.date.year == optLog.date.year &&
-              pLog.date.month == optLog.date.month &&
-              pLog.date.day == optLog.date.day);
+          final hasSameDay = parsedLogs.any(
+            (pLog) =>
+                pLog.date.year == optLog.date.year &&
+                pLog.date.month == optLog.date.month &&
+                pLog.date.day == optLog.date.day,
+          );
           if (!hasSameDay) {
             parsedLogs.add(optLog);
           }

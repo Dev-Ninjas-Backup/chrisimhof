@@ -3,9 +3,9 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/active_in_body_card.dart';
-import 'package:chrisimhof/features/dashboard/caffeine/widgets/add_caffeine_bottom_sheet.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_cut_off_card.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_card.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/add_caffeine_bottom_sheet.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/quick_add_chips_section.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,24 +25,19 @@ class CaffeineScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomAppBar(
-                title: 'Caffeine'.tr,
-                showBackButton: true,
-                showMoreButton: true,
-              ),
+              CustomAppBar(title: 'Caffeine'.tr, showBackButton: true),
               const SizedBox(height: 28),
 
               ActiveInBodyCard(controller: controller),
               const SizedBox(height: 20),
 
               const CaffeineCutOffCard(),
+              const SizedBox(height: 24),
+
+              // Quick add presets & custom button (positioned above history)
+              QuickAddChipsSection(controller: controller),
               const SizedBox(height: 28),
 
-              // Quick add section (moved above history per client instructions)
-              QuickAddChipsSection(controller: controller),
-              const SizedBox(height: 30),
-
-              // Today's entries header
               Obx(() {
                 final count = controller.entriesList.length;
                 return Row(
