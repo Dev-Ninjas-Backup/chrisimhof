@@ -1,6 +1,8 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,26 +13,53 @@ class CaffeineCutOffCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CaffeineController>();
     return Obx(() {
-      // --- Primary source: forYouPreview[caffeine] from live scores API/socket ---
-      final cutoffTime = controller.forYouCaffeineCutoff.value;
-      final fullBody   = controller.forYouCaffeineBody.value;
+      // 1. Primary source: CaffeineController
+      var cutoffTime = controller.forYouCaffeineCutoff.value;
+      var fullBody = controller.forYouCaffeineBody.value;
 
+      // 2. Fallback: DashboardController cached caffeine card
+      if ((cutoffTime == null || cutoffTime.isEmpty) &&
+          Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        final card = db.caffeineCardData.value;
+        if (card != null && card['cutoffTime'] != null) {
+          cutoffTime = card['cutoffTime'] as String?;
+        }
+      }
+
+      // 3. Fallback: RecommendationController recommendations
+      if ((cutoffTime == null || cutoffTime.isEmpty) &&
+          Get.isRegistered<RecommendationController>()) {
+        final recs = Get.find<RecommendationController>()
+            .recommendationResponse
+            .value
+            ?.data
+            ?.recommendations;
+        final caffeineRec = recs?.firstWhereOrNull(
+          (r) => r.category?.toLowerCase() == 'caffeine',
+        );
+        if (caffeineRec != null) {
+          cutoffTime = caffeineRec.bodyParams?['cutoffTime'] as String? ??
+              caffeineRec.bodyParams?['cutoff'] as String?;
+          fullBody ??= caffeineRec.body;
+        }
+      }
+
+      // Split body into bold part (before '—') and normal part (after '—') if possible
       final String boldPart;
       final String normalPart;
-      final divider = fullBody != null && fullBody.contains('—')
-          ? '—'
-          : (fullBody != null && fullBody.contains(' - ') ? ' - ' : null);
-
-      if (fullBody != null && divider != null) {
-        final idx = fullBody.indexOf(divider);
-        boldPart   = fullBody.substring(0, idx).trim();
-        normalPart = ' — ${fullBody.substring(idx + divider.length).trim()}';
+      if (fullBody != null && fullBody.contains('—')) {
+        final idx = fullBody.indexOf('—');
+        boldPart = fullBody.substring(0, idx).trim();
+        normalPart = ' — ${fullBody.substring(idx + 1).trim()}';
       } else if (fullBody != null && fullBody.isNotEmpty) {
-        boldPart   = fullBody;
+        boldPart = fullBody;
         normalPart = '';
       } else {
-        boldPart   = '${'Cut-off'.tr} ${cutoffTime ?? '--:--'}';
-        normalPart = cutoffTime != null ? ' — ${'protect tonight\'s sleep window.'.tr}' : '';
+        boldPart = '${'Cut-off'.tr} ${cutoffTime ?? '--:--'}';
+        normalPart = cutoffTime != null
+            ? ' — protect tonight\'s sleep window.'.tr
+            : '';
       }
 
 
