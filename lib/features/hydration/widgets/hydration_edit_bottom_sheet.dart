@@ -68,7 +68,9 @@ class HydrationEditBottomSheet extends StatelessWidget {
         top: 12,
         left: 20,
         right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 28,
+        bottom: MediaQuery.of(context).viewInsets.bottom > 0
+            ? MediaQuery.of(context).viewInsets.bottom + 20
+            : MediaQuery.of(context).padding.bottom + 36,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -554,6 +556,9 @@ class HydrationEditBottomSheet extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+            ] else ...[
+              const SizedBox(height: 12),
             ],
           ],
         ),

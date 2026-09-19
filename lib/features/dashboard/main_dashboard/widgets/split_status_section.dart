@@ -19,7 +19,7 @@ class SplitStatusSection extends StatelessWidget {
           Expanded(
             child: _buildStatusCard(
               headerIcon: Icons.work_outline,
-              headerLabel: 'WORK',
+              headerLabel: 'WORK'.tr,
               titleText: data.workShift,
               subtitleText: data.workShiftCountdown,
               onTap: () => Get.toNamed(AppRoutes.workScheduleScreen),
@@ -44,7 +44,7 @@ class SplitStatusSection extends StatelessWidget {
           Expanded(
             child: _buildStatusCard(
               headerIcon: Icons.nightlight_round,
-              headerLabel: 'LAST SLEEP',
+              headerLabel: 'LAST SLEEP'.tr,
               titleText: data.lastSleepDuration,
               subtitleText: data.sleepDebtText,
               onTap: () => Get.toNamed(AppRoutes.sleepScreen),
