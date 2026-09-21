@@ -20,7 +20,7 @@ class PulsingRhythmBadge extends StatelessWidget {
     controller.updateState(isSleepPrep: isSleepPrep);
 
     final badge = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
         color: AppColors.primaryButtonColor.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
@@ -35,13 +35,13 @@ class PulsingRhythmBadge extends StatelessWidget {
           Icon(
             Icons.auto_awesome,
             color: AppColors.primaryButtonColor,
-            size: 15,
+            size: 14,
           ),
-          const SizedBox(width: 7),
+          const SizedBox(width: 6),
           Text(
             '${'Rhythm score'.tr} $score',
             style: getTextStyle(
-              fontSize: 13,
+              fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppColors.primaryButtonColor,
             ),

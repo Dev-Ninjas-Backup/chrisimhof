@@ -34,16 +34,31 @@ class BedtimeCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            // ── Main content row ──────────────────────────────────────────────
+            // ── Main content area ─────────────────────────────────────────────
             SizedBox(
               height: 220,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  // ── Left text column ─────────────────────────────────────────
-                  Expanded(
+                  // ── Right: orbit + silhouette ────────────────────────────────
+                  Positioned(
+                    top: 0,
+                    right: -4,
+                    child: SleepOrbitWidget(
+                      imagePath: ImagePath.circadianAvatar,
+                      avatarSize: 155,
+                      imageShiftFactor: 0.52,
+                      optimalBedtime: data.optimalBedtime,
+                      minutesToBedtime: data.minutesToBedtime,
+                      isSleepLogged: false,
+                      isSleepPrep: data.isSleepPrep,
+                      isMissedBedtime: data.isMissedBedtime,
+                    ),
+                  ),
+                  // ── Left: text column & badge ────────────────────────────────
+                  Positioned.fill(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 0, 16),
+                      padding: const EdgeInsets.fromLTRB(20, 20, 16, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -93,29 +108,6 @@ class BedtimeCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                  // ── Right: orbit + silhouette ────────────────────────────────
-                  SizedBox(
-                    width: 168,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Positioned(
-                          top: 0,
-                          right: -4,
-                          child: SleepOrbitWidget(
-                            imagePath: ImagePath.circadianAvatar,
-                            avatarSize: 155,
-                            imageShiftFactor: 0.52,
-                            optimalBedtime: data.optimalBedtime,
-                            minutesToBedtime: data.minutesToBedtime,
-                            isSleepLogged: false,
-                            isSleepPrep: data.isSleepPrep,
-                            isMissedBedtime: data.isMissedBedtime,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                 ],
