@@ -56,6 +56,16 @@ class SportsController extends GetxController {
   // This Week sessions list
   final RxList<SportSession> sessionsList = <SportSession>[].obs;
 
+  // Weekly Sport Stats & Adaptive Rest (Future Scope Phase 2)
+  final RxBool hasWeeklySportStats = false.obs;
+  final RxInt weeklyGoal = 3.obs;
+  final RxInt workoutsCompletedThisWeek = 0.obs;
+  final RxInt daysRemainingInWeek = 0.obs;
+  final RxBool isGoalMet = false.obs;
+  final RxBool isOnPace = true.obs;
+  final RxBool adaptiveRestRecommended = false.obs;
+  final RxString adaptiveRestReason = ''.obs;
+
   Future<void> deleteWorkoutLog(String entryId) async {
     if (entryId.isEmpty) return;
     final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
@@ -709,6 +719,37 @@ class SportsController extends GetxController {
         _updateRecoveryText();
       }
 
+      final weeklyStats = sportTab['weeklySportStats'] as Map<String, dynamic>?;
+      if (weeklyStats != null) {
+        hasWeeklySportStats.value = true;
+        if (weeklyStats['weeklyGoal'] != null) {
+          weeklyGoal.value = (weeklyStats['weeklyGoal'] as num).toInt();
+        }
+        if (weeklyStats['workoutsCompletedThisWeek'] != null) {
+          workoutsCompletedThisWeek.value =
+              (weeklyStats['workoutsCompletedThisWeek'] as num).toInt();
+        }
+        if (weeklyStats['daysRemainingInWeek'] != null) {
+          daysRemainingInWeek.value =
+              (weeklyStats['daysRemainingInWeek'] as num).toInt();
+        }
+        if (weeklyStats['isGoalMet'] != null) {
+          isGoalMet.value = weeklyStats['isGoalMet'] == true;
+        }
+        if (weeklyStats['isOnPace'] != null) {
+          isOnPace.value = weeklyStats['isOnPace'] == true;
+        }
+      }
+
+      if (sportTab['adaptiveRestRecommended'] != null) {
+        adaptiveRestRecommended.value =
+            sportTab['adaptiveRestRecommended'] == true;
+      }
+      final reason = sportTab['adaptiveRestReason'] as String?;
+      if (reason != null && reason.isNotEmpty) {
+        adaptiveRestReason.value = reason;
+      }
+
       saveSportsData(syncWithServer: false);
     } catch (e) {
       debugPrint('SportsController: Error updating from live scores tab: $e');
@@ -730,6 +771,38 @@ class SportsController extends GetxController {
       if (note != null && note.isNotEmpty) {
         readinessNote.value = note;
       }
+
+      final weeklyStats = sportCard['weeklySportStats'] as Map<String, dynamic>?;
+      if (weeklyStats != null) {
+        hasWeeklySportStats.value = true;
+        if (weeklyStats['weeklyGoal'] != null) {
+          weeklyGoal.value = (weeklyStats['weeklyGoal'] as num).toInt();
+        }
+        if (weeklyStats['workoutsCompletedThisWeek'] != null) {
+          workoutsCompletedThisWeek.value =
+              (weeklyStats['workoutsCompletedThisWeek'] as num).toInt();
+        }
+        if (weeklyStats['daysRemainingInWeek'] != null) {
+          daysRemainingInWeek.value =
+              (weeklyStats['daysRemainingInWeek'] as num).toInt();
+        }
+        if (weeklyStats['isGoalMet'] != null) {
+          isGoalMet.value = weeklyStats['isGoalMet'] == true;
+        }
+        if (weeklyStats['isOnPace'] != null) {
+          isOnPace.value = weeklyStats['isOnPace'] == true;
+        }
+      }
+
+      if (sportCard['adaptiveRestRecommended'] != null) {
+        adaptiveRestRecommended.value =
+            sportCard['adaptiveRestRecommended'] == true;
+      }
+      final reason = sportCard['adaptiveRestReason'] as String?;
+      if (reason != null && reason.isNotEmpty) {
+        adaptiveRestReason.value = reason;
+      }
+
       saveSportsData(syncWithServer: false);
     } catch (e) {
       debugPrint('SportsController: Error updating from sport card: $e');

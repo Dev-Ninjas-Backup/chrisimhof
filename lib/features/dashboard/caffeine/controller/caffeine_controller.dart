@@ -18,6 +18,8 @@ class CaffeineController extends GetxController {
   final RxList<CaffeineEntry> entriesList = <CaffeineEntry>[].obs;
   final RxDouble activeCaffeine = 0.0.obs;
   final RxInt todayTotalCaffeine = 0.obs;
+  final RxDouble activeCaffeineAtBedtime = 0.0.obs;
+  final RxInt bedtimeBufferMinutes = 0.obs;
 
   final forYouCaffeineBody = RxnString();
   final forYouCaffeineCutoff = RxnString();
@@ -37,6 +39,10 @@ class CaffeineController extends GetxController {
   void _syncFromDashboardAndServer() {
     if (Get.isRegistered<DashboardController>()) {
       final db = Get.find<DashboardController>();
+      activeCaffeineAtBedtime.value =
+          db.dashboardData.value.activeCaffeineAtBedtimeMg;
+      bedtimeBufferMinutes.value =
+          db.dashboardData.value.bedtimeBufferMinutes;
       final cachedTab = db.caffeineTabData.value;
       if (cachedTab != null) {
         updateFromLiveScoresTab(cachedTab);
@@ -626,6 +632,25 @@ class CaffeineController extends GetxController {
           if (forYouCaffeineBody.value == null || forYouCaffeineBody.value!.isEmpty) {
             forYouCaffeineBody.value = '${'Cut-off'.tr} $tabCutoff — ${'protect tonight\'s sleep window.'.tr}';
           }
+        }
+
+        if (caffeineTab['activeCaffeineAtBedtimeMg'] != null) {
+          activeCaffeineAtBedtime.value =
+              (caffeineTab['activeCaffeineAtBedtimeMg'] as num).toDouble();
+        } else if (caffeineTab['activeAtBedtimeMg'] != null) {
+          activeCaffeineAtBedtime.value =
+              (caffeineTab['activeAtBedtimeMg'] as num).toDouble();
+        } else if (Get.isRegistered<DashboardController>()) {
+          activeCaffeineAtBedtime.value =
+              Get.find<DashboardController>().dashboardData.value.activeCaffeineAtBedtimeMg;
+        }
+
+        if (caffeineTab['bedtimeBufferMinutes'] != null) {
+          bedtimeBufferMinutes.value =
+              (caffeineTab['bedtimeBufferMinutes'] as num).toInt();
+        } else if (Get.isRegistered<DashboardController>()) {
+          bedtimeBufferMinutes.value =
+              Get.find<DashboardController>().dashboardData.value.bedtimeBufferMinutes;
         }
 
         _syncWithDashboard();

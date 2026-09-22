@@ -62,13 +62,50 @@ class BedtimeCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'OPTIMAL BEDTIME'.tr,
-                            style: getTextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryButtonColor,
-                            ).copyWith(letterSpacing: 1.4),
+                          Row(
+                            children: [
+                              Text(
+                                'OPTIMAL BEDTIME'.tr,
+                                style: getTextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryButtonColor,
+                                ).copyWith(letterSpacing: 1.4),
+                              ),
+                              if (data.bedtimeBufferMinutes > 0) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryButtonColor
+                                        .withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.coffee_outlined,
+                                        size: 10,
+                                        color: AppColors.primaryButtonColor,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        '+${data.bedtimeBufferMinutes}m',
+                                        style: getTextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryButtonColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Text(

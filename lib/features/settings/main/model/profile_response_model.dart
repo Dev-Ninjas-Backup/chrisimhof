@@ -38,6 +38,7 @@ class ProfileData {
   final String ?sportProfile;
   final int? defaultDailyMealTarget;
   final String? timeFormat;
+  final int? weeklySportGoal;
   final String role;
   final String? language;
   final String? safetyAcknowledgedAt;
@@ -69,6 +70,7 @@ class ProfileData {
     required this.sportProfile,
     this.defaultDailyMealTarget,
     this.timeFormat,
+    this.weeklySportGoal,
   });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
@@ -103,6 +105,7 @@ class ProfileData {
       sportProfile: profile['sportProfile'] ?? json['sportProfile'] ?? '',
       defaultDailyMealTarget: profile['defaultDailyMealTarget'] ?? json['defaultDailyMealTarget'],
       timeFormat: profile['timeFormat'] ?? json['timeFormat'],
+      weeklySportGoal: profile['weeklySportGoal'] ?? json['weeklySportGoal'],
     );
   }
 }

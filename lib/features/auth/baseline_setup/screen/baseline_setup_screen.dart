@@ -12,6 +12,7 @@ import 'package:chrisimhof/features/auth/baseline_setup/widgets/caffeine_sensiti
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/sport_profile_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_meal_target_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_time_format_bottomsheet.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_weekly_sport_goal_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
 
 class BaselineSetupScreen extends StatelessWidget {
@@ -153,6 +154,27 @@ class BaselineSetupScreen extends StatelessWidget {
                   onTap: () {
                     Get.bottomSheet(
                       const SportProfileBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.sports,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Weekly workout goal'.tr,
+                  subtitle:
+                      '${controller.weeklySportGoal.value} ${controller.weeklySportGoal.value == 1 ? 'workout / week'.tr : 'workouts / week'.tr}',
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const BaselineWeeklySportGoalBottomsheet(),
                       isScrollControlled: true,
                     );
                   },

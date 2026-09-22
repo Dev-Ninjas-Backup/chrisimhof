@@ -19,6 +19,7 @@ import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setu
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:chrisimhof/features/settings/main/widgets/default_meal_target_bottom_sheet.dart';
 import 'package:chrisimhof/features/settings/main/widgets/time_format_bottom_sheet.dart';
+import 'package:chrisimhof/features/settings/main/widgets/weekly_sport_goal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -235,6 +236,17 @@ class SettingsScreen extends StatelessWidget {
                                     initialSport) {
                                   await baselineController.saveBaselineData();
                                 }
+                              },
+                            ),
+                            SettingsRowData(
+                              iconpath: IconPath.sports,
+                              label: 'Weekly workout goal',
+                              trailing: '${controller.weeklySportGoal.value} ${controller.weeklySportGoal.value == 1 ? 'workout / week'.tr : 'workouts / week'.tr}',
+                              onTap: () {
+                                Get.bottomSheet(
+                                  WeeklySportGoalBottomSheet(controller: controller),
+                                  isScrollControlled: true,
+                                );
                               },
                             ),
                             SettingsRowData(

@@ -31,6 +31,7 @@ class SettingsController extends GetxController {
   final sportProfile = ''.obs;
   final defaultDailyMealTarget = 3.obs;
   final timeFormat = '24h'.obs;
+  final weeklySportGoal = 3.obs;
 
   Future<void> getProfile() async {
     try {
@@ -74,6 +75,10 @@ class SettingsController extends GetxController {
 
         if (profileData.timeFormat != null && profileData.timeFormat!.isNotEmpty) {
           timeFormat.value = profileData.timeFormat!;
+        }
+
+        if (profileData.weeklySportGoal != null) {
+          weeklySportGoal.value = profileData.weeklySportGoal!;
         }
         // Apply language from profile if provided (EN / FR)
         try {
@@ -189,6 +194,21 @@ class SettingsController extends GetxController {
     } catch (e) {
       debugPrint('Error updating time format: $e');
       EasyLoading.showError('Failed to update time format'.tr);
+    }
+  }
+
+  Future<void> updateWeeklySportGoal(int goal) async {
+    try {
+      EasyLoading.show(status: 'Saving...'.tr);
+      final service = BaselineSetupService();
+      final res = await service.updateBaseline(weeklySportGoal: goal);
+      if (res['success'] == true) {
+        weeklySportGoal.value = goal;
+        EasyLoading.showSuccess('Weekly goal updated'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error updating weekly sport goal: $e');
+      EasyLoading.showError('Failed to update weekly goal'.tr);
     }
   }
 

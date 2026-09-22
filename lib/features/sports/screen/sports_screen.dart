@@ -7,6 +7,7 @@ import 'package:chrisimhof/features/sports/widgets/add_sport_session_bottomsheet
 import 'package:chrisimhof/features/sports/widgets/list_of_workouts.dart';
 import 'package:chrisimhof/features/sports/widgets/recovery_impact_card.dart';
 import 'package:chrisimhof/features/sports/widgets/todays_sport_session_card.dart';
+import 'package:chrisimhof/features/sports/widgets/weekly_sport_goal_progress_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,11 @@ class SportsScreen extends StatelessWidget {
 
               // TODAY'S SESSION CARD
               TodaysSportSessionCard(controller: controller),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 16.0),
+
+              // WEEKLY SPORT GOAL & ADAPTIVE REST CARD
+              WeeklySportGoalProgressCard(controller: controller),
+              const SizedBox(height: 16.0),
 
               // RECOVERY IMPACT CARD
               RecoveryImpactCard(controller: controller),
