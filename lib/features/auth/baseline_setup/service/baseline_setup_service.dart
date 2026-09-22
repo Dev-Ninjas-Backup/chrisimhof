@@ -35,6 +35,7 @@ class BaselineSetupService {
     String? sportProfile,
     int? defaultDailyMealTarget,
     String? timeFormat,
+    int? weeklySportGoal,
   }) async {
     final uri = Uri.parse(Urls.baseline);
     final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
@@ -57,6 +58,9 @@ class BaselineSetupService {
     }
     if (timeFormat != null) {
       body['timeFormat'] = timeFormat;
+    }
+    if (weeklySportGoal != null) {
+      body['weeklySportGoal'] = weeklySportGoal;
     }
 
     final response = await http.patch(

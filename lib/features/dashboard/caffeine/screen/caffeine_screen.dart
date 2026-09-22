@@ -3,6 +3,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/active_in_body_card.dart';
+import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_bedtime_clearance_card.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_cut_off_card.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/caffeine_entry_card.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/widgets/add_caffeine_bottom_sheet.dart';
@@ -32,7 +33,9 @@ class CaffeineScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               const CaffeineCutOffCard(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+
+              const CaffeineBedtimeClearanceCard(),
 
               // Quick add presets & custom button (positioned above history)
               QuickAddChipsSection(controller: controller),

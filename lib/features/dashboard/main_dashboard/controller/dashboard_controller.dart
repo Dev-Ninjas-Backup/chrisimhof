@@ -428,6 +428,29 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         (cards?['sport']?['subtitle'] as String?) ??
         (sportMinutes > 0 ? '${sportMinutes}m' : 'Rest');
 
+    int bedtimeBufferMinutes = 0;
+    double activeCaffeineAtBedtimeMg = 0.0;
+
+    final sleepTabMap = (apiData['tabs']?['sleep'] ?? apiData['sleep']) as Map<String, dynamic>?;
+    if (sleepTabMap?['bedtimeBufferMinutes'] != null) {
+      bedtimeBufferMinutes = (sleepTabMap!['bedtimeBufferMinutes'] as num).toInt();
+    } else if (apiData['bedtimeBufferMinutes'] != null) {
+      bedtimeBufferMinutes = (apiData['bedtimeBufferMinutes'] as num).toInt();
+    } else if (cards?['sleep']?['bedtimeBufferMinutes'] != null) {
+      bedtimeBufferMinutes = (cards!['sleep']!['bedtimeBufferMinutes'] as num).toInt();
+    }
+
+    final caffeineTabMap = (apiData['tabs']?['caffeine'] ?? apiData['caffeine']) as Map<String, dynamic>?;
+    if (caffeineTabMap?['activeCaffeineAtBedtimeMg'] != null) {
+      activeCaffeineAtBedtimeMg = (caffeineTabMap!['activeCaffeineAtBedtimeMg'] as num).toDouble();
+    } else if (caffeineTabMap?['activeAtBedtimeMg'] != null) {
+      activeCaffeineAtBedtimeMg = (caffeineTabMap!['activeAtBedtimeMg'] as num).toDouble();
+    } else if (cards?['caffeine']?['activeCaffeineAtBedtimeMg'] != null) {
+      activeCaffeineAtBedtimeMg = (cards!['caffeine']!['activeCaffeineAtBedtimeMg'] as num).toDouble();
+    } else if (apiData['activeCaffeineAtBedtimeMg'] != null) {
+      activeCaffeineAtBedtimeMg = (apiData['activeCaffeineAtBedtimeMg'] as num).toDouble();
+    }
+
     dashboardData.value = DashboardModel(
       date: DateTime.now(),
       userName: nameToUse,
@@ -458,6 +481,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       isSleepLogged: isSleepLogged,
       isSleepPrep: current.isSleepPrep,
       hoursUntilBed: hoursUntilBed,
+      bedtimeBufferMinutes: bedtimeBufferMinutes,
+      activeCaffeineAtBedtimeMg: activeCaffeineAtBedtimeMg,
     );
 
     final sleepMap = (apiData['tabs']?['sleep'] ?? apiData['sleep']) as Map<String, dynamic>?;

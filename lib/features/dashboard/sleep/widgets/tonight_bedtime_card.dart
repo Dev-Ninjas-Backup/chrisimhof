@@ -36,6 +36,13 @@ class TonightBedtimeCard extends StatelessWidget {
         }
       }
 
+      int bufferMinutes = 0;
+      if (bedtimeMap?['bedtimeBufferMinutes'] != null) {
+        bufferMinutes = (bedtimeMap!['bedtimeBufferMinutes'] as num).toInt();
+      } else if (Get.isRegistered<DashboardController>()) {
+        bufferMinutes = Get.find<DashboardController>().dashboardData.value.bedtimeBufferMinutes;
+      }
+
       String bedtime = apiSleepStart ?? '--:--';
       String wakeup  = apiWakeTime  ?? '--:--';
       String note    = apiNote      ?? '';
@@ -83,13 +90,43 @@ class TonightBedtimeCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'TONIGHT\'S BEDTIME'.tr,
-                    style: getTextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.indigo,
-                    ).copyWith(letterSpacing: 1.1),
+                  Row(
+                    children: [
+                      Text(
+                        'TONIGHT\'S BEDTIME'.tr,
+                        style: getTextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.indigo,
+                        ).copyWith(letterSpacing: 1.1),
+                      ),
+                      if (bufferMinutes > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.amberSoft3,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.amberDark.withValues(alpha: 0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.coffee_outlined, size: 10, color: AppColors.amberDark),
+                              const SizedBox(width: 3),
+                              Text(
+                                '+${bufferMinutes}m ${'caffeine delay'.tr}',
+                                style: getTextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.amberDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Row(
