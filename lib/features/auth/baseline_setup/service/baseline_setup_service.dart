@@ -29,13 +29,35 @@ class BaselineSetupService {
 
   // PATCH /api/v1/profile/baseline
   Future<Map<String, dynamic>> updateBaseline({
-    required int sleepTargetMinutes,
-    required String chronotype,
-    required String caffeineSensitivity,
-    required String sportProfile,
+    int? sleepTargetMinutes,
+    String? chronotype,
+    String? caffeineSensitivity,
+    String? sportProfile,
+    int? defaultDailyMealTarget,
+    String? timeFormat,
   }) async {
     final uri = Uri.parse(Urls.baseline);
     final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    final Map<String, dynamic> body = {};
+    if (sleepTargetMinutes != null) {
+      body['sleepTargetMinutes'] = sleepTargetMinutes;
+    }
+    if (chronotype != null) {
+      body['chronotype'] = chronotype;
+    }
+    if (caffeineSensitivity != null) {
+      body['caffeineSensitivity'] = caffeineSensitivity;
+    }
+    if (sportProfile != null) {
+      body['sportProfile'] = sportProfile;
+    }
+    if (defaultDailyMealTarget != null) {
+      body['defaultDailyMealTarget'] = defaultDailyMealTarget;
+    }
+    if (timeFormat != null) {
+      body['timeFormat'] = timeFormat;
+    }
 
     final response = await http.patch(
       uri,
@@ -44,12 +66,7 @@ class BaselineSetupService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken',
       },
-      body: jsonEncode({
-        'sleepTargetMinutes': sleepTargetMinutes,
-        'chronotype': chronotype,
-        'caffeineSensitivity': caffeineSensitivity,
-        'sportProfile': sportProfile,
-      }),
+      body: jsonEncode(body),
     );
 
     final Map<String, dynamic> jsonData = jsonDecode(response.body);

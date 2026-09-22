@@ -28,6 +28,68 @@ class RotationCycleCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Custom Rotation Name input field
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Rotation Name'.tr,
+                style: getTextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Custom name for this rotation schedule (optional)'.tr,
+                style: getTextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSoft,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: controller.rotationNameController,
+                onChanged: (val) => controller.rotationName.value = val,
+                decoration: InputDecoration(
+                  hintText: 'e.g. Syngenta, 3x8 Novartis'.tr,
+                  hintStyle: getTextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSoft,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.gray50,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.borderSoft),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.borderSoft),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: AppColors.secondaryButtonColor,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+                style: getTextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24, color: AppColors.borderSoft),
+
           // Start date picker row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

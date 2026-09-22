@@ -1,3 +1,4 @@
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_setup_service.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
 import 'package:chrisimhof/features/settings/main/service/logout_service.dart';
@@ -28,6 +29,8 @@ class SettingsController extends GetxController {
   final chronotype = ''.obs;
   final caffeineSensitivity = ''.obs;
   final sportProfile = ''.obs;
+  final defaultDailyMealTarget = 3.obs;
+  final timeFormat = '24h'.obs;
 
   Future<void> getProfile() async {
     try {
@@ -64,6 +67,14 @@ class SettingsController extends GetxController {
         chronotype.value = profileData.chronotype ?? '';
         caffeineSensitivity.value = profileData.caffeineSensitivity ?? '';
         sportProfile.value = profileData.sportProfile ?? '';
+
+        if (profileData.defaultDailyMealTarget != null) {
+          defaultDailyMealTarget.value = profileData.defaultDailyMealTarget!;
+        }
+
+        if (profileData.timeFormat != null && profileData.timeFormat!.isNotEmpty) {
+          timeFormat.value = profileData.timeFormat!;
+        }
         // Apply language from profile if provided (EN / FR)
         try {
           final localLang = await SharedPreferencesHelper.getLanguage();
@@ -150,6 +161,36 @@ class SettingsController extends GetxController {
     }
   }
 
+
+  Future<void> updateDefaultMealTarget(int target) async {
+    try {
+      EasyLoading.show(status: 'Saving...'.tr);
+      final service = BaselineSetupService();
+      final res = await service.updateBaseline(defaultDailyMealTarget: target);
+      if (res['success'] == true) {
+        defaultDailyMealTarget.value = target;
+        EasyLoading.showSuccess('Default meal target updated'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error updating default meal target: $e');
+      EasyLoading.showError('Failed to update meal target'.tr);
+    }
+  }
+
+  Future<void> updateTimeFormat(String format) async {
+    try {
+      EasyLoading.show(status: 'Saving...'.tr);
+      final service = BaselineSetupService();
+      final res = await service.updateBaseline(timeFormat: format);
+      if (res['success'] == true) {
+        timeFormat.value = format;
+        EasyLoading.showSuccess('Time format updated'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error updating time format: $e');
+      EasyLoading.showError('Failed to update time format'.tr);
+    }
+  }
 
   @override
   void onInit() {

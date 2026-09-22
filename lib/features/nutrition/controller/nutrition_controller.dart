@@ -9,6 +9,8 @@ import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_setup_service.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 
 class MealItem {
   final String id;
@@ -51,7 +53,7 @@ class MealItem {
 }
 
 class NutritionController extends GetxController {
-  final RxInt dailyTarget = 5.obs;
+  final RxInt dailyTarget = 0.obs;
   final RxString selectedMealType = 'Light'.obs;
 
   final RxList<MealItem> mealsList = <MealItem>[].obs;
@@ -67,7 +69,33 @@ class NutritionController extends GetxController {
     _initData();
   }
 
+  Future<void> fetchBaselineMealTarget() async {
+    try {
+      if (Get.isRegistered<SettingsController>()) {
+        final settings = Get.find<SettingsController>();
+        if (settings.defaultDailyMealTarget.value > 0) {
+          dailyTarget.value = settings.defaultDailyMealTarget.value;
+        }
+      }
+      final res = await BaselineSetupService().getBaseline();
+      if (res['data'] != null &&
+          res['data']['defaultDailyMealTarget'] != null) {
+        final target = (res['data']['defaultDailyMealTarget'] as num).toInt();
+        if (target > 0) {
+          dailyTarget.value = target;
+          if (Get.isRegistered<SettingsController>()) {
+            Get.find<SettingsController>().defaultDailyMealTarget.value =
+                target;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('fetchBaselineMealTarget error: $e');
+    }
+  }
+
   Future<void> _initData() async {
+    await fetchBaselineMealTarget();
     await loadNutritionData();
     await fetchNotes();
     try {
@@ -281,7 +309,6 @@ class NutritionController extends GetxController {
       final jsonStr = await SharedPreferencesHelper.getMeals();
       if (jsonStr != null) {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
-        dailyTarget.value = data['dailyTarget'] ?? 5;
         final List mealsJson = data['meals'] ?? [];
         mealsList.assignAll(
           mealsJson.map((m) {
@@ -366,15 +393,15 @@ class NutritionController extends GetxController {
       dailyTarget.value++;
 
       try {
-        final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
-        if (sessionId.isNotEmpty) {
-          await DashboardService().patchQuickAddLog(
-            sessionId: sessionId,
-            dailyMealTarget: dailyTarget.value,
-          );
+        await BaselineSetupService().updateBaseline(
+          defaultDailyMealTarget: dailyTarget.value,
+        );
+        if (Get.isRegistered<SettingsController>()) {
+          Get.find<SettingsController>().defaultDailyMealTarget.value =
+              dailyTarget.value;
         }
       } catch (e) {
-        debugPrint('Nutrition API increment target error: $e');
+        debugPrint('Baseline API increment target error: $e');
       }
 
       String nextTime = '22:00';
@@ -412,15 +439,15 @@ class NutritionController extends GetxController {
         dailyTarget.value--;
 
         try {
-          final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
-          if (sessionId.isNotEmpty) {
-            await DashboardService().patchQuickAddLog(
-              sessionId: sessionId,
-              dailyMealTarget: dailyTarget.value,
-            );
+          await BaselineSetupService().updateBaseline(
+            defaultDailyMealTarget: dailyTarget.value,
+          );
+          if (Get.isRegistered<SettingsController>()) {
+            Get.find<SettingsController>().defaultDailyMealTarget.value =
+                dailyTarget.value;
           }
         } catch (e) {
-          debugPrint('Nutrition API decrement target error: $e');
+          debugPrint('Baseline API decrement target error: $e');
         }
 
         int lastUnloggedIdx = mealsList.lastIndexWhere((m) => !m.isLogged);
@@ -433,6 +460,22 @@ class NutritionController extends GetxController {
       } finally {
         EasyLoading.dismiss();
       }
+    }
+  }
+
+  Future<void> saveCurrentTargetAsDefault() async {
+    try {
+      EasyLoading.show(status: 'Saving default meal target...'.tr);
+      final service = BaselineSetupService();
+      await service.updateBaseline(defaultDailyMealTarget: dailyTarget.value);
+      if (Get.isRegistered<SettingsController>()) {
+        Get.find<SettingsController>().defaultDailyMealTarget.value =
+            dailyTarget.value;
+      }
+      EasyLoading.showSuccess('Default meal target saved'.tr);
+    } catch (e) {
+      debugPrint('saveCurrentTargetAsDefault error: $e');
+      EasyLoading.showError('Failed to save default meal target'.tr);
     }
   }
 
@@ -666,9 +709,6 @@ class NutritionController extends GetxController {
         }).toList();
 
         mealsList.assignAll(mappedMeals);
-      }
-      if (nutritionTab['dailyMealTarget'] != null) {
-        dailyTarget.value = (nutritionTab['dailyMealTarget'] as num).toInt();
       }
       sleepImpactNote.value = nutritionTab['sleepImpactNote'] ?? "--";
 

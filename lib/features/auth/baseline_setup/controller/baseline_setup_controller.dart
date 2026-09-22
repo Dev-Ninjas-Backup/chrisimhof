@@ -2,6 +2,7 @@ import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.d
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_setup_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
@@ -16,6 +17,8 @@ class BaselineSetupController extends GetxController {
   final chronotype = BaselineEnums.defaultChronotype.obs;
   final caffeineSensitivity = BaselineEnums.defaultCaffeineSensitivity.obs;
   final sportProfile = BaselineEnums.defaultSportProfile.obs;
+  final defaultDailyMealTarget = 3.obs;
+  final timeFormat = '24h'.obs;
 
   final isLoading = false.obs;
 
@@ -48,8 +51,17 @@ class BaselineSetupController extends GetxController {
         sportProfile.value = BaselineEnums.normalizeSportProfile(
           data['sportProfile'],
         );
+
+        if (data['defaultDailyMealTarget'] != null) {
+          defaultDailyMealTarget.value = (data['defaultDailyMealTarget'] as num).toInt();
+        }
+
+        if (data['timeFormat'] != null) {
+          timeFormat.value = data['timeFormat'] as String;
+        }
       }
     } catch (e) {
+      debugPrint('BaselineSetupController.fetchBaselineData error: $e');
       EasyLoading.showError('Failed to load baseline data.'.tr);
     } finally {
       isLoading.value = false;
@@ -69,6 +81,8 @@ class BaselineSetupController extends GetxController {
           caffeineSensitivity.value,
         ),
         sportProfile: BaselineEnums.normalizeSportProfile(sportProfile.value),
+        defaultDailyMealTarget: defaultDailyMealTarget.value,
+        timeFormat: timeFormat.value,
       );
 
       if (response['success'] == true) {

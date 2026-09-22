@@ -1,5 +1,6 @@
 class UserWorkRotationModel {
   final String id;
+  final String? name;
   final int cycleWeeks;
   final String startDate;
   final String timezone;
@@ -10,6 +11,7 @@ class UserWorkRotationModel {
 
   UserWorkRotationModel({
     required this.id,
+    this.name,
     required this.cycleWeeks,
     required this.startDate,
     required this.timezone,
@@ -21,6 +23,7 @@ class UserWorkRotationModel {
 
   factory UserWorkRotationModel.fromJson(Map<String, dynamic> json) {
     final String id = json['id'] as String? ?? '';
+    final String? name = json['name'] as String?;
     final int cycleWeeks = json['cycleWeeks'] as int? ?? 1;
     final String startDate = json['startDate'] as String? ?? '';
     final String timezone = json['timezone'] as String? ?? '';
@@ -131,6 +134,7 @@ class UserWorkRotationModel {
 
     return UserWorkRotationModel(
       id: id,
+      name: name,
       cycleWeeks: cycleWeeks,
       startDate: startDate,
       timezone: timezone,

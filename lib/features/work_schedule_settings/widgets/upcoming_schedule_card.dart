@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
+import 'package:chrisimhof/features/work_schedule_settings/widgets/batch_override_bottom_sheet.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/upcoming_schedule/upcoming_schedule_day_edit_box.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/upcoming_schedule/upcoming_schedule_day_row.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/upcoming_schedule/upcoming_schedule_query_controls.dart';
@@ -34,7 +35,55 @@ class UpcomingScheduleCard extends StatelessWidget {
           children: [
             // Controls Section: Start Date & Days Limit
             UpcomingScheduleQueryControls(controller: controller),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (ctx) => BatchOverrideBottomSheet(controller: controller),
+                );
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.mintSoft3,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.mintSoft),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.date_range_rounded,
+                          size: 18,
+                          color: AppColors.secondaryButtonColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Batch Overrides / Vacation'.tr,
+                          style: getTextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.mintSoftText,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: AppColors.secondaryButtonColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
             const Divider(height: 1, color: AppColors.borderSoft),
             const SizedBox(height: 16),
 

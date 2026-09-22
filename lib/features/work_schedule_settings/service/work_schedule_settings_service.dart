@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class WorkScheduleSettingsService {
   // GET /api/v1/calculator/work-rotation/presets
-  Future<List<WorkRotationPresetModel>> fetchRotationPresets() async {
+  Future<WorkRotationPresetsResponse?> fetchRotationPresetsData() async {
     try {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
       debugPrint('Fetching rotation presets from API...');
@@ -27,23 +27,159 @@ class WorkScheduleSettingsService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        final data = decoded['data'] as Map<String, dynamic>?;
-        final presetsList = data?['presets'] as List<dynamic>?;
-
-        if (presetsList != null) {
-          return presetsList
-              .whereType<Map<String, dynamic>>()
-              .map((json) => WorkRotationPresetModel.fromJson(json))
-              .toList();
-        }
+        return WorkRotationPresetsResponse.fromJson(decoded);
       } else {
         debugPrint('Failed to load presets: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('WorkScheduleSettingsService.fetchRotationPresets error: $e');
+      debugPrint('WorkScheduleSettingsService.fetchRotationPresetsData error: $e');
     }
-    return [];
+    return null;
   }
+
+  // Backward-compatible preset list fetcher
+  Future<List<WorkRotationPresetModel>> fetchRotationPresets() async {
+    final res = await fetchRotationPresetsData();
+    return res?.presets ?? [];
+  }
+
+  // POST /api/v1/calculator/work-rotation/presets/:key/apply
+  Future<bool> applyRotationPreset({
+    required String key,
+    required String startDate,
+    String? name,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      final uri = Uri.parse(Urls.applyRotationPreset(key));
+      final Map<String, dynamic> bodyMap = {'startDate': startDate};
+      if (name != null && name.trim().isNotEmpty) {
+        bodyMap['name'] = name.trim();
+      }
+
+      debugPrint('Applying rotation preset: $uri body: ${jsonEncode(bodyMap)}');
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Apply preset status: ${response.statusCode}');
+      debugPrint('Apply preset body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('WorkScheduleSettingsService.applyRotationPreset error: $e');
+    }
+    return false;
+  }
+
+  // DELETE /api/v1/calculator/work-rotation/templates/:id
+  Future<bool> deleteWorkRotationTemplate(String id) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      final uri = Uri.parse(Urls.deleteWorkRotationTemplate(id));
+
+      final response = await http.delete(
+        uri,
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('Delete template status: ${response.statusCode}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('WorkScheduleSettingsService.deleteWorkRotationTemplate error: $e');
+    }
+    return false;
+  }
+
+  // POST /api/v1/calculator/work-rotation/templates
+  Future<bool> saveWorkRotationTemplate({
+    required String name,
+    String? description,
+    required int cycleWeeks,
+    required Map<String, Map<String, String>> shiftTimes,
+    required List<String> pattern,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Saving work rotation template via API (POST)...');
+
+      final shiftTimesJson = <String, Map<String, String>>{};
+      shiftTimes.forEach((key, val) {
+        final apiKey = _toApiKey(key);
+        shiftTimesJson[apiKey] = {
+          'startTime': val['start'] ?? '00:00',
+          'endTime': val['end'] ?? '00:00',
+        };
+      });
+
+      final patternJson = <Map<String, dynamic>>[];
+      for (int w = 0; w < cycleWeeks; w++) {
+        for (int d = 0; d < 7; d++) {
+          final index = w * 7 + d;
+          String shiftCodeStr = 'off';
+          if (index < pattern.length) {
+            final p = pattern[index];
+            shiftCodeStr = _toApiKey(p);
+          }
+          patternJson.add({
+            'weekIndex': w,
+            'dayIndex': d,
+            'shiftCode': shiftCodeStr,
+          });
+        }
+      }
+
+      final Map<String, dynamic> bodyMap = {
+        'name': name.trim(),
+        'cycleWeeks': cycleWeeks,
+        'shiftTimesJson': shiftTimesJson,
+        'patternJson': patternJson,
+      };
+      if (description != null && description.trim().isNotEmpty) {
+        bodyMap['description'] = description.trim();
+      }
+
+      debugPrint('Save template request body: ${jsonEncode(bodyMap)}');
+
+      final response = await http.post(
+        Uri.parse(Urls.workRotationTemplates),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Save template status: ${response.statusCode}');
+      debugPrint('Save template body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('WorkScheduleSettingsService.saveWorkRotationTemplate error: $e');
+    }
+    return false;
+  }
+
 
   // GET /api/v1/calculator/work-rotation
   Future<UserWorkRotationModel?> fetchMyWorkRotation() async {
@@ -171,6 +307,7 @@ class WorkScheduleSettingsService {
     required Map<String, Map<String, String>> shiftTimes,
     required List<String> pattern,
     String? sourceTemplateKey,
+    String? name,
   }) async {
     try {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
@@ -208,6 +345,11 @@ class WorkScheduleSettingsService {
         'shiftTimesJson': shiftTimesJson,
         'patternJson': patternJson,
       };
+
+      if (name != null && name.trim().isNotEmpty) {
+        bodyMap['name'] = name.trim();
+      }
+      bodyMap['saveAsTemplate'] = true;
 
       if (shiftTimes.containsKey('Day')) {
         bodyMap['dayShift'] = {
@@ -343,6 +485,107 @@ class WorkScheduleSettingsService {
     } catch (e) {
       debugPrint(
         'WorkScheduleSettingsService.deleteWorkRotationOverride error: $e',
+      );
+    }
+    return false;
+  }
+
+  // POST /api/v1/calculator/work-rotation/overrides/batch
+  Future<bool> saveBatchWorkRotationOverrides({
+    required String startDate,
+    required String endDate,
+    required String shiftType,
+    String? shiftStartTime,
+    String? shiftEndTime,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Saving batch work rotation overrides via API (POST)...');
+
+      final Map<String, dynamic> bodyMap = {
+        'startDate': startDate,
+        'endDate': endDate,
+        'shiftType': _toApiKey(shiftType),
+      };
+
+      if (shiftType.toLowerCase() != 'off') {
+        if (shiftStartTime != null && shiftStartTime.isNotEmpty) {
+          bodyMap['shiftStartTime'] = shiftStartTime;
+        }
+        if (shiftEndTime != null && shiftEndTime.isNotEmpty) {
+          bodyMap['shiftEndTime'] = shiftEndTime;
+        }
+      }
+
+      debugPrint('Save batch work rotation overrides request body: ${jsonEncode(bodyMap)}');
+
+      final response = await http.post(
+        Uri.parse(Urls.batchWorkRotationOverrides),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Save batch work rotation overrides status: ${response.statusCode}');
+      debugPrint('Save batch work rotation overrides body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      } else {
+        debugPrint(
+          'Failed to save batch work rotation overrides: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint(
+        'WorkScheduleSettingsService.saveBatchWorkRotationOverrides error: $e',
+      );
+    }
+    return false;
+  }
+
+  // DELETE /api/v1/calculator/work-rotation/overrides/batch
+  Future<bool> deleteBatchWorkRotationOverrides({
+    required String startDate,
+    required String endDate,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      debugPrint('Deleting batch work rotation overrides via API (DELETE)...');
+
+      final Map<String, dynamic> bodyMap = {
+        'startDate': startDate,
+        'endDate': endDate,
+      };
+
+      final response = await http.delete(
+        Uri.parse(Urls.batchWorkRotationOverrides),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Delete batch work rotation overrides status: ${response.statusCode}');
+      debugPrint('Delete batch work rotation overrides body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      } else {
+        debugPrint(
+          'Failed to delete batch work rotation overrides: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint(
+        'WorkScheduleSettingsService.deleteBatchWorkRotationOverrides error: $e',
       );
     }
     return false;

@@ -4,6 +4,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/custom_rotation_toggle_card.dart';
+import 'package:chrisimhof/features/work_schedule_settings/widgets/rotation_list_card.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/rotation_builder_card.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/rotation_cycle_card.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/shift_times_card.dart';
@@ -78,38 +79,60 @@ class WorkScheduleSettingsScreen extends StatelessWidget {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildSectionTitle('SHIFT TIMES'.tr),
+                            _buildSectionTitle('ROTATIONS & TEMPLATES'.tr),
                             const SizedBox(height: 8),
-                            ShiftTimesCard(controller: controller),
+                            RotationListCard(controller: controller),
                             const SizedBox(height: 24),
 
-                            _buildSectionTitle('ROTATION CYCLE'.tr),
-                            const SizedBox(height: 8),
-                            RotationCycleCard(controller: controller),
-                            const SizedBox(height: 24),
+                            if (controller.isCreatingNewRotation.value) ...[
+                              _buildSectionTitle('CREATE CUSTOM ROTATION'.tr),
+                              const SizedBox(height: 8),
+                              RotationCycleCard(controller: controller),
+                              const SizedBox(height: 24),
 
-                            _buildSectionTitle('BUILD YOUR ROTATION'.tr),
-                            const SizedBox(height: 8),
-                            RotationBuilderCard(
-                              controller: controller,
-                              daysOfWeek: daysOfWeek,
-                            ),
-                            const SizedBox(height: 24),
+                              _buildSectionTitle('SHIFT TIMES'.tr),
+                              const SizedBox(height: 8),
+                              ShiftTimesCard(controller: controller),
+                              const SizedBox(height: 24),
 
-                            _buildSectionTitle('UPCOMING SCHEDULE'.tr),
-                            const SizedBox(height: 8),
-                            UpcomingScheduleCard(controller: controller),
-                            const SizedBox(height: 32),
+                              _buildSectionTitle('BUILD YOUR ROTATION'.tr),
+                              const SizedBox(height: 8),
+                              RotationBuilderCard(
+                                controller: controller,
+                                daysOfWeek: daysOfWeek,
+                              ),
+                              const SizedBox(height: 24),
+
+                              CustomButton(
+                                text: 'Save to Templates'.tr,
+                                onTap: controller.saveCustomRotationTemplate,
+                                icon: null,
+                              ),
+                              const SizedBox(height: 12),
+
+                              Center(
+                                child: TextButton(
+                                  onPressed: controller.cancelNewRotation,
+                                  child: Text(
+                                    'Cancel'.tr,
+                                    style: getTextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textSoft,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                            ] else ...[
+                              _buildSectionTitle('UPCOMING SCHEDULE'.tr),
+                              const SizedBox(height: 8),
+                              UpcomingScheduleCard(controller: controller),
+                              const SizedBox(height: 40),
+                            ],
                           ],
                         );
                       }),
-
-                      CustomButton(
-                        text: 'Save Rotation'.tr,
-                        onTap: controller.saveSettings,
-                        icon: null,
-                      ),
-                      const SizedBox(height: 40),
                     ],
                   );
                 }),

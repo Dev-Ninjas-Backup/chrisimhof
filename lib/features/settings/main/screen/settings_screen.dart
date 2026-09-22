@@ -17,6 +17,8 @@ import 'package:chrisimhof/features/auth/baseline_setup/widgets/caffeine_sensiti
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/sport_profile_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
+import 'package:chrisimhof/features/settings/main/widgets/default_meal_target_bottom_sheet.dart';
+import 'package:chrisimhof/features/settings/main/widgets/time_format_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -91,6 +93,19 @@ class SettingsScreen extends StatelessWidget {
                                 ? 'Français'
                                 : 'English',
                             onTap: () => Get.toNamed(AppRoutes.languageScreen),
+                          ),
+                          SettingsRowData(
+                            iconpath: IconPath.watch,
+                            label: 'Time format',
+                            trailing: controller.timeFormat.value == '12h'
+                                ? '12-Hour (AM/PM)'.tr
+                                : '24-Hour'.tr,
+                            onTap: () {
+                              Get.bottomSheet(
+                                TimeFormatBottomSheet(controller: controller),
+                                isScrollControlled: true,
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -220,6 +235,17 @@ class SettingsScreen extends StatelessWidget {
                                     initialSport) {
                                   await baselineController.saveBaselineData();
                                 }
+                              },
+                            ),
+                            SettingsRowData(
+                              iconpath: IconPath.nutrition,
+                              label: 'Default daily meal target',
+                              trailing: '${controller.defaultDailyMealTarget.value} ${controller.defaultDailyMealTarget.value == 1 ? 'meal'.tr : 'meals'.tr}',
+                              onTap: () {
+                                Get.bottomSheet(
+                                  DefaultMealTargetBottomSheet(controller: controller),
+                                  isScrollControlled: true,
+                                );
                               },
                             ),
                           ],

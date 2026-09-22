@@ -1,25 +1,31 @@
 class WorkRotationPresetModel {
+  final String? id;
   final String key;
   final String label;
   final String description;
   final int cycleWeeks;
+  final bool isCustom;
   final Map<String, Map<String, String>> shiftTimes;
   final List<String> pattern;
 
   WorkRotationPresetModel({
+    this.id,
     required this.key,
     required this.label,
     required this.description,
     required this.cycleWeeks,
+    this.isCustom = false,
     required this.shiftTimes,
     required this.pattern,
   });
 
   factory WorkRotationPresetModel.fromJson(Map<String, dynamic> json) {
+    final String? id = json['id'] as String?;
     final String key = json['key'] as String? ?? '';
     final String label = json['label'] as String? ?? '';
     final String description = json['description'] as String? ?? '';
     final int cycleWeeks = json['cycleWeeks'] as int? ?? 1;
+    final bool isCustom = json['isCustom'] as bool? ?? false;
 
     // Parse shiftTimesJson
     final shiftTimesMap = <String, Map<String, String>>{};
@@ -98,12 +104,39 @@ class WorkRotationPresetModel {
     }
 
     return WorkRotationPresetModel(
+      id: id,
       key: key,
       label: label,
       description: description,
       cycleWeeks: cycleWeeks,
+      isCustom: isCustom,
       shiftTimes: shiftTimesMap,
       pattern: patternList,
+    );
+  }
+}
+
+class WorkRotationPresetsResponse {
+  final List<WorkRotationPresetModel> presets;
+  final String? activeRotationKey;
+  final String? activeRotationName;
+
+  WorkRotationPresetsResponse({
+    required this.presets,
+    this.activeRotationKey,
+    this.activeRotationName,
+  });
+
+  factory WorkRotationPresetsResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] as Map<String, dynamic>? ?? {};
+    final presetsList = data['presets'] as List<dynamic>? ?? [];
+    return WorkRotationPresetsResponse(
+      presets: presetsList
+          .whereType<Map<String, dynamic>>()
+          .map((item) => WorkRotationPresetModel.fromJson(item))
+          .toList(),
+      activeRotationKey: data['activeRotationKey'] as String?,
+      activeRotationName: data['activeRotationName'] as String?,
     );
   }
 }

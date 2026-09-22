@@ -34,8 +34,10 @@ class Urls {
   static String calculateResult(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/calculate';
   static const String selectlanguage = '$baseUrl/api/v1/profile/language';
+  static const String requestAccountDeletionOtp =
+      '$baseUrl/api/v1/users/account-deletion/request-otp';
   static String deleteAccount(String userId) =>
-      '$baseUrl/api/v1/users/$userId/permanent';
+      '$baseUrl/api/v1/users/$userId';
   static String sessionReset(String sessionId) =>
       '$baseUrl/api/v1/calculator/session/$sessionId/reset';
   static String updateCalculatorSession(String sessionId) =>
@@ -83,6 +85,16 @@ class Urls {
       '$baseUrl/api/v1/calculator/work-rotation/overrides';
   static String deleteOverrideWorkRotation(String date) =>
       '$baseUrl/api/v1/calculator/work-rotation/overrides/$date';
+  static const String batchWorkRotationOverrides =
+      '$baseUrl/api/v1/calculator/work-rotation/overrides/batch';
+  static String applyRotationPreset(String key) =>
+      '$baseUrl/api/v1/calculator/work-rotation/presets/$key/apply';
+  static const String workRotationTemplates =
+      '$baseUrl/api/v1/calculator/work-rotation/templates';
+  static String deleteWorkRotationTemplate(String id) =>
+      '$baseUrl/api/v1/calculator/work-rotation/templates/$id';
+  static String applyWorkRotationTemplate(String id) =>
+      '$baseUrl/api/v1/calculator/work-rotation/templates/$id/apply';
   static String updateHydration(String sessionId, String entryId) =>
       '$baseUrl/api/v1/calculator/sessions/$sessionId/hydration/$entryId';
   static String updateCaffeine(String sessionId, String entryId) =>

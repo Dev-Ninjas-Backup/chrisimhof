@@ -10,6 +10,8 @@ import 'package:chrisimhof/features/auth/baseline_setup/widgets/sleep_taret_bott
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/chronotype_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/caffeine_sensitivity_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/sport_profile_bottomsheet.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_meal_target_bottomsheet.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_time_format_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
 
 class BaselineSetupScreen extends StatelessWidget {
@@ -151,6 +153,49 @@ class BaselineSetupScreen extends StatelessWidget {
                   onTap: () {
                     Get.bottomSheet(
                       const SportProfileBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.nutrition,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Default daily meal target'.tr,
+                  subtitle:
+                      '${controller.defaultDailyMealTarget.value} ${controller.defaultDailyMealTarget.value == 1 ? 'meal'.tr : 'meals'.tr}',
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const BaselineMealTargetBottomsheet(),
+                      isScrollControlled: true,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => BuildMenuItem(
+                  iconPath: IconPath.watch,
+                  iconBackgroundColor: AppColors.subtle,
+                  iconColor: AppColors.secondaryButtonColor,
+                  title: 'Time format'.tr,
+                  subtitle: controller.timeFormat.value == '12h'
+                      ? '12-Hour (AM/PM)'.tr
+                      : '24-Hour'.tr,
+                  borderRadius: 20,
+                  containerWidth: 36,
+                  containerHeight: 36,
+                  iconSize: 18,
+                  onTap: () {
+                    Get.bottomSheet(
+                      const BaselineTimeFormatBottomsheet(),
                       isScrollControlled: true,
                     );
                   },

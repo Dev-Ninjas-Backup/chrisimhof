@@ -70,7 +70,9 @@ class DeleteAccountScreen extends StatelessWidget {
                   final enabled = controller.canDelete;
                   return CustomButton(
                     text: 'Delete my account'.tr,
-                    onTap: enabled ? controller.deleteAccount : null,
+                    onTap: enabled
+                        ? () => controller.requestOtpAndShowModal(context)
+                        : null,
                     backgroundColor: enabled
                         ? AppColors.red
                         : AppColors.gray100Alt2,

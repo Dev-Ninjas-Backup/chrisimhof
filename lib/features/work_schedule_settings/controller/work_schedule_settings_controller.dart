@@ -19,6 +19,11 @@ class WorkScheduleSettingsController extends GetxController {
   final pattern = <String>[].obs;
   final overrides = <String, String>{}.obs;
   final hasRotationData = false.obs;
+  final rotationName = ''.obs;
+  final activeRotationKey = ''.obs;
+  final activeRotationName = ''.obs;
+  final isCreatingNewRotation = false.obs;
+  final rotationNameController = TextEditingController();
 
   // Selected preset index for bottom sheet template picker
   final selectedTemplateIndex = 0.obs;
@@ -48,6 +53,12 @@ class WorkScheduleSettingsController extends GetxController {
     loadPresetsFromApi();
   }
 
+  @override
+  void onClose() {
+    rotationNameController.dispose();
+    super.onClose();
+  }
+
   Future<void> fetchMyWorkRotation() async {
     try {
       isRotationLoading.value = true;
@@ -58,10 +69,14 @@ class WorkScheduleSettingsController extends GetxController {
         isEnabled.value = false;
         selectedTemplateKey.value = '';
         hasRotationData.value = false;
+        rotationName.value = '';
+        rotationNameController.text = '';
       } else {
         // has data => toggle ON & populate rotation data
         isEnabled.value = true;
         hasRotationData.value = true;
+        rotationName.value = rotation.name ?? '';
+        rotationNameController.text = rotation.name ?? '';
         weeks.value = rotation.cycleWeeks;
         selectedTemplateKey.value = rotation.sourceTemplateKey;
         if (rotation.startDate.isNotEmpty) {
@@ -100,7 +115,10 @@ class WorkScheduleSettingsController extends GetxController {
     }
   }
 
-  Future<void> updateCalendarRange(DateTime newFromDate, int newDaysLimit) async {
+  Future<void> updateCalendarRange(
+    DateTime newFromDate,
+    int newDaysLimit,
+  ) async {
     calendarFromDate.value = newFromDate;
     calendarDaysLimit.value = newDaysLimit;
     await fetchUpcomingSchedule(
@@ -116,9 +134,15 @@ class WorkScheduleSettingsController extends GetxController {
   Future<void> loadPresetsFromApi() async {
     try {
       isLoadingPresets.value = true;
-      final presets = await _service.fetchRotationPresets();
-      if (presets.isNotEmpty) {
-        apiPresets.assignAll(presets);
+      final res = await _service.fetchRotationPresetsData();
+      if (res != null) {
+        apiPresets.assignAll(res.presets);
+        activeRotationKey.value = res.activeRotationKey ?? '';
+        activeRotationName.value = res.activeRotationName ?? '';
+        if (rotationName.value.isEmpty && (res.activeRotationName?.isNotEmpty ?? false)) {
+          rotationName.value = res.activeRotationName!;
+          rotationNameController.text = res.activeRotationName!;
+        }
       }
     } catch (e) {
       debugPrint('Error loading rotation presets: $e');
@@ -127,11 +151,153 @@ class WorkScheduleSettingsController extends GetxController {
     }
   }
 
+  Future<void> activateRotation(WorkRotationPresetModel preset) async {
+    try {
+      EasyLoading.show(status: 'Activating rotation...'.tr);
+      final formattedDate = _formatDate(startDate.value);
+      final success = await _service.applyRotationPreset(
+        key: preset.key,
+        startDate: formattedDate,
+        name: preset.label,
+      );
+
+      if (success) {
+        activeRotationKey.value = preset.key;
+        activeRotationName.value = preset.label;
+        selectedTemplateKey.value = preset.key;
+        rotationName.value = preset.label;
+        rotationNameController.text = preset.label;
+        isCreatingNewRotation.value = false;
+
+        // Apply preset details to editor
+        applyPreset(preset);
+
+        await fetchUpcomingSchedule();
+        try {
+          final workCtrl = Get.find<WorkController>();
+          workCtrl.defaultRotation.value = preset.label;
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+
+        // Reload presets to update active indicators
+        await loadPresetsFromApi();
+
+        EasyLoading.showSuccess('Rotation activated!'.tr);
+      } else {
+        EasyLoading.showError('Failed to activate rotation'.tr);
+      }
+    } catch (e) {
+      debugPrint('activateRotation error: $e');
+      EasyLoading.showError('Failed to activate rotation'.tr);
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> deleteCustomTemplate(WorkRotationPresetModel preset) async {
+    if (!preset.isCustom || preset.id == null || preset.id!.isEmpty) return;
+    try {
+      EasyLoading.show(status: 'Deleting template...'.tr);
+      final success = await _service.deleteWorkRotationTemplate(preset.id!);
+      if (success) {
+        await loadPresetsFromApi();
+        EasyLoading.showSuccess('Template deleted'.tr);
+      } else {
+        EasyLoading.showError('Failed to delete template'.tr);
+      }
+    } catch (e) {
+      debugPrint('deleteCustomTemplate error: $e');
+      EasyLoading.showError('Failed to delete template'.tr);
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  void startNewRotation() {
+    isCreatingNewRotation.value = true;
+    rotationName.value = '';
+    rotationNameController.text = '';
+    weeks.value = 1;
+    pattern.assignAll(List.generate(7, (_) => 'Off'));
+    startDate.value = DateTime.now();
+    shiftTimes.assignAll({
+      'Day': {'start': '06:00', 'end': '14:00'},
+      'Evening': {'start': '14:00', 'end': '22:00'},
+      'Night': {'start': '22:00', 'end': '06:00'},
+    });
+  }
+
+  void cancelNewRotation() {
+    isCreatingNewRotation.value = false;
+  }
+
+  Future<void> saveCustomRotationTemplate() async {
+    final name = rotationName.value.trim();
+    if (name.isEmpty) {
+      EasyLoading.showInfo('Please enter a rotation name'.tr);
+      return;
+    }
+
+    try {
+      EasyLoading.show(status: 'Saving template...'.tr);
+
+      final success = await _service.saveWorkRotationTemplate(
+        name: name,
+        cycleWeeks: weeks.value,
+        shiftTimes: shiftTimes,
+        pattern: pattern,
+      );
+
+      if (success) {
+        isCreatingNewRotation.value = false;
+        rotationName.value = '';
+        rotationNameController.text = '';
+        await loadPresetsFromApi();
+        EasyLoading.showSuccess('Rotation template saved!'.tr);
+      } else {
+        EasyLoading.showError('Failed to save template'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error saving custom rotation template: $e');
+      EasyLoading.showError('Failed to save template'.tr);
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
   Future<void> onToggleChanged(bool value, BuildContext context) async {
     isEnabled.value = value;
     if (value) {
-      openTemplateSheet(context);
+      if (apiPresets.isEmpty && !isLoadingPresets.value) {
+        loadPresetsFromApi();
+      }
       fetchUpcomingSchedule();
+    } else {
+      try {
+        EasyLoading.show(status: 'Disabling work rotation...'.tr);
+        final success = await _service.deleteWorkRotation();
+        if (success) {
+          try {
+            final workCtrl = Get.find<WorkController>();
+            workCtrl.weeklyPattern.clear();
+          } catch (_) {}
+          hasRotationData.value = false;
+          activeRotationKey.value = '';
+          activeRotationName.value = '';
+          rotationName.value = '';
+          rotationNameController.text = '';
+          upcomingScheduleDays.clear();
+          EasyLoading.showSuccess('Work rotation disabled'.tr);
+        } else {
+          isEnabled.value = true;
+          EasyLoading.showError('Failed to disable work rotation'.tr);
+        }
+      } catch (e) {
+        isEnabled.value = true;
+        EasyLoading.showError('Failed to disable work rotation'.tr);
+      } finally {
+        EasyLoading.dismiss();
+      }
     }
   }
 
@@ -190,10 +356,13 @@ class WorkScheduleSettingsController extends GetxController {
     if (lower == 'night') return 'Night'.tr;
     if (lower == 'off') return 'Off'.tr;
 
-    return key.split('_').map((word) {
-      if (word.isEmpty) return '';
-      return word[0].toUpperCase() + word.substring(1);
-    }).join(' ');
+    return key
+        .split('_')
+        .map((word) {
+          if (word.isEmpty) return '';
+          return word[0].toUpperCase() + word.substring(1);
+        })
+        .join(' ');
   }
 
   String getShiftAbbreviation(String key) {
@@ -292,8 +461,7 @@ class WorkScheduleSettingsController extends GetxController {
     final cycleLength = 7 * weeks.value;
     if (cycleLength <= 0 || pattern.isEmpty) return -1;
 
-    final patternIndex =
-        ((diffDays % cycleLength) + cycleLength) % cycleLength;
+    final patternIndex = ((diffDays % cycleLength) + cycleLength) % cycleLength;
     if (patternIndex >= 0 && patternIndex < pattern.length) {
       return patternIndex;
     }
@@ -313,24 +481,21 @@ class WorkScheduleSettingsController extends GetxController {
       shiftStartTime = null;
       shiftEndTime = null;
     } else {
-      final matchKey = shiftTimes.keys.firstWhere(
-        (k) {
-          final lK = k.toLowerCase();
-          return lK == lowerCode ||
-              (lK == 'day' && lowerCode == 'd') ||
-              (lK == 'evening' && lowerCode == 'e') ||
-              (lK == 'night' && lowerCode == 'n');
-        },
-        orElse: () => shiftCode,
-      );
+      final matchKey = shiftTimes.keys.firstWhere((k) {
+        final lK = k.toLowerCase();
+        return lK == lowerCode ||
+            (lK == 'day' && lowerCode == 'd') ||
+            (lK == 'evening' && lowerCode == 'e') ||
+            (lK == 'night' && lowerCode == 'n');
+      }, orElse: () => shiftCode);
 
       apiShiftType = matchKey.toLowerCase() == 'day'
           ? 'day'
           : matchKey.toLowerCase() == 'evening'
-              ? 'evening'
-              : matchKey.toLowerCase() == 'night'
-                  ? 'night'
-                  : matchKey;
+          ? 'evening'
+          : matchKey.toLowerCase() == 'night'
+          ? 'night'
+          : matchKey;
 
       final times = shiftTimes[matchKey];
       shiftStartTime = times?['start'] ?? '00:00';
@@ -396,6 +561,120 @@ class WorkScheduleSettingsController extends GetxController {
     }
   }
 
+  Future<void> applyBatchOverrides(
+    DateTime start,
+    DateTime end,
+    String shiftCode, {
+    String? startTime,
+    String? endTime,
+  }) async {
+    final startStr = _formatDate(start);
+    final endStr = _formatDate(end);
+
+    String apiShiftType;
+    String? shiftStartTime;
+    String? shiftEndTime;
+
+    final lowerCode = shiftCode.toLowerCase();
+    if (lowerCode == 'off') {
+      apiShiftType = 'off';
+      shiftStartTime = null;
+      shiftEndTime = null;
+    } else {
+      final matchKey = shiftTimes.keys.firstWhere((k) {
+        final lK = k.toLowerCase();
+        return lK == lowerCode ||
+            (lK == 'day' && lowerCode == 'd') ||
+            (lK == 'evening' && lowerCode == 'e') ||
+            (lK == 'night' && lowerCode == 'n');
+      }, orElse: () => shiftCode);
+
+      apiShiftType = matchKey.toLowerCase() == 'day'
+          ? 'day'
+          : matchKey.toLowerCase() == 'evening'
+          ? 'evening'
+          : matchKey.toLowerCase() == 'night'
+          ? 'night'
+          : matchKey;
+
+      final times = shiftTimes[matchKey];
+      shiftStartTime = startTime ?? times?['start'] ?? '00:00';
+      shiftEndTime = endTime ?? times?['end'] ?? '00:00';
+    }
+
+    try {
+      EasyLoading.show(status: 'Saving batch overrides...'.tr);
+
+      final success = await _service.saveBatchWorkRotationOverrides(
+        startDate: startStr,
+        endDate: endStr,
+        shiftType: apiShiftType,
+        shiftStartTime: shiftStartTime,
+        shiftEndTime: shiftEndTime,
+      );
+
+      if (success) {
+        DateTime curr = DateTime(start.year, start.month, start.day);
+        final cleanEnd = DateTime(end.year, end.month, end.day);
+        while (!curr.isAfter(cleanEnd)) {
+          overrides[_formatDate(curr)] = shiftCode;
+          curr = curr.add(const Duration(days: 1));
+        }
+
+        await fetchUpcomingSchedule();
+
+        try {
+          final workCtrl = Get.find<WorkController>();
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+
+        EasyLoading.showSuccess('Batch overrides saved'.tr);
+      } else {
+        EasyLoading.showError('Failed to save batch overrides'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error applying batch overrides: $e');
+      EasyLoading.showError('Failed to save batch overrides'.tr);
+    }
+  }
+
+  Future<void> clearBatchOverrides(DateTime start, DateTime end) async {
+    final startStr = _formatDate(start);
+    final endStr = _formatDate(end);
+
+    try {
+      EasyLoading.show(status: 'Clearing overrides in range...'.tr);
+
+      final success = await _service.deleteBatchWorkRotationOverrides(
+        startDate: startStr,
+        endDate: endStr,
+      );
+
+      if (success) {
+        DateTime curr = DateTime(start.year, start.month, start.day);
+        final cleanEnd = DateTime(end.year, end.month, end.day);
+        while (!curr.isAfter(cleanEnd)) {
+          overrides.remove(_formatDate(curr));
+          curr = curr.add(const Duration(days: 1));
+        }
+
+        await fetchUpcomingSchedule();
+
+        try {
+          final workCtrl = Get.find<WorkController>();
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+
+        EasyLoading.showSuccess('Range overrides cleared'.tr);
+      } else {
+        EasyLoading.showError('Failed to clear range overrides'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error clearing batch overrides: $e');
+      EasyLoading.showError('Failed to clear range overrides'.tr);
+    }
+  }
+
   String getBaseShiftForDate(DateTime date) {
     final startDateClean = DateTime(
       startDate.value.year,
@@ -408,8 +687,7 @@ class WorkScheduleSettingsController extends GetxController {
     final cycleLength = 7 * weeks.value;
     if (cycleLength <= 0 || pattern.isEmpty) return 'Off';
 
-    final patternIndex =
-        ((diffDays % cycleLength) + cycleLength) % cycleLength;
+    final patternIndex = ((diffDays % cycleLength) + cycleLength) % cycleLength;
     if (patternIndex < pattern.length) {
       return pattern[patternIndex];
     }
@@ -444,6 +722,9 @@ class WorkScheduleSettingsController extends GetxController {
         sourceTemplateKey: selectedTemplateKey.value.isNotEmpty
             ? selectedTemplateKey.value
             : null,
+        name: rotationName.value.trim().isNotEmpty
+            ? rotationName.value.trim()
+            : null,
       );
 
       if (success) {
@@ -452,6 +733,7 @@ class WorkScheduleSettingsController extends GetxController {
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
         hasRotationData.value = true;
+        await loadPresetsFromApi();
         EasyLoading.showSuccess('Work schedule saved!'.tr);
         Get.back();
       } else {
@@ -551,6 +833,12 @@ class WorkScheduleSettingsController extends GetxController {
             int.tryParse(endParts[1]) ?? workCtrl.endMinute.value;
       }
     }
+
+    if (activeRotationName.value.isNotEmpty) {
+      workCtrl.defaultRotation.value = activeRotationName.value;
+    } else if (rotationName.value.isNotEmpty) {
+      workCtrl.defaultRotation.value = rotationName.value;
+    }
   }
 
   String getShiftForDate(DateTime date) {
@@ -570,8 +858,7 @@ class WorkScheduleSettingsController extends GetxController {
     final cycleLength = 7 * weeks.value;
     if (cycleLength <= 0 || pattern.isEmpty) return 'Off';
 
-    final patternIndex =
-        ((diffDays % cycleLength) + cycleLength) % cycleLength;
+    final patternIndex = ((diffDays % cycleLength) + cycleLength) % cycleLength;
     if (patternIndex < pattern.length) {
       return pattern[patternIndex];
     }

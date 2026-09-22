@@ -24,6 +24,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
   void initState() {
     super.initState();
     controller = Get.find<NutritionController>();
+    controller.fetchBaselineMealTarget();
   }
 
   @override

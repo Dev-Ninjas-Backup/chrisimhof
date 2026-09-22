@@ -63,6 +63,29 @@ class SetMealTarget extends StatelessWidget {
                       color: AppColors.textSoft,
                     ),
                   ),
+                  const SizedBox(height: 3),
+                  InkWell(
+                    onTap: controller.saveCurrentTargetAsDefault,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.bookmark_outline_rounded,
+                          size: 13,
+                          color: AppColors.secondaryButtonColor,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Save as default'.tr,
+                          style: getTextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.secondaryButtonColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

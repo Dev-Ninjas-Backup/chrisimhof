@@ -36,6 +36,8 @@ class ProfileData {
   final String ?chronotype;
   final String ?caffeineSensitivity;
   final String ?sportProfile;
+  final int? defaultDailyMealTarget;
+  final String? timeFormat;
   final String role;
   final String? language;
   final String? safetyAcknowledgedAt;
@@ -65,6 +67,8 @@ class ProfileData {
     required this.chronotype,
     required this.caffeineSensitivity,
     required this.sportProfile,
+    this.defaultDailyMealTarget,
+    this.timeFormat,
   });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
@@ -97,6 +101,8 @@ class ProfileData {
       chronotype: profile['chronotype'] ?? json['chronotype'] ?? '',
       caffeineSensitivity: profile['caffeineSensitivity'] ?? json['caffeineSensitivity'] ?? '',
       sportProfile: profile['sportProfile'] ?? json['sportProfile'] ?? '',
+      defaultDailyMealTarget: profile['defaultDailyMealTarget'] ?? json['defaultDailyMealTarget'],
+      timeFormat: profile['timeFormat'] ?? json['timeFormat'],
     );
   }
 }
