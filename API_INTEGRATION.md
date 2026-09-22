@@ -373,6 +373,161 @@ Users can customize whether time recommendations and clock windows are rendered 
 
 ---
 
+## ⚡ Future Scope Phase 2 Integrations
+
+---
+
+### 7. Dynamic Caffeine Metabolic Clearance & Optimal Bedtime Shift
+
+The caffeine engine now calculates true exponential clearance curves personalized to the user's metabolic sensitivity and dynamically adjusts scheduled bedtime in real-time when circulating caffeine at bedtime exceeds safe limits.
+
+#### Metabolic Sensitivity Half-Lives ($t_{\text{half}}$)
+Configured via `caffeineSensitivity` in Profile / Baseline:
+- `"low"` $\to$ **4.5 hours**
+- `"medium"` (or omitted/default) $\to$ **5.5 hours**
+- `"high"` $\to$ **7.0 hours**
+
+#### Circulating Caffeine Modeling
+When caffeine entries are logged via Quick Add (`POST /api/v1/calculator/sessions/:sessionId/quick-add`), updated, or deleted, the server recalculates circulating active caffeine at scheduled sleep time:
+$$\text{activeAtBedtime} = \sum_{i} \text{mg}_i \times 0.5^{\frac{\Delta t_{\text{bedtime}, i}}{t_{\text{half}}}}$$
+
+If $\text{activeAtBedtime} > 50\text{mg}$ (the clinical disruption threshold), the engine calculates an extra bedtime delay buffer (capped at 90 minutes for circadian safety):
+$$\Delta t_{\text{extra}} = \min\left(90, \text{round}\left(t_{\text{half}} \times \log_2\left(\frac{\text{activeAtBedtime}}{50}\right) \times 60\right)\right)$$
+
+#### Calculation Response Updates
+In `GET /api/v1/calculator/sessions/:sessionId` (or `tabs/overview` / `quick-add` responses):
+
+```json
+{
+  "caffeine": {
+    "score": 78,
+    "totalCaffeineMg": 400,
+    "activeCaffeineMg": 280.5,
+    "activeCaffeineAtBedtimeMg": 213.2,
+    "caffeineCutoffTime": "14:00",
+    "isPastCutoff": false,
+    "dailyLimitMg": 400,
+    "timeline": [ ... ],
+    "logs": [
+      {
+        "id": "log-1",
+        "time": "18:00",
+        "amountMg": 400,
+        "name": "Pre-Workout Energy",
+        "halfLifeHours": 5.5,
+        "projectedZeroTime": "09:30",
+        "activeAtBedtimeMg": 213.2
+      }
+    ]
+  },
+  "sleep": {
+    "optimalBedtime": "23:30",
+    "targetBedtime": "22:00",
+    "circadianBedtime": "22:00",
+    "bedtimeBufferMinutes": 90
+  }
+}
+```
+
+#### Mobile App Integration Checklist
+- [ ] Ensure `caffeineSensitivity` (`"low"` | `"medium"` | `"high"`) is selectable in Onboarding and Settings > Baseline Profile.
+- [ ] On the Sleep & Bedtime UI, observe `data.sleep.optimalBedtime` — this time automatically incorporates dynamic caffeine delay buffers without manual client calculation.
+- [ ] In the Caffeine Details / Timeline view, mobile apps can use `activeCaffeineAtBedtimeMg` to display warnings (e.g. *"213 mg active at bedtime — your recommended sleep time has been delayed by 90 minutes to allow clearance"*).
+
+---
+
+### 8. `PATCH /api/v1/profile/baseline` — Weekly Sport Goal & Adaptive Rest Recommendations (`weeklySportGoal`)
+
+Users can configure their weekly workout target (1 to 7 workouts per week, default: 3). The engine automatically computes weekly progress across each ISO calendar week (Monday to Sunday) anchored to the user's timezone, intelligently managing adaptive rest and catch-up pacing.
+
+#### Baseline Profile Payload Update
+- **Endpoint**: `PATCH /api/v1/profile/baseline`
+- **Request Body**:
+```json
+{
+  "weeklySportGoal": 4
+}
+```
+
+#### Weekly Sport Stats in Session Responses
+In `GET /api/v1/calculator/sessions/:sessionId` (or `tabs/overview` / `quick-add`):
+
+```json
+{
+  "sport": {
+    "sportScore": 85,
+    "sportReadiness": "medium",
+    "recoveryScore": 62,
+    "totalDurationMinutes": 0,
+    "isRestDay": true,
+    "weeklySportStats": {
+      "weeklyGoal": 4,
+      "workoutsCompletedThisWeek": 3,
+      "daysRemainingInWeek": 2,
+      "isGoalMet": false,
+      "isOnPace": true
+    },
+    "adaptiveRestRecommended": true,
+    "adaptiveRestReason": "onTrackRest"
+  }
+}
+```
+
+#### Adaptive Rest & Weekly Goal Recommendation Cards
+The recommendation engine automatically emits actionable cards based on weekly pace and biometric fatigue:
+
+1. **Adaptive Rest On Track** (`titleKey: "sport.adaptiveRestTitle"`, `bodyKey: "sport.adaptiveRestOnTrack"`):
+   - Triggered when user is comfortably on pace or has met their weekly goal but has accumulated fatigue (`sleepDebt7dMin > 60` or `recoveryScore < 65`).
+   - English: `"You're on track with 3/4 workouts this week — taking a rest day today will support your recovery and performance."`
+   - French: `"Vous êtes sur la bonne voie avec 3/4 séances cette semaine — un jour de repos aujourd'hui soutiendra votre récupération."`
+
+2. **Weekly Goal Met** (`titleKey: "sport.weeklyGoalTitle"`, `bodyKey: "sport.weeklyGoalMet"`):
+   - Triggered when `workoutsCompletedThisWeek >= weeklyGoal`.
+   - English: `"Weekly workout goal reached (4/4)! Any additional activity today can focus on light recovery or mobility."`
+   - French: `"Objectif hebdomadaire atteint (4/4) ! Toute activité supplémentaire aujourd'hui peut se concentrer sur la mobilité ou la récupération."`
+
+3. **Catch-up Pacing Nudge** (`titleKey: "sport.trainingTitle"`, `bodyKey: "sport.catchUpNudge"`):
+   - Triggered when days remaining in the week $\le$ workouts needed and the user is well-rested.
+   - English: `"You have 3 days left to complete 2 workouts toward your weekly goal — conditions look great for a session today."`
+   - French: `"Il vous reste 3 jours pour compléter 2 séances — les conditions sont idéales pour s'entraîner aujourd'hui."`
+
+#### Mobile App Integration Checklist
+- [ ] In Onboarding and Settings > Baseline Profile, provide a "Weekly Workout Goal" stepper/slider (1–7 workouts/week).
+- [ ] In the Sport Card on Dashboard / Today tab, render weekly progress (e.g. `"3/4 workouts this week"`).
+- [ ] When `adaptiveRestRecommended: true`, display an "Adaptive Rest" status badge highlighting that taking a rest day supports circadian recovery.
+
+---
+
+### 9. Active Profile Baseline Integration (`chronotype`, `sportProfile`, `sleepTargetMinutes`)
+
+Onboarding and profile baseline settings actively govern mathematical recommendations and thresholds across all domain engines:
+
+#### 1. Chronotype (`"morning"` | `"intermediate"` | `"evening"`)
+- **Peak Alertness & Suggested Training Time**:
+  - **Morning (*Lark*)**: Peak alertness occurs **2.0–3.0h post-wake** (base offset = 2.5h; shifted to 4.0h if poorly rested with `sleepScore < 55`).
+  - **Evening (*Owl*)**: Peak alertness occurs **5.0–6.5h post-wake** (base offset = 5.5h; shifted to 7.0h if poorly rested).
+  - **Intermediate / Standard**: Peak alertness occurs **3.5–4.0h post-wake** (base offset = 3.5h; shifted to 5.0h if poorly rested).
+- **Circadian Sleep Timing**:
+  - Morning chronotypes receive earlier sleep window recommendations (-30 min).
+  - Evening chronotypes receive later sleep window recommendations (+30 min).
+
+#### 2. Sport Profile (`"endurance"` | `"cardio"` | `"strength"` | `"mixed"` | `"sedentary"` | `"light"`)
+- **Dynamic Hydration Baseline Target**:
+  - `endurance`: Base hydration target is increased by **+20%** ($3000\,\text{ml}$ vs $2500\,\text{ml}$ baseline).
+  - `cardio`: Base hydration target is increased by **+10%** ($2750\,\text{ml}$).
+  - `sedentary`: Base hydration target adjusted to $2300\,\text{ml}$.
+  - `light`: Base hydration target adjusted to $2400\,\text{ml}$.
+  - `strength` / `mixed` / default: Standard $2500\,\text{ml}$ baseline.
+  - *Note*: Sweat volume from logged workouts (+300 to +700 ml/h), caffeine offsets, and night shift boosts stack dynamically on top of this profile base target.
+- **Post-Workout Sleep Wind-Down Buffer**:
+  - `strength` and `mixed`: Maximum bedtime buffer cap is expanded to **60 minutes** (vs 45 minutes for cardio/endurance) for late high-intensity sessions to account for sustained sympathetic nervous system activation, delayed muscle thermogenesis, and cortisol clearance.
+
+#### 3. Personalized Sleep Target (`sleepTargetMinutes`)
+- Configurable from 240 min (4h) to 660 min (11h).
+- Strictly determines sleep quality scoring ratios, 7-day sleep debt accumulation, and upcoming circadian sleep window durations without static hardcoded 8-hour overrides.
+
+---
+
 ## 🔒 Authentication & Standard Headers
 
 All authenticated routes require the standard Bearer header:
