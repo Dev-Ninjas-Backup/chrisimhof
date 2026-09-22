@@ -19,6 +19,7 @@ class BaselineSetupController extends GetxController {
   final sportProfile = BaselineEnums.defaultSportProfile.obs;
   final defaultDailyMealTarget = 3.obs;
   final timeFormat = '24h'.obs;
+  final weeklySportGoal = 3.obs;
 
   final isLoading = false.obs;
 
@@ -59,6 +60,10 @@ class BaselineSetupController extends GetxController {
         if (data['timeFormat'] != null) {
           timeFormat.value = data['timeFormat'] as String;
         }
+
+        if (data['weeklySportGoal'] != null) {
+          weeklySportGoal.value = (data['weeklySportGoal'] as num).toInt();
+        }
       }
     } catch (e) {
       debugPrint('BaselineSetupController.fetchBaselineData error: $e');
@@ -83,6 +88,7 @@ class BaselineSetupController extends GetxController {
         sportProfile: BaselineEnums.normalizeSportProfile(sportProfile.value),
         defaultDailyMealTarget: defaultDailyMealTarget.value,
         timeFormat: timeFormat.value,
+        weeklySportGoal: weeklySportGoal.value,
       );
 
       if (response['success'] == true) {
