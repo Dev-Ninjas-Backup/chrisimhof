@@ -48,3 +48,5 @@ ios/build
 /ios/Pods
 .gitignore
 .agents
+/client-message.txt
+/client-attrachments
