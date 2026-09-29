@@ -14,78 +14,95 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.welcomeScreenBg,
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
-        bottom: false,
+        bottom: true,
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 12),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
-                padding: EdgeInsets.symmetric(vertical: 24, horizontal: 40),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    width: 0.5,
-                    color: const Color(0x669CAAA6),
-                  ),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 24,
                 ),
-                child: CircadianAvatar(
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundColor,
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: AppColors.borderColor, width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const CircadianAvatar(
                   imagePath: ImagePath.circadianAvatar,
-                  avatarSize: 300,
-                  orbitRadius: 100,
+                  avatarSize: 280,
+                  orbitRadius: 95,
                   orbitCenterY: 55,
+                  isLightMode: true,
                 ),
               ),
-              SizedBox(height: 45),
+              const SizedBox(height: 28),
 
-              Image.asset(IconPath.welcomeLogo, width: 87.37, height: 37.8),
+              Image.asset(IconPath.welcomeLogo, width: 68, height: 32),
+              const SizedBox(height: 8),
               Text(
                 'RYVENZA',
                 style: getTextStyle2(
-                  color: AppColors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w500,
-                ),
+                  color: AppColors.addButtonColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ).copyWith(letterSpacing: 2.2),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 16),
               Text(
                 'Your rhythm, rebuilt around real life.'.tr,
                 textAlign: TextAlign.center,
                 style: getTextStyle2(
-                  color: AppColors.white,
-                  fontSize: 36,
-                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTextColor,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 12),
               Text(
                 'Sleep, caffeine, hydration, meals and work shifts in one adaptive daily plan.'
                     .tr,
                 textAlign: TextAlign.center,
                 style: getTextStyle(
-                  color: AppColors.sage,
-                  fontSize: 16,
+                  color: AppColors.textSoft,
+                  fontSize: 15,
                   fontWeight: FontWeight.w400,
+                  height: 1.4,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
 
               CustomButton(
                 text: 'Create account'.tr,
+                backgroundColor: AppColors.addButtonColor,
+                textColor: AppColors.white,
                 onTap: () => Get.toNamed(AppRoutes.createAccountScreen),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               CustomButton(
                 text: 'Log in'.tr,
                 onTap: () => Get.toNamed(AppRoutes.signInScreen),
                 borderWidth: 1,
+                borderColor: AppColors.borderColor,
                 backgroundColor: AppColors.white,
+                textColor: AppColors.primaryTextColor,
                 icon: null,
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 24),
             ],
           ),
         ),

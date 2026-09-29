@@ -42,13 +42,17 @@ class SplashScreenController extends GetxController {
             Get.offAll(() => const NavbarScreen());
           }
         } on UnauthorizedException catch (e) {
-          debugPrint('Profile API returned expired/unauthorized token error: $e. Attempting token refresh...');
+          debugPrint(
+            'Profile API returned expired/unauthorized token error: $e. Attempting token refresh...',
+          );
           try {
             final signInService = SignInService();
             final refreshResponse = await signInService.refreshToken(
               refreshToken: refreshToken,
             );
-            debugPrint('Refresh response: success=${refreshResponse.success}, data=${refreshResponse.data != null ? "exists" : "null"}');
+            debugPrint(
+              'Refresh response: success=${refreshResponse.success}, data=${refreshResponse.data != null ? "exists" : "null"}',
+            );
             if (refreshResponse.success && refreshResponse.data != null) {
               final newAccessToken = refreshResponse.data!.accessToken;
               final newRefreshToken = refreshResponse.data!.refreshToken;
@@ -57,7 +61,9 @@ class SplashScreenController extends GetxController {
               await SharedPreferencesHelper.saveAccessToken(newAccessToken);
               await SharedPreferencesHelper.saveRefreshToken(newRefreshToken);
 
-              debugPrint('Token refreshed successfully. Fetching profile with new token...');
+              debugPrint(
+                'Token refreshed successfully. Fetching profile with new token...',
+              );
               final retryProfileResp = await profileService.getProfile(
                 accessToken: newAccessToken,
               );
@@ -69,12 +75,16 @@ class SplashScreenController extends GetxController {
                 Get.offAll(() => const NavbarScreen());
               }
             } else {
-              debugPrint('Token refresh response was not successful. Redirecting to welcome screen.');
+              debugPrint(
+                'Token refresh response was not successful. Redirecting to welcome screen.',
+              );
               await SharedPreferencesHelper.clearAuthData();
               Get.offNamed(AppRoutes.getWelcomeScreen());
             }
           } catch (refreshErr) {
-            debugPrint('Failed to refresh token: $refreshErr. Redirecting to welcome screen.');
+            debugPrint(
+              'Failed to refresh token: $refreshErr. Redirecting to welcome screen.',
+            );
             await SharedPreferencesHelper.clearAuthData();
             Get.offNamed(AppRoutes.getWelcomeScreen());
           }

@@ -7,11 +7,13 @@ TextStyle getTextStyle({
   FontWeight fontWeight = FontWeight.w400,
   TextAlign textAlign = TextAlign.center,
   Color color = AppColors.black,
+  double? height,
 }) {
   return GoogleFonts.manrope(
     fontSize: fontSize,
     fontWeight: fontWeight,
     color: color,
+    height: height,
   );
 }
 
@@ -20,10 +22,12 @@ TextStyle getTextStyle2({
   FontWeight fontWeight = FontWeight.w600,
   TextAlign textAlign = TextAlign.center,
   Color color = AppColors.black,
+  double? height,
 }) {
   return GoogleFonts.outfit(
     fontSize: fontSize,
     fontWeight: fontWeight,
     color: color,
+    height: height,
   );
 }

@@ -102,12 +102,6 @@ class RhythmScoreCard extends StatelessWidget {
                               percentage: controller.nutritionMetric.value,
                               barColor: AppColors.rose,
                             ),
-                            const SizedBox(height: 14.0),
-                            MetricProgressRow(
-                              label: 'Work fit',
-                              percentage: controller.workFitMetric.value,
-                              barColor: AppColors.primaryButtonColor,
-                            ),
                           ],
                         ),
                       ),

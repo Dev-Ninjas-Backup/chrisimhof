@@ -1,13 +1,13 @@
-import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/statistics/controller/statistics_controller.dart';
-import 'package:chrisimhof/features/statistics/widgets/circadian_stability_card.dart';
-import 'package:chrisimhof/features/statistics/widgets/fatigue_prediction_card.dart';
-import 'package:chrisimhof/features/statistics/widgets/period_toggle.dart';
-import 'package:chrisimhof/features/statistics/widgets/recovery_card.dart';
-import 'package:chrisimhof/features/statistics/widgets/rhythm_score_card.dart';
-import 'package:chrisimhof/features/statistics/widgets/sleep_debt_card.dart';
-import 'package:chrisimhof/features/statistics/widgets/sleep_duration_card.dart';
+import 'package:chrisimhof/features/statistics/widgets/analytics_header_tabs.dart';
+import 'package:chrisimhof/features/statistics/widgets/daily_timeline_view.dart';
+import 'package:chrisimhof/features/statistics/widgets/date_range_navigation_bar.dart';
+import 'package:chrisimhof/features/statistics/widgets/lifestyle_indicators_card.dart';
+import 'package:chrisimhof/features/statistics/widgets/period_filter_bar.dart';
+import 'package:chrisimhof/features/statistics/widgets/rhythm_evolution_line_chart_card.dart';
+import 'package:chrisimhof/features/statistics/widgets/sleep_overview_stacked_chart_card.dart';
+import 'package:chrisimhof/features/statistics/widgets/top_scores_cards_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,20 +27,10 @@ class StatisticsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomAppBar(
-                showBackButton: false,
-                showSettingsButton: false,
-                showLogo: false,
-                title: 'Statistics'.tr,
-                showMoreButton: false,
-              ),
+              const SizedBox(height: 12.0),
+              AnalyticsHeaderTabs(controller: controller),
               const SizedBox(height: 18.0),
 
-              // Period Toggle Bar
-              PeriodToggle(controller: controller),
-              const SizedBox(height: 20.0),
-
-              // Cards
               Obx(() {
                 if (controller.isLoading.value) {
                   return const Padding(
@@ -52,30 +42,24 @@ class StatisticsScreen extends StatelessWidget {
                     ),
                   );
                 }
+
+                if (controller.selectedTab.value == 0) {
+                  return DailyTimelineView(controller: controller);
+                }
+
                 return Column(
                   children: [
-                    // Card 1: Global Rhythm Score
-                    RhythmScoreCard(controller: controller),
+                    PeriodFilterBar(controller: controller),
+                    const SizedBox(height: 14.0),
+                    DateRangeNavigationBar(controller: controller),
                     const SizedBox(height: 16.0),
-
-                    // Card 2: Circadian Stability
-                    CircadianStabilityCard(controller: controller),
+                    TopScoresCardsGrid(controller: controller),
                     const SizedBox(height: 16.0),
-
-                    // Card 3: Sleep Duration
-                    SleepDurationCard(controller: controller),
+                    RhythmEvolutionLineChartCard(controller: controller),
                     const SizedBox(height: 16.0),
-
-                    // Card 4: Recovery
-                    RecoveryCard(controller: controller),
+                    LifestyleIndicatorsCard(controller: controller),
                     const SizedBox(height: 16.0),
-
-                    // Card 5: Fatigue Prediction
-                    FatiguePredictionCard(controller: controller),
-                    const SizedBox(height: 16.0),
-
-                    // Card 6: Sleep Debt
-                    SleepDebtCard(controller: controller),
+                    SleepOverviewStackedChartCard(controller: controller),
                   ],
                 );
               }),

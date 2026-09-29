@@ -18,6 +18,7 @@ class CircadianAvatar extends StatelessWidget {
   /// Vertical center of ring from top of widget, in pixels.
   /// Tune this directly: try 60–110 for avatarSize=350.
   final double orbitCenterY;
+  final bool isLightMode;
 
   const CircadianAvatar({
     super.key,
@@ -27,6 +28,7 @@ class CircadianAvatar extends StatelessWidget {
     this.tag = 'default',
     this.orbitRadius = 90,
     this.orbitCenterY = 85,
+    this.isLightMode = false,
   });
 
   @override
@@ -81,7 +83,9 @@ class CircadianAvatar extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFFE9F7E7).withValues(alpha: .18),
+                        color: isLightMode
+                            ? const Color(0xFF10B981).withValues(alpha: 0.35)
+                            : const Color(0xFFE9F7E7).withValues(alpha: .18),
                         width: 1,
                       ),
                     ),
@@ -105,20 +109,20 @@ class CircadianAvatar extends StatelessWidget {
                           offset: Offset(sunX, sunY),
                           child: _buildOrb(
                             icon: IconPath.sun,
-                            color: AppColors.white,
-                            glowColor: AppColors.yellowAccent.withValues(
-                              alpha: .65,
-                            ),
+                            color: isLightMode ? const Color(0xFFD97706) : AppColors.white,
+                            glowColor: isLightMode
+                                ? const Color(0xFFFEF3C7)
+                                : AppColors.yellowAccent.withValues(alpha: .65),
                           ),
                         ),
                         Transform.translate(
                           offset: Offset(moonX, moonY),
                           child: _buildOrb(
                             icon: IconPath.moon1,
-                            color: const Color(0xFF00E5BF),
-                            glowColor: const Color(
-                              0xFF00E5BF,
-                            ).withValues(alpha: .35),
+                            color: isLightMode ? const Color(0xFF0F766E) : const Color(0xFF00E5BF),
+                            glowColor: isLightMode
+                                ? const Color(0xFFCCFBF1)
+                                : const Color(0xFF00E5BF).withValues(alpha: .35),
                           ),
                         ),
                       ],
