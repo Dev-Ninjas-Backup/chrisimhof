@@ -19,7 +19,8 @@ class SleepOverviewStackedChartCard extends StatelessWidget {
           ? controller.sleepDurationValue.value
           : '7 h 30';
       final napsCount = controller.totalNapsInPeriod.value;
-      final bars = controller.sleepBarsList;
+      final _ = controller.selectedPeriod.value;
+      final bars = controller.sleepBarsList.toList();
 
       return Container(
         padding: const EdgeInsets.all(20),

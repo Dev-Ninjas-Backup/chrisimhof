@@ -16,7 +16,8 @@ class RhythmEvolutionLineChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final points = controller.rhythmTrendList;
+      final _ = controller.selectedPeriod.value;
+      final points = controller.rhythmTrendList.toList();
 
       return Container(
         padding: const EdgeInsets.all(18),
