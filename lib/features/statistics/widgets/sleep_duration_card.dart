@@ -38,7 +38,9 @@ class SleepDurationCard extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  controller.sleepDurationValue.value,
+                  controller.sleepDurationValue.value.isNotEmpty
+                      ? controller.sleepDurationValue.value
+                      : '0h',
                   style: getTextStyle2(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,

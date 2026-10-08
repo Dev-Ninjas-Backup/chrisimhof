@@ -6,6 +6,7 @@ import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/features/dashboard/sleep/service/sleep_service.dart';
 import 'package:chrisimhof/features/dashboard/sleep/model/sleep_log.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -53,6 +54,11 @@ class SleepController extends GetxController {
   final sleepDebtTotalDisplay = RxString('--');
   final sleepDebtChartData = <Map<String, dynamic>>[].obs;
   final selectedDebtIndex = RxInt(-1);
+
+  // Nap Management observables
+  final loggedNaps = <Map<String, dynamic>>[].obs;
+  final totalNapMinutes = 0.obs;
+  final napDisplay = '0m'.obs;
 
   @override
   void onInit() {
@@ -652,8 +658,123 @@ class SleepController extends GetxController {
         parsedLogs.sort((a, b) => b.date.compareTo(a.date));
         historyLogs.assignAll(parsedLogs);
       }
+
+      // Parse naps
+      if (tabData['naps'] != null && tabData['naps'] is List) {
+        final list = List<Map<String, dynamic>>.from(tabData['naps']);
+        loggedNaps.assignAll(list);
+      } else {
+        loggedNaps.clear();
+      }
+      if (tabData['totalNapMinutes'] != null) {
+        totalNapMinutes.value = (tabData['totalNapMinutes'] as num).toInt();
+        napDisplay.value = '${totalNapMinutes.value}m';
+      }
     } catch (e) {
       debugPrint('SleepController socket update error: $e');
+    }
+  }
+
+  // ── Nap Management Methods ──────────────────────────────────────────
+
+  Future<void> logNap({
+    required DateTime occurredAt,
+    required int durationMinutes,
+    String quality = 'refreshing',
+    String? notes,
+  }) async {
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isEmpty) {
+        EasyLoading.showError('No active session found'.tr);
+        return;
+      }
+
+      EasyLoading.show(status: 'Logging nap...'.tr);
+      final isoTime = TimezoneHelper.formatToSessionUtcIso(occurredAt);
+
+      await DashboardService().patchQuickAddLog(
+        sessionId: sessionId,
+        newNaps: [
+          {
+            'occurredAt': isoTime,
+            'durationMinutes': durationMinutes,
+            'quality': quality,
+            if (notes != null && notes.isNotEmpty) 'notes': notes,
+          }
+        ],
+      );
+
+      // Refresh session & tab data
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        await db.fetchDashboardData();
+        if (db.sleepTabData.value != null) {
+          updateFromLiveScoresTab(db.sleepTabData.value!);
+        }
+      }
+
+      EasyLoading.showSuccess('Nap logged!'.tr);
+    } catch (e) {
+      debugPrint('Error logging nap: $e');
+      EasyLoading.showError('Failed to log nap'.tr);
+    }
+  }
+
+  Future<void> updateNapEntry({
+    required String entryId,
+    required int durationMinutes,
+    String? quality,
+    String? notes,
+  }) async {
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isEmpty) return;
+
+      EasyLoading.show(status: 'Updating nap...'.tr);
+      await SleepService().updateNap(
+        sessionId: sessionId,
+        entryId: entryId,
+        durationMinutes: durationMinutes,
+        quality: quality,
+        notes: notes,
+      );
+
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        await db.fetchDashboardData();
+        if (db.sleepTabData.value != null) {
+          updateFromLiveScoresTab(db.sleepTabData.value!);
+        }
+      }
+
+      EasyLoading.showSuccess('Nap updated!'.tr);
+    } catch (e) {
+      debugPrint('Error updating nap: $e');
+      EasyLoading.showError('Failed to update nap'.tr);
+    }
+  }
+
+  Future<void> deleteNapEntry({required String entryId}) async {
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isEmpty) return;
+
+      EasyLoading.show(status: 'Deleting nap...'.tr);
+      await SleepService().deleteNap(sessionId: sessionId, entryId: entryId);
+
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        await db.fetchDashboardData();
+        if (db.sleepTabData.value != null) {
+          updateFromLiveScoresTab(db.sleepTabData.value!);
+        }
+      }
+
+      EasyLoading.showSuccess('Nap deleted!'.tr);
+    } catch (e) {
+      debugPrint('Error deleting nap: $e');
+      EasyLoading.showError('Failed to delete nap'.tr);
     }
   }
 }

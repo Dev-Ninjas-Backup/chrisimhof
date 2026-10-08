@@ -66,4 +66,63 @@ class SleepService {
       throw Exception(jsonData['message'] ?? 'Failed to log sleep');
     }
   }
+
+  // PATCH /api/v1/calculator/sessions/{sessionId}/naps/{entryId}
+  Future<Map<String, dynamic>> updateNap({
+    required String sessionId,
+    required String entryId,
+    required int durationMinutes,
+    String? quality,
+    String? notes,
+  }) async {
+    final uri = Uri.parse(Urls.updateNap(sessionId, entryId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    final Map<String, dynamic> bodyMap = {
+      'durationMinutes': durationMinutes,
+    };
+    if (quality != null && quality.isNotEmpty) bodyMap['quality'] = quality;
+    if (notes != null && notes.isNotEmpty) bodyMap['notes'] = notes;
+
+    final response = await http.patch(
+      uri,
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode(bodyMap),
+    );
+
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonData;
+    } else {
+      throw Exception(jsonData['message'] ?? 'Failed to update nap');
+    }
+  }
+
+  // DELETE /api/v1/calculator/sessions/{sessionId}/naps/{entryId}
+  Future<Map<String, dynamic>> deleteNap({
+    required String sessionId,
+    required String entryId,
+  }) async {
+    final uri = Uri.parse(Urls.deleteNap(sessionId, entryId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    final response = await http.delete(
+      uri,
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return jsonData;
+    } else {
+      throw Exception(jsonData['message'] ?? 'Failed to delete nap');
+    }
+  }
 }

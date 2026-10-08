@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/statistics/model/statistics_model.dart';
 import 'package:chrisimhof/features/statistics/service/statistics_service.dart';
 import 'package:flutter/foundation.dart';
@@ -23,8 +24,8 @@ class StatisticsController extends GetxController {
       <Map<String, dynamic>>[].obs;
   final RxList<Map<String, dynamic>> sleepBarsList =
       <Map<String, dynamic>>[].obs;
-  final RxInt totalNapsInPeriod = 3.obs;
-  final RxInt globalRhythmDiff = 5.obs;
+  final RxInt totalNapsInPeriod = 0.obs;
+  final RxInt globalRhythmDiff = 0.obs;
 
   String get apiPeriod {
     switch (selectedPeriod.value) {
@@ -75,33 +76,96 @@ class StatisticsController extends GetxController {
   final RxString sleepDebtChange = ''.obs;
   final RxDouble sleepDebtProgress = 0.0.obs;
 
+  final Rxn<Map<String, dynamic>> dailyTimelineData = Rxn<Map<String, dynamic>>();
+
   @override
   void onInit() {
     super.onInit();
     loadAnalytics();
+    loadDailyTimeline();
+
+    ever(selectedPeriod, (_) => loadAnalytics());
+    ever(periodEndDate, (_) => loadAnalytics());
+    ever(myDaySelectedDate, (_) => loadDailyTimeline());
+    ever(selectedTab, (tab) {
+      if (tab == 0) {
+        loadDailyTimeline();
+      } else {
+        loadAnalytics();
+      }
+    });
   }
 
   Future<void> loadAnalytics() async {
     try {
       isLoading.value = true;
-      final result = await _analyticsService.getAnalytics(period: apiPeriod);
+      final endStr =
+          '${periodEndDate.value.year}-${periodEndDate.value.month.toString().padLeft(2, '0')}-${periodEndDate.value.day.toString().padLeft(2, '0')}';
+      final result = await _analyticsService.getAnalytics(
+        period: apiPeriod,
+        endDate: endStr,
+      );
       if (result != null) {
         _updateMetrics(result);
       } else {
-        debugPrint("Analytics data not found, setting mock data");
-        // _setMockData(selectedPeriod.value);
+        _resetMetrics();
       }
     } catch (e) {
       debugPrint("Error loading analytics: $e");
-      debugPrint("Setting mock data");
-      // _setMockData(selectedPeriod.value);
+      _resetMetrics();
     } finally {
       isLoading.value = false;
     }
   }
 
+  void _resetMetrics() {
+    globalScore.value = 0;
+    globalRhythmDiff.value = 0;
+    sleepMetric.value = 0;
+    caffeineMetric.value = 0;
+    sportMetric.value = 0;
+    hydrationMetric.value = 0;
+    nutritionMetric.value = 0;
+    workFitMetric.value = 0;
+    circadianScore.value = 0;
+    circadianChange.value = '';
+    sleepDurationValue.value = '';
+    sleepDurationData.clear();
+    recoveryScore.value = 0;
+    recoveryChange.value = 0;
+    recoveryData.clear();
+    sleepDebtValue.value = '';
+    sleepDebtChange.value = '';
+    sleepDebtProgress.value = 0.0;
+    fatigueExpectedTime.value = '';
+    fatigueWeeklyData.clear();
+    rhythmTrendList.clear();
+    sleepBarsList.clear();
+    totalNapsInPeriod.value = 0;
+  }
+
+  Future<void> loadDailyTimeline() async {
+    try {
+      final dateStr =
+          '${myDaySelectedDate.value.year}-${myDaySelectedDate.value.month.toString().padLeft(2, '0')}-${myDaySelectedDate.value.day.toString().padLeft(2, '0')}';
+      final tz = await SharedPreferencesHelper.getTimezone();
+      final data = await _analyticsService.getDailyTimeline(
+        date: dateStr,
+        timezone: tz,
+      );
+      if (data != null) {
+        dailyTimelineData.value = data;
+      }
+    } catch (e) {
+      debugPrint("Error loading daily timeline: $e");
+    }
+  }
+
   void _updateMetrics(DashboardAnalyticsModel analytics) {
+    _resetMetrics();
+
     globalScore.value = analytics.globalRhythmScore?.average ?? 0;
+    globalRhythmDiff.value = analytics.globalRhythmScore?.diff ?? 0;
     sleepMetric.value = analytics.avgScores?.sleepScore ?? 0;
     caffeineMetric.value = analytics.avgScores?.caffeineScore ?? 0;
     sportMetric.value = analytics.avgScores?.sportScore ?? 0;
@@ -117,7 +181,7 @@ class StatisticsController extends GetxController {
         analytics.sleepDuration!.trend!.isNotEmpty) {
       final trendList = analytics.sleepDuration!.trend!;
       final List<double> normalized = trendList.map((t) {
-        final mins = t.durationMinutes ?? 0;
+        final mins = t.totalMinutes ?? t.durationMinutes ?? 0;
         return (mins / 720.0) * 1.5.clamp(0.0, 1.5);
       }).toList();
       sleepDurationData.assignAll(normalized);
@@ -172,7 +236,7 @@ class StatisticsController extends GetxController {
       for (int i = 0; i < list.length && i < 7; i++) {
         final st = list[i];
         final dayLabel = daysFrench[i % 7];
-        final scoreVal = (st.globalRhythmScore ?? (globalScore.value + (i % 3 - 1) * 3)).clamp(0, 100);
+        final scoreVal = (st.globalRhythmScore ?? 0).clamp(0, 100);
         rhythmPoints.add({
           'day': dayLabel,
           'score': scoreVal.toDouble(),
@@ -180,49 +244,32 @@ class StatisticsController extends GetxController {
         });
       }
     }
-    if (rhythmPoints.isEmpty) {
-      final base = globalScore.value > 0 ? globalScore.value : 72;
-      final offsets = [-4, 0, -3, 2, 5, 3, 3];
-      for (int i = 0; i < 7; i++) {
-        rhythmPoints.add({
-          'day': daysFrench[i],
-          'score': (base + offsets[i]).clamp(0, 100).toDouble(),
-          'date': '',
-        });
-      }
-    }
     rhythmTrendList.assignAll(rhythmPoints);
 
     // Build Sleep Stacked Bars (Main sleep + Naps)
     final List<Map<String, dynamic>> sleepBars = [];
+    int napsCount = 0;
     if (analytics.sleepDuration?.trend != null &&
         analytics.sleepDuration!.trend!.isNotEmpty) {
       final trendList = analytics.sleepDuration!.trend!;
       for (int i = 0; i < trendList.length && i < 7; i++) {
         final t = trendList[i];
-        final totalMins = t.durationMinutes ?? 450;
-        final napMins = (i == 1 || i == 4 || i == 6) ? 30 : 0;
-        final mainMins = totalMins - napMins;
+        final totalMins = t.totalMinutes ?? t.durationMinutes ?? 0;
+        final napMins = t.napMinutes ?? 0;
+        final mainMins = t.mainSleepMinutes ?? (totalMins - napMins).clamp(0, totalMins);
+        if (napMins > 0) napsCount++;
+        final dayLabel = (t.dayLabel != null && t.dayLabel!.isNotEmpty)
+            ? t.dayLabel!
+            : daysFrench[i % 7];
         sleepBars.add({
-          'day': daysFrench[i % 7],
+          'day': dayLabel,
           'mainHours': (mainMins / 60.0).clamp(0.0, 12.0),
           'napHours': (napMins / 60.0).clamp(0.0, 4.0),
           'totalHours': (totalMins / 60.0).clamp(0.0, 12.0),
         });
       }
     }
-    if (sleepBars.isEmpty) {
-      final sampleHours = [7.0, 7.5, 7.8, 6.2, 7.6, 7.5, 8.0];
-      final sampleNaps = [0.0, 0.5, 0.0, 0.0, 0.6, 0.0, 0.8];
-      for (int i = 0; i < 7; i++) {
-        sleepBars.add({
-          'day': daysFrench[i],
-          'mainHours': sampleHours[i],
-          'napHours': sampleNaps[i],
-          'totalHours': sampleHours[i] + sampleNaps[i],
-        });
-      }
-    }
+    totalNapsInPeriod.value = napsCount;
     sleepBarsList.assignAll(sleepBars);
   }
 

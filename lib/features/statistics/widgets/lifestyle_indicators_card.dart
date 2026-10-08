@@ -15,11 +15,11 @@ class LifestyleIndicatorsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final sport = controller.sportMetric.value > 0 ? controller.sportMetric.value : 71;
-      final hydration = controller.hydrationMetric.value > 0 ? controller.hydrationMetric.value : 82;
-      final caffeine = controller.caffeineMetric.value > 0 ? controller.caffeineMetric.value : 58;
-      final nutrition = controller.nutritionMetric.value > 0 ? controller.nutritionMetric.value : 64;
-      final sleep = controller.sleepMetric.value > 0 ? controller.sleepMetric.value : 76;
+      final sport = controller.sportMetric.value;
+      final hydration = controller.hydrationMetric.value;
+      final caffeine = controller.caffeineMetric.value;
+      final nutrition = controller.nutritionMetric.value;
+      final sleep = controller.sleepMetric.value;
 
       return Container(
         padding: const EdgeInsets.all(20),

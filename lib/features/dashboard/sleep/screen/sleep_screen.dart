@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/common/widgets/custom_app_bar.dart';
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/widgets/log_sleep_card.dart';
+import 'package:chrisimhof/features/dashboard/sleep/widgets/naps_overview_card.dart';
 import 'package:chrisimhof/features/dashboard/sleep/widgets/sleep_debt_card.dart';
 import 'package:chrisimhof/features/dashboard/sleep/widgets/sleep_history_list.dart';
 import 'package:chrisimhof/features/dashboard/sleep/widgets/tonight_bedtime_card.dart';
@@ -31,6 +32,10 @@ class SleepScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               LogSleepCard(controller: controller),
+              const SizedBox(height: 24),
+
+              // Dedicated Nap Management Card
+              NapsOverviewCard(controller: controller),
               const SizedBox(height: 24),
 
               const SleepDebtCard(),

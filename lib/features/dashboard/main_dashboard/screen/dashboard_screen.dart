@@ -39,6 +39,7 @@ class DashboardScreen extends StatelessWidget {
                 const CustomAppBar(
                   showBackButton: false,
                   showSettingsButton: true,
+                  showNotificationButton: true,
                   showLogo: true,
                 ),
                 const SizedBox(height: 30),

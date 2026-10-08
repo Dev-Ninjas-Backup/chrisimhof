@@ -75,11 +75,15 @@ class GlobalRhythmScore {
   int? average;
   int? latest;
   int? highest;
+  int? diff;
+  String? diffLabel;
 
   GlobalRhythmScore({
     this.average,
     this.latest,
     this.highest,
+    this.diff,
+    this.diffLabel,
   });
 
   factory GlobalRhythmScore.fromJson(Map<String, dynamic> json) {
@@ -87,6 +91,8 @@ class GlobalRhythmScore {
       average: json['average'],
       latest: json['latest'],
       highest: json['highest'],
+      diff: json['diff'],
+      diffLabel: json['diffLabel'],
     );
   }
 }
@@ -166,20 +172,32 @@ class SleepDuration {
 
 class SleepDurationTrend {
   String? date;
+  String? dayLabel;
   int? durationMinutes;
   String? durationDisplay;
+  int? mainSleepMinutes;
+  int? napMinutes;
+  int? totalMinutes;
 
   SleepDurationTrend({
     this.date,
+    this.dayLabel,
     this.durationMinutes,
     this.durationDisplay,
+    this.mainSleepMinutes,
+    this.napMinutes,
+    this.totalMinutes,
   });
 
   factory SleepDurationTrend.fromJson(Map<String, dynamic> json) {
     return SleepDurationTrend(
       date: json['date'],
-      durationMinutes: json['durationMinutes'],
+      dayLabel: json['dayLabel'],
+      durationMinutes: json['durationMinutes'] ?? json['totalMinutes'],
       durationDisplay: json['durationDisplay'],
+      mainSleepMinutes: json['mainSleepMinutes'],
+      napMinutes: json['napMinutes'],
+      totalMinutes: json['totalMinutes'] ?? json['durationMinutes'],
     );
   }
 }

@@ -11,6 +11,7 @@ class CustomAppBar extends StatelessWidget {
   final bool showBackButton;
   final bool? showMoreButton;
   final bool? showSettingsButton;
+  final bool? showNotificationButton;
   final bool? showLogo;
   const CustomAppBar({
     super.key,
@@ -18,6 +19,7 @@ class CustomAppBar extends StatelessWidget {
     required this.showBackButton,
     this.showMoreButton,
     this.showSettingsButton,
+    this.showNotificationButton,
     this.showLogo,
   });
   @override
@@ -47,6 +49,10 @@ class CustomAppBar extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (showNotificationButton == true) ...[
+                  _buildNotificationButton(),
+                  const SizedBox(width: 8),
+                ],
                 showMoreButton == true
                     ? GestureDetector(
                         onTap: () {},
@@ -77,6 +83,24 @@ class CustomAppBar extends StatelessWidget {
         ),
         if (showCenter) _buildCenter(),
       ],
+    );
+  }
+
+  Widget _buildNotificationButton() {
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(AppRoutes.notificationCenterScreen);
+      },
+      child: SizedBox(
+        width: 36,
+        height: 36,
+        child: IconTile(
+          icon: Icons.notifications_none_rounded,
+          onTap: () {
+            Get.toNamed(AppRoutes.notificationCenterScreen);
+          },
+        ),
+      ),
     );
   }
 

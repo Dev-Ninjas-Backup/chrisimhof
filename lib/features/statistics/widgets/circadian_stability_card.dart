@@ -61,27 +61,27 @@ class CircadianStabilityCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15.0),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.trending_up,
-                        color: AppColors.primaryButtonColor,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4.0),
-                      Obx(() {
-                        return Text(
+                  if (controller.circadianChange.value.isNotEmpty) ...[
+                    const SizedBox(height: 15.0),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.trending_up,
+                          color: AppColors.primaryButtonColor,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
                           controller.circadianChange.value.tr,
                           style: getTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
                             color: AppColors.textSoft,
                           ),
-                        );
-                      }),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

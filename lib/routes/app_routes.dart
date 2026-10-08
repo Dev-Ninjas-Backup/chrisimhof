@@ -32,6 +32,7 @@ import 'package:chrisimhof/features/dashboard/caffeine/screen/caffeine_screen.da
 import 'package:chrisimhof/features/dashboard/sleep/screen/sleep_screen.dart';
 import 'package:chrisimhof/features/dashboard/work/screen/work_schedule_screen.dart';
 import 'package:chrisimhof/features/work_schedule_settings/screen/work_schedule_settings_screen.dart';
+import 'package:chrisimhof/features/notifications/screen/notification_center_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -68,6 +69,7 @@ class AppRoutes {
   static String editProfileScreen = '/editProfileScreen';
   static String languageScreen = '/languageScreen';
   static String subscriptionsScreen = '/subscriptionsScreen';
+  static String notificationCenterScreen = '/notificationCenterScreen';
 
   static String getSplashScreen() => splashScreen;
   static String getWelcomeScreen() => welcomeScreen;
@@ -103,6 +105,7 @@ class AppRoutes {
   static String getEditProfileScreen() => editProfileScreen;
   static String getLanguageScreen() => languageScreen;
   static String getSubscriptionsScreen() => subscriptionsScreen;
+  static String getNotificationCenterScreen() => notificationCenterScreen;
 
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
@@ -154,5 +157,9 @@ class AppRoutes {
     GetPage(name: editProfileScreen, page: () => const EditProfileScreen()),
     GetPage(name: languageScreen, page: () => const LanguageScreen()),
     GetPage(name: subscriptionsScreen, page: () => const SubscriptionsScreen()),
+    GetPage(
+      name: notificationCenterScreen,
+      page: () => const NotificationCenterScreen(),
+    ),
   ];
 }

@@ -55,13 +55,43 @@ class RhythmEvolutionLineChartCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            SizedBox(
-              height: 170,
-              width: double.infinity,
-              child: CustomPaint(
-                painter: _RhythmChartPainter(points: points),
+            if (points.isEmpty || points.every((p) => (p['score'] as num? ?? 0) == 0))
+              Container(
+                height: 140,
+                width: double.infinity,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.show_chart_rounded,
+                      size: 28,
+                      color: Color(0xFF94A3B8),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No rhythm data for this period'.tr,
+                      style: getTextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              SizedBox(
+                height: 170,
+                width: double.infinity,
+                child: CustomPaint(
+                  painter: _RhythmChartPainter(points: points),
+                ),
               ),
-            ),
           ],
         ),
       );

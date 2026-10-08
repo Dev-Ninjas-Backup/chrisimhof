@@ -528,6 +528,265 @@ Onboarding and profile baseline settings actively govern mathematical recommenda
 
 ---
 
+### 10. First-Class Nap Management & Zero-Day-Reset Safety
+
+Allows users to log daytime, power, and pre-shift naps without interfering with main anchor sleep or risking premature session termination. Logged nap durations are automatically credited against acute 7-day sleep debt.
+
+#### 1. Bulk Quick-Add with Naps (`PATCH /api/v1/calculator/session/:sessionId/log`)
+- **Endpoint**: `PATCH /api/v1/calculator/session/:sessionId/log`
+- **Auth Required**: `Bearer <token>`
+- **Request Body**:
+```json
+{
+  "newNaps": [
+    {
+      "occurredAt": "2026-07-28T14:00:00.000Z",
+      "durationMinutes": 30,
+      "quality": "refreshing",
+      "notes": "Afternoon power nap"
+    }
+  ]
+}
+```
+- **Response**: Returns `entries.naps` and updated `quickAddSummary.naps`:
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Quick log updated successfully",
+  "data": {
+    "sessionId": "cm123456789",
+    "entries": {
+      "naps": [
+        {
+          "id": "nap-uuid-1",
+          "occurredAt": "2026-07-28T14:00:00.000Z",
+          "timestamp": "14:00",
+          "durationMinutes": 30,
+          "quality": "refreshing",
+          "notes": "Afternoon power nap",
+          "createdAt": "2026-07-28T14:35:00.000Z",
+          "updatedAt": "2026-07-28T14:35:00.000Z"
+        }
+      ]
+    },
+    "quickAddSummary": {
+      "naps": {
+        "count": 1,
+        "totalMinutes": 30,
+        "display": "30m"
+      }
+    }
+  }
+}
+```
+
+#### 2. Update a Nap Entry (`PATCH /api/v1/calculator/sessions/:sessionId/naps/:entryId`)
+- **Endpoint**: `PATCH /api/v1/calculator/sessions/:sessionId/naps/:entryId`
+- **Auth Required**: `Bearer <token>`
+- **Request Body**:
+```json
+{
+  "durationMinutes": 45,
+  "quality": "grogginess",
+  "notes": "Extended nap before night shift"
+}
+```
+
+#### 3. Delete a Nap Entry (`DELETE /api/v1/calculator/sessions/:sessionId/naps/:entryId`)
+- **Endpoint**: `DELETE /api/v1/calculator/sessions/:sessionId/naps/:entryId`
+- **Auth Required**: `Bearer <token>`
+- **Response (`200 OK`)**: Deletes the specified nap entry, updates `napsJson`, and rolls back the sleep debt credit.
+
+#### Mobile App Integration Checklist
+- [ ] In the Quick-Add bottom sheet, add a "Nap" logging option (preset buttons: `20m`, `30m`, `45m`, `90m`, or custom minutes).
+- [ ] In the Sleep Tab, display today's logged naps list and total nap minutes (`data.sleep.naps` and `data.sleep.totalNapMinutes`).
+- [ ] Observe the 7-day Sleep Debt bar chart — taking a nap immediately reduces today's active sleep debt by the logged nap duration.
+
+---
+
+## 11. Proactive Nap Recommendations & Sleep Pressure Guidance
+
+The engine automatically generates shift-aware nap recommendation cards and dynamic sleep pressure guidance in the `recommendations` array (`FOR YOU` section).
+
+### 1. Recommendation Scenarios & Card Keys
+
+| Scenario | Trigger Condition | Title Key | Body Key | Sample English Output | Sample French Output |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Pre-Shift Anchor Nap** | Night shift today (`derivedWorkTiming === 'night'`), total naps $< 60\text{m}$ | `sleep.anchorNapTitle` | `sleep.preShiftAnchorNap` | *"A 90-min anchor nap between 14:30 and 16:00 completes a full sleep cycle to boost nocturnal alertness."* | *"Une sieste d'ancrage de 90 min entre 14:30 et 16:00 complète un cycle complet pour soutenir la vigilance nocturne."* |
+| **Circadian Dip Power Nap** | 7-day sleep debt $> 90\text{m}$, non-night shift, total naps $< 20\text{m}$ | `sleep.powerNapTitle` | `sleep.circadianDipPowerNap` | *"Sleep debt is elevated (2h 15m). A 20-min power nap (13:30–13:50) during your afternoon dip can restore alertness."* | *"Dette de sommeil élevée (2h 15m). Une sieste éclair de 20 min (13:30–13:50) pendant votre creux d'après-midi restaure la vigilance."* |
+| **Power Nap Restored** | Logged nap $\le 30\text{m}$ | `sleep.napPressureTitle` | `sleep.powerNapRestored` | *"20-min power nap logged — alertness restored with zero interference to tonight's sleep window."* | *"Sieste éclair de 20 min enregistrée — vigilance restaurée sans impacter votre fenêtre de sommeil de ce soir."* |
+| **Restorative Nap Pressure** | Logged nap $> 30\text{m}$ | `sleep.napPressureTitle` | `sleep.napSleepPressureNote` | *"Logged 60m nap today — homeostatic sleep pressure is reduced. Maintain your 22:30 bedtime to preserve circadian stability."* | *"Sieste de 60 min enregistrée aujourd'hui — pression de sommeil réduite. Maintenez votre coucher à 22:30 pour préserver votre stabilité circadienne."* |
+
+### 2. Sample Recommendation Payload
+
+```json
+{
+  "category": "sleep",
+  "priority": 1,
+  "isPremium": false,
+  "title": "Night shift anchor nap",
+  "body": "A 90-min anchor nap between 14:30 and 16:00 completes a full sleep cycle to boost nocturnal alertness.",
+  "titleKey": "sleep.anchorNapTitle",
+  "bodyKey": "sleep.preShiftAnchorNap",
+  "bodyParams": {
+    "napStart": "14:30",
+    "napEnd": "16:00",
+    "durationMin": 90
+  }
+}
+```
+
+### 3. 12-Hour vs. 24-Hour Time Format Formatting
+- When user `Profile.timeFormat` is `'12h'`, rendered `body` strings automatically format times as `2:30 PM–4:00 PM`.
+- `bodyParams` retains raw 24-hour time strings (`"14:30"`, `"16:00"`) for programmatic client scheduling and notifications.
+
+---
+
+## 12. Progressive Multi-Day Shift Transitions (Circadian Phasing)
+
+The engine monitors upcoming work rotations across a 3-day lookahead window ($T+1, T+2, T+3$) to proactively phase sleep-wake cycles and prevent acute circadian misalignment.
+
+### 1. Phasing Logic & Recommendations
+
+| Shift Transition | Lookahead Window | Strategy / Card Key | Phase Delay ($\Delta t$) | Description & Guidance |
+| :--- | :--- | :--- | :--- | :--- |
+| **Day / Off $\to$ Night** | 3 days away ($T+3$) | `sleep.circadianPhasingTitle` / `sleep.circadianPhaseDelay` | **+60 min** | Shifting bedtime 60 minutes later tonight to begin progressive nocturnal adaptation. |
+| **Day / Off $\to$ Night** | 2 days away ($T+2$) | `sleep.circadianPhasingTitle` / `sleep.circadianPhaseDelay` | **+90 min** | Phasing bedtime 90 minutes later tonight as night shift approaches. |
+| **Day / Off $\to$ Night** | Tomorrow ($T+1$) | `sleep.circadianPhasingTitle` / `sleep.circadianPhaseDelay` | **+120 min** | Applying a 2-hour phase delay tonight to optimize nocturnal stamina for tomorrow's shift. |
+| **Night $\to$ Day / Off** | Post-Night ($T+1$) | `sleep.splitSleepTitle` / `sleep.splitSleepStrategy` | **0 min** (Split Sleep) | Prescribes a **4-hour morning recovery anchor sleep** ($\text{shiftEnd} + 1\text{h}$ to $+4\text{h}$) followed by an early evening bedtime (`22:00`) to reset diurnal rhythm without 24h sleep deprivation. |
+
+### 2. Sample Payloads
+
+#### Phase Delay Recommendation Card (`sleep.circadianPhaseDelay`):
+```json
+{
+  "category": "sleep",
+  "priority": 1,
+  "isPremium": false,
+  "title": "Circadian shift prep",
+  "body": "Transitioning to a night shift in 3 days. Bedtime is phased 60m later tonight (23:00) to ease circadian adjustment.",
+  "titleKey": "sleep.circadianPhasingTitle",
+  "bodyKey": "sleep.circadianPhaseDelay",
+  "bodyParams": {
+    "daysUntilNight": 3,
+    "phaseDelayMin": 60,
+    "bedtime": "23:00"
+  }
+}
+```
+
+#### Split-Sleep Recovery Recommendation Card (`sleep.splitSleepStrategy`):
+```json
+{
+  "category": "sleep",
+  "priority": 1,
+  "isPremium": false,
+  "title": "Post-night recovery",
+  "body": "Post-night transition: prioritize a 4h morning recovery sleep (08:00–12:00), followed by an early evening bedtime (22:00) to reset your diurnal rhythm.",
+  "titleKey": "sleep.splitSleepTitle",
+  "bodyKey": "sleep.splitSleepStrategy",
+  "bodyParams": {
+    "morningSleepStart": "08:00",
+    "morningSleepEnd": "12:00",
+    "eveningBedtime": "22:00"
+  }
+}
+```
+
+---
+
+## 13. Comprehensive Notification Infrastructure & Preference Management
+
+Users can customize notification channels and timing offsets in Profile Settings. The backend automatically filters server-side push notifications according to user preferences and provides structured timing data for mobile client local offline notifications.
+
+### 1. Endpoints
+
+#### Get Notification Preferences (`GET /api/v1/profile/notifications`)
+- **Headers**: `Authorization: Bearer <accessToken>`
+- **Response (`200 OK`)**:
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Notification preferences retrieved successfully",
+  "data": {
+    "shiftReminders": true,
+    "shiftReminderMinutes": 30,
+    "bedtimeAlerts": true,
+    "bedtimeReminderMinutes": 60,
+    "caffeineCutoff": true,
+    "caffeineReminderMinutes": 30,
+    "hydrationReminders": true,
+    "circadianTransitions": true,
+    "weeklySportReport": true
+  }
+}
+```
+
+#### Update Notification Preferences (`PATCH /api/v1/profile/notifications`)
+- **Headers**: `Authorization: Bearer <accessToken>`
+- **Request Body** (all fields optional):
+```json
+{
+  "shiftReminders": true,
+  "shiftReminderMinutes": 45,
+  "bedtimeAlerts": true,
+  "bedtimeReminderMinutes": 45,
+  "caffeineCutoff": false,
+  "hydrationReminders": true,
+  "circadianTransitions": true,
+  "weeklySportReport": true
+}
+```
+- **Response (`200 OK`)**:
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Notification preferences updated successfully",
+  "data": {
+    "shiftReminders": true,
+    "shiftReminderMinutes": 45,
+    "bedtimeAlerts": true,
+    "bedtimeReminderMinutes": 45,
+    "caffeineCutoff": false,
+    "caffeineReminderMinutes": 30,
+    "hydrationReminders": true,
+    "circadianTransitions": true,
+    "weeklySportReport": true
+  }
+}
+```
+
+### 2. Notification Channels & Preference Filtering Matrix
+
+| Notification Channel | Trigger / Description | Profile Setting Key | Default |
+| :--- | :--- | :--- | :--- |
+| `shift_reminder` | Upcoming shift alert | `shiftReminders` / `shiftReminderMinutes` | `true` (30 min) |
+| `bedtime_alert` | Circadian bedtime wind-down alert | `bedtimeAlerts` / `bedtimeReminderMinutes` | `true` (60 min) |
+| `caffeine_cutoff` | Caffeine clearance cutoff reminder | `caffeineCutoff` / `caffeineReminderMinutes` | `true` (30 min) |
+| `hydration_reminder` | Daily hydration pacing reminders | `hydrationReminders` | `true` |
+| `circadian_transition`| Multi-day phase delays & split-sleep | `circadianTransitions` | `true` |
+| `weekly_sport` | Weekly workout progress & adaptive rest | `weeklySportReport` | `true` |
+| `payment_transaction` | Invoices, receipts, subscription alerts | *Mandatory* (Bypasses preference check) | `true` |
+| `system_alert` | Security alerts, password changes | *Mandatory* (Bypasses preference check) | `true` |
+
+### 3. Mobile Client Local Offline Notification Guide
+
+For resilient offline operation when users have airplane mode or spotty connectivity (e.g., flight crews, underground nurses):
+1. **Fetch Daily Calculation**: Query `GET /api/v1/calculator/live-scores` or `GET /api/v1/calculator/tabs/sleep`.
+2. **Read Notification Preferences**: Query `GET /api/v1/profile/notifications`.
+3. **Schedule Local Alarms**:
+   - **Bedtime Alert**: Schedule local notification at `nextSleepWindow.sleepStart` minus `bedtimeReminderMinutes`.
+   - **Caffeine Cutoff**: Schedule local notification at `caffeineResult.caffeineCutoffTime` minus `caffeineReminderMinutes`.
+   - **Shift Reminder**: Schedule local notification at `shiftStartTime` minus `shiftReminderMinutes`.
+4. Using `flutter_local_notifications` (Flutter) or Android `AlarmManager` / iOS `UNNotificationRequest`:
+   - Pass channel ID matching the preference channel.
+   - Reschedule automatically when a new calculation payload is received or when user updates preferences.
+
+---
+
 ## 🔒 Authentication & Standard Headers
 
 All authenticated routes require the standard Bearer header:
@@ -543,3 +802,312 @@ Responses adhere strictly to real HTTP status codes:
 - `404 Not Found`: Resource not found.
 - `409 Conflict`: Concurrency conflict (retry mutation).
 - `500 Internal Server Error`: Server exception.
+
+---
+
+## 📅 September 2026 Directives: Analytics & History Redesign
+
+### 1. Legal & Branding Directive: Complete Removal of Work Fitness
+- **Policy**: Ryvenza is a circadian rhythm & shift-work optimization platform, NOT an occupational fitness/suitability-for-work evaluator.
+- **Contract Changes**:
+  - `workFitScore`, `workFit`, `workReadyLabel`, and "Aptitude au travail" are completely removed from all API endpoints (Dashboard cards, Analytics, Calculator cards, Realtime payloads).
+  - Shift scheduling and work rotation tracking remain standard.
+
+---
+
+### 2. Advanced Nap Management (`sleepType: 'main' | 'nap'`)
+- **Endpoints**: `POST /api/v1/calculator/sessions/:sessionId/sleep` and `POST /api/v1/calculator/session/:sessionId/sleep`
+- **Zero-Day-Reset Invariant**: Logging a nap appends the entry to `session.napsJson`, credits sleep debt, and refreshes live scores, but **never** advances or finalizes the active circadian session.
+
+#### Request Payload
+```json
+{
+  "sleepType": "nap",
+  "sleepStartedAt": "2026-07-28T13:30:00.000Z",
+  "wakeRecordedAt": "2026-07-28T14:15:00.000Z",
+  "quality": 4,
+  "note": "Post-lunch power nap"
+}
+```
+
+#### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Sleep logged successfully",
+  "data": {
+    "sessionId": "cm...123",
+    "status": "ACTIVE",
+    "startedAt": "2026-07-28T06:00:00.000Z",
+    "wakeRecordedAt": "2026-07-28T06:00:00.000Z",
+    "saved": true,
+    "conflicts": [],
+    "message": "Nap logged.",
+    "liveScores": { ... }
+  }
+}
+```
+
+---
+
+### 3. Daily Timeline (`GET /api/v1/history/timeline`) — "My Day" Tab
+- **Endpoint**: `GET /api/v1/history/timeline?date=YYYY-MM-DD&timezone=Europe/Paris`
+- **Purpose**: Feeds the chronological "My day" (`Ma journée`) screen.
+- **Boundaries**:
+  - `startUtc`: Opening main sleep start instant.
+  - `endUtc`: Start of next session's main sleep (if finalized) or estimated next bedtime (if ongoing).
+  - `isOngoing`: `true` if active session, `false` if completed/finalized.
+
+#### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Success",
+  "data": {
+    "date": "2026-07-28",
+    "startUtc": "2026-07-27T22:30:00.000Z",
+    "endUtc": "2026-07-28T23:00:00.000Z",
+    "isOngoing": true,
+    "summary": {
+      "globalRhythmScore": 84,
+      "rhythmScoreLabel": "Optimal",
+      "sleepScore": 85,
+      "hydrationScore": 80,
+      "caffeineScore": 90,
+      "nutritionScore": 75,
+      "sportScore": 70,
+      "recoveryScore": 80,
+      "fatigueRiskScore": 25,
+      "sleepDurationMinutes": 450,
+      "sleepDebtMinutes": 30
+    },
+    "tracks": {
+      "sleep": [
+        {
+          "id": "cm...-main-sleep",
+          "type": "main",
+          "start": "2026-07-27T22:30:00.000Z",
+          "end": "2026-07-28T06:00:00.000Z",
+          "durationMin": 450,
+          "quality": 85
+        },
+        {
+          "id": "nap-uuid-1",
+          "type": "nap",
+          "start": "2026-07-28T13:30:00.000Z",
+          "end": "2026-07-28T14:15:00.000Z",
+          "durationMin": 45,
+          "quality": 4,
+          "notes": "Post-lunch power nap"
+        }
+      ],
+      "work": [
+        {
+          "id": "cm...-shift",
+          "type": "night",
+          "start": "2026-07-28T22:00:00.000Z",
+          "end": "2026-07-29T06:00:00.000Z",
+          "label": "Night shift"
+        }
+      ],
+      "hydration": [
+        {
+          "id": "water-uuid-1",
+          "time": "2026-07-28T07:00:00.000Z",
+          "volumeMl": 500,
+          "totalDayMl": 500,
+          "targetMl": 2500
+        }
+      ],
+      "caffeine": [
+        {
+          "id": "caff-uuid-1",
+          "time": "2026-07-28T08:00:00.000Z",
+          "mg": 100,
+          "drinkType": "espresso",
+          "cutoffTime": "23:00"
+        }
+      ],
+      "meals": [
+        {
+          "id": "meal-uuid-1",
+          "order": 1,
+          "time": "2026-07-28T09:00:00.000Z",
+          "heaviness": "medium",
+          "isPlanned": false
+        }
+      ],
+      "exercise": [
+        {
+          "id": "sport-uuid-1",
+          "start": "2026-07-28T11:00:00.000Z",
+          "durationMin": 45,
+          "sportType": "cardio",
+          "intensity": "medium",
+          "heartRateAvgBpm": 142,
+          "distanceKm": 6.8,
+          "readiness": "high"
+        }
+      ]
+    },
+    "recommendations": [
+      {
+        "category": "caffeine",
+        "priority": 1,
+        "title": "Caffeine Cutoff",
+        "body": "Avoid caffeine after 16:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 4. Overview Analytics Enhancements (`GET /api/v1/analytics`)
+- **Endpoint**: `GET /api/v1/analytics?period=7d&endDate=YYYY-MM-DD`
+- **Supported Periods**: `7d`, `30d`, `90d`, `1y` (or `360d`).
+- **Preceding Period Comparison**:
+  - `globalRhythmScore.diff`: Numerical difference vs the preceding equivalent window (e.g. current 7 days vs previous 7 days).
+  - `globalRhythmScore.diffLabel`: Localized label (e.g. `"vs 7 previous days"` / `"vs 7 jours précédents"`).
+- **Stacked Sleep Duration Breakdown**:
+  - `sleepDuration.trend`: Daily objects containing `date`, localized single-letter `dayLabel` (L, M, M, J, V, S, D in FR; M, T, W, T, F, S, S in EN), `mainSleepMinutes`, `napMinutes`, `totalMinutes`, and `durationDisplay`.
+
+---
+
+### 5. In-App Notification Center & Channel Specifications
+
+All notifications generated by background crons, delayed circadian calculations, and transactional events are delivered via Firebase Cloud Messaging (FCM) and persisted in the user's In-App Notification Center.
+
+#### Notification Channels & Automated Triggers
+| Channel | Purpose | Trigger Mechanism | User Preference Key |
+| :--- | :--- | :--- | :--- |
+| `bedtime_alert` | Wind-down alert before optimal bedtime | Scheduled on session calculation (`bedtimeReminderMinutes`, default: 60m) | `bedtimeAlerts` |
+| `caffeine_cutoff` | Warning before caffeine clearance threshold | Scheduled on session calculation (`caffeineReminderMinutes`, default: 30m) | `caffeineCutoff` |
+| `shift_reminder` | Warning before upcoming work shift starts | Scheduled on session calculation (`shiftReminderMinutes`, default: 30m) | `shiftReminders` |
+| `circadian_transition` | Morning wake check-in for unsynced days | Background Cron daily at 09:00 (`0 9 * * *`) | `circadianTransitions` |
+| `weekly_sport` | Sunday evening workout & recovery summary | Background Cron weekly on Sunday at 18:00 (`0 18 * * 0`) | `weeklySportReport` |
+| `payment_transaction` | Stripe subscription, renewal, invoice alerts | Transactional webhook dispatch (always delivered) | *N/A (Bypasses preference filter)* |
+| `system_alert` | Security and login notifications | Auth event dispatch (always delivered) | *N/A (Bypasses preference filter)* |
+
+---
+
+#### 5a. `GET /api/v1/notifications` — In-App Notifications Feed
+Returns paginated list of user notifications, unread counts, and total items.
+- **Endpoint**: `GET /api/v1/notifications`
+- **Query Params**:
+  - `page`: Page number (integer, default: 1).
+  - `limit`: Items per page (integer, default: 20, max: 100).
+  - `unreadOnly`: Filter to unread notifications only (`boolean`, default: false).
+- **Auth Required**: `Bearer <token>`
+
+##### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Success",
+  "data": {
+    "notifications": [
+      {
+        "id": "cm...abc1",
+        "userId": "user-uuid",
+        "title": "Bedtime Wind-Down Alert",
+        "body": "Your optimal sleep window opens in 60m (at 22:30). Start winding down to protect your sleep quality.",
+        "data": {
+          "channel": "bedtime_alert",
+          "sessionId": "session-uuid"
+        },
+        "status": "SENT",
+        "isRead": false,
+        "sentAt": "2026-10-08T21:30:00.000Z",
+        "createdAt": "2026-10-08T21:30:00.000Z"
+      }
+    ],
+    "unreadCount": 3,
+    "total": 12,
+    "page": 1,
+    "limit": 20,
+    "hasMore": false
+  }
+}
+```
+
+---
+
+#### 5b. `GET /api/v1/notifications/unread-count` — Top-Bar Badge Count
+Lightweight endpoint for displaying the unread notification badge count in navigation bars.
+- **Endpoint**: `GET /api/v1/notifications/unread-count`
+- **Auth Required**: `Bearer <token>`
+
+##### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Success",
+  "data": {
+    "unreadCount": 3
+  }
+}
+```
+
+---
+
+#### 5c. `PATCH /api/v1/notifications/:id/read` — Mark Notification Read
+Marks an individual notification as read (`isRead: true`).
+- **Endpoint**: `PATCH /api/v1/notifications/:id/read`
+- **Auth Required**: `Bearer <token>`
+
+##### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Notification marked as read",
+  "data": {
+    "id": "cm...abc1",
+    "isRead": true
+  }
+}
+```
+
+---
+
+#### 5d. `PATCH /api/v1/notifications/read-all` — Mark All As Read
+Batch marks all unread notifications as read.
+- **Endpoint**: `PATCH /api/v1/notifications/read-all`
+- **Auth Required**: `Bearer <token>`
+
+##### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "All notifications marked as read",
+  "data": {
+    "updatedCount": 5
+  }
+}
+```
+
+---
+
+#### 5e. `DELETE /api/v1/notifications/:id` — Delete / Dismiss Notification
+Permanently deletes or dismisses a notification.
+- **Endpoint**: `DELETE /api/v1/notifications/:id`
+- **Auth Required**: `Bearer <token>`
+
+##### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Notification deleted",
+  "data": {
+    "success": true
+  }
+}
+```

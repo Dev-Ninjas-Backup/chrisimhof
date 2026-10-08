@@ -103,5 +103,31 @@ class Urls {
       '$baseUrl/api/v1/calculator/sessions/$sessionId/meals/$entryId';
   static String updateWorkout(String sessionId, String entryId) =>
       '$baseUrl/api/v1/calculator/sessions/$sessionId/workouts/$entryId';
+
+  // Naps
+  static String updateNap(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/naps/$entryId';
+  static String deleteNap(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/naps/$entryId';
+
+  // History & Timeline
+  static String dailyTimeline(String date, [String? timezone]) =>
+      '$baseUrl/api/v1/history/timeline?date=$date${timezone != null ? '&timezone=$timezone' : ''}';
+  static String analyticsWithRange(String days, [String? endDate]) =>
+      '$baseUrl/api/v1/analytics?period=$days${endDate != null ? '&endDate=$endDate' : ''}';
+
+  // Notifications
+  static String notifications({int page = 1, int limit = 20, bool unreadOnly = false}) =>
+      '$baseUrl/api/v1/notifications?page=$page&limit=$limit&unreadOnly=$unreadOnly';
+  static const String unreadNotificationCount =
+      '$baseUrl/api/v1/notifications/unread-count';
+  static String markNotificationRead(String id) =>
+      '$baseUrl/api/v1/notifications/$id/read';
+  static const String markAllNotificationsRead =
+      '$baseUrl/api/v1/notifications/read-all';
+  static String deleteNotification(String id) =>
+      '$baseUrl/api/v1/notifications/$id';
+  static const String notificationPreferences =
+      '$baseUrl/api/v1/profile/notifications';
 }
 

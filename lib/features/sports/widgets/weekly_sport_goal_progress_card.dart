@@ -69,13 +69,33 @@ class WeeklySportGoalProgressCard extends StatelessWidget {
                             color: AppColors.secondaryTextColor,
                           ),
                         ),
-                        Text(
-                          '$completed / $goal ${'workouts'.tr}',
-                          style: getTextStyle2(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryTextColor,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              '$completed / $goal ${'workouts'.tr}',
+                              style: getTextStyle2(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryTextColor,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () => _showGoalPicker(context, controller, goal),
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(
+                                  Icons.edit_outlined,
+                                  size: 14,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -227,5 +247,84 @@ class WeeklySportGoalProgressCard extends StatelessWidget {
         ),
       );
     });
+  }
+
+  void _showGoalPicker(
+    BuildContext context,
+    SportsController controller,
+    int currentGoal,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Text(
+                'Weekly workout goal'.tr,
+                style: getTextStyle2(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'How many workouts do you aim to complete each week?'.tr,
+                textAlign: TextAlign.center,
+                style: getTextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(7, (i) {
+                  final val = i + 1;
+                  final isSelected = val == currentGoal;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      controller.updateWeeklyGoal(val);
+                    },
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.secondaryButtonColor
+                            : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$val',
+                        style: getTextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
