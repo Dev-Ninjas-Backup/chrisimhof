@@ -4,8 +4,10 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
-      ' — protect tonight\'s sleep window.': ' — protect tonight\'s sleep window.',
-      ' — Heavy meals after 02:00 reduce deep sleep by ~15%.': ' — Heavy meals after 02:00 reduce deep sleep by ~15%.',
+      ' — protect tonight\'s sleep window.':
+          ' — protect tonight\'s sleep window.',
+      ' — Heavy meals after 02:00 reduce deep sleep by ~15%.':
+          ' — Heavy meals after 02:00 reduce deep sleep by ~15%.',
       '"Off" is a reserved shift name': '"Off" is a reserved shift name',
       '(save & reset)': '(save & reset)',
       '1 Week': '1 Week',
@@ -20,7 +22,9 @@ class AppTranslations extends Translations {
       '4-4 split': '4-4 split',
       '4. Changes': '4. Changes',
       '8+ characters': '8+ characters',
-      'A shift with this name already exists': 'A shift with this name already exists',
+      'A shift with this name already exists':
+          'A shift with this name already exists',
+      'no_recomendation_today': 'No recommendations for today.',
       'Accept': 'Accept',
       'Accept privacy policy': 'Accept privacy policy',
       'Accept terms': 'Accept terms',
@@ -34,16 +38,19 @@ class AppTranslations extends Translations {
       'Add Custom Shift': 'Add Custom Shift',
       'Add Note': 'Add Note',
       'Add note': 'Add note',
-      'Adults need 7–9 hours for optimal recovery.': 'Adults need 7–9 hours for optimal recovery.',
+      'Adults need 7–9 hours for optimal recovery.':
+          'Adults need 7–9 hours for optimal recovery.',
       'AEST · Sydney': 'AEST · Sydney',
       'AMOUNT (MG)': 'AMOUNT (MG)',
       'API login failed': 'API login failed',
       'App aligns rotation week to dates': 'App aligns rotation week to dates',
       'Applied': 'Applied',
       'Apply to this day': 'Apply to this day',
-      'Are you sure you want to delete this shift? Any days in your pattern assigned to this shift will revert to "Off".': 'Are you sure you want to delete this shift? Any days in your pattern assigned to this shift will revert to "Off".',
+      'Are you sure you want to delete this shift? Any days in your pattern assigned to this shift will revert to "Off".':
+          'Are you sure you want to delete this shift? Any days in your pattern assigned to this shift will revert to "Off".',
       'Ask a professional': 'Ask a professional',
-      'Auto-fill shifts based on your pattern': 'Auto-fill shifts based on your pattern',
+      'Auto-fill shifts based on your pattern':
+          'Auto-fill shifts based on your pattern',
       'Auto: ': 'Auto: ',
       'Available for the app': 'Available for the app',
       'avg': 'avg',
@@ -54,7 +61,8 @@ class AppTranslations extends Translations {
       'Bio': 'Bio',
       'Build your baseline': 'Build your baseline',
       'BUILD YOUR ROTATION': 'BUILD YOUR ROTATION',
-      'By continuing, you accept Terms and Privacy.': 'By continuing, you accept Terms and Privacy.',
+      'By continuing, you accept Terms and Privacy.':
+          'By continuing, you accept Terms and Privacy.',
       'Caffeine': 'Caffeine',
       'Caffeine sensitivity': 'Caffeine sensitivity',
       'Cancel': 'Cancel',
@@ -62,12 +70,15 @@ class AppTranslations extends Translations {
       'CET · Geneva': 'CET · Geneva',
       'Change Password': 'Change Password',
       'Change password': 'Change password',
-      'Check your e-mail and enter the code below.': 'Check your e-mail and enter the code below.',
-      'Check your inbox and spam folder. The link expires after 20 minutes.': 'Check your inbox and spam folder. The link expires after 20 minutes.',
+      'Check your e-mail and enter the code below.':
+          'Check your e-mail and enter the code below.',
+      'Check your inbox and spam folder. The link expires after 20 minutes.':
+          'Check your inbox and spam folder. The link expires after 20 minutes.',
       'Checking onboarding status...': 'Checking onboarding status...',
       'Choose a new password': 'Choose a new password',
       'Choose Language': 'Choose Language',
-      'Choose reminder and analytics settings.': 'Choose reminder and analytics settings.',
+      'Choose reminder and analytics settings.':
+          'Choose reminder and analytics settings.',
       'Choose your plan': 'Choose your plan',
       'Chronotype': 'Chronotype',
       'CIRCADIAN STABILITY': 'CIRCADIAN STABILITY',
@@ -75,20 +86,25 @@ class AppTranslations extends Translations {
       'Code sent successfully': 'Code sent successfully',
       'Code verified successfully': 'Code verified successfully',
       'Coffee': 'Coffee',
-      'Configure your default shift rotation and shift times once. The app will automatically map them to your calendar.': 'Configure your default shift rotation and shift times once. The app will automatically map them to your calendar.',
+      'Configure your default shift rotation and shift times once. The app will automatically map them to your calendar.':
+          'Configure your default shift rotation and shift times once. The app will automatically map them to your calendar.',
       'Confirm Password': 'Confirm Password',
       'Confirm password is required': 'Confirm password is required',
       'Connected sources': 'Connected sources',
-      'Connected sources and permissions.': 'Connected sources and permissions.',
+      'Connected sources and permissions.':
+          'Connected sources and permissions.',
       'Consent settings': 'Consent settings',
-      'Consent settings saved successfully': 'Consent settings saved successfully',
+      'Consent settings saved successfully':
+          'Consent settings saved successfully',
       'Continue': 'Continue',
       'Continue setup': 'Continue setup',
       'Continue with Apple': 'Continue with Apple',
       'Continue with Google': 'Continue with Google',
       'Continue with Microsoft': 'Continue with Microsoft',
-      'Continue your rhythm plan from today.': 'Continue your rhythm plan from today.',
-      'Could not proceed with safety acknowledgment.': 'Could not proceed with safety acknowledgment.',
+      'Continue your rhythm plan from today.':
+          'Continue your rhythm plan from today.',
+      'Could not proceed with safety acknowledgment.':
+          'Could not proceed with safety acknowledgment.',
       'Could not save connected sources.': 'Could not save connected sources.',
       'Could not save consent settings.': 'Could not save consent settings.',
       'Create account': 'Create account',
@@ -133,7 +149,8 @@ class AppTranslations extends Translations {
       'Default rotation': 'Default rotation',
       'Delete': 'Delete',
       'Delete account': 'Delete account',
-      'Delete account failed. Please try again.': 'Delete account failed. Please try again.',
+      'Delete account failed. Please try again.':
+          'Delete account failed. Please try again.',
       'Delete my account': 'Delete my account',
       'Delete Shift': 'Delete Shift',
       'Deleted caffeine entry': 'Deleted caffeine entry',
@@ -171,9 +188,11 @@ class AppTranslations extends Translations {
       'Email': 'Email',
       'Email Address': 'Email Address',
       'Email is required': 'Email is required',
-      'Email not found. Please try again.': 'Email not found. Please try again.',
+      'Email not found. Please try again.':
+          'Email not found. Please try again.',
       'Employer view': 'Employer view',
-      'Turn on if you forgot to tap \'End My Day\' before sleeping': 'Turn on if you forgot to tap \'End My Day\' before sleeping',
+      'Turn on if you forgot to tap \'End My Day\' before sleeping':
+          'Turn on if you forgot to tap \'End My Day\' before sleeping',
       'Enabled': 'Enabled',
       'END': 'END',
       'End my day ': 'End my day ',
@@ -184,7 +203,8 @@ class AppTranslations extends Translations {
       'Enter The Code': 'Enter The Code',
       'Enter your confirm password': 'Enter your confirm password',
       'Enter your email': 'Enter your email',
-      'Enter your email and RYVENZA sends a secure reset link.': 'Enter your email and RYVENZA sends a secure reset link.',
+      'Enter your email and RYVENZA sends a secure reset link.':
+          'Enter your email and RYVENZA sends a secure reset link.',
       'Enter your full name': 'Enter your full name',
       'Enter your new password': 'Enter your new password',
       'Enter your note here...': 'Enter your note here...',
@@ -198,7 +218,8 @@ class AppTranslations extends Translations {
       'Evening': 'Evening',
       'Export my data': 'Export my data',
       'Export or remove your data.': 'Export or remove your data.',
-      'Failed to acknowledge safety requirements.': 'Failed to acknowledge safety requirements.',
+      'Failed to acknowledge safety requirements.':
+          'Failed to acknowledge safety requirements.',
       'Failed to clear day override': 'Failed to clear day override',
       'Failed to create account.': 'Failed to create account.',
       'Failed to delete entry': 'Failed to delete entry',
@@ -209,7 +230,8 @@ class AppTranslations extends Translations {
       'Failed to load baseline data.': 'Failed to load baseline data.',
       'Failed to load connected sources.': 'Failed to load connected sources.',
       'Failed to load consent settings.': 'Failed to load consent settings.',
-      'Failed to load safety requirements.': 'Failed to load safety requirements.',
+      'Failed to load safety requirements.':
+          'Failed to load safety requirements.',
       'Failed to log meal': 'Failed to log meal',
       'Failed to save baseline.': 'Failed to save baseline.',
       'Failed to save connected sources.': 'Failed to save connected sources.',
@@ -253,20 +275,24 @@ class AppTranslations extends Translations {
       'HOW THIS SHAPES TODAY': 'HOW THIS SHAPES TODAY',
       'Hydration': 'Hydration',
       'I understand': 'I understand',
-      'I understand this cannot be undone.': 'I understand this cannot be undone.',
-      'I want to remove my personal profile.': 'I want to remove my personal profile.',
+      'I understand this cannot be undone.':
+          'I understand this cannot be undone.',
+      'I want to remove my personal profile.':
+          'I want to remove my personal profile.',
       'Intensity': 'Intensity',
       'in': 'in',
       'In': 'In',
       'bedtime now': 'bedtime now',
       'past bedtime': 'past bedtime',
-      'Invalid purpose. Please try again.': 'Invalid purpose. Please try again.',
+      'Invalid purpose. Please try again.':
+          'Invalid purpose. Please try again.',
       'Keep night meal ': 'Keep night meal ',
       'Later': 'Later',
       'left': 'left',
       'left for today': 'left for today',
       'Legal & data': 'Legal & data',
-      'Lifestyle guidance, not medical care.': 'Lifestyle guidance, not medical care.',
+      'Lifestyle guidance, not medical care.':
+          'Lifestyle guidance, not medical care.',
       'Light': 'Light',
       'Loaded sleep log to edit': 'Loaded sleep log to edit',
       'Loading...': 'Loading...',
@@ -277,7 +303,8 @@ class AppTranslations extends Translations {
       'Log out': 'Log out',
       'Log sleep — it\'s not too late': 'Log sleep — it\'s not too late',
       'Log tonight\'s sleep': 'Log tonight\'s sleep',
-      'Log your daily data to get personalised tips.': 'Log your daily data to get personalised tips.',
+      'Log your daily data to get personalised tips.':
+          'Log your daily data to get personalised tips.',
       'Logged out successfully': 'Logged out successfully',
       'Logged tonight\'s sleep': 'Logged tonight\'s sleep',
       'Logging caffeine...': 'Logging caffeine...',
@@ -308,7 +335,8 @@ class AppTranslations extends Translations {
       'medium': 'medium',
       'MEDIUM': 'MEDIUM',
       'Microsoft sign-in cancelled': 'Microsoft sign-in cancelled',
-      'Microsoft sign-in timed out. Please try again.': 'Microsoft sign-in timed out. Please try again.',
+      'Microsoft sign-in timed out. Please try again.':
+          'Microsoft sign-in timed out. Please try again.',
       'mixed': 'mixed',
       'mobility': 'mobility',
       'Mon': 'Mon',
@@ -318,11 +346,13 @@ class AppTranslations extends Translations {
       'Name': 'Name',
       'New Password': 'New Password',
       'New password is required': 'New password is required',
-      'New password must be at least 6 characters': 'New password must be at least 6 characters',
+      'New password must be at least 6 characters':
+          'New password must be at least 6 characters',
       'Night': 'Night',
       'No account?': 'No account?',
       'No active session found.': 'No active session found.',
-      'No active workout session logged today.': 'No active workout session logged today.',
+      'No active workout session logged today.':
+          'No active workout session logged today.',
       'No caffeine entries logged today.': 'No caffeine entries logged today.',
       'No intake logged yet.': 'No intake logged yet.',
       'No presets available': 'No presets available',
@@ -351,16 +381,23 @@ class AppTranslations extends Translations {
       'Other': 'Other',
       'other': 'other',
       'Password': 'Password',
-      'Password must be at least 8 characters': 'Password must be at least 8 characters',
-      'Password must contain at least one number': 'Password must contain at least one number',
-      'Password must contain at least one uppercase letter': 'Password must contain at least one uppercase letter',
+      'Password must be at least 8 characters':
+          'Password must be at least 8 characters',
+      'Password must contain at least one number':
+          'Password must contain at least one number',
+      'Password must contain at least one uppercase letter':
+          'Password must contain at least one uppercase letter',
       'Password updated successfully': 'Password updated successfully',
       'Passwords do not match': 'Passwords do not match',
-      'Personal data, employer view and retention.': 'Personal data, employer view and retention.',
-      'Pick a template to pre-fill everything below, or build your own from scratch.': 'Pick a template to pre-fill everything below, or build your own from scratch.',
-      'Plan the when, not diagnose the why.': 'Plan the when, not diagnose the why.',
+      'Personal data, employer view and retention.':
+          'Personal data, employer view and retention.',
+      'Pick a template to pre-fill everything below, or build your own from scratch.':
+          'Pick a template to pre-fill everything below, or build your own from scratch.',
+      'Plan the when, not diagnose the why.':
+          'Plan the when, not diagnose the why.',
       'planned': 'planned',
-      'Please confirm all required safety limits before continuing.': 'Please confirm all required safety limits before continuing.',
+      'Please confirm all required safety limits before continuing.':
+          'Please confirm all required safety limits before continuing.',
       'Please enter a valid email': 'Please enter a valid email',
       'Please enter the 6-digit code': 'Please enter the 6-digit code',
       'Premium': 'Premium',
@@ -383,7 +420,8 @@ class AppTranslations extends Translations {
       'Request permanent deletion.': 'Request permanent deletion.',
       'Reset password': 'Reset password',
       'Responsible use': 'Responsible use',
-      'Responsible use and account rules.': 'Responsible use and account rules.',
+      'Responsible use and account rules.':
+          'Responsible use and account rules.',
       'Rest Day': 'Rest Day',
       'Rest day': 'Rest day',
       'Retry': 'Retry',
@@ -394,7 +432,8 @@ class AppTranslations extends Translations {
       'ROLLING': 'ROLLING',
       'ROTATION CYCLE': 'ROTATION CYCLE',
       'Rotation length': 'Rotation length',
-      'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.': 'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.',
+      'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.':
+          'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.',
       'rotation!': 'rotation!',
       'Running': 'Running',
       'Safety': 'Safety',
@@ -419,12 +458,14 @@ class AppTranslations extends Translations {
       'Saving work shift...': 'Saving work shift...',
       'Saving...': 'Saving...',
       'See all': 'See all',
-      'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.': 'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.',
+      'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.':
+          'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.',
       'Select Effort': 'Select Effort',
       'Select shift rotation pattern': 'Select shift rotation pattern',
       'Select Type': 'Select Type',
       'Send reset link': 'Send reset link',
-      'Session expired. Please sign in again.': 'Session expired. Please sign in again.',
+      'Session expired. Please sign in again.':
+          'Session expired. Please sign in again.',
       'Settings': 'Settings',
       'Setup': 'Setup',
       'SHIFT NAME': 'SHIFT NAME',
@@ -438,7 +479,8 @@ class AppTranslations extends Translations {
       'Signing in...': 'Signing in...',
       'Sleep': 'Sleep',
       'SLEEP DEBT': 'SLEEP DEBT',
-      'SLEEP DEBT - \\\${controller.selectedPeriod.value.toUpperCase()} ROLLING': 'SLEEP DEBT - \\\${controller.selectedPeriod.value.toUpperCase()} ROLLING',
+      'SLEEP DEBT - \\\${controller.selectedPeriod.value.toUpperCase()} ROLLING':
+          'SLEEP DEBT - \\\${controller.selectedPeriod.value.toUpperCase()} ROLLING',
       'SLEEP DURATION': 'SLEEP DURATION',
       'SLEEP IMPACT': 'SLEEP IMPACT',
       'Sleep log added!': 'Sleep log added!',
@@ -495,8 +537,10 @@ class AppTranslations extends Translations {
       'Tue': 'Tue',
       'Tuesday': 'Tuesday',
       'TYPE': 'TYPE',
-      'Unauthorized. Please sign in again.': 'Unauthorized. Please sign in again.',
+      'Unauthorized. Please sign in again.':
+          'Unauthorized. Please sign in again.',
       'UPCOMING SCHEDULE': 'UPCOMING SCHEDULE',
+      'timeline_activity_record': 'No activity recorded for this day.',
       'Update password': 'Update password',
       'Update password failed': 'Update password failed',
       'Update password successfully': 'Update password successfully',
@@ -512,10 +556,13 @@ class AppTranslations extends Translations {
       'Updating workout...': 'Updating workout...',
       'Updating...': 'Updating...',
       'Use a template': 'Use a template',
-      'Use a unique password with at least 8\\ncharacters.': 'Use a unique password with at least 8\\ncharacters.',
-      'Use something unique so your rhythm history stays protected.': 'Use something unique so your rhythm history stays protected.',
+      'Use a unique password with at least 8\\ncharacters.':
+          'Use a unique password with at least 8\\ncharacters.',
+      'Use something unique so your rhythm history stays protected.':
+          'Use something unique so your rhythm history stays protected.',
       'Use this template': 'Use this template',
-      'User identification not found. Please try verifying OTP again.': 'User identification not found. Please try verifying OTP again.',
+      'User identification not found. Please try verifying OTP again.':
+          'User identification not found. Please try verifying OTP again.',
       'User Name': 'User Name',
       'Verification failed': 'Verification failed',
       'Verify': 'Verify',
@@ -555,26 +602,36 @@ class AppTranslations extends Translations {
       'Work rotation deleted': 'Work rotation deleted',
       'Work schedule': 'Work schedule',
       'Work schedule saved!': 'Work schedule saved!',
-      'Workout entry ID missing. Refreshing dashboard...': 'Workout entry ID missing. Refreshing dashboard...',
+      'Workout entry ID missing. Refreshing dashboard...':
+          'Workout entry ID missing. Refreshing dashboard...',
       'Workout Session Options': 'Workout Session Options',
       'Write something about yourself': 'Write something about yourself',
       'Yesterday': 'Yesterday',
       'You are already logged out.': 'You are already logged out.',
-      'You can edit hydration only for today.': 'You can edit hydration only for today.',
-      'You can log hydration only for today.': 'You can log hydration only for today.',
+      'You can edit hydration only for today.':
+          'You can edit hydration only for today.',
+      'You can log hydration only for today.':
+          'You can log hydration only for today.',
       'You must keep at least one shift': 'You must keep at least one shift',
       'you@example.com': 'you@example.com',
       'Your controls': 'Your controls',
       'Your data controls': 'Your data controls',
       'Your inputs': 'Your inputs',
-      'Your password has been changed successfully': 'Your password has been changed successfully',
-      'Your rhythm, rebuilt around real life.': 'Your rhythm, rebuilt around real life.',
+      'Your password has been changed successfully':
+          'Your password has been changed successfully',
+      'Your rhythm, rebuilt around real life.':
+          'Your rhythm, rebuilt around real life.',
       'nutrition.title.mealTiming': 'Meal Timing',
-      'nutrition.substantialMeal': 'It\'s been a while since your last meal. Have a substantial, balanced meal now to stay on track.',
-      'nutrition.preSleepLightMeal': 'Bedtime is approaching. Opt for a lighter, protein-rich meal that won\'t disrupt your sleep quality.',
-      'nutrition.postWorkoutRecovery': 'Great workout! Prioritize a recovery meal with protein and complex carbohydrates.',
-      'nutrition.lightSnack': 'Have a light snack to maintain energy until your next regular meal.',
-      'IRREGULAR_SLEEP_WINDOW': 'Logged sleep duration is unusually long (> 12 hours). Please verify your entry.',
+      'nutrition.substantialMeal':
+          'It\'s been a while since your last meal. Have a substantial, balanced meal now to stay on track.',
+      'nutrition.preSleepLightMeal':
+          'Bedtime is approaching. Opt for a lighter, protein-rich meal that won\'t disrupt your sleep quality.',
+      'nutrition.postWorkoutRecovery':
+          'Great workout! Prioritize a recovery meal with protein and complex carbohydrates.',
+      'nutrition.lightSnack':
+          'Have a light snack to maintain energy until your next regular meal.',
+      'IRREGULAR_SLEEP_WINDOW':
+          'Logged sleep duration is unusually long (> 12 hours). Please verify your entry.',
       'Unusually long sleep detected.': 'Unusually long sleep detected.',
       'Enter another quantity': 'Enter another quantity',
       'Modifier la quantité': 'Edit quantity',
@@ -659,61 +716,78 @@ class AppTranslations extends Translations {
       'Mixed': 'Mixed',
       'Autre': 'Other',
       'Rotation Name': 'Rotation Name',
-      'Custom name for this rotation schedule (optional)': 'Custom name for this rotation schedule (optional)',
+      'Custom name for this rotation schedule (optional)':
+          'Custom name for this rotation schedule (optional)',
       'e.g. Syngenta, 3x8 Novartis': 'e.g. Syngenta, 3x8 Novartis',
       'Batch Shift Override': 'Batch Shift Override',
       'Batch Overrides / Vacation': 'Batch Overrides / Vacation',
-      'Set vacation, leave, or block shifts across multiple dates in a single action.': 'Set vacation, leave, or block shifts across multiple dates in a single action.',
+      'Set vacation, leave, or block shifts across multiple dates in a single action.':
+          'Set vacation, leave, or block shifts across multiple dates in a single action.',
       'DATE RANGE': 'DATE RANGE',
       'SELECT SHIFT TO APPLY': 'SELECT SHIFT TO APPLY',
       'Off (Vacation/Leave)': 'Off (Vacation/Leave)',
       'Apply to Range': 'Apply to Range',
+      'timeline_touche_event_detail': 'Tap an event to view its details.',
       'Clear Overrides in Range': 'Clear Overrides in Range',
       'Please select a date range first': 'Please select a date range first',
-      'Batch overrides applied successfully': 'Batch overrides applied successfully',
+      'Batch overrides applied successfully':
+          'Batch overrides applied successfully',
       'Failed to apply batch overrides': 'Failed to apply batch overrides',
-      'Overrides cleared for the selected range': 'Overrides cleared for the selected range',
+      'Overrides cleared for the selected range':
+          'Overrides cleared for the selected range',
       'Failed to clear overrides': 'Failed to clear overrides',
       '@days days selected': '@days days selected',
       'Default daily meal target': 'Default daily meal target',
-      'Your circadian day session will automatically initialize with this daily meal count preference (1–8 meals).': 'Your circadian day session will automatically initialize with this daily meal count preference (1–8 meals).',
+      'Your circadian day session will automatically initialize with this daily meal count preference (1–8 meals).':
+          'Your circadian day session will automatically initialize with this daily meal count preference (1–8 meals).',
       'Save as default': 'Save as default',
       'Default meal target saved': 'Default meal target saved',
       'Default meal target updated': 'Default meal target updated',
-      'Failed to save default meal target': 'Failed to save default meal target',
+      'Failed to save default meal target':
+          'Failed to save default meal target',
       'Time format': 'Time format',
-      'Choose how times and recommendations are displayed across the app.': 'Choose how times and recommendations are displayed across the app.',
+      'Choose how times and recommendations are displayed across the app.':
+          'Choose how times and recommendations are displayed across the app.',
       '12-Hour (AM/PM)': '12-Hour (AM/PM)',
       '24-Hour': '24-Hour',
       'Example: @example': 'Example: @example',
       'Time format updated': 'Time format updated',
       'Failed to update time format': 'Failed to update time format',
       'Confirm Account Deletion': 'Confirm Account Deletion',
-      'A 6-digit verification code has been sent to your registered email address. Enter it below to permanently delete your account.': 'A 6-digit verification code has been sent to your registered email address. Enter it below to permanently delete your account.',
+      'A 6-digit verification code has been sent to your registered email address. Enter it below to permanently delete your account.':
+          'A 6-digit verification code has been sent to your registered email address. Enter it below to permanently delete your account.',
       'Confirm & Delete Permanently': 'Confirm & Delete Permanently',
       'Resend code': 'Resend code',
-      'A new verification code has been sent.': 'A new verification code has been sent.',
+      'A new verification code has been sent.':
+          'A new verification code has been sent.',
       'Requesting verification code...': 'Requesting verification code...',
       'Deleting account...': 'Deleting account...',
       'Resending code...': 'Resending code...',
-      'Please enter the 6-digit verification code': 'Please enter the 6-digit verification code',
-      'Failed to request verification code. Please try again.': 'Failed to request verification code. Please try again.',
-      'Failed to resend code. Please try again.': 'Failed to resend code. Please try again.',
-      'Failed to delete account. Please try again.': 'Failed to delete account. Please try again.',
+      'Please enter the 6-digit verification code':
+          'Please enter the 6-digit verification code',
+      'Failed to request verification code. Please try again.':
+          'Failed to request verification code. Please try again.',
+      'Failed to resend code. Please try again.':
+          'Failed to resend code. Please try again.',
+      'Failed to delete account. Please try again.':
+          'Failed to delete account. Please try again.',
       'Rotations & Templates': 'Rotations & Templates',
-      'Toggle which rotation is currently active': 'Toggle which rotation is currently active',
+      'Toggle which rotation is currently active':
+          'Toggle which rotation is currently active',
       'New': 'New',
       'No rotations available': 'No rotations available',
       'wks': 'wks',
       'Delete template': 'Delete template',
       'Delete Template': 'Delete Template',
-      'Are you sure you want to delete this custom template?': 'Are you sure you want to delete this custom template?',
+      'Are you sure you want to delete this custom template?':
+          'Are you sure you want to delete this custom template?',
       'Activating rotation...': 'Activating rotation...',
       'Rotation activated!': 'Rotation activated!',
       'Failed to activate rotation': 'Failed to activate rotation',
       'Deleting template...': 'Deleting template...',
       'Template deleted': 'Template deleted',
-      'Set parameters below and tap Save Rotation': 'Set parameters below and tap Save Rotation',
+      'Set parameters below and tap Save Rotation':
+          'Set parameters below and tap Save Rotation',
       'CREATE CUSTOM ROTATION': 'CREATE CUSTOM ROTATION',
       'Save to Templates': 'Save to Templates',
       'Please enter a rotation name': 'Please enter a rotation name',
@@ -726,7 +800,8 @@ class AppTranslations extends Translations {
       'Weekly workout goal': 'Weekly workout goal',
       'Weekly Workout Goal': 'Weekly Workout Goal',
       'Workouts per week': 'Workouts per week',
-      'Select your weekly workout target (1 to 7 workouts per week).': 'Select your weekly workout target (1 to 7 workouts per week).',
+      'Select your weekly workout target (1 to 7 workouts per week).':
+          'Select your weekly workout target (1 to 7 workouts per week).',
       'WEEKLY GOAL': 'WEEKLY GOAL',
       'Adaptive Rest': 'Adaptive Rest',
       'Weekly Goal Met': 'Weekly Goal Met',
@@ -734,10 +809,12 @@ class AppTranslations extends Translations {
       'goal met': 'goal met',
       'on track': 'on track',
       'needs pace': 'needs pace',
-      'Take a rest day today — you\'ve reached your weekly workout goal and accumulated training fatigue.': 'Take a rest day today — you\'ve reached your weekly workout goal and accumulated training fatigue.',
+      'Take a rest day today — you\'ve reached your weekly workout goal and accumulated training fatigue.':
+          'Take a rest day today — you\'ve reached your weekly workout goal and accumulated training fatigue.',
       'BEDTIME DELAY': 'BEDTIME DELAY',
       'caffeine delay': 'caffeine delay',
-      'mg active at bedtime — elevated caffeine may impact your sleep latency and quality.': 'mg active at bedtime — elevated caffeine may impact your sleep latency and quality.',
+      'mg active at bedtime — elevated caffeine may impact your sleep latency and quality.':
+          'mg active at bedtime — elevated caffeine may impact your sleep latency and quality.',
       'Historique': 'History',
       'Ma journée': 'My Day',
       "Vue d'ensemble": 'Overview',
@@ -769,10 +846,58 @@ class AppTranslations extends Translations {
       'Dormir': 'Sleep',
       'Travail': 'Work',
       'Exercice': 'Exercise',
+      'Notifications': 'Notifications',
+      'Preferences': 'Preferences',
+      'Notification preferences': 'Notification preferences',
+      'Customize the categories of circadian and lifestyle guidance you receive.':
+          'Customize the categories of circadian and lifestyle guidance you receive.',
+      'REMINDERS & ALERTS': 'REMINDERS & ALERTS',
+      'Bedtime & Wind-down alerts': 'Bedtime & Wind-down alerts',
+      'Optimal bedtime & wind-down reminders':
+          'Optimal bedtime & wind-down reminders',
+      'Pre-shift alerts & light protocol': 'Pre-shift alerts & light protocol',
+      'Caffeine cut-off alerts': 'Caffeine cut-off alerts',
+      'Clearance alerts before sleep windows':
+          'Clearance alerts before sleep windows',
+      'Hydration reminders': 'Hydration reminders',
+      'Pacing sips throughout your shift': 'Pacing sips throughout your shift',
+      'Circadian transitions': 'Circadian transitions',
+      'Multi-day shift rotation adaptations':
+          'Multi-day shift rotation adaptations',
+      'Weekly sport report': 'Weekly sport report',
+      'Workout pace & adaptive rest summary':
+          'Workout pace & adaptive rest summary',
+      'Mark all as read': 'Mark all as read',
+      'All notifications marked as read': 'All notifications marked as read',
+      'Unread': 'Unread',
+      'No notifications': 'No notifications',
+      'You are all caught up! Circadian and lifestyle reminders will appear here.':
+          'You are all caught up! Circadian and lifestyle reminders will appear here.',
+      'How many workouts do you aim to complete each week?':
+          'How many workouts do you aim to complete each week?',
+      'Goal updated!': 'Goal updated!',
+      'Nap logged!': 'Nap logged!',
+      'Nap updated!': 'Nap updated!',
+      'Nap deleted!': 'Nap deleted!',
+      'Logging nap...': 'Logging nap...',
+      'Updating nap...': 'Updating nap...',
+      'Deleting nap...': 'Deleting nap...',
+      'Today\'s Naps': 'Today\'s Naps',
+      'Log a nap': 'Log a nap',
+      'Edit nap': 'Edit nap',
+      'POWER NAP': 'POWER NAP',
+      'STANDARD NAP': 'STANDARD NAP',
+      'ANCHOR NAP': 'ANCHOR NAP',
+      'Quality': 'Quality',
+      'Refreshing': 'Refreshing',
+      'Groggy': 'Groggy',
+      'Neutral': 'Neutral',
     },
     'fr_FR': {
-      ' — protect tonight\'s sleep window.': ' — protégez votre fenêtre de sommeil de ce soir.',
-      ' — Heavy meals after 02:00 reduce deep sleep by ~15%.': ' — Les repas lourds après 02:00 réduisent le sommeil profond d\'environ 15%.',
+      ' — protect tonight\'s sleep window.':
+          ' — protégez votre fenêtre de sommeil de ce soir.',
+      ' — Heavy meals after 02:00 reduce deep sleep by ~15%.':
+          ' — Les repas lourds après 02:00 réduisent le sommeil profond d\'environ 15%.',
       '"Off" is a reserved shift name': '"Off" est un nom de shift réservé',
       '(save & reset)': '(enregistrer et réinitialiser)',
       '1 Week': '1 semaine',
@@ -787,7 +912,8 @@ class AppTranslations extends Translations {
       '4-4 split': 'Alternance 4-4',
       '4. Changes': '4. Modifications',
       '8+ characters': '8+ caractères',
-      'A shift with this name already exists': 'Un shift avec ce nom existe déjà',
+      'A shift with this name already exists':
+          'Un shift avec ce nom existe déjà',
       'Accept': 'Accepter',
       'Accept privacy policy': 'Accepter la politique de confidentialité',
       'Accept terms': 'Accepter les conditions',
@@ -801,16 +927,20 @@ class AppTranslations extends Translations {
       'Add Custom Shift': 'Ajouter un shift personnalisé',
       'Add Note': 'Ajouter une note',
       'Add note': 'Ajouter une note',
-      'Adults need 7–9 hours for optimal recovery.': 'Les adultes ont besoin de 7 à 9 heures pour une récupération optimale.',
+      'Adults need 7–9 hours for optimal recovery.':
+          'Les adultes ont besoin de 7 à 9 heures pour une récupération optimale.',
       'AEST · Sydney': 'AEST · Sydney',
       'AMOUNT (MG)': 'QUANTITÉ (MG)',
       'API login failed': 'Échec de la connexion à l\'API',
-      'App aligns rotation week to dates': 'L\'application aligne la semaine de rotation sur les dates',
+      'App aligns rotation week to dates':
+          'L\'application aligne la semaine de rotation sur les dates',
       'Applied': 'Appliqué',
       'Apply to this day': 'Appliquer à cette journée',
-      'Are you sure you want to delete this shift? Any days in your pattern assigned to this shift will revert to "Off".': 'Êtes-vous sûr de vouloir supprimer ce shift ? Tous les jours de votre modèle attribués à ce shift reviendront à "Off".',
+      'Are you sure you want to delete this shift? Any days in your pattern assigned to this shift will revert to "Off".':
+          'Êtes-vous sûr de vouloir supprimer ce shift ? Tous les jours de votre modèle attribués à ce shift reviendront à "Off".',
       'Ask a professional': 'Consultez un professionnel',
-      'Auto-fill shifts based on your pattern': 'Remplissage automatique des postes en fonction de votre modèle.',
+      'Auto-fill shifts based on your pattern':
+          'Remplissage automatique des postes en fonction de votre modèle.',
       'Auto: ': 'Auto: ',
       'Available for the app': 'Disponible pour l\'application',
       'avg': 'moyen',
@@ -821,7 +951,8 @@ class AppTranslations extends Translations {
       'Bio': 'Bio',
       'Build your baseline': 'Créez votre profil de base',
       'BUILD YOUR ROTATION': 'CRÉEZ VOTRE ROTATION',
-      'By continuing, you accept Terms and Privacy.': 'En continuant, vous acceptez les Conditions et la Confidentialité.',
+      'By continuing, you accept Terms and Privacy.':
+          'En continuant, vous acceptez les Conditions et la Confidentialité.',
       'Caffeine': 'Caféine',
       'Caffeine sensitivity': 'Sensibilité à la caféine',
       'Cancel': 'Annuler',
@@ -829,12 +960,16 @@ class AppTranslations extends Translations {
       'CET · Geneva': 'CET · Genève',
       'Change Password': 'Changer de mot de passe',
       'Change password': 'Changer de mot de passe',
-      'Check your e-mail and enter the code below.': 'Vérifiez votre e-mail et entrez le code ci-dessous.',
-      'Check your inbox and spam folder. The link expires after 20 minutes.': 'Vérifiez votre boîte de réception et vos spams. Le lien expire après 20 minutes.',
-      'Checking onboarding status...': 'Vérification du statut d\'installation...',
+      'Check your e-mail and enter the code below.':
+          'Vérifiez votre e-mail et entrez le code ci-dessous.',
+      'Check your inbox and spam folder. The link expires after 20 minutes.':
+          'Vérifiez votre boîte de réception et vos spams. Le lien expire après 20 minutes.',
+      'Checking onboarding status...':
+          'Vérification du statut d\'installation...',
       'Choose a new password': 'Choisissez un nouveau mot de passe',
       'Choose Language': 'Choisir la langue',
-      'Choose reminder and analytics settings.': 'Choisissez les paramètres de rappels et d\'analytique.',
+      'Choose reminder and analytics settings.':
+          'Choisissez les paramètres de rappels et d\'analytique.',
       'Choose your plan': 'Choisissez votre forfait',
       'Chronotype': 'Chronotype',
       'CIRCADIAN STABILITY': 'STABILITÉ CIRCADIENNE',
@@ -842,22 +977,30 @@ class AppTranslations extends Translations {
       'Code sent successfully': 'Code envoyé avec succès',
       'Code verified successfully': 'Code vérifié avec succès',
       'Coffee': 'Café',
-      'Configure your default shift rotation and shift times once. The app will automatically map them to your calendar.': 'Configurez votre rotation et vos horaires de shift par défaut une seule fois. L\'application les associera automatiquement à votre calendrier.',
+      'Configure your default shift rotation and shift times once. The app will automatically map them to your calendar.':
+          'Configurez votre rotation et vos horaires de shift par défaut une seule fois. L\'application les associera automatiquement à votre calendrier.',
       'Confirm Password': 'Confirmer le mot de passe',
-      'Confirm password is required': 'La confirmation du mot de passe est requise',
+      'Confirm password is required':
+          'La confirmation du mot de passe est requise',
       'Connected sources': 'Sources connectées',
-      'Connected sources and permissions.': 'Sources connectées et autorisations.',
+      'Connected sources and permissions.':
+          'Sources connectées et autorisations.',
       'Consent settings': 'Paramètres de consentement',
-      'Consent settings saved successfully': 'Paramètres de consentement enregistrés avec succès',
+      'Consent settings saved successfully':
+          'Paramètres de consentement enregistrés avec succès',
       'Continue': 'Continuer',
       'Continue setup': 'Continuer la configuration',
       'Continue with Apple': 'Continuer avec Apple',
       'Continue with Google': 'Continuer avec Google',
       'Continue with Microsoft': 'Continuer avec Microsoft',
-      'Continue your rhythm plan from today.': 'Poursuivez votre plan de rythme dès aujourd\'hui.',
-      'Could not proceed with safety acknowledgment.': 'Impossible de poursuivre la confirmation de sécurité.',
-      'Could not save connected sources.': 'Impossible d\'enregistrer les sources connectées.',
-      'Could not save consent settings.': 'Impossible d\'enregistrer les paramètres de consentement.',
+      'Continue your rhythm plan from today.':
+          'Poursuivez votre plan de rythme dès aujourd\'hui.',
+      'Could not proceed with safety acknowledgment.':
+          'Impossible de poursuivre la confirmation de sécurité.',
+      'Could not save connected sources.':
+          'Impossible d\'enregistrer les sources connectées.',
+      'Could not save consent settings.':
+          'Impossible d\'enregistrer les paramètres de consentement.',
       'Create account': 'Créer un compte',
       'Create one': 'Créer un compte',
       'Creating account...': 'Création du compte...',
@@ -881,7 +1024,8 @@ class AppTranslations extends Translations {
       'Modifier la caféine': 'Modifier la caféine',
       'Ajouter de la caféine': 'Ajouter de la caféine',
       'Failed to log caffeine': "Échec de l'enregistrement de la caféine",
-      'Failed to update caffeine entry': "Échec de la mise à jour de l'entrée de caféine",
+      'Failed to update caffeine entry':
+          "Échec de la mise à jour de l'entrée de caféine",
       'Cut-off': 'Heure limite',
       'Cycling': 'Cyclisme',
       'D': 'D',
@@ -900,7 +1044,8 @@ class AppTranslations extends Translations {
       'Default rotation': 'Rotation par défaut',
       'Delete': 'Supprimer',
       'Delete account': 'Supprimer le compte',
-      'Delete account failed. Please try again.': 'Échec de la suppression du compte. Veuillez réessayer.',
+      'Delete account failed. Please try again.':
+          'Échec de la suppression du compte. Veuillez réessayer.',
       'Delete my account': 'Supprimer mon compte',
       'Delete Shift': 'Supprimer le shift',
       'Deleted caffeine entry': 'Entrée de caféine supprimée',
@@ -913,7 +1058,8 @@ class AppTranslations extends Translations {
       'DISTANCE': 'DISTANCE',
       'Distance (km - optional)': 'Distance (km - facultatif)',
       'Do you have an account?': 'Avez-vous un compte ?',
-      'Download profile inputs and logs.': 'Télécharger les données de profil et les journaux.',
+      'Download profile inputs and logs.':
+          'Télécharger les données de profil et les journaux.',
       'drag or tap to adjust': 'glissez ou appuyez pour ajuster',
       'Drink': 'Boisson',
       'DRINK NAME': 'NOM DE LA BOISSON',
@@ -938,9 +1084,11 @@ class AppTranslations extends Translations {
       'Email': 'E-mail',
       'Email Address': 'Adresse e-mail',
       'Email is required': 'L\'e-mail est requis',
-      'Email not found. Please try again.': 'E-mail non trouvé. Veuillez réessayer.',
+      'Email not found. Please try again.':
+          'E-mail non trouvé. Veuillez réessayer.',
       'Employer view': 'Vue employeur',
-      'Turn on if you forgot to tap \'End My Day\' before sleeping': 'Activez si vous avez oublié d\'appuyer sur « Terminer ma journée » avant de dormir',
+      'Turn on if you forgot to tap \'End My Day\' before sleeping':
+          'Activez si vous avez oublié d\'appuyer sur « Terminer ma journée » avant de dormir',
       'Enabled': 'Activé',
       'END': 'FIN',
       'End my day ': 'Terminer ma journée ',
@@ -949,9 +1097,11 @@ class AppTranslations extends Translations {
       'Energy dip expected': 'Baisse d\'énergie prévue',
       'Enter Distance': 'Entrer la distance',
       'Enter The Code': 'Entrez le code',
-      'Enter your confirm password': 'Entrez votre mot de passe de confirmation',
+      'Enter your confirm password':
+          'Entrez votre mot de passe de confirmation',
       'Enter your email': 'Entrez votre e-mail',
-      'Enter your email and RYVENZA sends a secure reset link.': 'Entrez votre e-mail et RYVENZA vous enverra un lien de réinitialisation sécurisé.',
+      'Enter your email and RYVENZA sends a secure reset link.':
+          'Entrez votre e-mail et RYVENZA vous enverra un lien de réinitialisation sécurisé.',
       'Enter your full name': 'Entrez votre nom complet',
       'Enter your new password': 'Entrez votre nouveau mot de passe',
       'Enter your note here...': 'Saisissez votre note ici...',
@@ -965,26 +1115,37 @@ class AppTranslations extends Translations {
       'Evening': 'Soir',
       'Export my data': 'Exporter mes données',
       'Export or remove your data.': 'Exporter ou supprimer vos données.',
-      'Failed to acknowledge safety requirements.': 'Échec de la confirmation des exigences de sécurité.',
+      'Failed to acknowledge safety requirements.':
+          'Échec de la confirmation des exigences de sécurité.',
       'Failed to clear day override': 'Échec de la suppression du remplacement',
       'Failed to create account.': 'Échec de la création du compte.',
       'Failed to delete entry': 'Échec de la suppression de l\'entrée',
       'Failed to delete meal': 'Échec de la suppression du repas',
-      'Failed to delete work rotation': 'Échec de la suppression de la rotation',
+      'Failed to delete work rotation':
+          'Échec de la suppression de la rotation',
       'Failed to delete workout': 'Échec de la suppression de l\'entraînement',
       'Failed to end day.': 'Échec de la fin de journée.',
-      'Failed to load baseline data.': 'Échec du chargement des données de base.',
-      'Failed to load connected sources.': 'Échec du chargement des sources connectées.',
-      'Failed to load consent settings.': 'Échec du chargement des paramètres de consentement.',
-      'Failed to load safety requirements.': 'Échec du chargement des exigences de sécurité.',
+      'Failed to load baseline data.':
+          'Échec du chargement des données de base.',
+      'Failed to load connected sources.':
+          'Échec du chargement des sources connectées.',
+      'Failed to load consent settings.':
+          'Échec du chargement des paramètres de consentement.',
+      'Failed to load safety requirements.':
+          'Échec du chargement des exigences de sécurité.',
       'Failed to log meal': 'Échec de l\'enregistrement du repas',
-      'Failed to save baseline.': 'Échec de l\'enregistrement du profil de base.',
-      'Failed to save connected sources.': 'Échec de l\'enregistrement des sources connectées.',
-      'Failed to save consent settings.': 'Échec de l\'enregistrement des paramètres de consentement.',
-      'Failed to save day override': 'Échec de l\'enregistrement du remplacement',
+      'Failed to save baseline.':
+          'Échec de l\'enregistrement du profil de base.',
+      'Failed to save connected sources.':
+          'Échec de l\'enregistrement des sources connectées.',
+      'Failed to save consent settings.':
+          'Échec de l\'enregistrement des paramètres de consentement.',
+      'Failed to save day override':
+          'Échec de l\'enregistrement du remplacement',
       'Failed to save settings': 'Échec de l\'enregistrement des paramètres',
       'Failed to save shift.': 'Échec de l\'enregistrement du shift.',
-      'Failed to save sleep log.': 'Échec de l\'enregistrement du journal de sommeil.',
+      'Failed to save sleep log.':
+          'Échec de l\'enregistrement du journal de sommeil.',
       'Failed to save work schedule': 'Échec de l\'enregistrement du planning',
       'Failed to send code': 'Échec de l\'envoi du code',
       'Failed to update entry': 'Échec de la mise à jour de l\'entrée',
@@ -1020,20 +1181,24 @@ class AppTranslations extends Translations {
       'HOW THIS SHAPES TODAY': 'IMPACT SUR AUJOURD\'HUI',
       'Hydration': 'Hydratation',
       'I understand': 'Je comprends',
-      'I understand this cannot be undone.': 'Je comprends que cela est irréversible.',
-      'I want to remove my personal profile.': 'Je souhaite supprimer mon profil personnel.',
+      'I understand this cannot be undone.':
+          'Je comprends que cela est irréversible.',
+      'I want to remove my personal profile.':
+          'Je souhaite supprimer mon profil personnel.',
       'Intensity': 'Intensité',
       'in': 'dans',
       'In': 'Dans',
       'bedtime now': 'c\'est l\'heure du coucher',
       'past bedtime': 'après l\'heure du coucher',
-      'Invalid purpose. Please try again.': 'Objectif non valide. Veuillez réessayer.',
+      'Invalid purpose. Please try again.':
+          'Objectif non valide. Veuillez réessayer.',
       'Keep night meal ': 'Garder le repas de nuit ',
       'Later': 'Plus tard',
       'left': 'restant',
       'left for today': 'restant pour aujourd\'hui',
       'Legal & data': 'Légal et données',
-      'Lifestyle guidance, not medical care.': 'Conseils de mode de vie, pas des soins médicaux.',
+      'Lifestyle guidance, not medical care.':
+          'Conseils de mode de vie, pas des soins médicaux.',
       'Light': 'Léger',
       'Loaded sleep log to edit': 'Journal de sommeil chargé pour modification',
       'Loading...': 'Chargement...',
@@ -1042,17 +1207,21 @@ class AppTranslations extends Translations {
       'Log in': 'Se connecter',
       'LOG NEW SESSION': 'NOUVELLE SESSION',
       'Log out': 'Se déconnecter',
-      'Log sleep — it\'s not too late': 'Enregistrer le sommeil — il n\'est pas trop tard',
+      'Log sleep — it\'s not too late':
+          'Enregistrer le sommeil — il n\'est pas trop tard',
       'Log tonight\'s sleep': 'Enregistrer le sommeil de ce soir',
-      'Log your daily data to get personalised tips.': 'Enregistrez vos données quotidiennes pour obtenir des conseils personnalisés.',
+      'Log your daily data to get personalised tips.':
+          'Enregistrez vos données quotidiennes pour obtenir des conseils personnalisés.',
       'Logged out successfully': 'Déconnexion réussie',
       'Logged tonight\'s sleep': 'Sommeil de ce soir enregistré',
       'Logging caffeine...': 'Enregistrement de la caféine...',
       'Logging out...': 'Déconnexion en cours...',
       'Logging water...': 'Enregistrement de l\'eau...',
-      'Login failed. Please try again.': 'Échec de la connexion. Veuillez réessayer.',
+      'Login failed. Please try again.':
+          'Échec de la connexion. Veuillez réessayer.',
       'Login successful': 'Connexion réussie',
-      'Logout failed. Please try again.': 'Échec de la déconnexion. Veuillez réessayer.',
+      'Logout failed. Please try again.':
+          'Échec de la déconnexion. Veuillez réessayer.',
       'low': 'faible',
       'LOW': 'FAIBLE',
       'Manage schedule': 'Gérer le calendrier',
@@ -1075,7 +1244,8 @@ class AppTranslations extends Translations {
       'medium': 'moyen',
       'MEDIUM': 'MOYEN',
       'Microsoft sign-in cancelled': 'Connexion Microsoft annulée',
-      'Microsoft sign-in timed out. Please try again.': 'Délai d\'attente de connexion Microsoft dépassé. Veuillez réessayer.',
+      'Microsoft sign-in timed out. Please try again.':
+          'Délai d\'attente de connexion Microsoft dépassé. Veuillez réessayer.',
       'mixed': 'mixte',
       'mobility': 'mobilité',
       'Mon': 'Lun',
@@ -1085,19 +1255,23 @@ class AppTranslations extends Translations {
       'Name': 'Nom',
       'New Password': 'Nouveau mot de passe',
       'New password is required': 'Le nouveau mot de passe est requis',
-      'New password must be at least 6 characters': 'Le nouveau mot de passe doit comporter au moins 6 caractères',
+      'New password must be at least 6 characters':
+          'Le nouveau mot de passe doit comporter au moins 6 caractères',
       'Night': 'Nuit',
       'No account?': 'Pas de compte ?',
       'No active session found.': 'Aucune session active trouvée.',
-      'No active workout session logged today.': 'Aucune session d\'entraînement active enregistrée aujourd\'hui.',
-      'No caffeine entries logged today.': 'Aucune entrée de caféine aujourd\'hui.',
+      'No active workout session logged today.':
+          'Aucune session d\'entraînement active enregistrée aujourd\'hui.',
+      'No caffeine entries logged today.':
+          'Aucune entrée de caféine aujourd\'hui.',
       'No intake logged yet.': 'Aucun apport enregistré.',
       'No presets available': 'No presets available',
       'No recommendations yet': 'Aucune recommandation pour le moment',
       'No schedule items found': 'Aucun élément de calendrier trouvé',
       'No shifts scheduled': 'Aucun poste planifié',
       'No sleep logged for this day.': 'Aucun sommeil enregistré pour ce jour.',
-      'No subscription plans available': 'Aucun forfait d\'abonnement disponible',
+      'No subscription plans available':
+          'Aucun forfait d\'abonnement disponible',
       'None (Fixed)': 'Aucun (Fixe)',
       'Not linked': 'Non lié',
       'Not medical advice': 'Pas un avis médical',
@@ -1118,16 +1292,23 @@ class AppTranslations extends Translations {
       'Other': 'Autre',
       'other': 'autre',
       'Password': 'Mot de passe',
-      'Password must be at least 8 characters': 'Le mot de passe doit comporter au moins 8 caractères',
-      'Password must contain at least one number': 'Le mot de passe doit contenir au moins un chiffre',
-      'Password must contain at least one uppercase letter': 'Le mot de passe doit contenir au moins une lettre majuscule',
+      'Password must be at least 8 characters':
+          'Le mot de passe doit comporter au moins 8 caractères',
+      'Password must contain at least one number':
+          'Le mot de passe doit contenir au moins un chiffre',
+      'Password must contain at least one uppercase letter':
+          'Le mot de passe doit contenir au moins une lettre majuscule',
       'Password updated successfully': 'Mot de passe mis à jour avec succès',
       'Passwords do not match': 'Les mots de passe ne correspondent pas',
-      'Personal data, employer view and retention.': 'Données personnelles, vue employeur et conservation.',
-      'Pick a template to pre-fill everything below, or build your own from scratch.': 'Choisissez un modèle pour tout pré-remplir ci-dessous, ou créez le vôtre à partir de zéro.',
-      'Plan the when, not diagnose the why.': 'Planifiez le quand, ne diagnostiquez pas le pourquoi.',
+      'Personal data, employer view and retention.':
+          'Données personnelles, vue employeur et conservation.',
+      'Pick a template to pre-fill everything below, or build your own from scratch.':
+          'Choisissez un modèle pour tout pré-remplir ci-dessous, ou créez le vôtre à partir de zéro.',
+      'Plan the when, not diagnose the why.':
+          'Planifiez le quand, ne diagnostiquez pas le pourquoi.',
       'planned': 'prévus',
-      'Please confirm all required safety limits before continuing.': 'Veuillez confirmer toutes les limites de sécurité requises avant de continuer.',
+      'Please confirm all required safety limits before continuing.':
+          'Veuillez confirmer toutes les limites de sécurité requises avant de continuer.',
       'Please enter a valid email': 'Veuillez entrer un e-mail valide',
       'Please enter the 6-digit code': 'Veuillez entrer le code à 6 chiffres',
       'Premium': 'Premium',
@@ -1150,7 +1331,8 @@ class AppTranslations extends Translations {
       'Request permanent deletion.': 'Demander une suppression permanente.',
       'Reset password': 'Réinitialiser le mot de passe',
       'Responsible use': 'Utilisation responsable',
-      'Responsible use and account rules.': 'Utilisation responsable et règles du compte.',
+      'Responsible use and account rules.':
+          'Utilisation responsable et règles du compte.',
       'Rest Day': 'Jour de repos',
       'Rest day': 'Jour de repos',
       'Retry': 'Réessayer',
@@ -1161,7 +1343,8 @@ class AppTranslations extends Translations {
       'ROLLING': 'GLISSANT',
       'ROTATION CYCLE': 'CYCLE DE ROTATION',
       'Rotation length': 'Longueur de la rotation',
-      'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.': 'Longueur de la rotation = @weeks semaines ajoute automatiquement des cartes de semaine supplémentaires — chaque semaine conserve ses propres lignes du lundi au dimanche.',
+      'Rotation length = @weeks weeks adds extra week cards automatically — each week keeps its own Monday–Sunday rows.':
+          'Longueur de la rotation = @weeks semaines ajoute automatiquement des cartes de semaine supplémentaires — chaque semaine conserve ses propres lignes du lundi au dimanche.',
       'rotation!': 'rotation !',
       'Running': 'Course',
       'Safety': 'Sécurité',
@@ -1186,12 +1369,15 @@ class AppTranslations extends Translations {
       'Saving work shift...': 'Enregistrement du shift de travail...',
       'Saving...': 'Enregistrement...',
       'See all': 'Voir tout',
-      'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.': 'Sélectionnez un modèle prédéfini pour mettre à jour le planning de cette semaine, ou appuyez directement sur les bulles de chaque jour pour le personnaliser.',
+      'Select a preset pattern to update this week\'s schedule, or tap individual day bubbles directly on the screen to customize.':
+          'Sélectionnez un modèle prédéfini pour mettre à jour le planning de cette semaine, ou appuyez directement sur les bulles de chaque jour pour le personnaliser.',
       'Select Effort': 'Sélectionner l\'effort',
-      'Select shift rotation pattern': 'Sélectionner le modèle de rotation des shifts',
+      'Select shift rotation pattern':
+          'Sélectionner le modèle de rotation des shifts',
       'Select Type': 'Sélectionner le type',
       'Send reset link': 'Envoyer le lien de réinitialisation',
-      'Session expired. Please sign in again.': 'Session expirée. Veuillez vous reconnecter.',
+      'Session expired. Please sign in again.':
+          'Session expirée. Veuillez vous reconnecter.',
       'Settings': 'Paramètres',
       'Setup': 'Configuration',
       'SHIFT NAME': 'NOM DU SHIFT',
@@ -1205,7 +1391,8 @@ class AppTranslations extends Translations {
       'Signing in...': 'Connexion en cours...',
       'Sleep': 'Sommeil',
       'SLEEP DEBT': 'DETTE DE SOMMEIL',
-      'SLEEP DEBT - \\\${controller.selectedPeriod.value.toUpperCase()} ROLLING': 'DETTE DE SOMMEIL - ROULEMENT',
+      'SLEEP DEBT - \\\${controller.selectedPeriod.value.toUpperCase()} ROLLING':
+          'DETTE DE SOMMEIL - ROULEMENT',
       'SLEEP DURATION': 'DURÉE DU SOMMEIL',
       'SLEEP IMPACT': 'IMPACT SUR LE SOMMEIL',
       'Sleep log added!': 'Journal de sommeil ajouté !',
@@ -1226,7 +1413,8 @@ class AppTranslations extends Translations {
       'Start your rotation': 'Démarrer votre rotation',
       'Statistics': 'Statistiques',
       'Stats': 'Stats',
-      'Still a great time to rest.': 'Toujours un excellent moment pour se reposer.',
+      'Still a great time to rest.':
+          'Toujours un excellent moment pour se reposer.',
       'strength': 'force',
       'Strength': 'Force',
       'force': 'force',
@@ -1262,7 +1450,8 @@ class AppTranslations extends Translations {
       'Tue': 'Mar',
       'Tuesday': 'Mardi',
       'TYPE': 'TYPE',
-      'Unauthorized. Please sign in again.': 'Non autorisé. Veuillez vous reconnecter.',
+      'Unauthorized. Please sign in again.':
+          'Non autorisé. Veuillez vous reconnecter.',
       'UPCOMING SCHEDULE': 'CALENDRIER À VENIR',
       'Update password': 'Mettre à jour le mot de passe',
       'Update password failed': 'Échec de la mise à jour du mot de passe',
@@ -1279,10 +1468,13 @@ class AppTranslations extends Translations {
       'Updating workout...': 'Mise à jour de l\'entraînement...',
       'Updating...': 'Mise à jour...',
       'Use a template': 'Utiliser un modèle',
-      'Use a unique password with at least 8\\ncharacters.': 'Utilisez un mot de passe unique avec au moins 8\\ncaractères.',
-      'Use something unique so your rhythm history stays protected.': 'Utilisez un mot de passe unique pour protéger l\'historique de votre rythme.',
+      'Use a unique password with at least 8\\ncharacters.':
+          'Utilisez un mot de passe unique avec au moins 8\\ncaractères.',
+      'Use something unique so your rhythm history stays protected.':
+          'Utilisez un mot de passe unique pour protéger l\'historique de votre rythme.',
       'Use this template': 'Utiliser ce modèle',
-      'User identification not found. Please try verifying OTP again.': 'Identification de l\'utilisateur non trouvée. Veuillez réessayer de vérifier l\'OTP.',
+      'User identification not found. Please try verifying OTP again.':
+          'Identification de l\'utilisateur non trouvée. Veuillez réessayer de vérifier l\'OTP.',
       'User Name': 'Nom d\'utilisateur',
       'Verification failed': 'La vérification a échoué',
       'Verify': 'Vérifier',
@@ -1322,26 +1514,37 @@ class AppTranslations extends Translations {
       'Work rotation deleted': 'Rotation de travail supprimée',
       'Work schedule': 'Horaires de travail',
       'Work schedule saved!': 'Planning de travail enregistré !',
-      'Workout entry ID missing. Refreshing dashboard...': 'Identifiant de l\'entraînement manquant. Actualisation du tableau de bord...',
+      'Workout entry ID missing. Refreshing dashboard...':
+          'Identifiant de l\'entraînement manquant. Actualisation du tableau de bord...',
       'Workout Session Options': 'Options de séance d\'entraînement',
       'Write something about yourself': 'Écrivez quelque chose sur vous',
       'Yesterday': 'Hier',
       'You are already logged out.': 'Vous êtes déjà déconnecté.',
-      'You can edit hydration only for today.': 'Vous ne pouvez modifier l\'hydratation que pour aujourd\'hui.',
-      'You can log hydration only for today.': 'Vous ne pouvez enregistrer l\'hydratation que pour aujourd\'hui.',
-      'You must keep at least one shift': 'Vous devez conserver au moins un shift',
+      'You can edit hydration only for today.':
+          'Vous ne pouvez modifier l\'hydratation que pour aujourd\'hui.',
+      'You can log hydration only for today.':
+          'Vous ne pouvez enregistrer l\'hydratation que pour aujourd\'hui.',
+      'You must keep at least one shift':
+          'Vous devez conserver au moins un shift',
       'you@example.com': 'vous@exemple.com',
       'Your controls': 'Vos contrôles',
       'Your data controls': 'Vos contrôles de données',
       'Your inputs': 'Vos données',
-      'Your password has been changed successfully': 'Votre mot de passe a été modifié avec succès',
-      'Your rhythm, rebuilt around real life.': 'Votre rythme, réinventé pour la vraie vie.',
+      'Your password has been changed successfully':
+          'Votre mot de passe a été modifié avec succès',
+      'Your rhythm, rebuilt around real life.':
+          'Votre rythme, réinventé pour la vraie vie.',
       'nutrition.title.mealTiming': 'Timing des repas',
-      'nutrition.substantialMeal': 'Votre dernier repas remonte à longtemps. Prenez un repas copieux et équilibré pour rester sur la bonne voie.',
-      'nutrition.preSleepLightMeal': 'L\'heure du coucher approche. Privilégiez un repas léger et riche en protéines qui ne perturbera pas votre sommeil.',
-      'nutrition.postWorkoutRecovery': 'Bravo pour votre séance ! Priorisez un repas de récupération avec des protéines et des glucides complexes.',
-      'nutrition.lightSnack': 'Prenez une collation légère pour maintenir votre énergie jusqu\'au prochain repas.',
-      'IRREGULAR_SLEEP_WINDOW': 'La durée de sommeil enregistrée est anormalement longue (> 12 heures). Veuillez vérifier votre saisie.',
+      'nutrition.substantialMeal':
+          'Votre dernier repas remonte à longtemps. Prenez un repas copieux et équilibré pour rester sur la bonne voie.',
+      'nutrition.preSleepLightMeal':
+          'L\'heure du coucher approche. Privilégiez un repas léger et riche en protéines qui ne perturbera pas votre sommeil.',
+      'nutrition.postWorkoutRecovery':
+          'Bravo pour votre séance ! Priorisez un repas de récupération avec des protéines et des glucides complexes.',
+      'nutrition.lightSnack':
+          'Prenez une collation légère pour maintenir votre énergie jusqu\'au prochain repas.',
+      'IRREGULAR_SLEEP_WINDOW':
+          'La durée de sommeil enregistrée est anormalement longue (> 12 heures). Veuillez vérifier votre saisie.',
       'Unusually long sleep detected.': 'Sommeil anormalement long détecté.',
       'Enter another quantity': 'Saisir une autre quantité',
       'Modifier la quantité': 'Modifier la quantité',
@@ -1426,61 +1629,80 @@ class AppTranslations extends Translations {
       'Mixed': 'Mixte',
       'Autre': 'Autre',
       'Rotation Name': 'Nom de la rotation',
-      'Custom name for this rotation schedule (optional)': 'Nom personnalisé pour ce cycle (facultatif)',
+      'Custom name for this rotation schedule (optional)':
+          'Nom personnalisé pour ce cycle (facultatif)',
       'e.g. Syngenta, 3x8 Novartis': 'ex. Syngenta, 3x8 Novartis',
       'Batch Shift Override': 'Remplacement de quarts par lot',
       'Batch Overrides / Vacation': 'Remplacements par lot / Vacances',
-      'Set vacation, leave, or block shifts across multiple dates in a single action.': 'Définissez des vacances, congés ou quarts groupés sur plusieurs dates en une seule action.',
+      'Set vacation, leave, or block shifts across multiple dates in a single action.':
+          'Définissez des vacances, congés ou quarts groupés sur plusieurs dates en une seule action.',
       'DATE RANGE': 'PLAGE DE DATES',
       'SELECT SHIFT TO APPLY': 'SÉLECTIONNER LE QUART À APPLIQUER',
       'Off (Vacation/Leave)': 'Repos (Vacances/Congé)',
       'Apply to Range': 'Appliquer à la période',
       'Clear Overrides in Range': 'Effacer les remplacements de la période',
-      'Please select a date range first': 'Veuillez d\'abord sélectionner une plage de dates',
-      'Batch overrides applied successfully': 'Remplacements par lot appliqués avec succès',
-      'Failed to apply batch overrides': 'Échec de l\'application des remplacements par lot',
-      'Overrides cleared for the selected range': 'Remplacements effacés pour la période sélectionnée',
+      'Please select a date range first':
+          'Veuillez d\'abord sélectionner une plage de dates',
+      'Batch overrides applied successfully':
+          'Remplacements par lot appliqués avec succès',
+      'Failed to apply batch overrides':
+          'Échec de l\'application des remplacements par lot',
+      'Overrides cleared for the selected range':
+          'Remplacements effacés pour la période sélectionnée',
       'Failed to clear overrides': 'Échec de l\'effacement des remplacements',
       '@days days selected': '@days jours sélectionnés',
       'Default daily meal target': 'Objectif quotidien de repas par défaut',
-      'Your circadian day session will automatically initialize with this daily meal count preference (1–8 meals).': 'Votre session journalière circadienne s\'initialisera automatiquement avec cette préférence de repas (1 à 8 repas).',
+      'Your circadian day session will automatically initialize with this daily meal count preference (1–8 meals).':
+          'Votre session journalière circadienne s\'initialisera automatiquement avec cette préférence de repas (1 à 8 repas).',
       'Save as default': 'Enregistrer par défaut',
       'Default meal target saved': 'Objectif de repas par défaut enregistré',
       'Default meal target updated': 'Objectif de repas par défaut mis à jour',
-      'Failed to save default meal target': 'Échec de l\'enregistrement de l\'objectif de repas par défaut',
+      'Failed to save default meal target':
+          'Échec de l\'enregistrement de l\'objectif de repas par défaut',
       'Time format': 'Format de l\'heure',
-      'Choose how times and recommendations are displayed across the app.': 'Choisissez le mode d\'affichage des heures et recommandations dans l\'application.',
+      'Choose how times and recommendations are displayed across the app.':
+          'Choisissez le mode d\'affichage des heures et recommandations dans l\'application.',
       '12-Hour (AM/PM)': '12 heures (AM/PM)',
       '24-Hour': '24 heures',
       'Example: @example': 'Exemple : @example',
       'Time format updated': 'Format de l\'heure mis à jour',
-      'Failed to update time format': 'Échec de la mise à jour du format de l\'heure',
+      'Failed to update time format':
+          'Échec de la mise à jour du format de l\'heure',
       'Confirm Account Deletion': 'Confirmer la suppression du compte',
-      'A 6-digit verification code has been sent to your registered email address. Enter it below to permanently delete your account.': 'Un code de vérification à 6 chiffres a été envoyé à votre adresse e-mail. Saisissez-le ci-dessous pour supprimer définitivement votre compte.',
+      'A 6-digit verification code has been sent to your registered email address. Enter it below to permanently delete your account.':
+          'Un code de vérification à 6 chiffres a été envoyé à votre adresse e-mail. Saisissez-le ci-dessous pour supprimer définitivement votre compte.',
       'Confirm & Delete Permanently': 'Confirmer et supprimer définitivement',
       'Resend code': 'Renvoyer le code',
-      'A new verification code has been sent.': 'Un nouveau code de vérification a été envoyé.',
+      'A new verification code has been sent.':
+          'Un nouveau code de vérification a été envoyé.',
       'Requesting verification code...': 'Demande du code de vérification...',
       'Deleting account...': 'Suppression du compte en cours...',
       'Resending code...': 'Renvoi du code...',
-      'Please enter the 6-digit verification code': 'Veuillez saisir le code de vérification à 6 chiffres',
-      'Failed to request verification code. Please try again.': 'Échec de la demande du code de vérification. Veuillez réessayer.',
-      'Failed to resend code. Please try again.': 'Échec du renvoi du code. Veuillez réessayer.',
-      'Failed to delete account. Please try again.': 'Échec de la suppression du compte. Veuillez réessayer.',
+      'Please enter the 6-digit verification code':
+          'Veuillez saisir le code de vérification à 6 chiffres',
+      'Failed to request verification code. Please try again.':
+          'Échec de la demande du code de vérification. Veuillez réessayer.',
+      'Failed to resend code. Please try again.':
+          'Échec du renvoi du code. Veuillez réessayer.',
+      'Failed to delete account. Please try again.':
+          'Échec de la suppression du compte. Veuillez réessayer.',
       'Rotations & Templates': 'Rotations & modèles',
-      'Toggle which rotation is currently active': 'Basculez la rotation actuellement active',
+      'Toggle which rotation is currently active':
+          'Basculez la rotation actuellement active',
       'New': 'Nouveau',
       'No rotations available': 'Aucune rotation disponible',
       'wks': 'sem',
       'Delete template': 'Supprimer le modèle',
       'Delete Template': 'Supprimer le modèle',
-      'Are you sure you want to delete this custom template?': 'Êtes-vous sûr de vouloir supprimer ce modèle personnalisé ?',
+      'Are you sure you want to delete this custom template?':
+          'Êtes-vous sûr de vouloir supprimer ce modèle personnalisé ?',
       'Activating rotation...': 'Activation de la rotation...',
       'Rotation activated!': 'Rotation activée !',
       'Failed to activate rotation': 'Échec de l\'activation de la rotation',
       'Deleting template...': 'Suppression du modèle...',
       'Template deleted': 'Modèle supprimé',
-      'Set parameters below and tap Save Rotation': 'Définissez les paramètres ci-dessous et appuyez sur Enregistrer la rotation',
+      'Set parameters below and tap Save Rotation':
+          'Définissez les paramètres ci-dessous et appuyez sur Enregistrer la rotation',
       'CREATE CUSTOM ROTATION': 'CRÉER UN ROULEMENT PERSONNALISÉ',
       'Save to Templates': 'Enregistrer dans les modèles',
       'Please enter a rotation name': 'Veuillez saisir un nom de roulement',
@@ -1489,11 +1711,13 @@ class AppTranslations extends Translations {
       'Failed to save template': 'Échec de l\'enregistrement du modèle',
       'Disabling work rotation...': 'Désactivation du roulement...',
       'Work rotation disabled': 'Roulement de travail désactivé',
-      'Failed to disable work rotation': 'Échec de la désactivation du roulement',
+      'Failed to disable work rotation':
+          'Échec de la désactivation du roulement',
       'Weekly workout goal': 'Objectif sportif hebdomadaire',
       'Weekly Workout Goal': 'Objectif Sportif Hebdomadaire',
       'Workouts per week': 'Séances par semaine',
-      'Select your weekly workout target (1 to 7 workouts per week).': 'Sélectionnez votre objectif de séances hebdomadaires (1 à 7 séances par semaine).',
+      'Select your weekly workout target (1 to 7 workouts per week).':
+          'Sélectionnez votre objectif de séances hebdomadaires (1 à 7 séances par semaine).',
       'WEEKLY GOAL': 'OBJECTIF HEBDOMADAIRE',
       'Adaptive Rest': 'Repos Adaptatif',
       'Weekly Goal Met': 'Objectif Hebdomadaire Atteint',
@@ -1501,12 +1725,15 @@ class AppTranslations extends Translations {
       'goal met': 'objectif atteint',
       'on track': 'sur la bonne voie',
       'needs pace': 'rythme à accélérer',
-      'Take a rest day today — you\'ve reached your weekly workout goal and accumulated training fatigue.': 'Prenez un jour de repos aujourd\'hui — vous avez atteint votre objectif et accumulé de la fatigue.',
+      'Take a rest day today — you\'ve reached your weekly workout goal and accumulated training fatigue.':
+          'Prenez un jour de repos aujourd\'hui — vous avez atteint votre objectif et accumulé de la fatigue.',
       'BEDTIME DELAY': 'DÉLAI DE COUCHER',
       'caffeine delay': 'délai caféine',
-      'mg active at bedtime — your recommended sleep time has been delayed by': 'mg actifs au coucher — votre heure de coucher recommandée a été retardée de',
+      'mg active at bedtime — your recommended sleep time has been delayed by':
+          'mg actifs au coucher — votre heure de coucher recommandée a été retardée de',
       'minutes to allow clearance.': 'minutes pour permettre l\'élimination.',
-      'mg active at bedtime — elevated caffeine may impact your sleep latency and quality.': 'mg actifs au coucher — la caféine résiduelle peut altérer l\'endormissement et la qualité du sommeil.',
+      'mg active at bedtime — elevated caffeine may impact your sleep latency and quality.':
+          'mg actifs au coucher — la caféine résiduelle peut altérer l\'endormissement et la qualité du sommeil.',
       'Historique': 'Historique',
       'Ma journée': 'Ma journée',
       "Vue d'ensemble": "Vue d'ensemble",
@@ -1538,6 +1765,60 @@ class AppTranslations extends Translations {
       'Dormir': 'Dormir',
       'Travail': 'Travail',
       'Exercice': 'Exercice',
+      'Notifications': 'Notifications',
+      'Preferences': 'Préférences',
+      'Notification preferences': 'Préférences de notification',
+      'Customize the categories of circadian and lifestyle guidance you receive.':
+          'Personnalisez les catégories de rappels circadiens et de bien-être que vous recevez.',
+      'REMINDERS & ALERTS': 'RAPPELS & ALERTES',
+      'Bedtime & Wind-down alerts': 'Alertes de coucher et relaxation',
+      'Optimal bedtime & wind-down reminders':
+          'Rappels pour l\'heure de coucher optimale et la détente',
+      'Pre-shift alerts & light protocol':
+          'Alertes pré-shift et protocole lumineux',
+      'Caffeine cut-off alerts': 'Alertes cut-off caféine',
+      'Clearance alerts before sleep windows':
+          'Rappels d\'arrêt de la caféine avant le sommeil',
+      'Hydration reminders': 'Rappels d\'hydratation',
+      'Pacing sips throughout your shift':
+          'Rappels réguliers pendant votre quart de travail',
+      'Circadian transitions': 'Transitions circadiennes',
+      'Multi-day shift rotation adaptations':
+          'Adaptations aux rotations de shifts multi-jours',
+      'Weekly sport report': 'Bilan sportif hebdomadaire',
+      'Workout pace & adaptive rest summary':
+          'Rythme d\'entraînement et repos adaptatif',
+      'Mark all as read': 'Tout marquer comme lu',
+      'All notifications marked as read':
+          'Toutes les notifications sont marquées comme lues',
+      'Unread': 'Non lues',
+      'No notifications': 'Aucune notification',
+      'You are all caught up! Circadian and lifestyle reminders will appear here.':
+          'Vous êtes à jour ! Vos rappels circadiens apparaîtront ici.',
+      'How many workouts do you aim to complete each week?':
+          'Combien de séances souhaitez-vous accomplir par semaine ?',
+      'Goal updated!': 'Objectif mis à jour !',
+      'Nap logged!': 'Sieste enregistrée !',
+      'Nap updated!': 'Sieste mise à jour !',
+      'Nap deleted!': 'Sieste supprimée !',
+      'Logging nap...': 'Enregistrement de la sieste...',
+      'Updating nap...': 'Mise à jour de la sieste...',
+      'Deleting nap...': 'Suppression de la sieste...',
+      'Today\'s Naps': 'Siestes du jour',
+      'Log a nap': 'Enregistrer une sieste',
+      'timeline_touche_event_detail':
+          'Touchez un événement pour afficher ses détails.',
+      'Edit nap': 'Modifier la sieste',
+      'POWER NAP': 'POWER NAP (FLASH)',
+      'STANDARD NAP': 'SIESTE STANDARD',
+      'ANCHOR NAP': 'SIESTE ANCRE',
+      'Quality': 'Qualité',
+      'Refreshing': 'Rafraîchissante',
+      'Groggy': 'Lourde / Vaseux',
+      'Neutral': 'Neutre',
+      'timeline_activity_record':
+          'Aucune activité enregistrée pour cette journée.',
+      'no_recomendation_today': 'Aucune recommandation pour cette journée.',
     },
   };
 }

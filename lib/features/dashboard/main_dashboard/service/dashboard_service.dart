@@ -91,6 +91,7 @@ class DashboardService {
     List<Map<String, dynamic>>? newCaffeineLogs,
     List<Map<String, dynamic>>? newMealLogs,
     List<Map<String, dynamic>>? newSportSessions,
+    List<Map<String, dynamic>>? newNaps,
     int? dailyMealTarget,
     String? fatigueLevel,
   }) async {
@@ -102,6 +103,7 @@ class DashboardService {
     if (newCaffeineLogs != null) body['newCaffeineLogs'] = newCaffeineLogs;
     if (newMealLogs != null) body['newMealLogs'] = newMealLogs;
     if (newSportSessions != null) body['newSportSessions'] = newSportSessions;
+    if (newNaps != null) body['newNaps'] = newNaps;
     if (dailyMealTarget != null) body['dailyMealTarget'] = dailyMealTarget;
     if (fatigueLevel != null) body['fatigueLevel'] = fatigueLevel;
 

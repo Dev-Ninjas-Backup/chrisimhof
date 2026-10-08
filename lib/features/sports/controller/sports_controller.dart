@@ -9,6 +9,8 @@ import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_setup_service.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:get/get.dart';
 
 class SportSession {
@@ -806,6 +808,21 @@ class SportsController extends GetxController {
       saveSportsData(syncWithServer: false);
     } catch (e) {
       debugPrint('SportsController: Error updating from sport card: $e');
+    }
+  }
+
+  Future<void> updateWeeklyGoal(int goal) async {
+    try {
+      EasyLoading.show(status: 'Updating goal...'.tr);
+      await BaselineSetupService().updateBaseline(weeklySportGoal: goal);
+      weeklyGoal.value = goal;
+      if (Get.isRegistered<SettingsController>()) {
+        Get.find<SettingsController>().weeklySportGoal.value = goal;
+      }
+      EasyLoading.showSuccess('Goal updated!'.tr);
+    } catch (e) {
+      debugPrint('SportsController: Error updating weekly goal: $e');
+      EasyLoading.showError('Failed to update goal'.tr);
     }
   }
 }

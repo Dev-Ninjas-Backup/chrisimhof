@@ -18,9 +18,7 @@ class TopScoresCardsGrid extends StatelessWidget {
       final global = controller.globalScore.value;
       final circadian = controller.circadianScore.value;
       final globalDiff = controller.globalRhythmDiff.value;
-      final circadianDiff = controller.circadianChange.value.isNotEmpty
-          ? controller.circadianChange.value
-          : '+12 pts';
+      final circadianDiff = controller.circadianChange.value;
 
       final periodSubtext = controller.selectedPeriod.value == '30d'
           ? 'vs 30 jours précédents'.tr
@@ -37,7 +35,7 @@ class TopScoresCardsGrid extends StatelessWidget {
               title: 'Rythme global'.tr,
               icon: Icons.trending_up_rounded,
               scoreText: '$global %',
-              diffText: '+${globalDiff.abs()} pts',
+              diffText: globalDiff != 0 ? '${globalDiff > 0 ? '+' : ''}$globalDiff pts' : '',
               isPositive: globalDiff >= 0,
               subtext: periodSubtext,
             ),
@@ -48,9 +46,7 @@ class TopScoresCardsGrid extends StatelessWidget {
               title: 'Stabilité circadienne'.tr,
               icon: Icons.wb_sunny_outlined,
               scoreText: '$circadian %',
-              diffText: circadianDiff.startsWith('+') || circadianDiff.startsWith('-')
-                  ? circadianDiff
-                  : '+$circadianDiff',
+              diffText: circadianDiff.isNotEmpty ? circadianDiff : '',
               isPositive: !circadianDiff.startsWith('-'),
               subtext: periodSubtext,
             ),
@@ -113,55 +109,66 @@ class TopScoresCardsGrid extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: isPositive
-                  ? const Color(0xFFECFDF5)
-                  : const Color(0xFFFEF2F2),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
+          if (diffText.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
                 color: isPositive
-                    ? const Color(0xFFA7F3D0)
-                    : const Color(0xFFFECDD3),
-                width: 0.8,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isPositive
-                      ? Icons.north_east_rounded
-                      : Icons.south_east_rounded,
-                  size: 12,
+                    ? const Color(0xFFECFDF5)
+                    : const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
                   color: isPositive
-                      ? const Color(0xFF059669)
-                      : const Color(0xFFE11D48),
+                      ? const Color(0xFFA7F3D0)
+                      : const Color(0xFFFECDD3),
+                  width: 0.8,
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  diffText,
-                  style: getTextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isPositive
+                        ? Icons.north_east_rounded
+                        : Icons.south_east_rounded,
+                    size: 12,
                     color: isPositive
                         ? const Color(0xFF059669)
                         : const Color(0xFFE11D48),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    diffText,
+                    style: getTextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: isPositive
+                          ? const Color(0xFF059669)
+                          : const Color(0xFFE11D48),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtext,
-            style: getTextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xFF64748B),
+            const SizedBox(height: 6),
+            Text(
+              subtext,
+              style: getTextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF64748B),
+              ),
             ),
-          ),
+          ] else ...[
+            Text(
+              'No prior data'.tr,
+              style: getTextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF94A3B8),
+              ),
+            ),
+          ],
         ],
       ),
     );

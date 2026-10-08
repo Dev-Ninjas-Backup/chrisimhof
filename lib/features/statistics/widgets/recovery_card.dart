@@ -49,17 +49,19 @@ class RecoveryCard extends StatelessWidget {
                     color: AppColors.primaryTextColor,
                   ),
                 ),
-                const SizedBox(width: 6.0),
-                Text(
-                  '${showPositive ? '+' : ''}${controller.recoveryChange.value}',
-                  style: getTextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: showPositive
-                        ? AppColors.primaryButtonColor
-                        : AppColors.rose,
+                if (controller.recoveryChange.value != 0) ...[
+                  const SizedBox(width: 6.0),
+                  Text(
+                    '${showPositive ? '+' : ''}${controller.recoveryChange.value}',
+                    style: getTextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: showPositive
+                          ? AppColors.primaryButtonColor
+                          : AppColors.rose,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
             const SizedBox(height: 30.0),

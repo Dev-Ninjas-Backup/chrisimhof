@@ -20,6 +20,7 @@ import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.d
 import 'package:chrisimhof/features/settings/main/widgets/default_meal_target_bottom_sheet.dart';
 import 'package:chrisimhof/features/settings/main/widgets/time_format_bottom_sheet.dart';
 import 'package:chrisimhof/features/settings/main/widgets/weekly_sport_goal_bottom_sheet.dart';
+import 'package:chrisimhof/features/notifications/widgets/notification_preferences_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -104,6 +105,17 @@ class SettingsScreen extends StatelessWidget {
                             onTap: () {
                               Get.bottomSheet(
                                 TimeFormatBottomSheet(controller: controller),
+                                isScrollControlled: true,
+                              );
+                            },
+                          ),
+                          SettingsRowData(
+                            iconpath: IconPath.reminder,
+                            label: 'Notifications',
+                            trailing: 'Preferences'.tr,
+                            onTap: () {
+                              Get.bottomSheet(
+                                const NotificationPreferencesBottomSheet(),
                                 isScrollControlled: true,
                               );
                             },

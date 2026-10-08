@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// Fatigue Prediction Bar Chart
 class FatigueWeekChart extends StatelessWidget {
@@ -12,6 +13,21 @@ class FatigueWeekChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     const double maxBarHeight = 65.0;
+
+    if (weeklyData.isEmpty) {
+      return Container(
+        height: maxBarHeight,
+        alignment: Alignment.center,
+        child: Text(
+          'No prediction data'.tr,
+          style: getTextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSoft,
+          ),
+        ),
+      );
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

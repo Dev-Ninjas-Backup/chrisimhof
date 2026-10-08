@@ -55,7 +55,9 @@ class FatiguePredictionCard extends StatelessWidget {
                 children: [
                   TextSpan(text: '${'Energy dip expected'.tr} '),
                   TextSpan(
-                    text: controller.fatigueExpectedTime.value,
+                    text: controller.fatigueExpectedTime.value.isNotEmpty
+                        ? controller.fatigueExpectedTime.value
+                        : '—',
                     style: const TextStyle(color: AppColors.rose),
                   ),
                 ],

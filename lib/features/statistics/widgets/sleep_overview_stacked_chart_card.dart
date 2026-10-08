@@ -17,7 +17,7 @@ class SleepOverviewStackedChartCard extends StatelessWidget {
     return Obx(() {
       final avgDisplay = controller.sleepDurationValue.value.isNotEmpty
           ? controller.sleepDurationValue.value
-          : '7 h 30';
+          : '0h';
       final napsCount = controller.totalNapsInPeriod.value;
       final _ = controller.selectedPeriod.value;
       final bars = controller.sleepBarsList.toList();
@@ -214,7 +214,28 @@ class _SleepStackedBarPainter extends CustomPainter {
       );
     }
 
-    if (bars.isEmpty) return;
+    if (bars.isEmpty) {
+      final noDataSpan = TextSpan(
+        text: 'Aucune donnée'.tr,
+        style: getTextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF94A3B8),
+        ),
+      );
+      final noDataPainter = TextPainter(
+        text: noDataSpan,
+        textDirection: TextDirection.ltr,
+      )..layout();
+      noDataPainter.paint(
+        canvas,
+        Offset(
+          leftMargin + (chartWidth - noDataPainter.width) / 2,
+          topMargin + (chartHeight - noDataPainter.height) / 2,
+        ),
+      );
+      return;
+    }
 
     final n = bars.length;
     const barWidth = 14.0;
