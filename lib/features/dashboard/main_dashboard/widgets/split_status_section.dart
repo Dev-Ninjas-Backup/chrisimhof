@@ -20,6 +20,7 @@ class SplitStatusSection extends StatelessWidget {
             child: _buildStatusCard(
               headerIcon: Icons.work_outline,
               headerLabel: 'WORK'.tr,
+              badgeText: data.workRotationName.isNotEmpty ? data.workRotationName : null,
               titleText: data.workShift,
               subtitleText: data.workShiftCountdown,
               onTap: () => Get.toNamed(AppRoutes.workScheduleScreen),
@@ -81,6 +82,7 @@ class SplitStatusSection extends StatelessWidget {
   Widget _buildStatusCard({
     required IconData headerIcon,
     required String headerLabel,
+    String? badgeText,
     required String titleText,
     required String subtitleText,
     required VoidCallback onTap,
@@ -110,6 +112,28 @@ class SplitStatusSection extends StatelessWidget {
                     color: AppColors.textSoft,
                   ),
                 ),
+                if (badgeText != null && badgeText.isNotEmpty) ...[
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondaryButtonColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        badgeText,
+                        style: getTextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.secondaryButtonColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
                 const Spacer(),
                 Icon(
                   Icons.chevron_right,

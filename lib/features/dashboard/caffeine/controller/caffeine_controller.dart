@@ -237,6 +237,7 @@ class CaffeineController extends GetxController {
               'timestamp': formattedTime,
               'caffeineMg': amountMg,
               'drinkType': drinkType,
+              'drinkLabel': title,
               'occurredAt': isoString,
             },
           ],
@@ -336,6 +337,7 @@ class CaffeineController extends GetxController {
         'occurredAt': isoString,
         'caffeineMg': amountMg,
         'drinkType': drinkType,
+        'drinkLabel': title,
       });
 
       debugPrint('=== EDIT CAFFEINE REQUEST ===');

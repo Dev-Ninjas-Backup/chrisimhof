@@ -110,15 +110,31 @@ class Urls {
   static String deleteNap(String sessionId, String entryId) =>
       '$baseUrl/api/v1/calculator/sessions/$sessionId/naps/$entryId';
 
+  // Sleep deletion
+  static String deleteSleepSessionEntry(String sessionId, String entryId) =>
+      '$baseUrl/api/v1/calculator/sessions/$sessionId/sleep/$entryId';
+  static String deleteHistoricalSleep(String entryId) =>
+      '$baseUrl/api/v1/history/sleep/$entryId';
+
   // History & Timeline
-  static String dailyTimeline(String date, [String? timezone]) =>
-      '$baseUrl/api/v1/history/timeline?date=$date${timezone != null ? '&timezone=$timezone' : ''}';
+  static String dailyTimeline(String date, [String? timezone]) {
+    final tzParam = (timezone != null && timezone.trim().isNotEmpty)
+        ? '&timezone=${Uri.encodeQueryComponent(timezone.trim())}'
+        : '';
+    return '$baseUrl/api/v1/history/timeline?date=$date$tzParam';
+  }
   static String analyticsWithRange(String days, [String? endDate]) =>
       '$baseUrl/api/v1/analytics?period=$days${endDate != null ? '&endDate=$endDate' : ''}';
 
   // Notifications
-  static String notifications({int page = 1, int limit = 20, bool unreadOnly = false}) =>
-      '$baseUrl/api/v1/notifications?page=$page&limit=$limit&unreadOnly=$unreadOnly';
+  static String notifications({int? page, int? limit, bool? unreadOnly}) {
+    final params = <String>[];
+    if (page != null) params.add('page=$page');
+    if (limit != null) params.add('limit=$limit');
+    if (unreadOnly != null) params.add('unreadOnly=$unreadOnly');
+    final query = params.isNotEmpty ? '?${params.join('&')}' : '';
+    return '$baseUrl/api/v1/notifications$query';
+  }
   static const String unreadNotificationCount =
       '$baseUrl/api/v1/notifications/unread-count';
   static String markNotificationRead(String id) =>

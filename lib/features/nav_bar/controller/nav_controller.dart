@@ -36,6 +36,9 @@ class NavController extends GetxController {
         break;
       case 2:
         try {
+          if (Get.isRegistered<StatisticsController>()) {
+            Get.find<StatisticsController>().selectedTab.value = 0;
+          }
           Get.delete<StatisticsController>(force: true);
         } catch (_) {}
         break;

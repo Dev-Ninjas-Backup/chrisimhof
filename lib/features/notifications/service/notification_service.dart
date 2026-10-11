@@ -13,16 +13,19 @@ class NotificationService {
     bool unreadOnly = false,
   }) async {
     final token = await SharedPreferencesHelper.getAccessToken() ?? '';
-    final url = Urls.notifications(page: page, limit: limit, unreadOnly: unreadOnly);
+    final url = Urls.notifications(
+      page: page,
+      limit: limit,
+      unreadOnly: unreadOnly,
+    );
 
     final response = await http.get(
       Uri.parse(url),
-      headers: {
-        'accept': '*/*',
-        'Authorization': 'Bearer $token',
-      },
+      headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
     );
-
+    debugPrint("URL : $url");
+    debugPrint("status Code : ${response.statusCode}");
+    debugPrint("Response : ${response.body}");
     if (response.statusCode == 200 || response.statusCode == 201) {
       final json = jsonDecode(response.body);
       final data = json['data'] as Map<String, dynamic>? ?? {};
@@ -33,9 +36,19 @@ class NotificationService {
         'notifications': list,
         'unreadCount': data['unreadCount'] ?? 0,
         'total': data['total'] ?? 0,
+        'page': data['page'] ?? page,
+        'limit': data['limit'] ?? limit,
+        'hasMore': data['hasMore'] ?? false,
       };
     }
-    return {'notifications': <AppNotificationItem>[], 'unreadCount': 0, 'total': 0};
+    return {
+      'notifications': <AppNotificationItem>[],
+      'unreadCount': 0,
+      'total': 0,
+      'page': page,
+      'limit': limit,
+      'hasMore': false,
+    };
   }
 
   Future<int> getUnreadCount() async {
@@ -45,10 +58,7 @@ class NotificationService {
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
@@ -68,10 +78,7 @@ class NotificationService {
 
       final response = await http.patch(
         Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
       return response.statusCode == 200;
     } catch (e) {
@@ -87,10 +94,7 @@ class NotificationService {
 
       final response = await http.patch(
         Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
       return response.statusCode == 200;
     } catch (e) {
@@ -106,10 +110,7 @@ class NotificationService {
 
       final response = await http.delete(
         Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
@@ -125,10 +126,7 @@ class NotificationService {
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'accept': '*/*', 'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {

@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -152,6 +153,21 @@ class NapsOverviewCard extends StatelessWidget {
                   final notes = nap['notes'] as String?;
                   final napId = nap['id'] as String? ?? '';
 
+                  String displayRange = timeStr;
+                  if (nap['occurredAt'] != null) {
+                    try {
+                      final start = TimezoneHelper.parseSessionUtcToLocal(
+                        nap['occurredAt'].toString(),
+                      );
+                      final end = start.add(Duration(minutes: duration));
+                      final sStr =
+                          '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
+                      final eStr =
+                          '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
+                      displayRange = '$sStr – $eStr';
+                    } catch (_) {}
+                  }
+
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -197,7 +213,7 @@ class NapsOverviewCard extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      timeStr,
+                                      displayRange,
                                       style: getTextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w600,
@@ -250,7 +266,12 @@ class NapsOverviewCard extends StatelessWidget {
     int selectedDuration = 30;
     String selectedQuality = 'refreshing';
     final notesController = TextEditingController();
-    DateTime napTime = DateTime.now();
+    final DateTime now = DateTime.now();
+    DateTime napDate = now;
+    TimeOfDay startTime = TimeOfDay(hour: now.hour, minute: now.minute);
+    TimeOfDay endTime = TimeOfDay.fromDateTime(now.add(const Duration(minutes: 30)));
+
+    final isFrench = (Get.locale?.languageCode ?? 'fr') == 'fr';
 
     showModalBottomSheet(
       context: context,
@@ -264,170 +285,347 @@ class NapsOverviewCard extends StatelessWidget {
                 left: 20,
                 right: 20,
                 top: 24,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
               ),
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFCBD5E1),
-                        borderRadius: BorderRadius.circular(2),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCBD5E1),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'Log a Nap'.tr,
-                    style: getTextStyle2(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryTextColor,
+                    const SizedBox(height: 18),
+                    Text(
+                      'Log a Nap'.tr,
+                      style: getTextStyle2(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryTextColor,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Select a recommended preset or set custom duration.'.tr,
-                    style: getTextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textSoft,
+                    const SizedBox(height: 6),
+                    Text(
+                      'Select start/end times or a recommended preset duration.'.tr,
+                      style: getTextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textSoft,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
+                    const SizedBox(height: 18),
 
-                  // Duration Presets
-                  Text(
-                    'DURATION'.tr,
-                    style: getTextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF64748B),
+                    // Start & End Time Pickers
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime: startTime,
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  startTime = picked;
+                                  final sDt = DateTime(
+                                    napDate.year,
+                                    napDate.month,
+                                    napDate.day,
+                                    startTime.hour,
+                                    startTime.minute,
+                                  );
+                                  final eDt = sDt.add(Duration(minutes: selectedDuration));
+                                  endTime = TimeOfDay(hour: eDt.hour, minute: eDt.minute);
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isFrench ? 'DÉBUT' : 'START TIME',
+                                    style: getTextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
+                                        style: getTextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryTextColor,
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.access_time_rounded,
+                                        size: 16,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime: endTime,
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  endTime = picked;
+                                  int sMin = startTime.hour * 60 + startTime.minute;
+                                  int eMin = endTime.hour * 60 + endTime.minute;
+                                  int diff = eMin - sMin;
+                                  if (diff <= 0) diff += 1440;
+                                  selectedDuration = diff;
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isFrench ? 'FIN' : 'END TIME',
+                                    style: getTextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}',
+                                        style: getTextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primaryTextColor,
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.access_time_rounded,
+                                        size: 16,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [20, 30, 45, 90].map((dur) {
-                      final isSelected = selectedDuration == dur;
-                      String label = '$dur min';
-                      if (dur == 20) label = '20m (Power)';
-                      if (dur == 90) label = '90m (Anchor)';
-                      return ChoiceChip(
-                        label: Text(
-                          label,
+                    const SizedBox(height: 16),
+
+                    // Duration Presets
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'DURATION'.tr,
+                          style: getTextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF64748B),
+                          ),
+                        ),
+                        Text(
+                          '$selectedDuration min',
                           style: getTextStyle(
                             fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected ? AppColors.white : AppColors.primaryTextColor,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.addButtonColor,
                           ),
                         ),
-                        selected: isSelected,
-                        selectedColor: AppColors.addButtonColor,
-                        backgroundColor: const Color(0xFFF1F5F9),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: isSelected ? AppColors.addButtonColor : Colors.transparent,
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [20, 30, 45, 90].map((dur) {
+                        final isSelected = selectedDuration == dur;
+                        String label = '$dur min';
+                        if (dur == 20) label = '20m (Power)';
+                        if (dur == 90) label = '90m (Anchor)';
+                        return ChoiceChip(
+                          label: Text(
+                            label,
+                            style: getTextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected ? AppColors.white : AppColors.primaryTextColor,
+                            ),
                           ),
-                        ),
-                        onSelected: (val) {
-                          if (val) setState(() => selectedDuration = dur);
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Quality selector
-                  Text(
-                    'NAP QUALITY'.tr,
-                    style: getTextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF64748B),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _buildQualityChip('refreshing', 'Refreshing'.tr, selectedQuality, (q) {
-                        setState(() => selectedQuality = q);
-                      }),
-                      const SizedBox(width: 8),
-                      _buildQualityChip('normal', 'Normal'.tr, selectedQuality, (q) {
-                        setState(() => selectedQuality = q);
-                      }),
-                      const SizedBox(width: 8),
-                      _buildQualityChip('grogginess', 'Grogginess'.tr, selectedQuality, (q) {
-                        setState(() => selectedQuality = q);
-                      }),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Notes input
-                  TextField(
-                    controller: notesController,
-                    decoration: InputDecoration(
-                      hintText: 'Notes (e.g. pre-night shift anchor nap)'.tr,
-                      hintStyle: getTextStyle(fontSize: 13, color: AppColors.textSoft),
-                      filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-
-                  // Save Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        controller.logNap(
-                          occurredAt: napTime,
-                          durationMinutes: selectedDuration,
-                          quality: selectedQuality,
-                          notes: notesController.text.trim(),
+                          selected: isSelected,
+                          selectedColor: AppColors.addButtonColor,
+                          backgroundColor: const Color(0xFFF1F5F9),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: isSelected ? AppColors.addButtonColor : Colors.transparent,
+                            ),
+                          ),
+                          onSelected: (val) {
+                            if (val) {
+                              setState(() {
+                                selectedDuration = dur;
+                                final sDt = DateTime(
+                                  napDate.year,
+                                  napDate.month,
+                                  napDate.day,
+                                  startTime.hour,
+                                  startTime.minute,
+                                );
+                                final eDt = sDt.add(Duration(minutes: selectedDuration));
+                                endTime = TimeOfDay(hour: eDt.hour, minute: eDt.minute);
+                              });
+                            }
+                          },
                         );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.addButtonColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Quality selector
+                    Text(
+                      'NAP QUALITY'.tr,
+                      style: getTextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF64748B),
                       ),
-                      child: Text(
-                        'Save Nap'.tr,
-                        style: getTextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.white,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _buildQualityChip(
+                          'refreshing',
+                          isFrench ? 'Reposé(e)' : 'Refreshing',
+                          selectedQuality,
+                          (q) => setState(() => selectedQuality = q),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildQualityChip(
+                          'normal',
+                          isFrench ? 'Comme avant' : 'Normal',
+                          selectedQuality,
+                          (q) => setState(() => selectedQuality = q),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildQualityChip(
+                          'grogginess',
+                          isFrench ? 'Encore somnolent(e)' : 'Still groggy',
+                          selectedQuality,
+                          (q) => setState(() => selectedQuality = q),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Notes input
+                    TextField(
+                      controller: notesController,
+                      decoration: InputDecoration(
+                        hintText: 'Notes (e.g. pre-night shift anchor nap)'.tr,
+                        hintStyle: getTextStyle(fontSize: 13, color: AppColors.textSoft),
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 20),
+
+                    // Save Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          final logDateTime = DateTime(
+                            napDate.year,
+                            napDate.month,
+                            napDate.day,
+                            startTime.hour,
+                            startTime.minute,
+                          );
+                          controller.logNap(
+                            occurredAt: logDateTime,
+                            durationMinutes: selectedDuration,
+                            quality: selectedQuality,
+                            notes: notesController.text.trim(),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.addButtonColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Save Nap'.tr,
+                          style: getTextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -480,6 +678,7 @@ class NapsOverviewCard extends StatelessWidget {
     int duration = currentDuration;
     String quality = currentQuality;
     final notesController = TextEditingController(text: currentNotes ?? '');
+    final isFrench = (Get.locale?.languageCode ?? 'fr') == 'fr';
 
     showModalBottomSheet(
       context: context,
@@ -493,81 +692,138 @@ class NapsOverviewCard extends StatelessWidget {
                 left: 20,
                 right: 20,
                 top: 24,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
               ),
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Edit Nap'.tr,
-                    style: getTextStyle2(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    children: [20, 30, 45, 60, 90].map((dur) {
-                      final isSelected = duration == dur;
-                      return ChoiceChip(
-                        label: Text('$dur min'),
-                        selected: isSelected,
-                        selectedColor: AppColors.addButtonColor,
-                        labelStyle: TextStyle(
-                          color: isSelected ? AppColors.white : AppColors.primaryTextColor,
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCBD5E1),
+                          borderRadius: BorderRadius.circular(2),
                         ),
-                        onSelected: (val) {
-                          if (val) setState(() => duration = dur);
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: notesController,
-                    decoration: InputDecoration(
-                      hintText: 'Notes'.tr,
-                      filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        controller.updateNapEntry(
-                          entryId: entryId,
-                          durationMinutes: duration,
-                          quality: quality,
-                          notes: notesController.text.trim(),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Edit Nap'.tr,
+                      style: getTextStyle2(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'DURATION'.tr,
+                      style: getTextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: [20, 30, 45, 60, 90].map((dur) {
+                        final isSelected = duration == dur;
+                        return ChoiceChip(
+                          label: Text('$dur min'),
+                          selected: isSelected,
+                          selectedColor: AppColors.addButtonColor,
+                          labelStyle: TextStyle(
+                            color: isSelected ? AppColors.white : AppColors.primaryTextColor,
+                          ),
+                          onSelected: (val) {
+                            if (val) setState(() => duration = dur);
+                          },
                         );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.addButtonColor,
-                        shape: RoundedRectangleBorder(
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'NAP QUALITY'.tr,
+                      style: getTextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _buildQualityChip(
+                          'refreshing',
+                          isFrench ? 'Reposé(e)' : 'Refreshing',
+                          quality,
+                          (q) => setState(() => quality = q),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildQualityChip(
+                          'normal',
+                          isFrench ? 'Comme avant' : 'Normal',
+                          quality,
+                          (q) => setState(() => quality = q),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildQualityChip(
+                          'grogginess',
+                          isFrench ? 'Encore somnolent(e)' : 'Still groggy',
+                          quality,
+                          (q) => setState(() => quality = q),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: notesController,
+                      decoration: InputDecoration(
+                        hintText: 'Notes'.tr,
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: Text(
-                        'Update Nap'.tr,
-                        style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          controller.updateNapEntry(
+                            entryId: entryId,
+                            durationMinutes: duration,
+                            quality: quality,
+                            notes: notesController.text.trim(),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.addButtonColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'Update Nap'.tr,
+                          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },

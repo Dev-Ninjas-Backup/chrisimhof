@@ -4,6 +4,13 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
+      'Delete sleep record?': 'Delete sleep record?',
+      'Are you sure you want to delete this sleep entry? Other daily logs (meals, caffeine, workouts) will be kept.':
+          'Are you sure you want to delete this sleep entry? Other daily logs (meals, caffeine, workouts) will be kept.',
+      'Deleting sleep record...': 'Deleting sleep record...',
+      'Sleep entry deleted!': 'Sleep entry deleted!',
+      'Clear today\'s sleep': 'Clear today\'s sleep',
+      'Edit custom rotation': 'Edit custom rotation',
       ' — protect tonight\'s sleep window.':
           ' — protect tonight\'s sleep window.',
       ' — Heavy meals after 02:00 reduce deep sleep by ~15%.':
@@ -716,9 +723,17 @@ class AppTranslations extends Translations {
       'Mixed': 'Mixed',
       'Autre': 'Other',
       'Rotation Name': 'Rotation Name',
-      'Custom name for this rotation schedule (optional)':
-          'Custom name for this rotation schedule (optional)',
-      'e.g. Syngenta, 3x8 Novartis': 'e.g. Syngenta, 3x8 Novartis',
+      'e.g. Syngenta, 3x8 Novartis': 'e.g. My rotation',
+      'e.g. My rotation': 'e.g. My rotation',
+      'Create a custom rotation': 'Create a custom rotation',
+      'Set your personal shift rotation schedule':
+          'Set your personal shift rotation schedule',
+      'Meals': 'Meals',
+      '1 action for today': '1 action for today',
+      'actions for today': 'actions for today',
+      '9 actions for today': '9 actions for today',
+      'No naps logged today': 'No naps logged today',
+      'Log nap': 'Log nap',
       'Batch Shift Override': 'Batch Shift Override',
       'Batch Overrides / Vacation': 'Batch Overrides / Vacation',
       'Set vacation, leave, or block shifts across multiple dates in a single action.':
@@ -894,6 +909,13 @@ class AppTranslations extends Translations {
       'Neutral': 'Neutral',
     },
     'fr_FR': {
+      'Delete sleep record?': 'Supprimer cet enregistrement de sommeil ?',
+      'Are you sure you want to delete this sleep entry? Other daily logs (meals, caffeine, workouts) will be kept.':
+          'Voulez-vous vraiment supprimer cet enregistrement de sommeil ? Les autres entrées du jour (repas, caféine, sport) seront conservées.',
+      'Deleting sleep record...': 'Suppression de l\'enregistrement de sommeil...',
+      'Sleep entry deleted!': 'Enregistrement de sommeil supprimé !',
+      'Clear today\'s sleep': 'Effacer le sommeil du jour',
+      'Edit custom rotation': 'Modifier le tournus personnalisé',
       ' — protect tonight\'s sleep window.':
           ' — protégez votre fenêtre de sommeil de ce soir.',
       ' — Heavy meals after 02:00 reduce deep sleep by ~15%.':
@@ -1629,9 +1651,17 @@ class AppTranslations extends Translations {
       'Mixed': 'Mixte',
       'Autre': 'Autre',
       'Rotation Name': 'Nom de la rotation',
-      'Custom name for this rotation schedule (optional)':
-          'Nom personnalisé pour ce cycle (facultatif)',
-      'e.g. Syngenta, 3x8 Novartis': 'ex. Syngenta, 3x8 Novartis',
+      'e.g. Syngenta, 3x8 Novartis': 'Ex. : Mon tournus',
+      'e.g. My rotation': 'Ex. : Mon tournus',
+      'Create a custom rotation': 'Créer un tournus personnalisé',
+      'Set your personal shift rotation schedule':
+          'Définissez votre roulement de travail personnalisé',
+      'Meals': 'Repas',
+      '1 action for today': '1 action pour aujourd’hui',
+      'actions for today': 'actions pour aujourd’hui',
+      '9 actions for today': '9 actions pour aujourd’hui',
+      'No naps logged today': 'Aucune sieste enregistrée aujourd’hui',
+      'Log nap': 'Ajouter une sieste',
       'Batch Shift Override': 'Remplacement de quarts par lot',
       'Batch Overrides / Vacation': 'Remplacements par lot / Vacances',
       'Set vacation, leave, or block shifts across multiple dates in a single action.':

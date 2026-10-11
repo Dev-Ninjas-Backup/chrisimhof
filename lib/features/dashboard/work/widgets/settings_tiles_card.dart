@@ -2,6 +2,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/work_settings_row.dart';
+import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,11 +34,7 @@ class SettingsTilesCard extends StatelessWidget {
             iconBg: AppColors.subtle,
             label: 'Default rotation'.tr,
             value: controller.defaultRotation,
-            onTap: () => _showOptionsDialog(
-              title: 'Default rotation'.tr,
-              options: ['3-2-2 night', '2-2-3 schedule', '4-4 split', 'None (Fixed)'],
-              selectedVal: controller.defaultRotation,
-            ),
+            onTap: () => _showRotationOptionsSheet(context),
             showDivider: true,
           ),
           WorkSettingsRow(
@@ -69,6 +66,158 @@ class SettingsTilesCard extends StatelessWidget {
     );
   }
 
+  void _showRotationOptionsSheet(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Obx(() {
+          final rotations = controller.availableRotations;
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Default rotation'.tr,
+                style: getTextStyle2(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryTextColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (rotations.isNotEmpty) ...[
+                ...rotations.map((item) {
+                  final label = item['label'] as String? ?? item['name'] as String? ?? '';
+                  final desc = item['description'] as String? ?? '';
+                  final isCustom = item['isCustom'] == true;
+                  final isSelected = controller.defaultRotation.value == label ||
+                      controller.rotationName.value == label;
+
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            label.tr,
+                            style: getTextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryTextColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (isCustom) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondaryButtonColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'Custom'.tr,
+                              style: getTextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.secondaryButtonColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    subtitle: desc.isNotEmpty
+                        ? Text(
+                            desc,
+                            style: getTextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSoft,
+                            ),
+                          )
+                        : null,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isSelected)
+                          const Icon(Icons.check_circle, color: AppColors.secondaryButtonColor),
+                        if (isCustom) ...[
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.edit_outlined,
+                              size: 18,
+                              color: AppColors.textSoft,
+                            ),
+                            onPressed: () {
+                              Get.back();
+                              Get.toNamed(AppRoutes.workScheduleSettingsScreen);
+                            },
+                            tooltip: 'Edit custom rotation'.tr,
+                          ),
+                        ],
+                      ],
+                    ),
+                    onTap: () {
+                      controller.selectAvailableRotation(item);
+                      Get.back();
+                    },
+                  );
+                }),
+              ] else ...[
+                ...['3-2-2 night', '2-2-3 schedule', '4-4 split', 'None (Fixed)'].map((option) => ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        option.tr,
+                        style: getTextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryTextColor,
+                        ),
+                      ),
+                      trailing: controller.defaultRotation.value == option
+                          ? const Icon(Icons.check_circle, color: AppColors.secondaryButtonColor)
+                          : const SizedBox.shrink(),
+                      onTap: () {
+                        controller.applyRotationPattern(option);
+                        Get.back();
+                      },
+                    )),
+              ],
+              const Divider(height: 24),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: AppColors.secondaryButtonColor,
+                ),
+                title: Text(
+                  'Create custom rotation'.tr,
+                  style: getTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.secondaryButtonColor,
+                  ),
+                ),
+                onTap: () {
+                  Get.back();
+                  Get.toNamed(AppRoutes.workScheduleSettingsScreen);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
   // Small helper to show interactive selection dialogs for mock settings
   void _showOptionsDialog({
     required String title,
@@ -96,6 +245,7 @@ class SettingsTilesCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ...options.map((option) => ListTile(
+                  contentPadding: EdgeInsets.zero,
                   title: Text(
                     option.tr,
                     style: getTextStyle(
@@ -108,9 +258,7 @@ class SettingsTilesCard extends StatelessWidget {
                       ? const Icon(Icons.check_circle, color: AppColors.secondaryButtonColor)
                       : const SizedBox.shrink()),
                   onTap: () {
-                    if (title == 'Default rotation') {
-                      controller.applyRotationPattern(option);
-                    } else if (title == 'Shift reminders') {
+                    if (title == 'Shift reminders') {
                       controller.updateShiftReminders(option);
                     } else if (title == 'Time zone') {
                       controller.updateTimeZone(option);

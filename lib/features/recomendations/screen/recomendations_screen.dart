@@ -92,7 +92,7 @@ class RecomendationsScreen extends StatelessWidget {
                           Expanded(
                             child: Text(
                               (data?.actionsLabel != null && data!.actionsLabel!.isNotEmpty)
-                                  ? data.actionsLabel!.tr
+                                  ? _formatActionsLabel(data.actionsLabel, activeCategories.fold<int>(0, (sum, list) => sum + list.length))
                                   : (data?.message != null && data!.message!.isNotEmpty ? 'Note'.tr : ''),
                               style: getTextStyle2(
                                 fontSize: 14,
@@ -145,5 +145,19 @@ class RecomendationsScreen extends StatelessWidget {
         }),
       ),
     );
+  }
+
+  String _formatActionsLabel(String? rawLabel, int? fallbackCount) {
+    if (rawLabel == null || rawLabel.isEmpty) return '';
+    final match = RegExp(r'\d+').firstMatch(rawLabel);
+    final count = match != null ? int.tryParse(match.group(0)!) : fallbackCount;
+    if (count == null) return rawLabel.tr;
+
+    final isFrench = (Get.locale?.languageCode ?? 'fr') == 'fr';
+    if (isFrench) {
+      return count == 1 ? '1 action pour aujourd’hui' : '$count actions pour aujourd’hui';
+    } else {
+      return count == 1 ? '1 action for today' : '$count actions for today';
+    }
   }
 }

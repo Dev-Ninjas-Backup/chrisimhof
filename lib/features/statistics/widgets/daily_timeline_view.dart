@@ -6,10 +6,71 @@ import 'package:chrisimhof/features/statistics/widgets/date_range_navigation_bar
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DailyTimelineView extends StatelessWidget {
+class DailyTimelineView extends StatefulWidget {
   final StatisticsController controller;
 
   const DailyTimelineView({super.key, required this.controller});
+
+  @override
+  State<DailyTimelineView> createState() => _DailyTimelineViewState();
+}
+
+class _DailyTimelineViewState extends State<DailyTimelineView> {
+  StatisticsController get controller => widget.controller;
+  final ScrollController _timelineScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentTime();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timelineScrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentTime() {
+    if (!_timelineScrollController.hasClients) return;
+    try {
+      final timeline = controller.dailyTimelineData.value;
+      DateTime windowStart;
+      if (timeline?['startUtc'] != null) {
+        windowStart = TimezoneHelper.parseSessionUtcToLocal(
+          timeline!['startUtc'].toString(),
+        );
+      } else {
+        final sel = controller.myDaySelectedDate.value;
+        windowStart = DateTime(sel.year, sel.month, sel.day, 7, 0);
+      }
+      DateTime windowEnd;
+      if (timeline?['endUtc'] != null) {
+        windowEnd = TimezoneHelper.parseSessionUtcToLocal(
+          timeline!['endUtc'].toString(),
+        );
+      } else {
+        windowEnd = windowStart.add(const Duration(hours: 24));
+      }
+      final totalMin = windowEnd.difference(windowStart).inMinutes;
+      if (totalMin <= 0) return;
+
+      final now = DateTime.now();
+      final currentMin = now.difference(windowStart).inMinutes;
+      if (currentMin > 0 && currentMin < totalMin) {
+        final progress = currentMin / totalMin;
+        final targetOffset = (progress * 500.0) - 80.0;
+        final maxScroll = _timelineScrollController.position.maxScrollExtent;
+        _timelineScrollController.animateTo(
+          targetOffset.clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +161,7 @@ class DailyTimelineView extends StatelessWidget {
 
           // Horizontal 6-Track Timeline container
           SingleChildScrollView(
+            controller: _timelineScrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
               width: 580,
@@ -394,7 +456,7 @@ class DailyTimelineView extends StatelessWidget {
 
         // Track 5: Meals
         _buildTrackRow(
-          label: 'Meals'.tr,
+          label: (Get.locale?.languageCode == 'fr') ? 'Repas' : 'Meals',
           icon: Icons.restaurant_outlined,
           color: const Color(0xFFE11D48),
           child: mealsList.isNotEmpty
@@ -409,10 +471,14 @@ class DailyTimelineView extends StatelessWidget {
                     final heaviness = (m['heaviness'] ?? 'Meal').toString();
                     final timeStr =
                         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                    final isFr = (Get.locale?.languageCode == 'fr');
+                    final displayLabel = isFr
+                        ? 'Repas (${heaviness.toLowerCase()})'
+                        : '${heaviness.capitalizeFirst} meal';
                     return _buildEventDot(
                       left: left,
                       icon: Icons.restaurant,
-                      label: '${heaviness.capitalizeFirst} meal',
+                      label: displayLabel,
                       time: timeStr,
                       dotColor: const Color(0xFFE11D48),
                     );
@@ -624,10 +690,11 @@ class DailyTimelineView extends StatelessWidget {
     Color dotColor = const Color(0xFF0EA5E9),
   }) {
     return Positioned(
-      left: left,
-      top: 4,
-      bottom: 4,
+      left: (left - 11).clamp(0.0, 480.0),
+      top: 3,
+      bottom: 3,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           controller.selectedTimelineEvent.assignAll({
             'title': label,
@@ -635,27 +702,22 @@ class DailyTimelineView extends StatelessWidget {
           });
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
+          width: 22,
+          height: 22,
           decoration: BoxDecoration(
-            color: dotColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: dotColor.withValues(alpha: 0.4)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 11, color: dotColor),
-              const SizedBox(width: 3),
-              Text(
-                time,
-                style: getTextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  color: dotColor,
-                ),
+            color: dotColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: dotColor.withValues(alpha: 0.35),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 10, color: Colors.white),
         ),
       ),
     );
@@ -671,9 +733,18 @@ class DailyTimelineView extends StatelessWidget {
         items = apiRecs.map((r) {
           final cat = (r['category'] ?? '').toString().toLowerCase();
           final meta = _getRecommendationCategoryMeta(cat);
+          final timeVal = (r['time'] ??
+                  r['cutoffTime'] ??
+                  (r['bodyParams'] is Map
+                      ? r['bodyParams']['cutoffTime'] ??
+                          r['bodyParams']['bedtime'] ??
+                          r['bodyParams']['napStart'] ??
+                          ''
+                      : ''))
+              .toString();
           return {
             'title': (r['title'] ?? meta['defaultTitle']).toString(),
-            'time': (r['time'] ?? r['cutoffTime'] ?? '').toString(),
+            'time': timeVal,
             'type': cat.capitalizeFirst ?? 'General',
             'icon': meta['icon'] as IconData,
             'color': meta['color'] as Color,

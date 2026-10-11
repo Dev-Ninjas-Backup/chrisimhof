@@ -28,6 +28,7 @@ class DashboardModel {
   final String workShift;
   final String workShiftCountdown;
   final double workProgress;
+  final String workRotationName;
 
   // Last Sleep card
   final String lastSleepDuration;
@@ -65,6 +66,7 @@ class DashboardModel {
     required this.workShift,
     required this.workShiftCountdown,
     required this.workProgress,
+    this.workRotationName = '',
     required this.lastSleepDuration,
     required this.sleepDebtText,
     required this.lastSleepWeekBars,
@@ -99,6 +101,7 @@ class DashboardModel {
     String? workShift,
     String? workShiftCountdown,
     double? workProgress,
+    String? workRotationName,
     String? lastSleepDuration,
     String? sleepDebtText,
     List<double>? lastSleepWeekBars,
@@ -132,6 +135,7 @@ class DashboardModel {
       workShift: workShift ?? this.workShift,
       workShiftCountdown: workShiftCountdown ?? this.workShiftCountdown,
       workProgress: workProgress ?? this.workProgress,
+      workRotationName: workRotationName ?? this.workRotationName,
       lastSleepDuration: lastSleepDuration ?? this.lastSleepDuration,
       sleepDebtText: sleepDebtText ?? this.sleepDebtText,
       lastSleepWeekBars: lastSleepWeekBars ?? this.lastSleepWeekBars,

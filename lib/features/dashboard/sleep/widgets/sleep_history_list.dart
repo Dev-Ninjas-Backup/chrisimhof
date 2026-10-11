@@ -100,48 +100,89 @@ class SleepHistoryList extends StatelessWidget {
     final wakeStr =
         '${log.wakeupTime.hour.toString().padLeft(2, '0')}:${log.wakeupTime.minute.toString().padLeft(2, '0')}';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16.02, 16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.gray100, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
-            offset: const Offset(0, 1),
-            blurRadius: 2,
-            spreadRadius: 0,
-          ),
-        ],
+    return Dismissible(
+      key: ValueKey(log.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        await controller.deleteSleepEntry(log);
+        return false;
+      },
+      background: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.redAccent.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(22),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: AppColors.sleepHistoryCircle,
-              shape: BoxShape.circle,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16.02, 16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: AppColors.gray100, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.05),
+              offset: const Offset(0, 1),
+              blurRadius: 2,
+              spreadRadius: 0,
             ),
-            child: const Center(
-              child: Icon(
-                Icons.nightlight_round,
-                color: AppColors.indigo,
-                size: 20,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: AppColors.sleepHistoryCircle,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.nightlight_round,
+                  color: AppColors.indigo,
+                  size: 20,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
 
-          // Date & Time details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Date & Time details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$weekdayStr $dayStr',
+                    style: getTextStyle2(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryTextColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$bedStr → $wakeStr',
+                    style: getTextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.selectionGray,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$weekdayStr $dayStr',
+                  log.durationString,
                   style: getTextStyle2(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -150,50 +191,31 @@ class SleepHistoryList extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$bedStr → $wakeStr',
+                  '${'quality'.tr} ${log.quality}',
                   style: getTextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.selectionGray,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.secondaryButtonColor,
                   ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(width: 8),
 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                log.durationString,
-                style: getTextStyle2(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryTextColor,
-                ),
+            IconButton(
+              icon: const Icon(
+                Icons.delete_outline_rounded,
+                color: AppColors.selectionGray,
+                size: 20,
               ),
-              const SizedBox(height: 4),
-              Text(
-                '${'quality'.tr} ${log.quality}',
-                style: getTextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.secondaryButtonColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 12),
-
-          // GestureDetector(
-          //   onTap: () => showSleepEntryDialog(context, controller, log: log),
-          //   child: const Icon(
-          //     Icons.edit_outlined,
-          //     color: AppColors.selectionGray,
-          //     size: 20,
-          //   ),
-          // ),
-        ],
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => controller.deleteSleepEntry(log),
+              tooltip: 'Delete'.tr,
+            ),
+          ],
+        ),
       ),
     );
   }

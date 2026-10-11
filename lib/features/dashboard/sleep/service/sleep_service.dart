@@ -125,4 +125,51 @@ class SleepService {
       throw Exception(jsonData['message'] ?? 'Failed to delete nap');
     }
   }
+
+  // DELETE /api/v1/calculator/sessions/{sessionId}/sleep/{entryId}
+  Future<Map<String, dynamic>> deleteSleepSessionEntry({
+    required String sessionId,
+    required String entryId,
+  }) async {
+    final uri = Uri.parse(Urls.deleteSleepSessionEntry(sessionId, entryId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    final response = await http.delete(
+      uri,
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return jsonData;
+    } else {
+      throw Exception(jsonData['message'] ?? 'Failed to delete sleep entry');
+    }
+  }
+
+  // DELETE /api/v1/history/sleep/{entryId}
+  Future<Map<String, dynamic>> deleteHistoricalSleep({
+    required String entryId,
+  }) async {
+    final uri = Uri.parse(Urls.deleteHistoricalSleep(entryId));
+    final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+    final response = await http.delete(
+      uri,
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return jsonData;
+    } else {
+      throw Exception(jsonData['message'] ?? 'Failed to delete sleep entry');
+    }
+  }
 }

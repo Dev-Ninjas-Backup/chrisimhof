@@ -433,6 +433,24 @@ In `GET /api/v1/calculator/sessions/:sessionId` (or `tabs/overview` / `quick-add
 - [ ] Ensure `caffeineSensitivity` (`"low"` | `"medium"` | `"high"`) is selectable in Onboarding and Settings > Baseline Profile.
 - [ ] On the Sleep & Bedtime UI, observe `data.sleep.optimalBedtime` — this time automatically incorporates dynamic caffeine delay buffers without manual client calculation.
 - [ ] In the Caffeine Details / Timeline view, mobile apps can use `activeCaffeineAtBedtimeMg` to display warnings (e.g. *"213 mg active at bedtime — your recommended sleep time has been delayed by 90 minutes to allow clearance"*).
+- [ ] Send `drinkLabel` (e.g. `"Monster"`, `"Red Bull"`, or custom roasts) alongside `drinkType` in caffeine logs. The API persists and returns `drinkLabel` in session tabs and daily timeline.
+
+#### Custom Caffeine Drink Labels (`drinkLabel`)
+When logging caffeine drinks via Quick Add (`PATCH /api/v1/calculator/session/:sessionId/log` or resource CRUD `/caffeine/:entryId`), clients can supply a custom drink name:
+
+```json
+{
+  "newCaffeineLogs": [
+    {
+      "occurredAt": "2026-10-09T08:30:00.000Z",
+      "caffeineMg": 160,
+      "drinkType": "energy",
+      "drinkLabel": "Monster"
+    }
+  ]
+}
+```
+- **Response**: The API preserves `drinkLabel` in `session.caffeineLogsJson`, `tabs.caffeine.logs`, and `GET /api/v1/history/timeline` (caffeine track).
 
 ---
 
@@ -526,6 +544,21 @@ Onboarding and profile baseline settings actively govern mathematical recommenda
 - Configurable from 240 min (4h) to 660 min (11h).
 - Strictly determines sleep quality scoring ratios, 7-day sleep debt accumulation, and upcoming circadian sleep window durations without static hardcoded 8-hour overrides.
 
+#### 4. Daily Meal Target Synchronization & Flexible Meal Logging (`defaultDailyMealTarget`)
+- Configurable in Baseline Profile (`PATCH /api/v1/profile/baseline`, 1 to 10 meals/day, default: 3).
+- **Session Synchronization**:
+  - Every new daily session automatically initializes `quickAddSummary.meals.dailyTarget` directly from `profile.defaultDailyMealTarget`.
+  - When the user updates `defaultDailyMealTarget` in profile settings, all unfinalized circadian day sessions (`ACTIVE` and `PENDING_WAKE`) immediately update their `dailyMealTarget`.
+  - When opening the app via `GET /api/v1/calculator/session`, any pending or active session dynamically verifies and synchronizes its `dailyMealTarget` against the user's latest baseline profile settings so the quick-add counter never shows stale defaults (e.g. `0/3` when the profile target is 5).
+- **Flexible Quick Meal Logging**:
+  - Direct endpoint: `POST /api/v1/calculator/session/:sessionId/meals` (or plural `POST /sessions/:sessionId/meals`).
+  - Bulk Quick-Add: `PATCH /api/v1/calculator/session/:sessionId/log` (`newMealLogs`).
+  - Payload parameters are fully flexible:
+    - `occurredAt`: Optional ISO-8601 UTC timestamp (defaults to current instant `now`).
+    - `heaviness`: Optional (`'light'`, `'medium'`, `'heavy'`, defaults to `'medium'`).
+    - `order`: Optional sequence integer (automatically calculated as `existingCount + 1`).
+  - Logged meals dynamically increment `quickAddSummary.meals.count` and are accurately reflected in `display: "${count}/${dailyTarget}"` (e.g. `"1/5"`).
+
 ---
 
 ### 10. First-Class Nap Management & Zero-Day-Reset Safety
@@ -598,7 +631,41 @@ Allows users to log daytime, power, and pre-shift naps without interfering with 
 - **Auth Required**: `Bearer <token>`
 - **Response (`200 OK`)**: Deletes the specified nap entry, updates `napsJson`, and rolls back the sleep debt credit.
 
+#### 4. Delete Individual Sleep Record (`DELETE /api/v1/calculator/sessions/:sessionId/sleep/:entryId` & `DELETE /api/v1/history/sleep/:entryId`)
+Users can delete mistaken or unwanted sleep records without deleting their entire day or resetting other logged entries:
+- **Active Session Endpoint**: `DELETE /api/v1/calculator/sessions/:sessionId/sleep/:entryId` (alias: `DELETE /api/v1/calculator/session/:sessionId/sleep/:entryId`)
+- **History Endpoint**: `DELETE /api/v1/history/sleep/:entryId`
+- **Auth Required**: `Bearer <token>`
+
+##### Deletion Routing & Behavior:
+1. **Nap Record**: If `:entryId` matches a logged nap ID in `napsJson`, it safely removes that nap, updates quick-add counters, and rolls back the nap sleep debt credit.
+2. **Main Sleep (Active Session)**: If `:entryId` is `'main'`, `:sessionId`, or matching calculation ID, the backend:
+   - Clears main sleep timestamps (`sleepStartTime`, `wakeTime`, `sleepStartedAt`, `wakeRecordedAt`).
+   - Reverts session status to `PENDING_WAKE`.
+   - Clears live scores until a new main wake is logged.
+   - **Crucially retains** all other logged data (meals, hydration, caffeine, workouts, and other naps).
+3. **Historical Sleep (`DELETE /api/v1/history/sleep/:entryId`)**:
+   - Deletes the historical `Calculation` record.
+   - Cleans up linked `DailySession` references (`calculationId`, `rhythmScore`, `sleepScore`, etc.) without deleting the session or workouts.
+
+##### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Sleep entry deleted successfully",
+  "data": {
+    "sessionId": "cm123456789",
+    "status": "PENDING_WAKE",
+    "liveScores": null
+  }
+}
+```
+
 #### Mobile App Integration Checklist
+- [ ] In the Sleep Tab or Sleep History list, add swipe-to-delete or a delete button on individual sleep cards.
+- [ ] For active sessions, call `DELETE /api/v1/calculator/sessions/:sessionId/sleep/:entryId`. If main sleep is deleted, prompt the user with a wake logging CTA while keeping their daily logs intact.
+- [ ] For historical days, call `DELETE /api/v1/history/sleep/:calculationId`.
 - [ ] In the Quick-Add bottom sheet, add a "Nap" logging option (preset buttons: `20m`, `30m`, `45m`, `90m`, or custom minutes).
 - [ ] In the Sleep Tab, display today's logged naps list and total nap minutes (`data.sleep.naps` and `data.sleep.totalNapMinutes`).
 - [ ] Observe the 7-day Sleep Debt bar chart — taking a nap immediately reduces today's active sleep debt by the logged nap duration.
@@ -1111,3 +1178,175 @@ Permanently deletes or dismisses a notification.
   }
 }
 ```
+
+---
+
+## 14. Shift Bedtime Constraints & 30-Hour Circadian Session Lifecycle Rules
+
+### 1. Shift Bedtime Hard Ceiling Constraint
+When the user has an upcoming shift (e.g. morning shift starting at 06:00), the circadian engine guarantees that the recommended bedtime leaves enough time for full sleep recovery:
+- **Wake Target**: Wake time is computed as `shiftStart - commuteMinutes - prepBuffer` (e.g. 06:00 shift $\to$ 04:30 wake).
+- **Bedtime Hard Ceiling**: The engine enforces a strict mathematical upper bound:
+  $$\text{latestBedtimeMin} = \text{wakeTargetMin} - \text{minSleepMin}$$
+  Even if the user's chronotype is evening or daytime naps occurred, bedtime will never be placed late (e.g. 23:50 before a 06:00 shift). For an 04:30 wake and 7.5h sleep target, the engine recommends a bedtime no later than 21:00.
+- **Evening Anchor Sleep Guard**: The immediate recovery sleep branch ($\le 10\text{h}$ interval) is strictly restricted to evening anchor wakeups (`wakeTime >= 18:00`, such as after an overnight shift), preventing early morning wakes from erroneously triggering daytime sleep recovery modes.
+
+### 2. Circadian Session Lifecycle & 30-Hour Rollover
+The circadian day model differs fundamentally from standard calendar days:
+1. **Midnight Non-Interference**:
+   - Calendar midnight (00:00) does **not** close, reset, or split an active session. Workouts, meals, and hydration logged past midnight remain linked to the active circadian day.
+2. **Explicit Session Closure**:
+   - **Manual End Day**: User taps *"Terminer ma journée"* (`POST /api/v1/calculator/sessions/:sessionId/end-day` or `/calculate`). The session transitions from `ACTIVE` to `FINALIZED` (`closedBy: 'MANUAL'`).
+   - **Next Main Wake**: If the user did not manually close yesterday's session before going to bed, logging their next wake (`isNewMainWake: true`) automatically finalizes the previous day (`closedBy: 'NEW_WAKE'`) and starts the new circadian cycle.
+3. **30-Hour Safety Expiry Window**:
+   - Active sessions are stamped with `expiresAt = startedAt + 30h`.
+   - If no new wake is logged and the session is not manually closed within 30 hours, it is considered stale, preventing unbounded open sessions.
+
+---
+
+## 15. Daily Timeline Dynamic Localization, Circadian Boundaries & Timezone Contract
+
+### 1. Dynamic Localization in `GET /api/v1/history/timeline`
+The daily timeline endpoint powers the *"My day"* (*Ma journée*) view. It dynamically translates recommendations and summary score labels to the client's current preferred language:
+- **Endpoint**: `GET /api/v1/history/timeline?date=YYYY-MM-DD&locale=fr` (or `locale=en`)
+- **Query Parameters**:
+  - `date`: Target date key (`YYYY-MM-DD`).
+  - `timezone` (optional): IANA timezone string (defaults to user baseline timezone).
+  - `locale` (optional): `'fr'` | `'en'` (defaults to `user.language` or `'en'`).
+
+#### Response Example
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Success",
+  "data": {
+    "date": "2026-10-10",
+    "startUtc": "2026-10-09T22:30:00.000Z",
+    "endUtc": "2026-10-10T22:00:00.000Z",
+    "isOngoing": true,
+    "summary": {
+      "globalRhythmScore": 84,
+      "rhythmScoreLabel": "Optimal",
+      "sleepScore": 85,
+      "hydrationScore": 80,
+      "caffeineScore": 90,
+      "nutritionScore": 75,
+      "sportScore": 70,
+      "recoveryScore": 80,
+      "fatigueRiskScore": 25,
+      "sleepDurationMinutes": 450,
+      "sleepDebtMinutes": 30
+    },
+    "tracks": {
+      "sleep": [ ... ],
+      "work": [ ... ],
+      "hydration": [ ... ],
+      "caffeine": [ ... ],
+      "meals": [ ... ],
+      "exercise": [ ... ]
+    },
+    "recommendations": [
+      {
+        "category": "sleep",
+        "priority": 1,
+        "isPremium": false,
+        "title": "Sieste d'ancrage nuit",
+        "body": "Une sieste d'ancrage de 90 min entre 14:30 et 16:00 complète un cycle complet pour soutenir la vigilance nocturne.",
+        "titleKey": "sleep.anchorNapTitle",
+        "bodyKey": "sleep.preShiftAnchorNap",
+        "bodyParams": {
+          "napStart": "14:30",
+          "napEnd": "16:00",
+          "durationMin": 90
+        }
+      }
+    ]
+  }
+}
+```
+
+#### Key Contract Assurances:
+1. **Dynamic Language Switch**: Even if a session was calculated and cached in French, requesting `?locale=en` immediately translates recommendations and `rhythmScoreLabel` into English without requiring recalculation.
+2. **Circadian Cycle Bounds (`startUtc` & `endUtc`)**:
+   - `startUtc`: Absolute UTC timestamp of the main sleep period opening the waking cycle (or wake anchor if bedtime unrecorded).
+   - `endUtc`: Absolute UTC timestamp of bedtime closing the waking cycle (from upcoming sleep window or next session).
+3. **Timezone & UTC Contract**:
+   - All logged timestamps (`occurredAt`, `sleepStartedAt`, `wakeRecordedAt`, etc.) are formatted and stored as UTC ISO-8601 strings.
+   - Weekday calculations (such as Monday to Sunday weekly sport goals and daily timeline date matching) strictly evaluate within the user's active IANA timezone (`session.timezoneAtStart` or `profile.timezone`), preventing off-by-one calendar shifts across timezones.
+
+---
+
+## 16. Work Rotation Selectors, Custom Name Persistence & Schedule Aliases
+
+### 1. Work Schedule Settings & Selectors (`GET /api/v1/calculator/work-settings`)
+Provides settings for the Work Schedule configuration page (Image 5), complete with dropdown options for both built-in rotation presets and saved user custom templates:
+- **Endpoint**: `GET /api/v1/calculator/work-settings`
+- **Auth Required**: `Bearer <token>`
+
+#### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Work schedule settings retrieved successfully",
+  "data": {
+    "defaultRotation": "Syngenta",
+    "rotationName": "Syngenta",
+    "activeRotationKey": "custom-clabc1234",
+    "availableRotations": [
+      {
+        "key": "three-two-two-night",
+        "label": "3-2-2 Night",
+        "description": "3 nights, 2 off, 2 days",
+        "cycleWeeks": 1,
+        "isCustom": false,
+        "shiftTimesJson": { ... },
+        "patternJson": [ ... ]
+      },
+      {
+        "key": "two-two-three-continental",
+        "label": "2-2-3 Continental",
+        "description": "Panama / Pitman rotating shift",
+        "cycleWeeks": 2,
+        "isCustom": false,
+        "shiftTimesJson": { ... },
+        "patternJson": [ ... ]
+      },
+      {
+        "id": "clabc1234",
+        "key": "custom-clabc1234",
+        "label": "Syngenta",
+        "description": "Plant shift rotation",
+        "cycleWeeks": 3,
+        "isCustom": true,
+        "shiftTimesJson": { ... },
+        "patternJson": [ ... ]
+      }
+    ],
+    "shiftReminderEnabled": true,
+    "shiftReminderMinutes": 30,
+    "shiftReminderDisplay": "On · 30 min before",
+    "timezone": "Europe/Zurich",
+    "timezoneDisplay": "CET · Geneva"
+  }
+}
+```
+
+### 2. Mobile Schedule Aliases (`/schedule/rotation/*`)
+Mobile clients can use the following top-level aliases alongside existing `/calculator/work-rotation/*` endpoints:
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/v1/schedule/rotation/my-rotation` | `GET` | Fetches active rotation with `rotationName`, shift times, and day grid. |
+| `/api/v1/schedule/rotation/save` | `POST` | Upserts active rotation, saves custom template if `saveAsTemplate: true`, and updates active day. |
+| `/api/v1/calculator/work-rotation` | `GET` | Primary work rotation retrieval endpoint. |
+| `/api/v1/calculator/work-rotation` | `PUT` | Primary work rotation upsert endpoint. |
+| `/api/v1/calculator/work-rotation/presets` | `GET` | Returns built-in system presets and custom user templates. |
+
+#### Mobile App Integration Checklist
+- [ ] In Settings > Work Schedule, populate the "Default Rotation" dropdown using `data.availableRotations`.
+- [ ] For items where `isCustom: true`, show a "Custom" badge or allow the user to edit their custom cycle template.
+- [ ] Observe `data.rotationName` to display the active rotation title on the home dashboard work card (e.g. *"Syngenta"* or *"3-2-2 Night"*).
+
+

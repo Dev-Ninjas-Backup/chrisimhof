@@ -366,32 +366,31 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   String getShiftAbbreviation(String key) {
-    final lower = key.toLowerCase();
-    if (lower == 'day' || lower == 'd') return 'D';
-    if (lower == 'evening' || lower == 'e') return 'E';
-    if (lower == 'night' || lower == 'n') return 'N';
-    if (lower == 'off') return 'Off';
+    final isFr = (Get.locale?.languageCode ?? 'fr') == 'fr';
+    final lower = key.toLowerCase().trim();
 
-    if (key.length <= 3) return key.toUpperCase();
-
-    final numberMatch = RegExp(r'\d+').firstMatch(key);
-    final numberStr = numberMatch != null ? numberMatch.group(0) : '';
-
-    final parts = key.split(RegExp(r'[-_ ]+'));
-    if (parts.length > 1) {
-      final firstChar = parts[0].isNotEmpty ? parts[0][0].toUpperCase() : '';
-      final secondChar = parts[1].isNotEmpty ? parts[1][0].toUpperCase() : '';
-
-      if (numberStr != null && numberStr.isNotEmpty) {
-        return '$firstChar$numberStr';
-      }
-      return '$firstChar$secondChar';
+    if (lower == 'off' || lower == 'repos') {
+      return isFr ? 'Repos' : 'Off';
+    }
+    if (lower == 'jour' || lower == 'day' || lower == 'j' || lower == 'd') {
+      return isFr ? 'J' : 'D';
+    }
+    if (lower == 'après-midi' ||
+        lower == 'apres-midi' ||
+        lower == 'evening' ||
+        lower == 'afternoon' ||
+        lower == 'a' ||
+        lower == 'e') {
+      return isFr ? 'A' : 'E';
+    }
+    if (lower == 'nuit' || lower == 'night' || lower == 'n') {
+      return 'N';
     }
 
-    if (numberStr != null && numberStr.isNotEmpty) {
-      return '${key[0].toUpperCase()}$numberStr';
+    if (key.trim().isNotEmpty) {
+      return key.trim()[0].toUpperCase();
     }
-    return key.substring(0, 3).toUpperCase();
+    return key;
   }
 
   void addCustomShift(String key, String start, String end) {

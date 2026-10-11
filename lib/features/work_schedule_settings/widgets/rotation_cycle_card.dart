@@ -53,7 +53,7 @@ class RotationCycleCard extends StatelessWidget {
                 controller: controller.rotationNameController,
                 onChanged: (val) => controller.rotationName.value = val,
                 decoration: InputDecoration(
-                  hintText: 'e.g. Syngenta, 3x8 Novartis'.tr,
+                  hintText: 'e.g. My rotation'.tr,
                   hintStyle: getTextStyle(
                     fontSize: 14,
                     color: AppColors.textSoft,

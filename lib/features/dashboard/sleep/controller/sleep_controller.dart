@@ -384,9 +384,168 @@ class SleepController extends GetxController {
   }
 
   void deleteLog(String id) async {
-    historyLogs.removeWhere((log) => log.id == id);
-    await saveSleepHistory();
-    EasyLoading.showSuccess('Sleep log deleted!'.tr);
+    final log = historyLogs.firstWhereOrNull((l) => l.id == id);
+    if (log != null) {
+      await deleteSleepEntry(log);
+    } else {
+      historyLogs.removeWhere((l) => l.id == id);
+      await saveSleepHistory();
+      EasyLoading.showSuccess('Sleep log deleted!'.tr);
+    }
+  }
+
+  Future<void> deleteSleepEntry(SleepLog log) async {
+    final isConfirmed = await Get.dialog<bool>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Delete sleep record?'.tr,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete this sleep entry? Other daily logs (meals, caffeine, workouts) will be kept.'.tr,
+          style: const TextStyle(
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(
+              'Cancel'.tr,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(
+              'Delete'.tr,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.redAccent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (isConfirmed != true) return;
+
+    EasyLoading.show(status: 'Deleting sleep record...'.tr);
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      final now = DateTime.now();
+      final isToday = log.date.year == now.year &&
+          log.date.month == now.month &&
+          log.date.day == now.day;
+
+      if (isToday && sessionId.isNotEmpty) {
+        final entryId = (log.id.startsWith('server_') || log.id.isEmpty) ? 'main' : log.id;
+        await SleepService().deleteSleepSessionEntry(
+          sessionId: sessionId,
+          entryId: entryId,
+        );
+      } else {
+        await SleepService().deleteHistoricalSleep(
+          entryId: log.id,
+        );
+      }
+
+      historyLogs.removeWhere((item) => item.id == log.id);
+      await saveSleepHistory();
+
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        await db.fetchDashboardData();
+      }
+
+      EasyLoading.showSuccess('Sleep entry deleted!'.tr);
+    } catch (e) {
+      debugPrint('deleteSleepEntry error: $e');
+      EasyLoading.showError('Failed to delete sleep entry'.tr);
+    }
+  }
+
+  Future<void> deleteTodayMainSleep() async {
+    final isConfirmed = await Get.dialog<bool>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Delete sleep record?'.tr,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete this sleep entry? Other daily logs (meals, caffeine, workouts) will be kept.'.tr,
+          style: const TextStyle(
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(
+              'Cancel'.tr,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(
+              'Delete'.tr,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.redAccent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (isConfirmed != true) return;
+
+    EasyLoading.show(status: 'Deleting sleep record...'.tr);
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      if (sessionId.isNotEmpty) {
+        await SleepService().deleteSleepSessionEntry(
+          sessionId: sessionId,
+          entryId: 'main',
+        );
+      }
+
+      final now = DateTime.now();
+      historyLogs.removeWhere((item) =>
+          item.date.year == now.year &&
+          item.date.month == now.month &&
+          item.date.day == now.day);
+      await saveSleepHistory();
+
+      if (Get.isRegistered<DashboardController>()) {
+        final db = Get.find<DashboardController>();
+        await db.fetchDashboardData();
+      }
+
+      EasyLoading.showSuccess('Sleep entry deleted!'.tr);
+    } catch (e) {
+      debugPrint('deleteTodayMainSleep error: $e');
+      EasyLoading.showError('Failed to delete sleep entry'.tr);
+    }
   }
 
   /// Called with the top-level liveScores payload to extract forYouPreview sleep entry.

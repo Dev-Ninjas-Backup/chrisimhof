@@ -229,8 +229,24 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     // Work details
-    final workInfo = apiData['workInfo'] as Map<String, dynamic>?;
+    Map<String, dynamic>? workInfo = apiData['workInfo'] as Map<String, dynamic>?;
+    if (workInfo == null && apiData['work'] is Map<String, dynamic>) {
+      workInfo = apiData['work'] as Map<String, dynamic>;
+    }
+    if (workInfo == null &&
+        apiData['tabs'] is Map &&
+        apiData['tabs']['work'] is Map<String, dynamic>) {
+      workInfo = apiData['tabs']['work'] as Map<String, dynamic>;
+    }
+
     final workFitCard = cards?['workFit'] as Map<String, dynamic>?;
+    final rotationNameVal = apiData['rotationName'] as String? ??
+        workInfo?['rotationName'] as String? ??
+        workInfo?['name'] as String? ??
+        workInfo?['settings']?['defaultRotation'] as String? ??
+        (Get.isRegistered<WorkController>()
+            ? Get.find<WorkController>().rotationName.value
+            : '');
 
     String workShift = 'Off Today'.tr;
     String workShiftCountdown = 'No shifts scheduled'.tr;
@@ -241,8 +257,12 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       final capShiftType = shiftType.isNotEmpty
           ? shiftType[0].toUpperCase() + shiftType.substring(1)
           : 'Work';
-      final start = workInfo['shiftStart'] as String? ?? '';
-      final end = workInfo['shiftEnd'] as String? ?? '';
+      final start = workInfo['shiftStart'] as String? ??
+          workInfo['shiftStartTime'] as String? ??
+          '';
+      final end = workInfo['shiftEnd'] as String? ??
+          workInfo['shiftEndTime'] as String? ??
+          '';
 
       workShift = '$capShiftType shift';
       if (start.isNotEmpty && end.isNotEmpty) {
@@ -295,8 +315,11 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         }
       } catch (_) {}
     } else {
-      workShift = workFitCard?['subtitle'] as String? ?? 'Off Today'.tr;
-      workShiftCountdown = 'No shifts scheduled'.tr;
+      workShift = workInfo?['shiftBadge'] as String? ??
+          workFitCard?['subtitle'] as String? ??
+          'Off Today'.tr;
+      workShiftCountdown = workInfo?['shiftDateDisplay'] as String? ??
+          'No shifts scheduled'.tr;
       workProgress = 0.0;
     }
 
@@ -475,6 +498,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       workProgress: workProgress == 0.0
           ? (workInfo != null && workInfo['shiftType'] != 'off' ? 0.35 : 0.0)
           : workProgress,
+      workRotationName: rotationNameVal,
       lastSleepDuration: lastSleepDuration,
       sleepDebtText: sleepDebtText,
       lastSleepWeekBars: lastSleepWeekBars,
@@ -594,9 +618,12 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       }
     }
     // Also forward top-level workInfo so WorkController can init shift data
-    if (apiData['workInfo'] != null && Get.isRegistered<WorkController>()) {
+    final effectiveWorkInfo = apiData['workInfo'] ??
+        apiData['work'] ??
+        (apiData['tabs'] is Map ? apiData['tabs']['work'] : null);
+    if (effectiveWorkInfo is Map && Get.isRegistered<WorkController>()) {
       Get.find<WorkController>().updateWorkInfoFromSession(
-        Map<String, dynamic>.from(apiData['workInfo'] as Map<String, dynamic>),
+        Map<String, dynamic>.from(effectiveWorkInfo),
       );
     }
 

@@ -44,6 +44,7 @@ class AnalyticsService {
       final token = await SharedPreferencesHelper.getAccessToken();
       final url = Urls.dailyTimeline(date, timezone);
 
+      debugPrint("[Timeline] Request URL: $url");
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -52,6 +53,7 @@ class AnalyticsService {
         },
       );
 
+      debugPrint("[Timeline] Status: ${response.statusCode}, Body: ${response.body}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonData = jsonDecode(response.body);
         debugPrint("Daily Timeline Data: $jsonData");

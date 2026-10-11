@@ -5,6 +5,7 @@ import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -66,31 +67,56 @@ class LogSleepCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Obx(
-                () => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryButtonColor.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.primaryButtonColor.withValues(
-                        alpha: 0.30,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Obx(
+                    () => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                      width: 1,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryButtonColor.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: AppColors.primaryButtonColor.withValues(
+                            alpha: 0.30,
+                          ),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        controller.currentSleepDuration,
+                        style: getTextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryButtonColor,
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    controller.currentSleepDuration,
-                    style: getTextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryButtonColor,
-                    ),
-                  ),
-                ),
+                  if (Get.isRegistered<DashboardController>())
+                    Obx(() {
+                      final isLogged = Get.find<DashboardController>().dashboardData.value.isSleepLogged;
+                      if (!isLogged) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            color: Colors.redAccent,
+                            size: 20,
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: controller.deleteTodayMainSleep,
+                          tooltip: 'Clear today\'s sleep'.tr,
+                        ),
+                      );
+                    }),
+                ],
               ),
             ],
           ),

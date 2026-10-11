@@ -31,6 +31,9 @@ class WorkController extends GetxController {
   ].obs;
 
   final defaultRotation = ''.obs;
+  final rotationName = ''.obs;
+  final activeRotationKey = ''.obs;
+  final availableRotations = <Map<String, dynamic>>[].obs;
   final shiftReminders = 'On · 30 min before'.obs;
   final timeZone = ''.obs;
 
@@ -310,9 +313,99 @@ class WorkController extends GetxController {
     }
   }
 
+  void selectAvailableRotation(Map<String, dynamic> item) async {
+    final label = item['label'] as String? ?? item['name'] as String? ?? '';
+    final key = item['key'] as String? ?? '';
+    if (label.isNotEmpty) {
+      defaultRotation.value = label;
+      rotationName.value = label;
+    }
+    if (key.isNotEmpty) {
+      activeRotationKey.value = key;
+    }
+    await saveWorkSettings();
+
+    // If key exists, apply via preset/custom endpoint
+    if (key.isNotEmpty) {
+      try {
+        final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+        final now = DateTime.now();
+        final formattedDate =
+            '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+        final uri = Uri.parse(Urls.applyRotationPreset(key));
+        await http.post(
+          uri,
+          headers: {
+            'accept': '*/*',
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({'startDate': formattedDate, 'name': label}),
+        );
+      } catch (e) {
+        debugPrint('selectAvailableRotation apply preset error: $e');
+      }
+    }
+
+    // If patternJson exists, update local weeklyPattern
+    if (item['patternJson'] is List) {
+      final pList = item['patternJson'] as List;
+      final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+      final List<Map<String, String>> newPattern = [];
+      for (int i = 0; i < 7; i++) {
+        String shiftCode = 'Off';
+        if (i < pList.length) {
+          final p = pList[i];
+          final code = (p['shiftCode'] as String? ?? 'off').toLowerCase();
+          if (code == 'day') {
+            shiftCode = 'D';
+          } else if (code == 'evening') {
+            shiftCode = 'A';
+          } else if (code == 'night') {
+            shiftCode = 'N';
+          } else {
+            shiftCode = 'Off';
+          }
+        }
+        newPattern.add({'day': days[i], 'shift': shiftCode});
+      }
+      weeklyPattern.assignAll(newPattern);
+      saveWeeklyPattern();
+    } else {
+      final Map<String, List<String>> patterns = {
+        '3-2-2 night': ['N', 'N', 'N', 'Off', 'Off', 'D', 'D'],
+        '2-2-3 schedule': ['D', 'D', 'N', 'N', 'Off', 'Off', 'Off'],
+        '4-4 split': ['D', 'D', 'D', 'D', 'Off', 'Off', 'Off'],
+        'None (Fixed)': ['D', 'D', 'D', 'D', 'D', 'Off', 'Off'],
+      };
+      final list = patterns[label];
+      if (list != null) {
+        final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+        weeklyPattern.assignAll(List.generate(7, (i) => {'day': days[i], 'shift': list[i]}));
+        saveWeeklyPattern();
+      }
+    }
+
+    if (Get.isRegistered<DashboardController>()) {
+      try {
+        Get.find<DashboardController>().fetchDashboardData();
+      } catch (_) {}
+    }
+  }
+
   void applyRotationPattern(String pattern) async {
+    final matched = availableRotations.firstWhereOrNull(
+      (r) =>
+          (r['label'] as String?)?.toLowerCase() == pattern.toLowerCase() ||
+          (r['name'] as String?)?.toLowerCase() == pattern.toLowerCase(),
+    );
+    if (matched != null) {
+      selectAvailableRotation(matched);
+      return;
+    }
     await CustomRotationPrefs.setEnabled(false);
     defaultRotation.value = pattern;
+    rotationName.value = pattern;
     saveWorkSettings();
     final Map<String, List<String>> patterns = {
       '3-2-2 night': ['N', 'N', 'N', 'Off', 'Off', 'D', 'D'],
@@ -325,6 +418,11 @@ class WorkController extends GetxController {
       final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
       weeklyPattern.assignAll(List.generate(7, (i) => {'day': days[i], 'shift': list[i]}));
       saveWeeklyPattern();
+    }
+    if (Get.isRegistered<DashboardController>()) {
+      try {
+        Get.find<DashboardController>().fetchDashboardData();
+      } catch (_) {}
     }
   }
 
@@ -542,6 +640,9 @@ class WorkController extends GetxController {
           if (data['defaultRotation'] != null) {
             defaultRotation.value = data['defaultRotation'];
           }
+          if (data['rotationName'] != null) {
+            rotationName.value = data['rotationName'];
+          }
           if (data['shiftReminderDisplay'] != null) {
             shiftReminders.value = data['shiftReminderDisplay'];
           }
@@ -575,6 +676,17 @@ class WorkController extends GetxController {
         if (data != null) {
           if (data['defaultRotation'] != null && (data['defaultRotation'] as String).isNotEmpty) {
             defaultRotation.value = data['defaultRotation'];
+          }
+          if (data['rotationName'] != null && (data['rotationName'] as String).isNotEmpty) {
+            rotationName.value = data['rotationName'];
+          }
+          if (data['activeRotationKey'] != null && (data['activeRotationKey'] as String).isNotEmpty) {
+            activeRotationKey.value = data['activeRotationKey'];
+          }
+          if (data['availableRotations'] is List) {
+            availableRotations.assignAll(
+              List<Map<String, dynamic>>.from(data['availableRotations']),
+            );
           }
           if (data['shiftReminderDisplay'] != null && (data['shiftReminderDisplay'] as String).isNotEmpty) {
             shiftReminders.value = data['shiftReminderDisplay'];

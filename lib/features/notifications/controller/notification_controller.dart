@@ -12,6 +12,11 @@ class NotificationController extends GetxController {
   final RxInt unreadCount = 0.obs;
   final RxInt totalCount = 0.obs;
   final RxBool isLoading = false.obs;
+  final RxBool isLoadingMore = false.obs;
+  final RxBool hasMore = false.obs;
+  final RxInt currentPage = 1.obs;
+  static const int pageSize = 20;
+
   final RxBool filterUnreadOnly = false.obs;
   final Rxn<NotificationPreferencesModel> preferences =
       Rxn<NotificationPreferencesModel>();
@@ -28,16 +33,46 @@ class NotificationController extends GetxController {
     if (isLoading.value && !refresh) return;
     try {
       if (!refresh) isLoading.value = true;
+      currentPage.value = 1;
       final result = await _service.getNotifications(
+        page: 1,
+        limit: pageSize,
         unreadOnly: filterUnreadOnly.value,
       );
-      notifications.assignAll(result['notifications'] as List<AppNotificationItem>);
+      final list = result['notifications'] as List<AppNotificationItem>;
+      notifications.assignAll(list);
       unreadCount.value = result['unreadCount'] as int? ?? 0;
       totalCount.value = result['total'] as int? ?? 0;
+      hasMore.value = result['hasMore'] as bool? ?? (list.length < totalCount.value);
     } catch (e) {
       debugPrint('Error fetching notifications: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreNotifications() async {
+    if (isLoadingMore.value || isLoading.value || !hasMore.value) return;
+    try {
+      isLoadingMore.value = true;
+      final nextPage = currentPage.value + 1;
+      final result = await _service.getNotifications(
+        page: nextPage,
+        limit: pageSize,
+        unreadOnly: filterUnreadOnly.value,
+      );
+      final newItems = result['notifications'] as List<AppNotificationItem>;
+      if (newItems.isNotEmpty) {
+        notifications.addAll(newItems);
+        currentPage.value = nextPage;
+      }
+      unreadCount.value = result['unreadCount'] as int? ?? unreadCount.value;
+      totalCount.value = result['total'] as int? ?? totalCount.value;
+      hasMore.value = result['hasMore'] as bool? ?? (notifications.length < totalCount.value);
+    } catch (e) {
+      debugPrint('Error loading more notifications: $e');
+    } finally {
+      isLoadingMore.value = false;
     }
   }
 

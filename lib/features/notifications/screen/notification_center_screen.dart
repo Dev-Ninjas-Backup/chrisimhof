@@ -44,17 +44,44 @@ class NotificationCenterScreen extends StatelessWidget {
                 return RefreshIndicator(
                   color: AppColors.secondaryButtonColor,
                   onRefresh: () => controller.fetchNotifications(refresh: true),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 12,
-                    ),
-                    itemCount: controller.notifications.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final item = controller.notifications[index];
-                      return _buildNotificationCard(context, controller, item);
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (scrollInfo.metrics.pixels >=
+                              scrollInfo.metrics.maxScrollExtent - 200 &&
+                          !controller.isLoadingMore.value &&
+                          controller.hasMore.value) {
+                        controller.loadMoreNotifications();
+                      }
+                      return false;
                     },
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                      itemCount: controller.notifications.length +
+                          (controller.isLoadingMore.value ? 1 : 0),
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        if (index == controller.notifications.length) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.secondaryButtonColor,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        final item = controller.notifications[index];
+                        return _buildNotificationCard(context, controller, item);
+                      },
+                    ),
                   ),
                 );
               }),

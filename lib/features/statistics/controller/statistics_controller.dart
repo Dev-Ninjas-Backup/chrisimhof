@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 class StatisticsController extends GetxController {
   // Tab Selection: 0 = "Ma journée" (My day), 1 = "Vue d'ensemble" (Overview)
-  final RxInt selectedTab = 1.obs;
+  final RxInt selectedTab = 0.obs;
 
   final RxString selectedPeriod = '7d'.obs;
   final List<String> periods = ['7d', '30d', '90d', '1y'];
