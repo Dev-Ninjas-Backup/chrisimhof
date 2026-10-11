@@ -6,6 +6,7 @@ import 'package:chrisimhof/features/auth/session/session.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/model/dashboard_model.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
@@ -417,9 +418,21 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
     int mealsLogged = 0;
     int mealsTarget = 3;
+    if (Get.isRegistered<SettingsController>() &&
+        Get.find<SettingsController>().defaultDailyMealTarget.value > 0) {
+      mealsTarget = Get.find<SettingsController>().defaultDailyMealTarget.value;
+    } else if (Get.isRegistered<NutritionController>() &&
+        Get.find<NutritionController>().dailyTarget.value > 0) {
+      mealsTarget = Get.find<NutritionController>().dailyTarget.value;
+    }
+
     if (quickAdd?['meals'] != null) {
       mealsLogged = (quickAdd!['meals']!['count'] as num?)?.toInt() ?? 0;
-      mealsTarget = (quickAdd['meals']!['dailyTarget'] as num?)?.toInt() ?? 3;
+      if (mealsTarget == 3 &&
+          quickAdd['meals']!['dailyTarget'] != null &&
+          (quickAdd['meals']!['dailyTarget'] as num).toInt() > 0) {
+        mealsTarget = (quickAdd['meals']!['dailyTarget'] as num).toInt();
+      }
     } else if (derived?['mealCountToday'] != null) {
       mealsLogged = (derived!['mealCountToday'] as num).toInt();
     }
@@ -441,10 +454,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         (cards?['caffeine']?['subtitle'] as String?) ??
         '${caffeineMg}mg';
 
-    final mealsDisplay =
-        quickAdd?['meals']?['display'] as String? ??
-        (cards?['nutrition']?['subtitle'] as String?) ??
-        '$mealsLogged/$mealsTarget';
+    final mealsDisplay = '$mealsLogged/$mealsTarget';
 
     final sportDisplay =
         quickAdd?['sport']?['display'] as String? ??
@@ -996,9 +1006,14 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         jsonEncode(emptyHydration),
       );
 
-      // Nutrition: truly empty — no hardcoded meals
+      // Nutrition: truly empty — preserves profile dailyTarget
+      int currentTarget = 3;
+      if (Get.isRegistered<SettingsController>() &&
+          Get.find<SettingsController>().defaultDailyMealTarget.value > 0) {
+        currentTarget = Get.find<SettingsController>().defaultDailyMealTarget.value;
+      }
       await SharedPreferencesHelper.saveMeals(
-        jsonEncode({'dailyTarget': 3, 'meals': []}),
+        jsonEncode({'dailyTarget': currentTarget, 'meals': []}),
       );
 
       // Sports: reset today metrics to neutral

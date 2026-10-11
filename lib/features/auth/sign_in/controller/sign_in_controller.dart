@@ -13,6 +13,7 @@ import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
 import 'package:chrisimhof/features/auth/session/session.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
+import 'package:chrisimhof/core/service/fcm_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -74,6 +75,7 @@ class SignInController extends GetxController {
 
         await SessionService().fetchAndStoreSessionId();
         await RealtimeSocketService().connectSocket();
+        FcmService().syncTokenWithBackend();
 
         debugPrint('Access Token: $accessToken');
         debugPrint('Refresh Token: $refreshToken');
@@ -86,6 +88,9 @@ class SignInController extends GetxController {
             accessToken: accessToken,
           );
           final profile = profileResp.data;
+          if (profile != null && profile.id.isNotEmpty) {
+            await SharedPreferencesHelper.saveUserId(profile.id);
+          }
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess(response.message);
@@ -155,6 +160,7 @@ class SignInController extends GetxController {
 
           await SessionService().fetchAndStoreSessionId();
           await RealtimeSocketService().connectSocket();
+          FcmService().syncTokenWithBackend();
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful'.tr);
@@ -224,6 +230,7 @@ class SignInController extends GetxController {
 
           await SessionService().fetchAndStoreSessionId();
           await RealtimeSocketService().connectSocket();
+          FcmService().syncTokenWithBackend();
 
           EasyLoading.dismiss();
           EasyLoading.showSuccess('Login successful'.tr);

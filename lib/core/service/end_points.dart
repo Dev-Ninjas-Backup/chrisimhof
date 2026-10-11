@@ -145,5 +145,7 @@ class Urls {
       '$baseUrl/api/v1/notifications/$id';
   static const String notificationPreferences =
       '$baseUrl/api/v1/profile/notifications';
+  static String updateUserFcmToken(String userId) =>
+      '$baseUrl/api/v1/users/$userId/fcm-token';
 }
 

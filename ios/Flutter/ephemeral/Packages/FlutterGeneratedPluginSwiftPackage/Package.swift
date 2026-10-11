@@ -15,9 +15,11 @@ let package = Package(
         .library(name: "FlutterGeneratedPluginSwiftPackage", type: .static, targets: ["FlutterGeneratedPluginSwiftPackage"])
     ],
     dependencies: [
-        .package(name: "firebase_auth", path: "../.packages/firebase_auth-6.4.0"),
-        .package(name: "firebase_core", path: "../.packages/firebase_core-4.7.0"),
+        .package(name: "firebase_auth", path: "../.packages/firebase_auth-6.7.0"),
+        .package(name: "firebase_core", path: "../.packages/firebase_core-4.15.0"),
+        .package(name: "firebase_messaging", path: "../.packages/firebase_messaging-16.7.0"),
         .package(name: "flutter_appauth", path: "../.packages/flutter_appauth-12.0.0"),
+        .package(name: "flutter_local_notifications", path: "../.packages/flutter_local_notifications-22.3.1"),
         .package(name: "flutter_localization", path: "../.packages/flutter_localization-0.4.0"),
         .package(name: "flutter_timezone", path: "../.packages/flutter_timezone-5.1.0"),
         .package(name: "google_sign_in_ios", path: "../.packages/google_sign_in_ios-6.3.0"),
@@ -32,7 +34,9 @@ let package = Package(
             dependencies: [
                 .product(name: "firebase-auth", package: "firebase_auth"),
                 .product(name: "firebase-core", package: "firebase_core"),
+                .product(name: "firebase-messaging", package: "firebase_messaging"),
                 .product(name: "flutter-appauth", package: "flutter_appauth"),
+                .product(name: "flutter-local-notifications", package: "flutter_local_notifications"),
                 .product(name: "flutter-localization", package: "flutter_localization"),
                 .product(name: "flutter-timezone", package: "flutter_timezone"),
                 .product(name: "google-sign-in-ios", package: "google_sign_in_ios"),

@@ -15,8 +15,22 @@ class WeeklySportGoalProgressCard extends StatelessWidget {
       final goal = controller.weeklyGoal.value;
       if (goal <= 0) return const SizedBox.shrink();
 
-      final completed = controller.workoutsCompletedThisWeek.value;
-      final daysRemaining = controller.daysRemainingInWeek.value;
+      final now = DateTime.now();
+      final calcDaysRemaining = (7 - now.weekday).clamp(0, 7);
+      final daysRemaining = controller.daysRemainingInWeek.value > 0
+          ? controller.daysRemainingInWeek.value
+          : calcDaysRemaining;
+
+      int completed = controller.workoutsCompletedThisWeek.value;
+      if (completed == 0) {
+        completed = controller.sessionsList
+            .where((s) =>
+                s.title.toLowerCase() != 'rest day' &&
+                s.title.toLowerCase() != 'repos' &&
+                !s.subtitle.toLowerCase().contains('earlier'))
+            .length;
+      }
+
       final isMet = controller.isGoalMet.value || completed >= goal;
       final isAdaptiveRest = controller.adaptiveRestRecommended.value;
       final progress = (completed / goal).clamp(0.0, 1.0);
@@ -264,7 +278,12 @@ class WeeklySportGoalProgressCard extends StatelessWidget {
         return SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(ctx).padding.bottom + 24,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

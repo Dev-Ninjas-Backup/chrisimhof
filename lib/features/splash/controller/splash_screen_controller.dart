@@ -6,6 +6,7 @@ import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:chrisimhof/features/nav_bar/screen/navbar_screen.dart';
 import 'package:chrisimhof/features/settings/main/model/profile_response_model.dart';
 import 'package:chrisimhof/features/settings/main/service/profile_service.dart';
+import 'package:chrisimhof/core/service/fcm_service.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -102,6 +103,11 @@ class SplashScreenController extends GetxController {
     // Fetch and save the calculator session ID at startup
     await SessionService().fetchAndStoreSessionId();
     await RealtimeSocketService().connectSocket();
+
+    if (profile.id.isNotEmpty) {
+      await SharedPreferencesHelper.saveUserId(profile.id);
+    }
+    FcmService().syncTokenWithBackend();
 
     if (profile.safetyAcknowledgedAt == null) {
       Get.offAllNamed(AppRoutes.safetyScreen);
