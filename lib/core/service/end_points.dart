@@ -8,6 +8,7 @@ class Urls {
   static const String logout = '$baseUrl/api/v1/auth/logout';
   static const String refresh = '$baseUrl/api/v1/auth/refresh';
   static const String googleSignin = '$baseUrl/api/v1/auth/google';
+  static const String appleSignin = '$baseUrl/api/v1/auth/apple';
 
   static const String microsoftSignin = '$baseUrl/api/v1/auth/microsoft';
 

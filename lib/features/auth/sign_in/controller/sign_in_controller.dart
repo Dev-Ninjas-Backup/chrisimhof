@@ -8,6 +8,11 @@ import 'package:chrisimhof/features/auth/microsoft_signin/model/user_model.dart'
 import 'package:chrisimhof/features/auth/microsoft_signin/service/api_service.dart'
     as microsoft_api;
 import 'package:chrisimhof/features/auth/microsoft_signin/service/microsoft_auth_service.dart';
+import 'package:chrisimhof/features/auth/apple_signin/model/user_model.dart'
+    as apple_user;
+import 'package:chrisimhof/features/auth/apple_signin/service/api_service.dart'
+    as apple_api;
+import 'package:chrisimhof/features/auth/apple_signin/service/apple_auth_service.dart';
 import 'package:chrisimhof/features/auth/sign_in/model/login_response_model.dart';
 import 'package:chrisimhof/features/auth/sign_in/service/sign_in_service.dart';
 import 'package:chrisimhof/core/service/realtime/realtime_socket_service.dart';
@@ -136,6 +141,9 @@ class SignInController extends GetxController {
   final microsoft_api.MicrosoftApiService _microsoftApiService =
       microsoft_api.MicrosoftApiService();
 
+  final AppleAuthService _appleService = AppleAuthService();
+  final apple_api.ApiService _appleApiService = apple_api.ApiService();
+
   Future<void> signInWithGoogle() async {
     try {
       isLoading.value = true;
@@ -192,15 +200,53 @@ class SignInController extends GetxController {
   Future<void> signInWithApple() async {
     try {
       isLoading.value = true;
-      EasyLoading.showSuccess(
-        'Apple Sign-In Clicked',
-        duration: Duration(seconds: 1),
-      );
+      EasyLoading.show(status: 'Signing in with Apple...'.tr);
+
+      apple_user.UserModel? user = await _appleService.signIn();
+
+      if (user != null) {
+        final apiResponse = await _appleApiService.sendUser(user);
+
+        if (apiResponse.success && apiResponse.accessToken != null) {
+          // Save tokens
+          await SharedPreferencesHelper.saveAccessToken(
+            apiResponse.accessToken!,
+          );
+          if (apiResponse.refreshToken != null) {
+            await SharedPreferencesHelper.saveRefreshToken(
+              apiResponse.refreshToken!,
+            );
+          }
+          await SharedPreferencesHelper.setLoginStatus(true);
+
+          await SessionService().fetchAndStoreSessionId();
+          await RealtimeSocketService().connectSocket();
+          FcmService().syncTokenWithBackend();
+
+          EasyLoading.dismiss();
+          EasyLoading.showSuccess('Login successful'.tr);
+
+          if (apiResponse.isNewUser) {
+            Get.offAllNamed(AppRoutes.safetyScreen);
+          } else {
+            Get.offAllNamed(AppRoutes.navbarScreen);
+          }
+        } else {
+          EasyLoading.dismiss();
+          EasyLoading.showError(
+            apiResponse.message ?? 'Login failed. Please try again.'.tr,
+          );
+          debugPrint('Apple login failed: ${apiResponse.message}');
+        }
+      } else {
+        EasyLoading.dismiss();
+        EasyLoading.showInfo('Apple sign-in cancelled'.tr);
+        debugPrint('Apple sign-in cancelled by user');
+      }
     } catch (e) {
-      EasyLoading.showError(
-        'Apple Sign-In Error: ${e.toString()}',
-        duration: Duration(seconds: 1),
-      );
+      EasyLoading.dismiss();
+      EasyLoading.showError('Sign-in error: ${e.toString()}');
+      debugPrint('Apple Sign-In Controller Error: $e');
     } finally {
       isLoading.value = false;
     }
