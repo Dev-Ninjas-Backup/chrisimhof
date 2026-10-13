@@ -44,6 +44,7 @@ class AppTranslations extends Translations {
       'Add custom shift': 'Add custom shift',
       'Add Custom Shift': 'Add Custom Shift',
       'Add Note': 'Add Note',
+      'not_subscribed': 'Not Subscribed',
       'Add note': 'Add note',
       'Adults need 7–9 hours for optimal recovery.':
           'Adults need 7–9 hours for optimal recovery.',
@@ -913,10 +914,12 @@ class AppTranslations extends Translations {
       'Neutral': 'Neutral',
     },
     'fr_FR': {
+      'not_subscribed': 'Non abonné',
       'Delete sleep record?': 'Supprimer cet enregistrement de sommeil ?',
       'Are you sure you want to delete this sleep entry? Other daily logs (meals, caffeine, workouts) will be kept.':
           'Voulez-vous vraiment supprimer cet enregistrement de sommeil ? Les autres entrées du jour (repas, caféine, sport) seront conservées.',
-      'Deleting sleep record...': 'Suppression de l\'enregistrement de sommeil...',
+      'Deleting sleep record...':
+          'Suppression de l\'enregistrement de sommeil...',
       'Sleep entry deleted!': 'Enregistrement de sommeil supprimé !',
       'Clear today\'s sleep': 'Effacer le sommeil du jour',
       'Edit custom rotation': 'Modifier le tournus personnalisé',

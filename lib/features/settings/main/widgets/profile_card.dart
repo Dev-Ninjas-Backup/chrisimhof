@@ -96,16 +96,27 @@ class ProfileCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.asset(IconPath.premium, width: 14, height: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Premium'.tr,
-                          style: GoogleFonts.manrope(
-                            color: AppColors.mint,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        if (controller.isSubscribed.value) ...[
+                          Image.asset(IconPath.premium, width: 14, height: 14),
+                          const SizedBox(width: 4),
+                        ],
+                        controller.isSubscribed.value
+                            ? Text(
+                                'Premium'.tr,
+                                style: GoogleFonts.manrope(
+                                  color: AppColors.mint,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            : Text(
+                                'not_subscribed'.tr,
+                                style: GoogleFonts.manrope(
+                                  color: AppColors.mint,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                       ],
                     ),
                   ),

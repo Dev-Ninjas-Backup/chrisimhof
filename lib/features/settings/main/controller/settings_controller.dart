@@ -23,7 +23,7 @@ class SettingsController extends GetxController {
   final avatarUrl = ''.obs;
   final bio = ''.obs;
   final userId = ''.obs;
-
+  final isSubscribed = false.obs;
   // Baseline variables
   final sleepTargetMinutes = 465.obs;
   final chronotype = ''.obs;
@@ -58,12 +58,13 @@ class SettingsController extends GetxController {
       if (response.success && profileData != null) {
         fullName.value = profileData.fullName;
         email.value = profileData.email;
+        isSubscribed.value = profileData.isSubscribed;
         avatarUrl.value = profileData.avatarUrl ?? '';
         bio.value = profileData.bio ?? '';
         userId.value = profileData.userId.isNotEmpty
             ? profileData.userId
             : profileData.id;
-        
+
         sleepTargetMinutes.value = profileData.sleepTargetMinutes ?? 465;
         chronotype.value = profileData.chronotype ?? '';
         caffeineSensitivity.value = profileData.caffeineSensitivity ?? '';
@@ -73,7 +74,8 @@ class SettingsController extends GetxController {
           defaultDailyMealTarget.value = profileData.defaultDailyMealTarget!;
         }
 
-        if (profileData.timeFormat != null && profileData.timeFormat!.isNotEmpty) {
+        if (profileData.timeFormat != null &&
+            profileData.timeFormat!.isNotEmpty) {
           timeFormat.value = profileData.timeFormat!;
         }
 
@@ -83,7 +85,8 @@ class SettingsController extends GetxController {
         // Apply language from profile if provided (EN / FR)
         try {
           final localLang = await SharedPreferencesHelper.getLanguage();
-          final String? lang = localLang?.toUpperCase() ?? profileData.language?.toUpperCase();
+          final String? lang =
+              localLang?.toUpperCase() ?? profileData.language?.toUpperCase();
           if (lang != null && (lang == 'FR' || lang == 'EN')) {
             // Update app locale without calling the backend
             if (lang == 'FR') {
@@ -165,7 +168,6 @@ class SettingsController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   Future<void> updateDefaultMealTarget(int target) async {
     try {
