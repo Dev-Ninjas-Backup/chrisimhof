@@ -38,7 +38,9 @@ class ConnectedSourcesScreen extends StatelessWidget {
           if (controller.isLoading.value) {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryButtonColor),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.primaryButtonColor,
+                ),
               ),
             );
           }
@@ -111,7 +113,7 @@ class ConnectedSourcesScreen extends StatelessWidget {
                   children: data.sources.map((src) {
                     final isApple = src.key == 'apple';
                     final isGoogle = src.key == 'google';
-                    
+
                     // Determine connection status based on key and controller state
                     final bool isConnected;
                     if (isApple) {
@@ -119,25 +121,36 @@ class ConnectedSourcesScreen extends StatelessWidget {
                     } else if (isGoogle) {
                       isConnected = controller.isGoogleHealthConnected.value;
                     } else {
-                      isConnected = src.status == 'enabled' || src.status == 'linked';
+                      isConnected =
+                          src.status == 'enabled' || src.status == 'linked';
                     }
 
                     // Dynamically set layout styles
-                    final String badgeText = isConnected ? 'Enabled'.tr : 'Not linked'.tr;
-                    final Color badgeBgColor = isConnected ? AppColors.mintSoft2 : AppColors.gray100;
-                    final Color badgeTextColor = isConnected ? AppColors.secondaryButtonColor : AppColors.textMid;
-                    
-                    final Color iconBgColor = isConnected ? AppColors.mintSoft2 : AppColors.gray50;
-                    final Color iconColor = isConnected ? AppColors.secondaryButtonColor : AppColors.textSoft;
+                    final String badgeText = isConnected
+                        ? 'Enabled'.tr
+                        : 'Not linked'.tr;
+                    final Color badgeBgColor = isConnected
+                        ? AppColors.mintSoft2
+                        : AppColors.gray100;
+                    final Color badgeTextColor = isConnected
+                        ? AppColors.secondaryButtonColor
+                        : AppColors.textMid;
 
-                    final VoidCallback? onTap;
-                    if (isApple) {
-                      onTap = controller.toggleAppleHealth;
-                    } else if (isGoogle) {
-                      onTap = controller.toggleGoogleHealthConnect;
-                    } else {
-                      onTap = null;
-                    }
+                    final Color iconBgColor = isConnected
+                        ? AppColors.mintSoft2
+                        : AppColors.gray50;
+                    final Color iconColor = isConnected
+                        ? AppColors.secondaryButtonColor
+                        : AppColors.textSoft;
+
+                    // final VoidCallback? onTap;
+                    // if (isApple) {
+                    //   onTap = controller.toggleAppleHealth;
+                    // } else if (isGoogle) {
+                    //   onTap = controller.toggleGoogleHealthConnect;
+                    // } else {
+                    //   onTap = null;
+                    // }
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
@@ -150,7 +163,7 @@ class ConnectedSourcesScreen extends StatelessWidget {
                         badgeText: badgeText,
                         badgeBackgroundColor: badgeBgColor,
                         badgeTextColor: badgeTextColor,
-                        onTap: onTap,
+                        //onTap: onTap,
                       ),
                     );
                   }).toList(),
