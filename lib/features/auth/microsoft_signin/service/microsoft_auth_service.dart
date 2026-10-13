@@ -10,9 +10,9 @@ import '../model/user_model.dart';
 
 class MicrosoftAuthService {
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
-  static const Duration _authorizationTimeout = Duration(seconds: 45);
-  static const Duration _tokenExchangeTimeout = Duration(seconds: 20);
-  static const Duration _graphRequestTimeout = Duration(seconds: 15);
+  static const Duration _authorizationTimeout = Duration(minutes: 5);
+  static const Duration _tokenExchangeTimeout = Duration(minutes: 1);
+  static const Duration _graphRequestTimeout = Duration(seconds: 30);
 
   // Microsoft Azure AD Configuration
   static const String _clientId =

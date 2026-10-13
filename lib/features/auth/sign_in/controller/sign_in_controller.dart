@@ -255,11 +255,11 @@ class SignInController extends GetxController {
   Future<void> signInWithMicrosoft() async {
     try {
       isLoading.value = true;
-      EasyLoading.show(status: 'Signing in with Microsoft...'.tr);
 
       microsoft_user.UserModel? user = await _microsoftService.signIn();
 
       if (user != null) {
+        EasyLoading.show(status: 'Signing in with Microsoft...'.tr);
         final apiResponse = await _microsoftApiService.sendUser(user);
 
         if (apiResponse.success && apiResponse.accessToken != null) {
