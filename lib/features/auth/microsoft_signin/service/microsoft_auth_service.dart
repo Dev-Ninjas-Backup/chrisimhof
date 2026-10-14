@@ -16,7 +16,7 @@ class MicrosoftAuthService {
 
   // Microsoft Azure AD Configuration
   static const String _clientId =
-      'de51be26-02d9-41a1-9c0b-9e3b4050aaf0'; // Replace with your Microsoft App ID
+      '2d22adfa-d9c1-459e-a6a4-0a0d23daf226';
   static const String _androidRedirectUrl =
       'msauth://com.ryvenza.app/eCjfdTT0ePbJMhw4XEgNcp01Wsg=';
   static const String _iosRedirectUrl =
