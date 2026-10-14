@@ -341,8 +341,14 @@ class NutritionController extends GetxController {
         await saveNutritionData();
       }
     } catch (e) {
-      debugPrint('Error loading nutrition data: $e');
     }
+  }
+
+  Future<void> resetNutritionData() async {
+    mealsList.clear();
+    sleepImpactNote.value = null;
+    notesList.clear();
+    await saveNutritionData(syncWithServer: false);
   }
 
   Future<void> saveNutritionData({bool syncWithServer = true}) async {

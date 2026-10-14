@@ -134,6 +134,16 @@ class HydrationController extends GetxController {
     }
   }
 
+  Future<void> resetHydrationData() async {
+    hydrationPreviewBody.value = null;
+    todayDeficitMl.value = null;
+    for (final dayList in weeklyLogs) {
+      dayList.clear();
+    }
+    weeklyDayTotalsMl.assignAll(List<int>.filled(7, 0));
+    await saveLogsToPrefs(syncWithServer: false);
+  }
+
   Future<void> saveLogsToPrefs({bool syncWithServer = true}) async {
     try {
       final listToSave = weeklyLogs.map((dayList) {

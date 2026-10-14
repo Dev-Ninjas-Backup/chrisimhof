@@ -20,6 +20,7 @@ import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_contr
 import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
+import 'package:chrisimhof/features/statistics/controller/statistics_controller.dart';
 
 class DashboardController extends GetxController with WidgetsBindingObserver {
   final _dashboardService = DashboardService();
@@ -921,31 +922,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     _isEndingDay = true;
     EasyLoading.show(status: 'Ending day...'.tr);
 
-    // Clear recommendations preview cache and active controllers immediately
-    forYouPreviewData.value = null;
-    caffeineCardData.value = null;
-    caffeineTabData.value = null;
-    sportCardData.value = null;
-    if (Get.isRegistered<RecommendationController>()) {
-      Get.find<RecommendationController>().forYouPreview.clear();
-    }
-    if (Get.isRegistered<SleepController>()) {
-      final sleepCtrl = Get.find<SleepController>();
-      sleepCtrl.forYouSleepBody.value = null;
-      sleepCtrl.forYouSleepBedtime.value = null;
-    }
-    if (Get.isRegistered<HydrationController>()) {
-      Get.find<HydrationController>().hydrationPreviewBody.value = null;
-    }
-    if (Get.isRegistered<CaffeineController>()) {
-      final caffeineCtrl = Get.find<CaffeineController>();
-      caffeineCtrl.forYouCaffeineBody.value = null;
-      caffeineCtrl.forYouCaffeineCutoff.value = null;
-      caffeineCtrl.entriesList.clear();
-      caffeineCtrl.activeCaffeine.value = 0.0;
-      caffeineCtrl.todayTotalCaffeine.value = 0.0.toInt();
-    }
-
     String? newSessionId;
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
@@ -991,54 +967,19 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       // Save new session ID from end session response if available
       if (newSessionId != null && newSessionId.isNotEmpty) {
         await SharedPreferencesHelper.saveSessionId(newSessionId);
+        currentSessionId.value = newSessionId;
         debugPrint('endMyDay: saved new sessionId from response = $newSessionId');
       } else {
         // Fallback: Create a brand-new session
         newSessionId = await SessionService().fetchAndStoreSessionId();
+        if (newSessionId != null && newSessionId.isNotEmpty) {
+          currentSessionId.value = newSessionId;
+        }
         debugPrint('endMyDay: new sessionId fetched as fallback = $newSessionId');
       }
 
-      // Clear all local caches
-      await SharedPreferencesHelper.saveCaffeineLogs('[]');
-
-      final emptyHydration = List.generate(7, (_) => []).toList();
-      await SharedPreferencesHelper.saveHydrationLogs(
-        jsonEncode(emptyHydration),
-      );
-
-      // Nutrition: truly empty — preserves profile dailyTarget
-      int currentTarget = 3;
-      if (Get.isRegistered<SettingsController>() &&
-          Get.find<SettingsController>().defaultDailyMealTarget.value > 0) {
-        currentTarget = Get.find<SettingsController>().defaultDailyMealTarget.value;
-      }
-      await SharedPreferencesHelper.saveMeals(
-        jsonEncode({'dailyTarget': currentTarget, 'meals': []}),
-      );
-
-      // Sports: reset today metrics to neutral
-      await SharedPreferencesHelper.saveSportsTodayMetrics(
-        hasTodaySession: false,
-        duration: 0,
-        zone: '',
-        sport: 'Rest day',
-        distance: '',
-        startTime: '',
-        endTime: '',
-        effort: '',
-        type: '',
-        recoveryScore: 0,
-      );
-      await SharedPreferencesHelper.saveSportsSessions('[]');
-
-      // Also refresh recommendations so ForYouSection reflects the new session
-      if (Get.isRegistered<RecommendationController>()) {
-        final locale = Get.locale?.languageCode == 'fr' ? 'fr' : 'en';
-        Get.find<RecommendationController>().getRecommendations(
-          sessionId: newSessionId ?? '',
-          locale: locale,
-        );
-      }
+      // Reset all tracking data and caches across the app
+      await resetTrackingData(newSessionId: newSessionId);
 
       if (newSessionId != null && newSessionId.isNotEmpty) {
         await RealtimeSocketService().connectSocket();
@@ -1055,6 +996,134 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       EasyLoading.showError(msg.isNotEmpty ? msg : 'Failed to end day.'.tr);
     } finally {
       _isEndingDay = false;
+    }
+  }
+
+  /// Resets daily tracking metrics, local storage caches, and in-memory feature controllers
+  /// when starting a new day (via "Start a New Day" or "End My Day").
+  Future<void> resetTrackingData({String? newSessionId}) async {
+    // 1. Reset Dashboard observables immediately
+    forYouPreviewData.value = null;
+    caffeineCardData.value = null;
+    caffeineTabData.value = null;
+    sportCardData.value = null;
+    nutritionTabData.value = null;
+    sleepTabData.value = null;
+
+    int currentTarget = 3;
+    if (Get.isRegistered<SettingsController>() &&
+        Get.find<SettingsController>().defaultDailyMealTarget.value > 0) {
+      currentTarget = Get.find<SettingsController>().defaultDailyMealTarget.value;
+    } else if (Get.isRegistered<NutritionController>() &&
+        Get.find<NutritionController>().dailyTarget.value > 0) {
+      currentTarget = Get.find<NutritionController>().dailyTarget.value;
+    }
+
+    final current = dashboardData.value;
+    dashboardData.value = current.copyWith(
+      waterLiters: 0.0,
+      caffeineMg: 0,
+      mealsLogged: 0,
+      mealsTarget: currentTarget,
+      sportMinutes: 0,
+      waterDisplay: '0.0L',
+      caffeineDisplay: '0mg',
+      mealsDisplay: '0/$currentTarget',
+      sportDisplay: 'Rest',
+      sleepProgress: 0.0,
+      hydrationProgress: 0.0,
+      caffeineProgress: 0.0,
+      recoveryProgress: 1.0,
+    );
+
+    // 2. Clear all local caches in SharedPreferences
+    await SharedPreferencesHelper.saveCaffeineLogs('[]');
+
+    final emptyHydration = List.generate(7, (_) => []).toList();
+    await SharedPreferencesHelper.saveHydrationLogs(
+      jsonEncode(emptyHydration),
+    );
+
+    await SharedPreferencesHelper.saveMeals(
+      jsonEncode({'dailyTarget': currentTarget, 'meals': []}),
+    );
+
+    await SharedPreferencesHelper.saveSportsTodayMetrics(
+      hasTodaySession: false,
+      duration: 0,
+      zone: '',
+      sport: 'Rest day',
+      distance: '',
+      startTime: '',
+      endTime: '',
+      effort: '',
+      type: '',
+      recoveryScore: 100,
+    );
+    await SharedPreferencesHelper.saveSportsSessions('[]');
+
+    // 3. Reset in-memory state of active feature controllers
+    if (Get.isRegistered<HydrationController>()) {
+      try {
+        await Get.find<HydrationController>().resetHydrationData();
+      } catch (e) {
+        debugPrint('resetTrackingData hydration error: $e');
+      }
+    }
+
+    if (Get.isRegistered<CaffeineController>()) {
+      try {
+        await Get.find<CaffeineController>().resetCaffeineData();
+      } catch (e) {
+        debugPrint('resetTrackingData caffeine error: $e');
+      }
+    }
+
+    if (Get.isRegistered<NutritionController>()) {
+      try {
+        await Get.find<NutritionController>().resetNutritionData();
+      } catch (e) {
+        debugPrint('resetTrackingData nutrition error: $e');
+      }
+    }
+
+    if (Get.isRegistered<SportsController>()) {
+      try {
+        await Get.find<SportsController>().resetSportsData();
+      } catch (e) {
+        debugPrint('resetTrackingData sports error: $e');
+      }
+    }
+
+    if (Get.isRegistered<SleepController>()) {
+      try {
+        Get.find<SleepController>().resetSleepDayData();
+      } catch (e) {
+        debugPrint('resetTrackingData sleep error: $e');
+      }
+    }
+
+    if (Get.isRegistered<RecommendationController>()) {
+      try {
+        final recCtrl = Get.find<RecommendationController>();
+        recCtrl.forYouPreview.clear();
+        if (newSessionId != null && newSessionId.isNotEmpty) {
+          final locale = Get.locale?.languageCode == 'fr' ? 'fr' : 'en';
+          recCtrl.getRecommendations(sessionId: newSessionId, locale: locale);
+        }
+      } catch (e) {
+        debugPrint('resetTrackingData recommendation error: $e');
+      }
+    }
+
+    if (Get.isRegistered<StatisticsController>()) {
+      try {
+        final statsCtrl = Get.find<StatisticsController>();
+        statsCtrl.loadDailyTimeline();
+        statsCtrl.loadAnalytics();
+      } catch (e) {
+        debugPrint('resetTrackingData statistics error: $e');
+      }
     }
   }
 

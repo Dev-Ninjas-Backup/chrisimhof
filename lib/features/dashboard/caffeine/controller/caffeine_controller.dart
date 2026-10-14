@@ -87,8 +87,17 @@ class CaffeineController extends GetxController {
       }
     } catch (e) {
       debugPrint('Error loading caffeine entries: $e');
-      _initializeMockEntries();
     }
+  }
+
+  Future<void> resetCaffeineData() async {
+    forYouCaffeineBody.value = null;
+    forYouCaffeineCutoff.value = null;
+    entriesList.clear();
+    activeCaffeine.value = 0.0;
+    todayTotalCaffeine.value = 0;
+    activeCaffeineAtBedtime.value = 0.0;
+    await SharedPreferencesHelper.saveCaffeineLogs('[]');
   }
 
   Future<void> saveEntriesToPrefs({bool syncWithServer = true}) async {

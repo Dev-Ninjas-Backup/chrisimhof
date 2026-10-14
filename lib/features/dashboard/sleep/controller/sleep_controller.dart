@@ -8,6 +8,7 @@ import 'package:chrisimhof/features/dashboard/sleep/model/sleep_log.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/service/dashboard_service.dart';
 import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
+import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class SleepController extends GetxController {
@@ -101,6 +102,15 @@ class SleepController extends GetxController {
 
   Future<void> saveSleepHistory() async {
     // Local storage persistence disabled: server is authoritative
+  }
+
+  void resetSleepDayData() {
+    forYouSleepBody.value = null;
+    forYouSleepBedtime.value = null;
+    loggedNaps.clear();
+    totalNapMinutes.value = 0;
+    napDisplay.value = '0m';
+    isNewMainWake.value = false;
   }
 
   // Bedtime adjusters
@@ -297,17 +307,19 @@ class SleepController extends GetxController {
 
         final returnedSessionId = data?['sessionId'] as String?;
         final returnedStatus = data?['status'] as String?;
+        final previousSessionId = data?['previousSessionId'] as String?;
+        final previousDayClosedBy = data?['previousDayClosedBy'] as String?;
+
+        final bool isDayRollover = sendIsNewMainWake ||
+            (returnedSessionId != null &&
+                returnedSessionId.isNotEmpty &&
+                returnedSessionId != sessionId) ||
+            previousSessionId != null ||
+            previousDayClosedBy != null;
 
         if (returnedSessionId != null && returnedSessionId.isNotEmpty) {
           await SharedPreferencesHelper.saveSessionId(returnedSessionId);
           await RealtimeSocketService().connectSocket();
-        }
-
-        if (data != null && data['liveScores'] != null) {
-          RealtimeSocketService().handleLiveScores(
-            data['liveScores'],
-            useLocalCaches: false,
-          );
         }
 
         try {
@@ -319,7 +331,29 @@ class SleepController extends GetxController {
             if (returnedStatus != null && returnedStatus.isNotEmpty) {
               dashboardController.sessionStatus.value = returnedStatus;
             }
+
+            if (isDayRollover) {
+              await dashboardController.resetTrackingData(
+                newSessionId: returnedSessionId,
+              );
+            }
+          }
+        } catch (_) {}
+
+        if (data != null && data['liveScores'] != null) {
+          RealtimeSocketService().handleLiveScores(
+            data['liveScores'],
+            useLocalCaches: false,
+          );
+        }
+
+        try {
+          if (Get.isRegistered<DashboardController>()) {
+            final dashboardController = Get.find<DashboardController>();
             await dashboardController.fetchDashboardData();
+            if (isDayRollover && Get.isRegistered<WorkController>()) {
+              await Get.find<WorkController>().fetchWorkSettings();
+            }
           }
         } catch (_) {}
 

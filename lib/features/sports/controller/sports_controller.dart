@@ -333,6 +333,40 @@ class SportsController extends GetxController {
     }
   }
 
+  Future<void> resetSportsData() async {
+    hasTodaySession.value = false;
+    todayDuration.value = 0;
+    todayZone.value = '';
+    todaySport.value = 'Rest day';
+    todayDistance.value = '';
+    todayStartTime.value = '';
+    todayEndTime.value = '';
+    todayEffort.value = '';
+    todayType.value = '';
+    todayDisplayDuration.value = '0 min';
+    todayHeartRateZoneLabel.value = '';
+    todayTimeRange.value = '';
+    todayDisplayIntensity.value = '';
+    todayDisplayType.value = 'Rest day';
+    recoveryScore.value = 100;
+    readinessNote.value = null;
+    sessionsList.clear();
+
+    await SharedPreferencesHelper.saveSportsTodayMetrics(
+      hasTodaySession: false,
+      duration: 0,
+      zone: '',
+      sport: 'Rest day',
+      distance: '',
+      startTime: '',
+      endTime: '',
+      effort: '',
+      type: '',
+      recoveryScore: 100,
+    );
+    await SharedPreferencesHelper.saveSportsSessions('[]');
+  }
+
   // No mock session initializer — real data only comes from SharedPrefs or user input
 
   void addSession({
