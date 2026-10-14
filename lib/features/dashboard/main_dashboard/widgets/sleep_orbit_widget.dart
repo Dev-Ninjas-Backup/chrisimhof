@@ -115,7 +115,7 @@ class SleepOrbitWidget extends StatelessWidget {
     super.key,
     required this.imagePath,
     this.avatarSize = 110,
-    this.imageShiftFactor = 0.42,
+    this.imageShiftFactor = 0.38,
     required this.optimalBedtime,
     required this.minutesToBedtime,
     required this.isSleepLogged,

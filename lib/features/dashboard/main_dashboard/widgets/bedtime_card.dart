@@ -47,7 +47,7 @@ class BedtimeCard extends StatelessWidget {
                     child: SleepOrbitWidget(
                       imagePath: ImagePath.circadianAvatar,
                       avatarSize: 155,
-                      imageShiftFactor: 0.52,
+                      imageShiftFactor: 0.38,
                       optimalBedtime: data.optimalBedtime,
                       minutesToBedtime: data.minutesToBedtime,
                       isSleepLogged: false,
