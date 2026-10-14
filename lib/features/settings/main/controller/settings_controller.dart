@@ -9,6 +9,7 @@ import 'dart:ui';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:chrisimhof/core/common/controller/language_controller.dart';
+import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
 
 class SettingsController extends GetxController {
   final isLoading = false.obs;
@@ -81,6 +82,10 @@ class SettingsController extends GetxController {
 
         if (profileData.weeklySportGoal != null) {
           weeklySportGoal.value = profileData.weeklySportGoal!;
+          await SharedPreferencesHelper.saveSportsWeeklyGoal(profileData.weeklySportGoal!);
+          if (Get.isRegistered<SportsController>()) {
+            Get.find<SportsController>().weeklyGoal.value = profileData.weeklySportGoal!;
+          }
         }
         // Apply language from profile if provided (EN / FR)
         try {
@@ -206,6 +211,10 @@ class SettingsController extends GetxController {
       final res = await service.updateBaseline(weeklySportGoal: goal);
       if (res['success'] == true) {
         weeklySportGoal.value = goal;
+        await SharedPreferencesHelper.saveSportsWeeklyGoal(goal);
+        if (Get.isRegistered<SportsController>()) {
+          Get.find<SportsController>().weeklyGoal.value = goal;
+        }
         EasyLoading.showSuccess('Weekly goal updated'.tr);
       }
     } catch (e) {

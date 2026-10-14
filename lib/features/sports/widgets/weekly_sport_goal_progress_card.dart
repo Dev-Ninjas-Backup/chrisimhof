@@ -16,10 +16,7 @@ class WeeklySportGoalProgressCard extends StatelessWidget {
       if (goal <= 0) return const SizedBox.shrink();
 
       final now = DateTime.now();
-      final calcDaysRemaining = (7 - now.weekday).clamp(0, 7);
-      final daysRemaining = controller.daysRemainingInWeek.value > 0
-          ? controller.daysRemainingInWeek.value
-          : calcDaysRemaining;
+      final daysRemaining = (7 - now.weekday).clamp(0, 7);
 
       int completed = controller.workoutsCompletedThisWeek.value;
       if (completed == 0) {

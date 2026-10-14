@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class AddCaffeineBottomSheet extends StatelessWidget {
+class AddCaffeineBottomSheet extends StatefulWidget {
   final CaffeineController controller;
   final CaffeineEntry? entry;
 
@@ -36,19 +36,122 @@ class AddCaffeineBottomSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    DateTime initialDt = entry?.timestamp ?? DateTime.now();
-    final initialAmount = entry?.amountMg ?? 80;
-    final currentAmount = initialAmount.obs;
+  State<AddCaffeineBottomSheet> createState() => _AddCaffeineBottomSheetState();
+}
 
-    final titleController = TextEditingController(
-      text: entry != null ? entry!.title.tr : 'Custom'.tr,
+class _AddCaffeineBottomSheetState extends State<AddCaffeineBottomSheet> {
+  late TextEditingController _titleController;
+  late TextEditingController _amountController;
+  late RxInt _currentAmount;
+  late Rx<DateTime> _selectedDate;
+  late Rx<TimeOfDay> _selectedTime;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialDt = widget.entry?.timestamp ?? DateTime.now();
+    final initialAmount = widget.entry?.amountMg ?? 80;
+    _currentAmount = initialAmount.obs;
+
+    _titleController = TextEditingController(
+      text: widget.entry != null ? widget.entry!.title.tr : 'Custom'.tr,
     );
-    final amountController = TextEditingController(text: '$initialAmount');
-    final selectedDate = initialDt.obs;
-    final selectedTime =
+    _amountController = TextEditingController(text: '$initialAmount');
+    _selectedDate = initialDt.obs;
+    _selectedTime =
         TimeOfDay(hour: initialDt.hour, minute: initialDt.minute).obs;
+  }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  void _showEditDrinkNameDialog() {
+    final dialogController = TextEditingController(text: _titleController.text);
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Nom de la boisson'.tr,
+          style: getTextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.primaryTextColor,
+          ),
+        ),
+        content: TextField(
+          controller: dialogController,
+          autofocus: true,
+          style: getTextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryTextColor,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Nom de la boisson'.tr,
+            hintStyle: getTextStyle(
+              color: AppColors.textSoft.withValues(alpha: 0.5),
+            ),
+            filled: true,
+            fillColor: AppColors.gray100Alt2,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: Text(
+              'Cancel'.tr,
+              style: getTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSoft,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF9A3412),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            ),
+            onPressed: () {
+              final newName = dialogController.text.trim();
+              if (newName.isNotEmpty) {
+                setState(() {
+                  _titleController.text = newName;
+                });
+              }
+              Navigator.of(dialogCtx).pop();
+            },
+            child: Text(
+              'OK'.tr,
+              style: getTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -115,7 +218,9 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        isEdit ? 'Modifier la caféine'.tr : 'Ajouter de la caféine'.tr,
+                        widget.isEdit
+                            ? 'Modifier la caféine'.tr
+                            : 'Ajouter de la caféine'.tr,
                         style: getTextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w700,
@@ -155,40 +260,45 @@ class AddCaffeineBottomSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.borderColor, width: 1.2),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: titleController,
-                      style: getTextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTextColor,
-                      ),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                        border: InputBorder.none,
-                        hintText: 'Nom de la boisson'.tr,
-                        hintStyle: getTextStyle(
-                          color: AppColors.textSoft.withValues(alpha: 0.5),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _showEditDrinkNameDialog,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.borderColor, width: 1.2),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _titleController.text.isNotEmpty
+                            ? _titleController.text
+                            : 'Nom de la boisson'.tr,
+                        style: getTextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: _titleController.text.isNotEmpty
+                              ? AppColors.primaryTextColor
+                              : AppColors.textSoft.withValues(alpha: 0.5),
                         ),
                       ),
                     ),
-                  ),
-                  const Icon(
-                    Icons.edit_outlined,
-                    color: AppColors.textSoft,
-                    size: 20,
-                  ),
-                ],
+                    IconButton(
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: Color(0xFF9A3412),
+                        size: 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: _showEditDrinkNameDialog,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -222,12 +332,13 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      if (currentAmount.value > 0) {
-                        currentAmount.value =
-                            (currentAmount.value - 10).clamp(0, 1000);
-                        amountController.text = currentAmount.value.toString();
-                        amountController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: amountController.text.length),
+                      if (_currentAmount.value > 0) {
+                        _currentAmount.value =
+                            (_currentAmount.value - 10).clamp(0, 1000);
+                        _amountController.text = _currentAmount.value.toString();
+                        _amountController.selection =
+                            TextSelection.fromPosition(
+                          TextPosition(offset: _amountController.text.length),
                         );
                       }
                     },
@@ -259,7 +370,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                       children: [
                         IntrinsicWidth(
                           child: TextField(
-                            controller: amountController,
+                            controller: _amountController,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
@@ -281,7 +392,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                             onChanged: (val) {
                               final parsed = int.tryParse(val);
                               if (parsed != null) {
-                                currentAmount.value = parsed;
+                                _currentAmount.value = parsed;
                               }
                             },
                           ),
@@ -303,11 +414,11 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      currentAmount.value =
-                          (currentAmount.value + 10).clamp(0, 1000);
-                      amountController.text = currentAmount.value.toString();
-                      amountController.selection = TextSelection.fromPosition(
-                        TextPosition(offset: amountController.text.length),
+                      _currentAmount.value =
+                          (_currentAmount.value + 10).clamp(0, 1000);
+                      _amountController.text = _currentAmount.value.toString();
+                      _amountController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: _amountController.text.length),
                       );
                     },
                     child: Container(
@@ -354,7 +465,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
-                          initialDate: selectedDate.value,
+                          initialDate: _selectedDate.value,
                           firstDate: DateTime.now().subtract(
                             const Duration(days: 365),
                           ),
@@ -375,7 +486,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                           },
                         );
                         if (picked != null) {
-                          selectedDate.value = picked;
+                          _selectedDate.value = picked;
                         }
                       },
                       child: Container(
@@ -404,7 +515,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                                 DateFormat(
                                   'd MMM yyyy',
                                   Get.locale?.toString(),
-                                ).format(selectedDate.value),
+                                ).format(_selectedDate.value),
                                 style: getTextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -426,7 +537,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                       onTap: () async {
                         final picked = await showTimePicker(
                           context: context,
-                          initialTime: selectedTime.value,
+                          initialTime: _selectedTime.value,
                           builder: (context, child) {
                             return Theme(
                               data: Theme.of(context).copyWith(
@@ -441,7 +552,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                           },
                         );
                         if (picked != null) {
-                          selectedTime.value = picked;
+                          _selectedTime.value = picked;
                         }
                       },
                       child: Container(
@@ -467,7 +578,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                '${selectedTime.value.hour.toString().padLeft(2, '0')}:${selectedTime.value.minute.toString().padLeft(2, '0')}',
+                                '${_selectedTime.value.hour.toString().padLeft(2, '0')}:${_selectedTime.value.minute.toString().padLeft(2, '0')}',
                                 style: getTextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -519,14 +630,14 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      final title = titleController.text.trim();
+                      final title = _titleController.text.trim();
                       final amount =
-                          int.tryParse(amountController.text.trim()) ??
-                          currentAmount.value;
+                          int.tryParse(_amountController.text.trim()) ??
+                              _currentAmount.value;
                       if (title.isEmpty || amount <= 0) return;
 
-                      final d = selectedDate.value;
-                      final t = selectedTime.value;
+                      final d = _selectedDate.value;
+                      final t = _selectedTime.value;
                       final fullDateTime = DateTime(
                         d.year,
                         d.month,
@@ -536,15 +647,15 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                       );
 
                       bool success = false;
-                      if (isEdit && entry != null) {
-                        success = await controller.editCaffeineEntry(
-                          entry!.id,
+                      if (widget.isEdit && widget.entry != null) {
+                        success = await widget.controller.editCaffeineEntry(
+                          widget.entry!.id,
                           title,
                           amount,
                           fullDateTime,
                         );
                       } else {
-                        success = await controller.addCaffeineEntry(
+                        success = await widget.controller.addCaffeineEntry(
                           title,
                           amount,
                           fullDateTime,
@@ -562,7 +673,7 @@ class AddCaffeineBottomSheet extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        isEdit ? 'Save'.tr : 'Add'.tr,
+                        widget.isEdit ? 'Save'.tr : 'Add'.tr,
                         style: getTextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -576,14 +687,14 @@ class AddCaffeineBottomSheet extends StatelessWidget {
             ),
 
             // Delete entry action (shown only when editing an existing entry)
-            if (isEdit && entry != null) ...[
+            if (widget.isEdit && widget.entry != null) ...[
               const SizedBox(height: 20),
               Center(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
                     Navigator.of(context).pop();
-                    controller.deleteCaffeineEntry(entry!.id);
+                    widget.controller.deleteCaffeineEntry(widget.entry!.id);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

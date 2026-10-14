@@ -289,6 +289,15 @@ class SportsController extends GetxController {
               .toList(),
         );
       }
+      final savedGoal = await SharedPreferencesHelper.getSportsWeeklyGoal();
+      if (savedGoal != null && savedGoal > 0) {
+        weeklyGoal.value = savedGoal;
+      } else if (Get.isRegistered<SettingsController>()) {
+        final settingsGoal = Get.find<SettingsController>().weeklySportGoal.value;
+        if (settingsGoal > 0) {
+          weeklyGoal.value = settingsGoal;
+        }
+      }
       // No mock sessions — sessionsList stays empty if nothing saved
     } catch (e) {
       debugPrint('Error loading sports data: $e');
@@ -350,7 +359,22 @@ class SportsController extends GetxController {
     todayDisplayType.value = 'Rest day';
     recoveryScore.value = 100;
     readinessNote.value = null;
-    sessionsList.clear();
+
+    // Shift any "Today" entries to "Yesterday" so the week's workout history & progress is preserved!
+    for (int i = 0; i < sessionsList.length; i++) {
+      final s = sessionsList[i];
+      if (s.subtitle.startsWith('Today') || s.subtitle.startsWith("Aujourd'hui")) {
+        sessionsList[i] = SportSession(
+          id: s.id,
+          title: s.title,
+          subtitle: s.subtitle
+              .replaceFirst('Today', 'Yesterday')
+              .replaceFirst("Aujourd'hui", 'Hier'),
+          iconPath: s.iconPath,
+          occurredAt: s.occurredAt,
+        );
+      }
+    }
 
     await SharedPreferencesHelper.saveSportsTodayMetrics(
       hasTodaySession: false,
@@ -364,7 +388,18 @@ class SportsController extends GetxController {
       type: '',
       recoveryScore: 100,
     );
-    await SharedPreferencesHelper.saveSportsSessions('[]');
+    final listToSave = sessionsList
+        .map(
+          (s) => {
+            'id': s.id,
+            'title': s.title,
+            'subtitle': s.subtitle,
+            'iconPath': s.iconPath,
+            'occurredAt': s.occurredAt,
+          },
+        )
+        .toList();
+    await SharedPreferencesHelper.saveSportsSessions(jsonEncode(listToSave));
   }
 
   // No mock session initializer — real data only comes from SharedPrefs or user input
@@ -743,8 +778,13 @@ class SportsController extends GetxController {
         todayDisplayIntensity.value = todaySession['displayIntensity'] as String? ?? '';
         todayDisplayType.value = todaySession['displayType'] as String? ?? '';
       } else {
-        hasTodaySession.value = false;
-        todaySport.value = 'Rest day';
+        final hasActiveToday = sessionsList.any((s) =>
+            s.subtitle.startsWith('Today') ||
+            s.subtitle.startsWith("Aujourd'hui"));
+        if (!hasActiveToday) {
+          hasTodaySession.value = false;
+          todaySport.value = 'Rest day';
+        }
       }
 
       if (sportTab['recoveryScore'] != null) {
@@ -758,17 +798,23 @@ class SportsController extends GetxController {
       final weeklyStats = sportTab['weeklySportStats'] as Map<String, dynamic>?;
       if (weeklyStats != null) {
         hasWeeklySportStats.value = true;
-        if (weeklyStats['weeklyGoal'] != null) {
-          weeklyGoal.value = (weeklyStats['weeklyGoal'] as num).toInt();
-        }
+        SharedPreferencesHelper.getSportsWeeklyGoal().then((savedGoal) {
+          if (savedGoal != null && savedGoal > 0) {
+            weeklyGoal.value = savedGoal;
+          } else if (weeklyStats['weeklyGoal'] != null) {
+            final g = (weeklyStats['weeklyGoal'] as num).toInt();
+            if (g > 0) {
+              weeklyGoal.value = g;
+              SharedPreferencesHelper.saveSportsWeeklyGoal(g);
+            }
+          }
+        });
         if (weeklyStats['workoutsCompletedThisWeek'] != null) {
           workoutsCompletedThisWeek.value =
               (weeklyStats['workoutsCompletedThisWeek'] as num).toInt();
         }
-        if (weeklyStats['daysRemainingInWeek'] != null) {
-          daysRemainingInWeek.value =
-              (weeklyStats['daysRemainingInWeek'] as num).toInt();
-        }
+        final now = DateTime.now();
+        daysRemainingInWeek.value = (7 - now.weekday).clamp(0, 7);
         if (weeklyStats['isGoalMet'] != null) {
           isGoalMet.value = weeklyStats['isGoalMet'] == true;
         }
@@ -811,17 +857,23 @@ class SportsController extends GetxController {
       final weeklyStats = sportCard['weeklySportStats'] as Map<String, dynamic>?;
       if (weeklyStats != null) {
         hasWeeklySportStats.value = true;
-        if (weeklyStats['weeklyGoal'] != null) {
-          weeklyGoal.value = (weeklyStats['weeklyGoal'] as num).toInt();
-        }
+        SharedPreferencesHelper.getSportsWeeklyGoal().then((savedGoal) {
+          if (savedGoal != null && savedGoal > 0) {
+            weeklyGoal.value = savedGoal;
+          } else if (weeklyStats['weeklyGoal'] != null) {
+            final g = (weeklyStats['weeklyGoal'] as num).toInt();
+            if (g > 0) {
+              weeklyGoal.value = g;
+              SharedPreferencesHelper.saveSportsWeeklyGoal(g);
+            }
+          }
+        });
         if (weeklyStats['workoutsCompletedThisWeek'] != null) {
           workoutsCompletedThisWeek.value =
               (weeklyStats['workoutsCompletedThisWeek'] as num).toInt();
         }
-        if (weeklyStats['daysRemainingInWeek'] != null) {
-          daysRemainingInWeek.value =
-              (weeklyStats['daysRemainingInWeek'] as num).toInt();
-        }
+        final now = DateTime.now();
+        daysRemainingInWeek.value = (7 - now.weekday).clamp(0, 7);
         if (weeklyStats['isGoalMet'] != null) {
           isGoalMet.value = weeklyStats['isGoalMet'] == true;
         }
@@ -850,6 +902,7 @@ class SportsController extends GetxController {
       EasyLoading.show(status: 'Updating goal...'.tr);
       await BaselineSetupService().updateBaseline(weeklySportGoal: goal);
       weeklyGoal.value = goal;
+      await SharedPreferencesHelper.saveSportsWeeklyGoal(goal);
       if (Get.isRegistered<SettingsController>()) {
         Get.find<SettingsController>().weeklySportGoal.value = goal;
       }
@@ -857,6 +910,8 @@ class SportsController extends GetxController {
     } catch (e) {
       debugPrint('SportsController: Error updating weekly goal: $e');
       EasyLoading.showError('Failed to update goal'.tr);
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 }

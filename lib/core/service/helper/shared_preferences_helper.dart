@@ -177,6 +177,16 @@ class SharedPreferencesHelper {
     };
   }
 
+  static Future<void> saveSportsWeeklyGoal(int goal) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('sportsWeeklyGoal', goal);
+  }
+
+  static Future<int?> getSportsWeeklyGoal() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('sportsWeeklyGoal');
+  }
+
   // --- Timezone Settings ---
   static Future<void> saveTimezone(String timezone) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
