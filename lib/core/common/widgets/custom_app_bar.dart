@@ -64,16 +64,13 @@ class CustomAppBar extends StatelessWidget {
                       )
                     : showSettingsButton == true
                     ? GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Get.toNamed(AppRoutes.settingsScreen);
+                        },
                         child: SizedBox(
                           width: 36,
                           height: 36,
-                          child: IconTile(
-                            icon: Icons.settings_outlined,
-                            onTap: () {
-                              Get.toNamed(AppRoutes.settingsScreen);
-                            },
-                          ),
+                          child: IconTile(icon: Icons.settings_outlined),
                         ),
                       )
                     : const SizedBox(width: 36, height: 36),

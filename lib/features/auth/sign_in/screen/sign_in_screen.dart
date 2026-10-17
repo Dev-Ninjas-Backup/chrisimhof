@@ -28,7 +28,7 @@ class SignInScreen extends StatelessWidget {
               CustomAppBar(
                 title: title.tr,
                 showBackButton: true,
-                showSettingsButton: true,
+                showSettingsButton: false,
               ),
               const SizedBox(height: 45),
               Text(

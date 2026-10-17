@@ -15,7 +15,8 @@ import 'package:get/get.dart';
 class CreateAccountScreen extends StatelessWidget {
   CreateAccountScreen({super.key});
 
-  final CreateAccountController controller = Get.find<CreateAccountController>();
+  final CreateAccountController controller =
+      Get.find<CreateAccountController>();
   final SignInController signInController = Get.find<SignInController>();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final String title = 'Create account';
@@ -30,7 +31,11 @@ class CreateAccountScreen extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
             child: Column(
               children: [
-                CustomAppBar(title: title.tr, showBackButton: true, showSettingsButton: true),
+                CustomAppBar(
+                  title: title.tr,
+                  showBackButton: true,
+                  showSettingsButton: false,
+                ),
                 const SizedBox(height: 30),
                 const PrivacyByDesignCard(),
                 Form(
