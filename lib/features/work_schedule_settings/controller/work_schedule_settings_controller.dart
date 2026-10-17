@@ -1,3 +1,5 @@
+import 'package:chrisimhof/core/service/helper/custom_rotation_prefs.dart';
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_calendar_model.dart';
 import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_preset_model.dart';
@@ -17,6 +19,7 @@ class WorkScheduleSettingsController extends GetxController {
     'Night': {'start': '22:00', 'end': '06:00'},
   }.obs;
   final pattern = <String>[].obs;
+  final dayDisplayCodes = <int, String>{}.obs;
   final overrides = <String, String>{}.obs;
   final hasRotationData = false.obs;
   final rotationName = ''.obs;
@@ -46,11 +49,27 @@ class WorkScheduleSettingsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    ShiftDisplayHelper.init();
+    _loadDayDisplayCodes();
     if (pattern.isEmpty) {
       pattern.assignAll(List.generate(7 * weeks.value, (_) => 'Off'));
     }
     fetchMyWorkRotation();
     loadPresetsFromApi();
+  }
+
+  Future<void> _loadDayDisplayCodes() async {
+    try {
+      final codes = await CustomRotationPrefs.getDayDisplayCodes();
+      final intMap = <int, String>{};
+      codes.forEach((k, v) {
+        final idx = int.tryParse(k);
+        if (idx != null) {
+          intMap[idx] = v;
+        }
+      });
+      dayDisplayCodes.assignAll(intMap);
+    } catch (_) {}
   }
 
   @override
@@ -86,6 +105,9 @@ class WorkScheduleSettingsController extends GetxController {
         shiftTimes.assignAll(rotation.shiftTimes);
         pattern.assignAll(rotation.pattern);
         overrides.assignAll(rotation.overrides);
+        if (rotation.dayDisplayCodes.isNotEmpty) {
+          dayDisplayCodes.assignAll(rotation.dayDisplayCodes);
+        }
         await fetchUpcomingSchedule();
       }
     } catch (e) {
@@ -366,31 +388,25 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   String getShiftAbbreviation(String key) {
-    final isFr = (Get.locale?.languageCode ?? 'fr') == 'fr';
-    final lower = key.toLowerCase().trim();
+    return ShiftDisplayHelper.getDisplayCode(key);
+  }
 
-    if (lower == 'off' || lower == 'repos') {
-      return isFr ? 'Repos' : 'Off';
+  String getDisplayCodeForDay(int dayIndex, String shiftOption) {
+    final isSelected = dayIndex < pattern.length && pattern[dayIndex] == shiftOption;
+    if (isSelected && dayDisplayCodes.containsKey(dayIndex)) {
+      return dayDisplayCodes[dayIndex]!;
     }
-    if (lower == 'jour' || lower == 'day' || lower == 'j' || lower == 'd') {
-      return isFr ? 'J' : 'D';
-    }
-    if (lower == 'après-midi' ||
-        lower == 'apres-midi' ||
-        lower == 'evening' ||
-        lower == 'afternoon' ||
-        lower == 'a' ||
-        lower == 'e') {
-      return isFr ? 'A' : 'E';
-    }
-    if (lower == 'nuit' || lower == 'night' || lower == 'n') {
-      return 'N';
-    }
+    return ShiftDisplayHelper.getDisplayCode(shiftOption);
+  }
 
-    if (key.trim().isNotEmpty) {
-      return key.trim()[0].toUpperCase();
+  void setDayDisplayCode(int dayIndex, String? code) {
+    if (code == null || code.trim().isEmpty) {
+      dayDisplayCodes.remove(dayIndex);
+    } else {
+      dayDisplayCodes[dayIndex] = code.trim().toUpperCase();
     }
-    return key;
+    final stringKeyMap = dayDisplayCodes.map((k, v) => MapEntry(k.toString(), v));
+    CustomRotationPrefs.setDayDisplayCodes(stringKeyMap);
   }
 
   void addCustomShift(String key, String start, String end) {
@@ -474,29 +490,20 @@ class WorkScheduleSettingsController extends GetxController {
     String? shiftStartTime;
     String? shiftEndTime;
 
-    final lowerCode = shiftCode.toLowerCase();
-    if (lowerCode == 'off') {
+    final canonical = ShiftDisplayHelper.toCanonicalApiKey(shiftCode);
+    if (canonical == 'off') {
       apiShiftType = 'off';
       shiftStartTime = null;
       shiftEndTime = null;
     } else {
       final matchKey = shiftTimes.keys.firstWhere((k) {
-        final lK = k.toLowerCase();
-        return lK == lowerCode ||
-            (lK == 'day' && lowerCode == 'd') ||
-            (lK == 'evening' && lowerCode == 'e') ||
-            (lK == 'night' && lowerCode == 'n');
+        return ShiftDisplayHelper.toCanonicalApiKey(k) == canonical ||
+            k.toLowerCase() == shiftCode.toLowerCase();
       }, orElse: () => shiftCode);
 
-      apiShiftType = matchKey.toLowerCase() == 'day'
-          ? 'day'
-          : matchKey.toLowerCase() == 'evening'
-          ? 'evening'
-          : matchKey.toLowerCase() == 'night'
-          ? 'night'
-          : matchKey;
+      apiShiftType = ShiftDisplayHelper.toCanonicalApiKey(matchKey);
 
-      final times = shiftTimes[matchKey];
+      final times = shiftTimes[matchKey] ?? shiftTimes[apiShiftType];
       shiftStartTime = times?['start'] ?? '00:00';
       shiftEndTime = times?['end'] ?? '00:00';
     }
@@ -574,29 +581,20 @@ class WorkScheduleSettingsController extends GetxController {
     String? shiftStartTime;
     String? shiftEndTime;
 
-    final lowerCode = shiftCode.toLowerCase();
-    if (lowerCode == 'off') {
+    final canonical = ShiftDisplayHelper.toCanonicalApiKey(shiftCode);
+    if (canonical == 'off') {
       apiShiftType = 'off';
       shiftStartTime = null;
       shiftEndTime = null;
     } else {
       final matchKey = shiftTimes.keys.firstWhere((k) {
-        final lK = k.toLowerCase();
-        return lK == lowerCode ||
-            (lK == 'day' && lowerCode == 'd') ||
-            (lK == 'evening' && lowerCode == 'e') ||
-            (lK == 'night' && lowerCode == 'n');
+        return ShiftDisplayHelper.toCanonicalApiKey(k) == canonical ||
+            k.toLowerCase() == shiftCode.toLowerCase();
       }, orElse: () => shiftCode);
 
-      apiShiftType = matchKey.toLowerCase() == 'day'
-          ? 'day'
-          : matchKey.toLowerCase() == 'evening'
-          ? 'evening'
-          : matchKey.toLowerCase() == 'night'
-          ? 'night'
-          : matchKey;
+      apiShiftType = ShiftDisplayHelper.toCanonicalApiKey(matchKey);
 
-      final times = shiftTimes[matchKey];
+      final times = shiftTimes[matchKey] ?? shiftTimes[apiShiftType];
       shiftStartTime = startTime ?? times?['start'] ?? '00:00';
       shiftEndTime = endTime ?? times?['end'] ?? '00:00';
     }
@@ -794,17 +792,18 @@ class WorkScheduleSettingsController extends GetxController {
 
     final todayIndex = now.weekday - 1;
     final todayShift = computedPattern[todayIndex]['shift']!;
-    final lowerToday = todayShift.toLowerCase();
+    final cat = ShiftDisplayHelper.getShiftCategory(todayShift);
 
-    if (lowerToday == 'd' || lowerToday == 'day') {
+    if (cat == 'day') {
       workCtrl.selectedShiftType.value = 'Day';
-    } else if (lowerToday == 'e' || lowerToday == 'evening') {
+    } else if (cat == 'evening') {
       workCtrl.selectedShiftType.value = 'Evening';
-    } else if (lowerToday == 'n' || lowerToday == 'night') {
+    } else if (cat == 'night') {
       workCtrl.selectedShiftType.value = 'Night';
-    } else if (lowerToday == 'off') {
+    } else if (cat == 'off') {
       workCtrl.selectedShiftType.value = 'Off';
     } else {
+      final lowerToday = todayShift.toLowerCase();
       final matchKey = shiftTimes.keys.firstWhere(
         (k) => k.toLowerCase() == lowerToday,
         orElse: () => todayShift,

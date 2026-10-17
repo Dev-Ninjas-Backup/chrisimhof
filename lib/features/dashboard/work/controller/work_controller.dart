@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
@@ -8,8 +7,10 @@ import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/work/service/work_service.dart';
 import 'package:chrisimhof/core/service/helper/custom_rotation_prefs.dart';
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
+import 'package:flutter/material.dart';
 
 class WorkController extends GetxController {
   final startHour = 22.obs;
@@ -40,6 +41,7 @@ class WorkController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    ShiftDisplayHelper.init();
     _initializeFromDashboard();
     fetchWorkSettings();
     _initCustomRotation();
@@ -275,42 +277,123 @@ class WorkController extends GetxController {
   }
 
   void toggleDayShift(int index) async {
+    final currentShift = weeklyPattern.length > index
+        ? (weeklyPattern[index]['shift'] ?? 'Off')
+        : 'Off';
+    final cat = ShiftDisplayHelper.getShiftCategory(currentShift);
+
+    String nextShift = 'Off';
+    if (cat == 'night') {
+      nextShift = 'Off';
+    } else if (cat == 'off') {
+      nextShift = 'D';
+    } else if (cat == 'day') {
+      nextShift = 'E';
+    } else if (cat == 'evening') {
+      nextShift = 'N';
+    }
+
     final customEnabled = await CustomRotationPrefs.isEnabled();
     if (customEnabled) {
       final now = DateTime.now();
       final monday = now.subtract(Duration(days: now.weekday - 1));
       final date = monday.add(Duration(days: index));
-      final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-
-      final currentShift = weeklyPattern[index]['shift'];
-      String nextShift = 'Off';
-      if (currentShift == 'N') {
-        nextShift = 'Off';
-      } else if (currentShift == 'Off') {
-        nextShift = 'D';
-      } else if (currentShift == 'D') {
-        nextShift = 'E';
-      } else if (currentShift == 'E') {
-        nextShift = 'N';
-      }
+      final dateStr =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
       await CustomRotationPrefs.addOverride(dateStr, nextShift);
       await loadCustomRotationSchedule();
     } else {
-      final currentShift = weeklyPattern[index]['shift'];
-      String nextShift = 'Off';
-      if (currentShift == 'N') {
-        nextShift = 'Off';
-      } else if (currentShift == 'Off') {
-        nextShift = 'D';
-      } else if (currentShift == 'D') {
-        nextShift = 'E';
-      } else if (currentShift == 'E') {
-        nextShift = 'N';
-      }
-      weeklyPattern[index] = {'day': weeklyPattern[index]['day']!, 'shift': nextShift};
+      weeklyPattern[index] = {
+        'day': weeklyPattern[index]['day']!,
+        'shift': nextShift,
+      };
       saveWeeklyPattern();
     }
+  }
+
+  void showCustomizeShiftDialog(BuildContext context, int index) {
+    final currentShift = weeklyPattern.length > index
+        ? (weeklyPattern[index]['shift'] ?? 'Off')
+        : 'Off';
+    final currentDisplay = ShiftDisplayHelper.getDisplayCode(currentShift);
+    final textController = TextEditingController(text: currentDisplay);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            'Customize shift code'.tr,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Enter a custom initial or short code (e.g. DN)'.tr,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: textController,
+                maxLength: 4,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  hintText: 'e.g. J, A, N, DN',
+                  counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+              child: Text('Cancel'.tr),
+            ),
+            TextButton(
+              onPressed: () async {
+                final customCode = textController.text.trim().toUpperCase();
+                if (customCode.isNotEmpty) {
+                  weeklyPattern[index] = {
+                    'day': weeklyPattern[index]['day']!,
+                    'shift': customCode,
+                  };
+                  final customEnabled = await CustomRotationPrefs.isEnabled();
+                  if (customEnabled) {
+                    final now = DateTime.now();
+                    final monday = now.subtract(Duration(days: now.weekday - 1));
+                    final date = monday.add(Duration(days: index));
+                    final dateStr =
+                        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                    await CustomRotationPrefs.addOverride(dateStr, customCode);
+                  }
+                  saveWeeklyPattern();
+                }
+                Navigator.of(ctx).pop();
+              },
+              child: Text(
+                'Save'.tr,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void selectAvailableRotation(Map<String, dynamic> item) async {
@@ -356,15 +439,12 @@ class WorkController extends GetxController {
         String shiftCode = 'Off';
         if (i < pList.length) {
           final p = pList[i];
-          final code = (p['shiftCode'] as String? ?? 'off').toLowerCase();
-          if (code == 'day') {
-            shiftCode = 'D';
-          } else if (code == 'evening') {
-            shiftCode = 'A';
-          } else if (code == 'night') {
-            shiftCode = 'N';
+          final rawCode = (p['shiftCode'] as String? ?? 'off');
+          final displayCode = p['displayCode'] as String?;
+          if (displayCode != null && displayCode.isNotEmpty) {
+            shiftCode = displayCode;
           } else {
-            shiftCode = 'Off';
+            shiftCode = ShiftDisplayHelper.toCanonicalPatternCode(rawCode);
           }
         }
         newPattern.add({'day': days[i], 'shift': shiftCode});
@@ -432,7 +512,10 @@ class WorkController extends GetxController {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
       if (sessionId.isEmpty || token.isEmpty) return;
 
-      final patternCodes = weeklyPattern.map((d) => d['shift']!).toList();
+      final patternCodes = weeklyPattern.map((d) {
+        final raw = d['shift'] ?? 'Off';
+        return ShiftDisplayHelper.toCanonicalPatternCode(raw);
+      }).toList();
 
       final response = await http.post(
         Uri.parse(Urls.createWeeklyPattern(sessionId)),
@@ -443,6 +526,7 @@ class WorkController extends GetxController {
         },
         body: jsonEncode({'pattern': patternCodes}),
       );
+
 
       debugPrint('Weekly pattern POST status: ${response.statusCode}');
       debugPrint('Weekly pattern POST body: ${response.body}');
@@ -472,7 +556,7 @@ class WorkController extends GetxController {
     try {
       final sessionId = await SharedPreferencesHelper.getSessionId();
       if (sessionId != null && sessionId.isNotEmpty) {
-        final shiftType = selectedShiftType.value.toLowerCase();
+        final shiftType = ShiftDisplayHelper.toCanonicalApiKey(selectedShiftType.value);
         
         final startHStr = startHour.value.toString().padLeft(2, '0');
         final startMStr = startMinute.value.toString().padLeft(2, '0');

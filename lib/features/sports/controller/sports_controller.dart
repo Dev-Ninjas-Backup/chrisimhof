@@ -154,7 +154,16 @@ class SportsController extends GetxController {
     };
     if (durationMinutes != null) body['durationMinutes'] = durationMinutes;
     if (intensity != null && intensity.isNotEmpty) {
-      body['intensity'] = intensity.toLowerCase();
+      final i = intensity.toLowerCase().trim();
+      if (i == 'faible' || i == 'low') {
+        body['intensity'] = 'low';
+      } else if (i == 'moyenne' || i == 'moyen' || i == 'medium') {
+        body['intensity'] = 'medium';
+      } else if (i == 'élevée' || i == 'elevee' || i == 'high') {
+        body['intensity'] = 'high';
+      } else {
+        body['intensity'] = i;
+      }
     }
     if (sportType != null && sportType.isNotEmpty) {
       final st = sportType.toLowerCase().trim();

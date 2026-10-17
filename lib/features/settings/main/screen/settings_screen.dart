@@ -128,28 +128,32 @@ class SettingsScreen extends StatelessWidget {
                         final hours = sleepMinutes ~/ 60;
                         final mins = sleepMinutes % 60;
                         final sleepDisplay = mins == 0
-                            ? '${hours}h'
-                            : '${hours}h ${mins}m';
+                            ? '$hours h'
+                            : '$hours h $mins min';
 
+                        final chronoEnum =
+                            BaselineEnums.normalizeChronotype(
+                          controller.chronotype.value,
+                        );
                         final chronoDisplay =
-                            BaselineEnums.chronotype[BaselineEnums.normalizeChronotype(
-                              controller.chronotype.value,
-                            )] ??
-                            'Intermediate';
+                            (BaselineEnums.chronotype[chronoEnum] ??
+                                'Intermediate').tr;
 
+                        final caffeineEnum =
+                            BaselineEnums.normalizeCaffeineSensitivity(
+                          controller.caffeineSensitivity.value,
+                        );
                         final caffeineDisplay =
-                            BaselineEnums
-                                .caffeineSensitivity[BaselineEnums.normalizeCaffeineSensitivity(
-                              controller.caffeineSensitivity.value,
-                            )] ??
-                            'Medium sensitivity';
+                            (BaselineEnums.caffeineSensitivity[caffeineEnum] ??
+                                'Medium sensitivity').tr;
 
+                        final sportEnum =
+                            BaselineEnums.normalizeSportProfile(
+                          controller.sportProfile.value,
+                        );
                         final sportDisplay =
-                            BaselineEnums
-                                .sportProfile[BaselineEnums.normalizeSportProfile(
-                              controller.sportProfile.value,
-                            )] ??
-                            'Light activity';
+                            (BaselineEnums.sportProfile[sportEnum] ??
+                                'Lightly active').tr;
 
                         return SettingsGroup(
                           accent: true,

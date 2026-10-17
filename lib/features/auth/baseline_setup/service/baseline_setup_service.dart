@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:chrisimhof/core/service/end_points.dart';
 import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:http/http.dart' as http;
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 
 class BaselineSetupService {
   // GET /api/v1/profile/baseline
@@ -45,13 +46,13 @@ class BaselineSetupService {
       body['sleepTargetMinutes'] = sleepTargetMinutes;
     }
     if (chronotype != null) {
-      body['chronotype'] = chronotype;
+      body['chronotype'] = BaselineEnums.normalizeChronotype(chronotype);
     }
     if (caffeineSensitivity != null) {
-      body['caffeineSensitivity'] = caffeineSensitivity;
+      body['caffeineSensitivity'] = BaselineEnums.normalizeCaffeineSensitivity(caffeineSensitivity);
     }
     if (sportProfile != null) {
-      body['sportProfile'] = sportProfile;
+      body['sportProfile'] = BaselineEnums.normalizeSportProfile(sportProfile);
     }
     if (defaultDailyMealTarget != null) {
       body['defaultDailyMealTarget'] = defaultDailyMealTarget;

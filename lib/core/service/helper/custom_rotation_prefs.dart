@@ -147,4 +147,43 @@ class CustomRotationPrefs {
     overrides.remove(dateStr);
     await setOverrides(overrides);
   }
+
+  // Day display codes (e.g. index/date -> 'DN')
+  static const String _dayDisplayCodesKey = 'custom_rotation_day_display_codes';
+  static Future<Map<String, String>> getDayDisplayCodes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString(_dayDisplayCodesKey) ?? '';
+    if (jsonStr.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, v.toString()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  static Future<void> setDayDisplayCodes(Map<String, String> codes) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_dayDisplayCodesKey, jsonEncode(codes));
+  }
+
+  // Custom shift initials (e.g. 'day' -> 'J', 'night' -> 'DN')
+  static const String _customShiftInitialsKey = 'custom_shift_initials';
+  static Future<Map<String, String>> getCustomShiftInitials() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString(_customShiftInitialsKey) ?? '';
+    if (jsonStr.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, v.toString()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  static Future<void> setCustomShiftInitials(Map<String, String> initials) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_customShiftInitialsKey, jsonEncode(initials));
+  }
 }
+

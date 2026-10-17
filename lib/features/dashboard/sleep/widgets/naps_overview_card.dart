@@ -8,10 +8,7 @@ import 'package:get/get.dart';
 class NapsOverviewCard extends StatelessWidget {
   final SleepController controller;
 
-  const NapsOverviewCard({
-    super.key,
-    required this.controller,
-  });
+  const NapsOverviewCard({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -40,66 +37,77 @@ class NapsOverviewCard extends StatelessWidget {
           children: [
             // Header Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.wb_twilight_rounded,
-                        color: Color(0xFFD97706),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Today\'s Naps'.tr,
-                          style: getTextStyle2(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryTextColor,
-                          ),
-                        ),
-                        Text(
-                          napCount > 0
-                              ? '$napCount nap${napCount > 1 ? 's' : ''} · ${totalMin}m total'
-                              : 'No naps logged today'.tr,
-                          style: getTextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSoft,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                // Quick + Log Nap Button
-                TextButton.icon(
-                  onPressed: () => _showLogNapDialog(context),
-                  icon: const Icon(Icons.add, size: 16, color: AppColors.addButtonColor),
-                  label: Text(
-                    'Log nap'.tr,
-                    style: getTextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.addButtonColor,
-                    ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFE8FBF3),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  child: const Icon(
+                    Icons.wb_twilight_rounded,
+                    color: Color(0xFFD97706),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Today\'s Naps'.tr,
+                              style: getTextStyle2(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryTextColor,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            onPressed: () => _showLogNapDialog(context),
+                            icon: const Icon(
+                              Icons.add,
+                              size: 16,
+                              color: AppColors.addButtonColor,
+                            ),
+                            label: Text(
+                              'Log nap'.tr,
+                              style: getTextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.addButtonColor,
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              backgroundColor: const Color(0xFFE8FBF3),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        napCount > 0
+                            ? '$napCount nap${napCount > 1 ? 's' : ''} · ${totalMin}m total'
+                            : 'No naps logged today'.tr,
+                        style: getTextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSoft,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -124,7 +132,8 @@ class NapsOverviewCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Naps reduce 7-day sleep debt with zero reset to your circadian day.'.tr,
+                      'Naps reduce 7-day sleep debt with zero reset to your circadian day.'
+                          .tr,
                       style: getTextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
@@ -147,7 +156,8 @@ class NapsOverviewCard extends StatelessWidget {
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final nap = naps[index];
-                  final duration = (nap['durationMinutes'] as num?)?.toInt() ?? 30;
+                  final duration =
+                      (nap['durationMinutes'] as num?)?.toInt() ?? 30;
                   final timeStr = nap['timestamp'] as String? ?? 'Nap';
                   final quality = nap['quality'] as String? ?? 'refreshing';
                   final notes = nap['notes'] as String?;
@@ -207,7 +217,10 @@ class NapsOverviewCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFE2E8F0),
                                       borderRadius: BorderRadius.circular(6),
@@ -238,14 +251,28 @@ class NapsOverviewCard extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF64748B)),
-                          onPressed: () => _showEditNapDialog(context, napId, duration, quality, notes),
+                          icon: const Icon(
+                            Icons.edit_outlined,
+                            size: 18,
+                            color: Color(0xFF64748B),
+                          ),
+                          onPressed: () => _showEditNapDialog(
+                            context,
+                            napId,
+                            duration,
+                            quality,
+                            notes,
+                          ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
                         const SizedBox(width: 12),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.rose),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: AppColors.rose,
+                          ),
                           onPressed: () => _confirmDeleteNap(context, napId),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -269,7 +296,9 @@ class NapsOverviewCard extends StatelessWidget {
     final DateTime now = DateTime.now();
     DateTime napDate = now;
     TimeOfDay startTime = TimeOfDay(hour: now.hour, minute: now.minute);
-    TimeOfDay endTime = TimeOfDay.fromDateTime(now.add(const Duration(minutes: 30)));
+    TimeOfDay endTime = TimeOfDay.fromDateTime(
+      now.add(const Duration(minutes: 30)),
+    );
 
     final isFrench = (Get.locale?.languageCode ?? 'fr') == 'fr';
 
@@ -318,7 +347,8 @@ class NapsOverviewCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Select start/end times or a recommended preset duration.'.tr,
+                      'Select start/end times or a recommended preset duration.'
+                          .tr,
                       style: getTextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
@@ -347,17 +377,27 @@ class NapsOverviewCard extends StatelessWidget {
                                     startTime.hour,
                                     startTime.minute,
                                   );
-                                  final eDt = sDt.add(Duration(minutes: selectedDuration));
-                                  endTime = TimeOfDay(hour: eDt.hour, minute: eDt.minute);
+                                  final eDt = sDt.add(
+                                    Duration(minutes: selectedDuration),
+                                  );
+                                  endTime = TimeOfDay(
+                                    hour: eDt.hour,
+                                    minute: eDt.minute,
+                                  );
                                 });
                               }
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF8FAFC),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +412,8 @@ class NapsOverviewCard extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
@@ -405,7 +446,8 @@ class NapsOverviewCard extends StatelessWidget {
                               if (picked != null) {
                                 setState(() {
                                   endTime = picked;
-                                  int sMin = startTime.hour * 60 + startTime.minute;
+                                  int sMin =
+                                      startTime.hour * 60 + startTime.minute;
                                   int eMin = endTime.hour * 60 + endTime.minute;
                                   int diff = eMin - sMin;
                                   if (diff <= 0) diff += 1440;
@@ -414,11 +456,16 @@ class NapsOverviewCard extends StatelessWidget {
                               }
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF8FAFC),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,7 +480,8 @@ class NapsOverviewCard extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}',
@@ -495,8 +543,12 @@ class NapsOverviewCard extends StatelessWidget {
                             label,
                             style: getTextStyle(
                               fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? AppColors.white : AppColors.primaryTextColor,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? AppColors.white
+                                  : AppColors.primaryTextColor,
                             ),
                           ),
                           selected: isSelected,
@@ -505,7 +557,9 @@ class NapsOverviewCard extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                             side: BorderSide(
-                              color: isSelected ? AppColors.addButtonColor : Colors.transparent,
+                              color: isSelected
+                                  ? AppColors.addButtonColor
+                                  : Colors.transparent,
                             ),
                           ),
                           onSelected: (val) {
@@ -519,8 +573,13 @@ class NapsOverviewCard extends StatelessWidget {
                                   startTime.hour,
                                   startTime.minute,
                                 );
-                                final eDt = sDt.add(Duration(minutes: selectedDuration));
-                                endTime = TimeOfDay(hour: eDt.hour, minute: eDt.minute);
+                                final eDt = sDt.add(
+                                  Duration(minutes: selectedDuration),
+                                );
+                                endTime = TimeOfDay(
+                                  hour: eDt.hour,
+                                  minute: eDt.minute,
+                                );
                               });
                             }
                           },
@@ -570,17 +629,27 @@ class NapsOverviewCard extends StatelessWidget {
                       controller: notesController,
                       decoration: InputDecoration(
                         hintText: 'Notes (e.g. pre-night shift anchor nap)'.tr,
-                        hintStyle: getTextStyle(fontSize: 13, color: AppColors.textSoft),
+                        hintStyle: getTextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSoft,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE2E8F0),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE2E8F0),
+                          ),
                         ),
                       ),
                     ),
@@ -648,10 +717,14 @@ class NapsOverviewCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFE8FBF3) : const Color(0xFFF1F5F9),
+            color: isSelected
+                ? const Color(0xFFE8FBF3)
+                : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: isSelected ? AppColors.secondaryButtonColor : Colors.transparent,
+              color: isSelected
+                  ? AppColors.secondaryButtonColor
+                  : Colors.transparent,
               width: 1.2,
             ),
           ),
@@ -660,7 +733,9 @@ class NapsOverviewCard extends StatelessWidget {
             style: getTextStyle(
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? AppColors.mintSoftText : const Color(0xFF475569),
+              color: isSelected
+                  ? AppColors.mintSoftText
+                  : const Color(0xFF475569),
             ),
           ),
         ),
@@ -742,7 +817,9 @@ class NapsOverviewCard extends StatelessWidget {
                           selected: isSelected,
                           selectedColor: AppColors.addButtonColor,
                           labelStyle: TextStyle(
-                            color: isSelected ? AppColors.white : AppColors.primaryTextColor,
+                            color: isSelected
+                                ? AppColors.white
+                                : AppColors.primaryTextColor,
                           ),
                           onSelected: (val) {
                             if (val) setState(() => duration = dur);
@@ -818,7 +895,10 @@ class NapsOverviewCard extends StatelessWidget {
                         ),
                         child: Text(
                           'Update Nap'.tr,
-                          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -848,7 +928,10 @@ class NapsOverviewCard extends StatelessWidget {
               Navigator.pop(ctx);
               controller.deleteNapEntry(entryId: entryId);
             },
-            child: Text('Delete'.tr, style: const TextStyle(color: AppColors.rose)),
+            child: Text(
+              'Delete'.tr,
+              style: const TextStyle(color: AppColors.rose),
+            ),
           ),
         ],
       ),

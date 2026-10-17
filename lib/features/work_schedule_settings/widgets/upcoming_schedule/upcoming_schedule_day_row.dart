@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -161,34 +162,37 @@ class UpcomingScheduleDayRow extends StatelessWidget {
   }
 
   Color _getShiftDotColor(String code) {
-    final lower = code.toLowerCase();
-    if (lower == 'day' || lower == 'd') return AppColors.orangeAccent2;
-    if (lower == 'evening' || lower == 'e') return AppColors.violet;
-    if (lower == 'night' || lower == 'n') return AppColors.indigo;
-    if (lower == 'off') return AppColors.grey;
-
-    if (lower.contains('morning') || lower.contains('day')) {
-      return AppColors.orangeAccent2;
+    final cat = ShiftDisplayHelper.getShiftCategory(code);
+    switch (cat) {
+      case 'day':
+        return AppColors.orangeAccent2;
+      case 'evening':
+        return AppColors.violet;
+      case 'night':
+        return AppColors.indigo;
+      case 'off':
+        return AppColors.grey;
+      default:
+        return AppColors.secondaryButtonColor;
     }
-    if (lower.contains('evening') || lower.contains('afternoon')) {
-      return AppColors.violet;
-    }
-    if (lower.contains('night')) {
-      return AppColors.indigo;
-    }
-    return AppColors.secondaryButtonColor;
   }
 
   String _getShiftFullName(String code) {
-    final lower = code.toLowerCase();
-    if (lower == 'day' || lower == 'd') return 'Day'.tr;
-    if (lower == 'evening' || lower == 'e') return 'Evening'.tr;
-    if (lower == 'night' || lower == 'n') return 'Night'.tr;
-    if (lower == 'off') return 'Off'.tr;
-
-    return code.split('_').map((word) {
-      if (word.isEmpty) return '';
-      return word[0].toUpperCase() + word.substring(1);
-    }).join(' ');
+    final cat = ShiftDisplayHelper.getShiftCategory(code);
+    switch (cat) {
+      case 'day':
+        return 'Day'.tr;
+      case 'evening':
+        return 'Evening'.tr;
+      case 'night':
+        return 'Night'.tr;
+      case 'off':
+        return 'Off'.tr;
+      default:
+        return code.split('_').map((word) {
+          if (word.isEmpty) return '';
+          return word[0].toUpperCase() + word.substring(1);
+        }).join(' ');
+    }
   }
 }

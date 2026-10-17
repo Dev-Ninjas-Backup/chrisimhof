@@ -4,6 +4,7 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,39 +16,43 @@ class ChronotypeBottomsheet extends StatefulWidget {
 }
 
 class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
-  late String selectedTitle;
+  late String selectedValue;
   late final BaselineSetupController controller;
 
-  final List<Map<String, String>> options = [
-    {
-      'title': 'Early Bird',
-      'range': '5am – 9pm',
-      'value': BaselineEnums.chronotypeMorning,
-    },
-    {
-      'title': 'Intermediate',
-      'range': '7am – 11pm',
-      'value': BaselineEnums.chronotypeIntermediate,
-    },
-    {
-      'title': 'Night Owl',
-      'range': '10am – 2am',
-      'value': BaselineEnums.chronotypeEvening,
-    },
-  ];
+  bool get _is24Hour {
+    if (Get.isRegistered<SettingsController>()) {
+      return Get.find<SettingsController>().timeFormat.value != '12h';
+    }
+    return controller.timeFormat.value != '12h';
+  }
+
+  List<Map<String, String>> _getOptions(bool is24h) {
+    return [
+      {
+        'title': 'Early Bird',
+        'range': is24h ? '05:00 - 21:00' : '5am - 9pm',
+        'value': BaselineEnums.chronotypeMorning,
+      },
+      {
+        'title': 'Intermediate',
+        'range': is24h ? '07:00 - 23:00' : '7am - 11pm',
+        'value': BaselineEnums.chronotypeIntermediate,
+      },
+      {
+        'title': 'Night Owl',
+        'range': is24h ? '10:00 - 02:00' : '10am - 2am',
+        'value': BaselineEnums.chronotypeEvening,
+      },
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
     controller = Get.find<BaselineSetupController>();
-    final currentEnum = BaselineEnums.normalizeChronotype(
+    selectedValue = BaselineEnums.normalizeChronotype(
       controller.chronotype.value,
     );
-    final matched = options.firstWhere(
-      (opt) => opt['value'] == currentEnum,
-      orElse: () => options[1],
-    );
-    selectedTitle = matched['title']!;
   }
 
   @override
@@ -125,88 +130,94 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
           const SizedBox(height: 28),
 
           // Options List
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: options.map((opt) {
-              final title = opt['title']!;
-              final range = opt['range']!;
-              final isSelected = selectedTitle == title;
+          Builder(
+            builder: (context) {
+              final options = _getOptions(_is24Hour);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: options.map((opt) {
+                  final String title = opt['title']!;
+                  final String range = opt['range']!;
+                  final String value = opt['value']!;
+                  final isSelected = selectedValue == value;
 
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedTitle = title;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 14.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFFECFDF5)
-                        : AppColors.white,
-                    borderRadius: BorderRadius.circular(16.0),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF10B981)
-                          : AppColors.borderSoft,
-                      width: isSelected ? 1.5 : 1.0,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title.tr,
-                              style: getTextStyle2(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primaryTextColor,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              range.tr,
-                              style: getTextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: isSelected
-                                    ? const Color(0xFF047857)
-                                    : AppColors.textSoft,
-                              ),
-                            ),
-                          ],
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedValue = value;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 14.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFFECFDF5)
+                            : AppColors.white,
+                        borderRadius: BorderRadius.circular(16.0),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFF10B981)
+                              : AppColors.borderSoft,
+                          width: isSelected ? 1.5 : 1.0,
                         ),
                       ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_circle,
-                          color: Color(0xFF10B981),
-                          size: 22,
-                        )
-                      else
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFFD1D5DB),
-                              width: 1.5,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title.tr,
+                                  style: getTextStyle2(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primaryTextColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  range.tr,
+                                  style: getTextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: isSelected
+                                        ? const Color(0xFF047857)
+                                        : AppColors.textSoft,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                ),
+                          if (isSelected)
+                            const Icon(
+                              Icons.check_circle,
+                              color: Color(0xFF10B981),
+                              size: 22,
+                            )
+                          else
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFD1D5DB),
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               );
-            }).toList(),
+            },
           ),
           const SizedBox(height: 16),
 
@@ -228,10 +239,7 @@ class _ChronotypeBottomsheetState extends State<ChronotypeBottomsheet> {
           CustomButton(
             text: 'Save'.tr,
             onTap: () {
-              final matched = options.firstWhere(
-                (opt) => opt['title'] == selectedTitle,
-              );
-              controller.chronotype.value = matched['value']!;
+              controller.chronotype.value = selectedValue;
               Get.back();
             },
             icon: null,

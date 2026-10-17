@@ -16,7 +16,7 @@ class SportProfileBottomsheet extends StatefulWidget {
 }
 
 class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
-  late String selectedTitle;
+  late String selectedValue;
   late final BaselineSetupController controller;
 
   final List<Map<String, String>> options = [
@@ -33,25 +33,25 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
       'value': BaselineEnums.sportProfileLight,
     },
     {
-      'title': 'Cardio',
+      'title': 'Active',
       'desc': '3-4x per week',
       'icon': IconPath.running,
       'value': BaselineEnums.sportProfileCardio,
     },
     {
-      'title': 'Strength',
+      'title': 'Very active',
       'desc': '5-6x per week',
       'icon': IconPath.veryActive,
       'value': BaselineEnums.sportProfileStrength,
     },
     {
-      'title': 'Mixed',
+      'title': 'Varied training',
       'desc': 'Mixed training',
       'icon': IconPath.running,
       'value': BaselineEnums.sportProfileMixed,
     },
     {
-      'title': 'Endurance',
+      'title': 'Intensive',
       'desc': 'Intense training daily',
       'icon': IconPath.athlete,
       'value': BaselineEnums.sportProfileEndurance,
@@ -62,14 +62,9 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
   void initState() {
     super.initState();
     controller = Get.find<BaselineSetupController>();
-    final currentEnum = BaselineEnums.normalizeSportProfile(
+    selectedValue = BaselineEnums.normalizeSportProfile(
       controller.sportProfile.value,
     );
-    final matched = options.firstWhere(
-      (opt) => opt['value'] == currentEnum,
-      orElse: () => options[2],
-    );
-    selectedTitle = matched['title']!;
   }
 
   @override
@@ -150,15 +145,16 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: options.map((opt) {
-              final title = opt['title']!;
-              final desc = opt['desc']!;
-              final iconPath = opt['icon']!;
-              final isSelected = selectedTitle == title;
+              final String title = opt['title']!;
+              final String desc = opt['desc']!;
+              final String iconPath = opt['icon']!;
+              final String value = opt['value']!;
+              final isSelected = selectedValue == value;
 
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    selectedTitle = title;
+                    selectedValue = value;
                   });
                 },
                 child: Container(
@@ -259,10 +255,7 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
           // Save Button
           CustomButton(
             onTap: () {
-              final matched = options.firstWhere(
-                (opt) => opt['title'] == selectedTitle,
-              );
-              controller.sportProfile.value = matched['value']!;
+              controller.sportProfile.value = selectedValue;
               Get.back();
             },
             text: 'Save'.tr,
@@ -272,7 +265,7 @@ class _SportProfileBottomsheetState extends State<SportProfileBottomsheet> {
 
           // Cancel Button
           CustomButton(
-            text: 'Cancel',
+            text: 'Cancel'.tr,
             onTap: Get.back,
             backgroundColor: Colors.transparent,
             borderColor: AppColors.greyMedium,

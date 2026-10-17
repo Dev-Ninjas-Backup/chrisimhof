@@ -4,6 +4,8 @@ import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
+
 class WorkService {
   // POST /api/v1/calculator/session/{sessionId}/work
   Future<Map<String, dynamic>> saveWork({
@@ -15,10 +17,12 @@ class WorkService {
     final uri = Uri.parse(Urls.workCalculator(sessionId));
     final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
 
+    final canonicalShift = ShiftDisplayHelper.toCanonicalApiKey(shiftType);
+
     final bodyMap = {
-      'shiftType': shiftType.toLowerCase(),
-      if (shiftStartTime != null) 'shiftStartTime': shiftStartTime,
-      if (shiftEndTime != null) 'shiftEndTime': shiftEndTime,
+      'shiftType': canonicalShift,
+      if (canonicalShift != 'off' && shiftStartTime != null) 'shiftStartTime': shiftStartTime,
+      if (canonicalShift != 'off' && shiftEndTime != null) 'shiftEndTime': shiftEndTime,
     };
 
     final response = await http.post(

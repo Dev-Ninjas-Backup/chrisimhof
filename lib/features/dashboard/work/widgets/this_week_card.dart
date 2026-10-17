@@ -77,6 +77,7 @@ class ThisWeekCard extends StatelessWidget {
                   shift: dayData['shift']!,
                   isToday: index == todayIndex,
                   onTap: () => controller.toggleDayShift(index),
+                  onLongPress: () => controller.showCustomizeShiftDialog(context, index),
                 );
               }),
             );

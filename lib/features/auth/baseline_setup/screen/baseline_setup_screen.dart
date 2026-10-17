@@ -13,27 +13,29 @@ import 'package:chrisimhof/features/auth/baseline_setup/widgets/sport_profile_bo
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_meal_target_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_time_format_bottomsheet.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/widgets/baseline_weekly_sport_goal_bottomsheet.dart';
+import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setup_controller.dart';
 
 class BaselineSetupScreen extends StatelessWidget {
   const BaselineSetupScreen({super.key});
 
-  String _getSportProfileSubtitle(String enumValue) {
+  String _getSportProfileSubtitle(String val) {
+    final enumValue = BaselineEnums.normalizeSportProfile(val);
     switch (enumValue) {
-      case 'sedentary':
+      case BaselineEnums.sportProfileSedentary:
         return 'Little to no exercise';
-      case 'light':
+      case BaselineEnums.sportProfileLight:
         return '1-2x per week';
-      case 'cardio':
+      case BaselineEnums.sportProfileCardio:
         return '3-4x per week';
-      case 'strength':
+      case BaselineEnums.sportProfileStrength:
         return '5-6x per week';
-      case 'mixed':
+      case BaselineEnums.sportProfileMixed:
         return 'Mixed training';
-      case 'endurance':
+      case BaselineEnums.sportProfileEndurance:
         return 'Intense training daily';
       default:
-        return '3-4x per week';
+        return '1-2x per week';
     }
   }
 

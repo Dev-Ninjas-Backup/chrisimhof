@@ -35,22 +35,92 @@ class BaselineEnums {
   // SPORT PROFILE (STRICT 1:1)
   static const Map<String, String> sportProfile = {
     sportProfileSedentary: 'Sedentary',
-    sportProfileLight: 'Light activity',
-    sportProfileCardio: 'Cardio',
-    sportProfileStrength: 'Strength',
-    sportProfileMixed: 'Mixed',
-    sportProfileEndurance: 'Endurance',
+    sportProfileLight: 'Lightly active',
+    sportProfileCardio: 'Active',
+    sportProfileStrength: 'Very active',
+    sportProfileMixed: 'Varied training',
+    sportProfileEndurance: 'Intensive',
   };
 
   static String normalizeChronotype(dynamic value) {
+    final str = value?.toString().toLowerCase().trim();
+    if (str == null || str.isEmpty) return defaultChronotype;
+    if (str == 'morning' || str == 'early bird' || str == 'matinal') {
+      return chronotypeMorning;
+    }
+    if (str == 'intermediate' ||
+        str == 'intermédiaire' ||
+        str == 'intermediaire') {
+      return chronotypeIntermediate;
+    }
+    if (str == 'evening' ||
+        str == 'night owl' ||
+        str == 'couche-tard' ||
+        str == 'couche tard') {
+      return chronotypeEvening;
+    }
     return _normalize(value, chronotype, defaultChronotype);
   }
 
   static String normalizeCaffeineSensitivity(dynamic value) {
+    final str = value?.toString().toLowerCase().trim();
+    if (str == null || str.isEmpty) return defaultCaffeineSensitivity;
+    if (str == 'low' ||
+        str == 'low sensitivity' ||
+        str == 'faible' ||
+        str == 'sensibilité faible') {
+      return caffeineSensitivityLow;
+    }
+    if (str == 'medium' ||
+        str == 'moderate' ||
+        str == 'medium sensitivity' ||
+        str == 'modérée' ||
+        str == 'moderee' ||
+        str == 'sensibilité modérée') {
+      return caffeineSensitivityMedium;
+    }
+    if (str == 'high' ||
+        str == 'high sensitivity' ||
+        str == 'élevée' ||
+        str == 'elevee' ||
+        str == 'sensibilité élevée') {
+      return caffeineSensitivityHigh;
+    }
     return _normalize(value, caffeineSensitivity, defaultCaffeineSensitivity);
   }
 
   static String normalizeSportProfile(dynamic value) {
+    final str = value?.toString().toLowerCase().trim();
+    if (str == null || str.isEmpty) return defaultSportProfile;
+    if (str == 'sedentary' || str == 'sédentaire') {
+      return sportProfileSedentary;
+    }
+    if (str == 'light' ||
+        str == 'lightly active' ||
+        str == 'peu actif' ||
+        str == 'light activity') {
+      return sportProfileLight;
+    }
+    if (str == 'cardio' || str == 'active' || str == 'actif') {
+      return sportProfileCardio;
+    }
+    if (str == 'strength' ||
+        str == 'very active' ||
+        str == 'très actif' ||
+        str == 'tres actif' ||
+        str == 'force') {
+      return sportProfileStrength;
+    }
+    if (str == 'mixed' ||
+        str == 'varied training' ||
+        str == 'pratique variée' ||
+        str == 'pratique variee' ||
+        str == 'mixte') {
+      return sportProfileMixed;
+    }
+    if (str == 'endurance' || str == 'intensive' || str == 'intensif') {
+      return sportProfileEndurance;
+    }
     return _normalize(value, sportProfile, defaultSportProfile);
   }
 

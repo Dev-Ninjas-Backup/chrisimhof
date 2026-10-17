@@ -85,9 +85,9 @@ class UpcomingScheduleDayEditBox extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          abbrev.tr,
+                          abbrev,
                           style: getTextStyle(
-                            fontSize: 12,
+                            fontSize: abbrev.length > 2 ? 10 : 12,
                             fontWeight: FontWeight.w700,
                             color: isSelected
                                 ? AppColors.white

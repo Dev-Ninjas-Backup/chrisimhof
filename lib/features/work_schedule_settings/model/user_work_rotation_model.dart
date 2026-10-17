@@ -8,6 +8,7 @@ class UserWorkRotationModel {
   final Map<String, Map<String, String>> shiftTimes;
   final List<String> pattern;
   final Map<String, String> overrides;
+  final Map<int, String> dayDisplayCodes;
 
   UserWorkRotationModel({
     required this.id,
@@ -19,6 +20,7 @@ class UserWorkRotationModel {
     required this.shiftTimes,
     required this.pattern,
     required this.overrides,
+    this.dayDisplayCodes = const {},
   });
 
   factory UserWorkRotationModel.fromJson(Map<String, dynamic> json) {
@@ -63,6 +65,7 @@ class UserWorkRotationModel {
 
     // Parse patternJson
     final List<String> patternList = [];
+    final Map<int, String> dayDisplayCodesMap = {};
     final rawPattern = json['patternJson'] as List<dynamic>?;
     if (rawPattern != null && rawPattern.isNotEmpty) {
       final sortedItems = List<Map<String, dynamic>>.from(
@@ -76,7 +79,14 @@ class UserWorkRotationModel {
         return (wA * 7 + dA).compareTo(wB * 7 + dB);
       });
 
+      int dayIdx = 0;
       for (final item in sortedItems) {
+        final displayCode = item['displayCode'] as String?;
+        if (displayCode != null && displayCode.isNotEmpty) {
+          dayDisplayCodesMap[dayIdx] = displayCode;
+        }
+        dayIdx++;
+
         final code = (item['shiftCode'] as String? ?? 'off');
         final lower = code.toLowerCase();
         if (lower == 'off') {
@@ -142,6 +152,7 @@ class UserWorkRotationModel {
       shiftTimes: shiftTimesMap,
       pattern: patternList,
       overrides: overridesMap,
+      dayDisplayCodes: dayDisplayCodesMap,
     );
   }
 }

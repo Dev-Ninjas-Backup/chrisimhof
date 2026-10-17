@@ -6,6 +6,7 @@ import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_c
 import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_preset_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 
 class WorkScheduleSettingsService {
   // GET /api/v1/calculator/work-rotation/presets
@@ -292,12 +293,7 @@ class WorkScheduleSettingsService {
   }
 
   String _toApiKey(String key) {
-    final lower = key.toLowerCase();
-    if (lower == 'day' || lower == 'd') return 'day';
-    if (lower == 'evening' || lower == 'e') return 'evening';
-    if (lower == 'night' || lower == 'n') return 'night';
-    if (lower == 'off') return 'off';
-    return lower.replaceAll(RegExp(r'[\s\-]+'), '_').replaceAll(RegExp(r'[^a-z0-9_]'), '');
+    return ShiftDisplayHelper.toCanonicalApiKey(key);
   }
 
   // PUT /api/v1/calculator/work-rotation
@@ -351,23 +347,24 @@ class WorkScheduleSettingsService {
       }
       bodyMap['saveAsTemplate'] = true;
 
-      if (shiftTimes.containsKey('Day')) {
-        bodyMap['dayShift'] = {
-          'startTime': shiftTimes['Day']?['start'] ?? '06:00',
-          'endTime': shiftTimes['Day']?['end'] ?? '14:00',
-        };
-      }
-      if (shiftTimes.containsKey('Evening')) {
-        bodyMap['eveningShift'] = {
-          'startTime': shiftTimes['Evening']?['start'] ?? '14:00',
-          'endTime': shiftTimes['Evening']?['end'] ?? '22:00',
-        };
-      }
-      if (shiftTimes.containsKey('Night')) {
-        bodyMap['nightShift'] = {
-          'startTime': shiftTimes['Night']?['start'] ?? '22:00',
-          'endTime': shiftTimes['Night']?['end'] ?? '06:00',
-        };
+      for (final entry in shiftTimes.entries) {
+        final canonical = ShiftDisplayHelper.toCanonicalApiKey(entry.key);
+        if (canonical == 'day' && !bodyMap.containsKey('dayShift')) {
+          bodyMap['dayShift'] = {
+            'startTime': entry.value['start'] ?? '06:00',
+            'endTime': entry.value['end'] ?? '14:00',
+          };
+        } else if (canonical == 'evening' && !bodyMap.containsKey('eveningShift')) {
+          bodyMap['eveningShift'] = {
+            'startTime': entry.value['start'] ?? '14:00',
+            'endTime': entry.value['end'] ?? '22:00',
+          };
+        } else if (canonical == 'night' && !bodyMap.containsKey('nightShift')) {
+          bodyMap['nightShift'] = {
+            'startTime': entry.value['start'] ?? '22:00',
+            'endTime': entry.value['end'] ?? '06:00',
+          };
+        }
       }
 
       if (sourceTemplateKey != null && sourceTemplateKey.trim().isNotEmpty) {
@@ -412,12 +409,13 @@ class WorkScheduleSettingsService {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
       debugPrint('Saving work rotation override via API (POST)...');
 
+      final apiKey = _toApiKey(shiftType);
       final Map<String, dynamic> bodyMap = {
         'date': date,
-        'shiftType': _toApiKey(shiftType),
+        'shiftType': apiKey,
       };
 
-      if (shiftType.toLowerCase() != 'off') {
+      if (apiKey != 'off') {
         if (shiftStartTime != null && shiftStartTime.isNotEmpty) {
           bodyMap['shiftStartTime'] = shiftStartTime;
         }
@@ -502,13 +500,14 @@ class WorkScheduleSettingsService {
       final token = await SharedPreferencesHelper.getAccessToken() ?? '';
       debugPrint('Saving batch work rotation overrides via API (POST)...');
 
+      final apiKey = _toApiKey(shiftType);
       final Map<String, dynamic> bodyMap = {
         'startDate': startDate,
         'endDate': endDate,
-        'shiftType': _toApiKey(shiftType),
+        'shiftType': apiKey,
       };
 
-      if (shiftType.toLowerCase() != 'off') {
+      if (apiKey != 'off') {
         if (shiftStartTime != null && shiftStartTime.isNotEmpty) {
           bodyMap['shiftStartTime'] = shiftStartTime;
         }

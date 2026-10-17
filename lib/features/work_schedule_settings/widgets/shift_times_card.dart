@@ -1,6 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/const/icon_path.dart';
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -205,6 +206,28 @@ class ShiftTimesCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: isEditable ? () => _editShiftInitial(context, shiftName) : null,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: color.withValues(alpha: 0.3)),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                ShiftDisplayHelper.getDisplayCode(shiftName),
+                style: getTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+            ),
+          ),
           if (isCustom && isEditable) ...[
             const SizedBox(width: 12),
             GestureDetector(
@@ -218,6 +241,83 @@ class ShiftTimesCard extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+
+  void _editShiftInitial(BuildContext context, String shiftName) {
+    final currentInitial = ShiftDisplayHelper.getDisplayCode(shiftName);
+    final textController = TextEditingController(text: currentInitial);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            'Customize initial'.tr,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Enter the initial or code to display for this shift.'.tr,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: textController,
+                maxLength: 4,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  labelText: 'Initial'.tr,
+                  hintText: 'e.g. J, A, N, D, E',
+                  counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                ShiftDisplayHelper.setCustomShiftInitial(shiftName, null);
+                Navigator.of(ctx).pop();
+              },
+              child: Text(
+                'Reset to default'.tr,
+                style: const TextStyle(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                final customInit = textController.text.trim().toUpperCase();
+                ShiftDisplayHelper.setCustomShiftInitial(
+                  shiftName,
+                  customInit.isEmpty ? null : customInit,
+                );
+                Navigator.of(ctx).pop();
+              },
+              child: Text(
+                'Save'.tr,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.secondaryButtonColor,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
