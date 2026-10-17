@@ -19,7 +19,7 @@ class WeeklySportGoalProgressCard extends StatelessWidget {
       final daysRemaining = (7 - now.weekday).clamp(0, 7);
 
       int completed = controller.workoutsCompletedThisWeek.value;
-      if (completed == 0) {
+      if (completed == 0 && !controller.hasWeeklySportStats.value) {
         completed = controller.sessionsList
             .where((s) =>
                 s.title.toLowerCase() != 'rest day' &&

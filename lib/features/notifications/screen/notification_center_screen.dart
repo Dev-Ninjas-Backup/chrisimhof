@@ -59,7 +59,8 @@ class NotificationCenterScreen extends StatelessWidget {
                         horizontal: 18,
                         vertical: 12,
                       ),
-                      itemCount: controller.notifications.length +
+                      itemCount:
+                          controller.notifications.length +
                           (controller.isLoadingMore.value ? 1 : 0),
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
@@ -79,7 +80,11 @@ class NotificationCenterScreen extends StatelessWidget {
                           );
                         }
                         final item = controller.notifications[index];
-                        return _buildNotificationCard(context, controller, item);
+                        return _buildNotificationCard(
+                          context,
+                          controller,
+                          item,
+                        );
                       },
                     ),
                   ),
@@ -92,38 +97,42 @@ class NotificationCenterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    NotificationController controller,
-  ) {
+  Widget _buildHeader(BuildContext context, NotificationController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       color: AppColors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 36,
-                height: 36,
-                child: IconTile(
-                  icon: Icons.chevron_left_rounded,
-                  onTap: () => Get.back(),
+          Expanded(
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: IconTile(
+                    icon: Icons.chevron_left_rounded,
+                    onTap: () => Get.back(),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Notifications'.tr,
-                style: getTextStyle2(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF0F172A),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Notifications'.tr,
+                    style: getTextStyle2(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF0F172A),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Obx(() {
                 if (controller.unreadCount.value == 0) {
@@ -132,10 +141,10 @@ class NotificationCenterScreen extends StatelessWidget {
                 return GestureDetector(
                   onTap: controller.markAllAsRead,
                   child: Container(
-                    margin: const EdgeInsets.only(right: 8),
+                    margin: const EdgeInsets.only(right: 6),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 8,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFECFDF5),
@@ -321,9 +330,7 @@ class NotificationCenterScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: item.isRead
-                ? AppColors.white
-                : const Color(0xFFF0FDF4),
+            color: item.isRead ? AppColors.white : const Color(0xFFF0FDF4),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: item.isRead

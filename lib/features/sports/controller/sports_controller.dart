@@ -472,27 +472,8 @@ class SportsController extends GetxController {
       iconPath: _getIconPathForActivity(activity),
     );
 
-    // Update old "Today" to "Yesterday" only if adding a session for Today
-    if (diffDays == 0) {
-      for (int i = 0; i < sessionsList.length; i++) {
-        final s = sessionsList[i];
-        if (s.subtitle.startsWith('Today')) {
-          sessionsList[i] = SportSession(
-            id: s.id,
-            title: s.title,
-            subtitle: s.subtitle.replaceFirst('Today', 'Yesterday'),
-            iconPath: s.iconPath,
-          );
-        } else if (s.subtitle.startsWith('Yesterday')) {
-          sessionsList[i] = SportSession(
-            id: s.id,
-            title: s.title,
-            subtitle: s.subtitle.replaceFirst('Yesterday', 'Earlier'),
-            iconPath: s.iconPath,
-          );
-        }
-      }
-    }
+    // Note: Multiple workouts can be logged for the same day (diffDays == 0).
+    // We preserve the accurate day prefixes for all sessions without shifting older ones.
 
     sessionsList.insert(0, newSession);
 
@@ -594,7 +575,7 @@ class SportsController extends GetxController {
             heartRate = 180; // avg of 171-190
           }
 
-          await DashboardService().patchQuickAddLog(
+          final quickAddResp = await DashboardService().patchQuickAddLog(
             sessionId: sessionId,
             newSportSessions: [
               {
@@ -608,6 +589,20 @@ class SportsController extends GetxController {
               },
             ],
           );
+          final data = quickAddResp['data'] as Map<String, dynamic>?;
+          if (data != null && data['liveScores'] != null) {
+            RealtimeSocketService().handleLiveScores(
+              data['liveScores'],
+              useLocalCaches: false,
+            );
+          } else {
+            try {
+              if (Get.isRegistered<DashboardController>()) {
+                final db = Get.find<DashboardController>();
+                await db.fetchDashboardData();
+              }
+            } catch (_) {}
+          }
           apiSuccess = true;
         }
       } catch (e) {
