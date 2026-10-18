@@ -78,7 +78,8 @@ class FcmService {
       );
 
       // 4. Initialize local notifications for heads-up popup notifications
-      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidInit =
+          AndroidInitializationSettings('@drawable/ic_notification');
       const darwinInit = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
@@ -249,7 +250,8 @@ class FcmService {
           channelDescription: highImportanceChannel.description,
           importance: Importance.max,
           priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
+          icon: '@drawable/ic_notification',
+          color: const Color(0xFF10B981),
           playSound: true,
           enableVibration: true,
         ),
