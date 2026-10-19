@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/service/helper/custom_rotation_prefs.dart';
 import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_calendar_model.dart';
 import 'package:chrisimhof/features/work_schedule_settings/model/work_rotation_preset_model.dart';
@@ -90,6 +91,7 @@ class WorkScheduleSettingsController extends GetxController {
         hasRotationData.value = false;
         rotationName.value = '';
         rotationNameController.text = '';
+        CustomRotationPrefs.setEnabled(false);
       } else {
         // has data => toggle ON & populate rotation data
         isEnabled.value = true;
@@ -108,7 +110,23 @@ class WorkScheduleSettingsController extends GetxController {
         if (rotation.dayDisplayCodes.isNotEmpty) {
           dayDisplayCodes.assignAll(rotation.dayDisplayCodes);
         }
+
+        CustomRotationPrefs.setEnabled(true);
+        CustomRotationPrefs.setWeeks(rotation.cycleWeeks);
+        if (rotation.startDate.isNotEmpty) {
+          CustomRotationPrefs.setStartDate(rotation.startDate);
+        }
+        CustomRotationPrefs.setShiftTimes(rotation.shiftTimes);
+        CustomRotationPrefs.setPattern(rotation.pattern);
+        CustomRotationPrefs.setOverrides(rotation.overrides);
+
         await fetchUpcomingSchedule();
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
       }
     } catch (e) {
       debugPrint('Error fetching my work rotation: $e');
@@ -177,11 +195,33 @@ class WorkScheduleSettingsController extends GetxController {
     try {
       EasyLoading.show(status: 'Activating rotation...'.tr);
       final formattedDate = _formatDate(startDate.value);
-      final success = await _service.applyRotationPreset(
-        key: preset.key,
-        startDate: formattedDate,
-        name: preset.label,
-      );
+      bool success = false;
+
+      if (preset.isCustom && preset.id != null && preset.id!.isNotEmpty) {
+        success = await _service.applyWorkRotationTemplate(
+          id: preset.id!,
+          startDate: formattedDate,
+          name: preset.label,
+        );
+      } else if (preset.key.isNotEmpty) {
+        success = await _service.applyRotationPreset(
+          key: preset.key,
+          startDate: formattedDate,
+          name: preset.label,
+        );
+      }
+
+      // If preset apply endpoint fails or is unsupported, directly save rotation
+      if (!success) {
+        success = await _service.saveWorkRotation(
+          cycleWeeks: preset.cycleWeeks,
+          startDate: formattedDate,
+          shiftTimes: preset.shiftTimes,
+          pattern: preset.pattern,
+          name: preset.label,
+          sourceTemplateKey: preset.key.isNotEmpty ? preset.key : null,
+        );
+      }
 
       if (success) {
         activeRotationKey.value = preset.key;
@@ -216,6 +256,16 @@ class WorkScheduleSettingsController extends GetxController {
     }
   }
 
+  void editRotation(WorkRotationPresetModel preset) {
+    isCreatingNewRotation.value = true;
+    selectedTemplateKey.value = '';
+    rotationName.value = preset.label;
+    rotationNameController.text = preset.label;
+    weeks.value = preset.cycleWeeks;
+    shiftTimes.assignAll(preset.shiftTimes);
+    pattern.assignAll(preset.pattern);
+  }
+
   Future<void> deleteCustomTemplate(WorkRotationPresetModel preset) async {
     if (!preset.isCustom || preset.id == null || preset.id!.isEmpty) return;
     try {
@@ -237,6 +287,7 @@ class WorkScheduleSettingsController extends GetxController {
 
   void startNewRotation() {
     isCreatingNewRotation.value = true;
+    selectedTemplateKey.value = '';
     rotationName.value = '';
     rotationNameController.text = '';
     weeks.value = 1;
@@ -251,6 +302,64 @@ class WorkScheduleSettingsController extends GetxController {
 
   void cancelNewRotation() {
     isCreatingNewRotation.value = false;
+  }
+
+  Future<void> saveAndApplySchedule() async {
+    final name = rotationName.value.trim();
+    if (name.isEmpty) {
+      EasyLoading.showInfo('Please enter a rotation name'.tr);
+      return;
+    }
+
+    try {
+      EasyLoading.show(status: 'Saving work schedule...'.tr);
+
+      final success = await _service.saveWorkRotation(
+        cycleWeeks: weeks.value,
+        startDate: _formatDate(startDate.value),
+        shiftTimes: shiftTimes,
+        pattern: pattern,
+        sourceTemplateKey: selectedTemplateKey.value.isNotEmpty
+            ? selectedTemplateKey.value
+            : null,
+        name: name,
+      );
+
+      if (success) {
+        CustomRotationPrefs.setEnabled(true);
+        CustomRotationPrefs.setWeeks(weeks.value);
+        CustomRotationPrefs.setStartDate(_formatDate(startDate.value));
+        CustomRotationPrefs.setShiftTimes(shiftTimes);
+        CustomRotationPrefs.setPattern(pattern);
+        CustomRotationPrefs.setOverrides(overrides);
+
+        try {
+          final workCtrl = Get.find<WorkController>();
+          await loadCustomRotationSchedule(workCtrl);
+        } catch (_) {}
+        hasRotationData.value = true;
+        isCreatingNewRotation.value = false;
+        activeRotationName.value = name;
+        activeRotationKey.value = selectedTemplateKey.value;
+        await loadPresetsFromApi();
+        await fetchUpcomingSchedule();
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
+
+        EasyLoading.showSuccess('Work schedule saved & applied!'.tr);
+      } else {
+        EasyLoading.showError('Failed to save work schedule'.tr);
+      }
+    } catch (e) {
+      debugPrint('Error saving and applying schedule: $e');
+      EasyLoading.showError('Failed to save work schedule'.tr);
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
 
   Future<void> saveCustomRotationTemplate() async {
@@ -364,6 +473,10 @@ class WorkScheduleSettingsController extends GetxController {
 
   void applyPreset(WorkRotationPresetModel preset) {
     selectedTemplateKey.value = preset.key;
+    if (rotationName.value.isEmpty) {
+      rotationName.value = preset.label;
+      rotationNameController.text = preset.label;
+    }
     weeks.value = preset.cycleWeeks;
     pattern.assignAll(preset.pattern);
     shiftTimes.assignAll(preset.shiftTimes);
@@ -371,20 +484,7 @@ class WorkScheduleSettingsController extends GetxController {
   }
 
   String formatShiftName(String key) {
-    if (key.isEmpty) return '';
-    final lower = key.toLowerCase();
-    if (lower == 'day') return 'Day'.tr;
-    if (lower == 'evening') return 'Evening'.tr;
-    if (lower == 'night') return 'Night'.tr;
-    if (lower == 'off') return 'Off'.tr;
-
-    return key
-        .split('_')
-        .map((word) {
-          if (word.isEmpty) return '';
-          return word[0].toUpperCase() + word.substring(1);
-        })
-        .join(' ');
+    return ShiftDisplayHelper.formatShiftName(key);
   }
 
   String getShiftAbbreviation(String key) {
@@ -521,6 +621,7 @@ class WorkScheduleSettingsController extends GetxController {
       if (success) {
         overrides[dateStr] = shiftCode;
         editingDateStr.value = '';
+        CustomRotationPrefs.setOverrides(overrides);
 
         await fetchUpcomingSchedule();
 
@@ -528,6 +629,12 @@ class WorkScheduleSettingsController extends GetxController {
           final workCtrl = Get.find<WorkController>();
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
 
         EasyLoading.showSuccess('Day override saved'.tr);
       } else {
@@ -549,6 +656,7 @@ class WorkScheduleSettingsController extends GetxController {
       if (success) {
         overrides.remove(dateStr);
         editingDateStr.value = '';
+        CustomRotationPrefs.setOverrides(overrides);
 
         await fetchUpcomingSchedule();
 
@@ -556,6 +664,12 @@ class WorkScheduleSettingsController extends GetxController {
           final workCtrl = Get.find<WorkController>();
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
 
         EasyLoading.showSuccess('Day override cleared'.tr);
       } else {
@@ -617,6 +731,7 @@ class WorkScheduleSettingsController extends GetxController {
           overrides[_formatDate(curr)] = shiftCode;
           curr = curr.add(const Duration(days: 1));
         }
+        CustomRotationPrefs.setOverrides(overrides);
 
         await fetchUpcomingSchedule();
 
@@ -624,6 +739,12 @@ class WorkScheduleSettingsController extends GetxController {
           final workCtrl = Get.find<WorkController>();
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
 
         EasyLoading.showSuccess('Batch overrides saved'.tr);
       } else {
@@ -654,6 +775,7 @@ class WorkScheduleSettingsController extends GetxController {
           overrides.remove(_formatDate(curr));
           curr = curr.add(const Duration(days: 1));
         }
+        CustomRotationPrefs.setOverrides(overrides);
 
         await fetchUpcomingSchedule();
 
@@ -661,6 +783,12 @@ class WorkScheduleSettingsController extends GetxController {
           final workCtrl = Get.find<WorkController>();
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
 
         EasyLoading.showSuccess('Range overrides cleared'.tr);
       } else {
@@ -725,12 +853,26 @@ class WorkScheduleSettingsController extends GetxController {
       );
 
       if (success) {
+        CustomRotationPrefs.setEnabled(true);
+        CustomRotationPrefs.setWeeks(weeks.value);
+        CustomRotationPrefs.setStartDate(_formatDate(startDate.value));
+        CustomRotationPrefs.setShiftTimes(shiftTimes);
+        CustomRotationPrefs.setPattern(pattern);
+        CustomRotationPrefs.setOverrides(overrides);
+
         try {
           final workCtrl = Get.find<WorkController>();
           await loadCustomRotationSchedule(workCtrl);
         } catch (_) {}
         hasRotationData.value = true;
         await loadPresetsFromApi();
+
+        if (Get.isRegistered<DashboardController>()) {
+          try {
+            Get.find<DashboardController>().fetchDashboardData();
+          } catch (_) {}
+        }
+
         EasyLoading.showSuccess('Work schedule saved!'.tr);
         Get.back();
       } else {
@@ -792,30 +934,28 @@ class WorkScheduleSettingsController extends GetxController {
 
     final todayIndex = now.weekday - 1;
     final todayShift = computedPattern[todayIndex]['shift']!;
-    final cat = ShiftDisplayHelper.getShiftCategory(todayShift);
-
-    if (cat == 'day') {
-      workCtrl.selectedShiftType.value = 'Day';
-    } else if (cat == 'evening') {
-      workCtrl.selectedShiftType.value = 'Evening';
-    } else if (cat == 'night') {
-      workCtrl.selectedShiftType.value = 'Night';
-    } else if (cat == 'off') {
-      workCtrl.selectedShiftType.value = 'Off';
-    } else {
-      final lowerToday = todayShift.toLowerCase();
-      final matchKey = shiftTimes.keys.firstWhere(
-        (k) => k.toLowerCase() == lowerToday,
-        orElse: () => todayShift,
-      );
-      workCtrl.selectedShiftType.value = matchKey;
-    }
+    final lowerToday = todayShift.toLowerCase();
+    final matchKey = shiftTimes.keys.firstWhere(
+      (k) =>
+          k.toLowerCase() == lowerToday ||
+          k.toLowerCase().replaceAll(RegExp(r'[\s_]+'), '') ==
+              lowerToday.replaceAll(RegExp(r'[\s_]+'), ''),
+      orElse: () => todayShift,
+    );
+    workCtrl.selectedShiftType.value = ShiftDisplayHelper.formatShiftName(matchKey);
 
     final times = shiftTimes;
     final shiftName = workCtrl.selectedShiftType.value;
-    if (times.containsKey(shiftName)) {
-      final start = times[shiftName]!['start']!;
-      final end = times[shiftName]!['end']!;
+    final matchingTimeKey = times.keys.firstWhere(
+      (k) =>
+          k.toLowerCase() == shiftName.toLowerCase() ||
+          k.toLowerCase().replaceAll(RegExp(r'[\s_]+'), '') ==
+              shiftName.toLowerCase().replaceAll(RegExp(r'[\s_]+'), ''),
+      orElse: () => '',
+    );
+    if (matchingTimeKey.isNotEmpty && times[matchingTimeKey] != null) {
+      final start = times[matchingTimeKey]!['start'] ?? '';
+      final end = times[matchingTimeKey]!['end'] ?? '';
       final startParts = start.split(':');
       final endParts = end.split(':');
       if (startParts.length == 2) {

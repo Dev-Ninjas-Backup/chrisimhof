@@ -291,7 +291,24 @@ class RotationListCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
+
+              // Edit button to customize/modify rotation
+              IconButton(
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  size: 18,
+                  color: AppColors.secondaryButtonColor,
+                ),
+                onPressed: () => controller.editRotation(tmpl),
+                tooltip: 'Edit rotation'.tr,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+              ),
 
               // Delete button for custom templates
               if (tmpl.isCustom && tmpl.id != null && tmpl.id!.isNotEmpty)

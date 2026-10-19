@@ -1,0 +1,106 @@
+Finally, I have one question about the Android APK. You previously mentioned that a user's day
+should automatically close after 30 hours if they don't manually end it.
+However, I've just reopened the application after approximately three days, and my previous day is
+still showing as active and ongoing
+Could you confirm whether the automatic 30-hour closure has actually been implemented and is
+working correctly? Because based on what I'm seeing, it doesn't seem to be functioning as expected.
+
+
+
+
+
+
+I noticed that all the notifications in the app are currently in English.
+Could you send me the complete list of all the notifications you've implemented so far, including their
+titles and messages?
+lil translate everything into French and send it back to you so you can integrate the translations.
+Thanks!
+
+
+
+
+
+
+Hi Ansarul, I hope you're doing well!
+I have a quick question. Could you please check if the "Start a New Day" function is working
+correctly?
+I tried recording a new sleep session, then selected the small green checkbox below to start a new
+day.
+The new sleep session was successfully recorded, but hydration, caffeine, sport, and the other daily
+data were not reset.
+Could you please check whether everything is working as intended? Normally, starting a new day
+should reset the daily tracking values while keeping the previous day's data in the history.
+
+
+
+
+
+
+
+
+
+Hi Ansarul,
+
+I decided to download and test the app anyway, and I have a few things to mention.
+
+1. Caffeine & Weekly Sport Objective
+
+The caffeine feature is working perfectly now, great job!
+
+I also noticed that the weekly sport objective correctly follows the Monday-to-Sunday schedule, which is great.
+
+I haven't been able to test yet whether the sport sessions are correctly counted across two consecutive days.
+
+However, I noticed something important regarding the weekly objective.
+
+For example, because I work night shifts, I might train at 8 PM and then again at 6 AM the following morning. Both sessions should count separately toward my weekly objective, even if they fall within the same RYVENZA day.
+
+I tested adding three sport sessions consecutively, but the weekly objective only counted one session.
+
+The idea is simple: If my weekly objective is 5 sport sessions, I should be able to complete 5 separate workouts during the week and reach 5/5, even if two or more sessions happen within the same RYVENZA da
+
+attachment: /Users/saharaislam/Desktop/tahmid/chrisimhof/chrisimhof-attachments (2)
+
+
+
+
+
+
+
+
+your analysis on this last one: 
+Summary: Is this a Backend or Frontend issue?
+It is primarily a Backend issue, with a related Frontend display dependency.
+
+1. The Root Cause (Backend)
+What happens on the server: In the backend's calculation for weeklySportStats.workoutsCompletedThisWeek, the server is counting distinct workout days (e.g., COUNT(DISTINCT date) or 1 per RYVENZA calendar day) rather than counting each individual workout session.
+Why it showed 1/5: When Chris added 3 sessions within the same day, the backend recorded the workouts, but its weekly stats calculator treated all 3 as belonging to the same day, returning:
+json
+"weeklySportStats": {
+  "weeklyGoal": 5,
+  "workoutsCompletedThisWeek": 1
+}
+Why the Backend needs to fix this: The backend doesn't just send this number for display; it also uses workoutsCompletedThisWeek to calculate:
+isGoalMet (whether the goal is achieved)
+isOnPace (pacing status)
+Recommendation engine cards (e.g., "Adaptive Rest", "Goal Met", "Catch-up Pacing").
+2. The Frontend Side
+In the mobile app (
+
+weekly_sport_goal_progress_card.dart
+), the UI displays controller.workoutsCompletedThisWeek.value, which directly reflects whatever number the backend sends.
+Furthermore, in 
+
+sports_controller.dart
+, the optimistic local list was shifting older "Today" entries to "Yesterday" and then "Earlier" when multiple workouts were added on the same day, which is also something we can clean up on the frontend.
+What to do next?
+You have two options:
+
+Let the Backend Developer fix it (Recommended for full sync): The backend developer (who returns tomorrow) simply needs to change the weekly counter query from counting distinct days to counting total workout sessions logged between Monday and Sunday: $$\text{workoutsCompletedThisWeek} = \text{COUNT(sessions within current ISO week)}$$ This ensures the UI, the goal counter, and the server's adaptive rest recommendations all match 100%.
+
+
+
+
+
+
+

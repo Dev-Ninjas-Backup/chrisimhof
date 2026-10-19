@@ -67,48 +67,43 @@ class RotationBuilderCard extends StatelessWidget {
 
                       // "Use a template" button on Week 1 header
                       if (weekIdx == 0)
-                        Obx(() {
-                          final isEditable = !controller.hasRotationData.value;
-                          if (!isEditable) return const SizedBox.shrink();
-
-                          return InkWell(
-                            onTap: () => _openTemplateSheet(context),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: AppColors.secondaryButtonColor,
-                                  width: 1.2,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.auto_awesome_outlined,
-                                    size: 13,
-                                    color: AppColors.secondaryButtonColor,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    'Use a template'.tr,
-                                    style: getTextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.secondaryButtonColor,
-                                    ),
-                                  ),
-                                ],
+                        InkWell(
+                          onTap: () => _openTemplateSheet(context),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: AppColors.secondaryButtonColor,
+                                width: 1.2,
                               ),
                             ),
-                          );
-                        }),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.auto_awesome_outlined,
+                                  size: 13,
+                                  color: AppColors.secondaryButtonColor,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Use a template'.tr,
+                                  style: getTextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.secondaryButtonColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 14),
@@ -120,11 +115,6 @@ class RotationBuilderCard extends StatelessWidget {
 
                     final dayName = daysOfWeek[dayIdx];
                     final currentShift = controller.pattern[overallDayIdx];
-
-                    final isTemplate =
-                        controller.selectedTemplateKey.value.isNotEmpty;
-                    final isEditable = !controller.hasRotationData.value;
-                    final isDisabled = isTemplate || !isEditable;
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -160,35 +150,29 @@ class RotationBuilderCard extends StatelessWidget {
                                       horizontal: 3.0,
                                     ),
                                     child: GestureDetector(
-                                      onTap: isDisabled
-                                          ? null
-                                          : () {
-                                              if (isSelected) {
-                                                _showCustomizeCodeDialog(
-                                                  context,
-                                                  overallDayIdx,
-                                                  shiftOption,
-                                                );
-                                              } else {
-                                                controller.updateDayPattern(
-                                                  overallDayIdx,
-                                                  shiftOption,
-                                                );
-                                              }
-                                            },
-                                      onLongPress: isDisabled
-                                          ? null
-                                          : () => _showCustomizeCodeDialog(
-                                                context,
-                                                overallDayIdx,
-                                                shiftOption,
-                                              ),
-                                      child: Opacity(
-                                        opacity: isDisabled ? 0.6 : 1.0,
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 160,
-                                          ),
+                                      onTap: () {
+                                        if (isSelected) {
+                                          _showCustomizeCodeDialog(
+                                            context,
+                                            overallDayIdx,
+                                            shiftOption,
+                                          );
+                                        } else {
+                                          controller.updateDayPattern(
+                                            overallDayIdx,
+                                            shiftOption,
+                                          );
+                                        }
+                                      },
+                                      onLongPress: () => _showCustomizeCodeDialog(
+                                        context,
+                                        overallDayIdx,
+                                        shiftOption,
+                                      ),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 160,
+                                        ),
                                           height: 36,
                                           decoration: BoxDecoration(
                                             color: isSelected
@@ -228,9 +212,8 @@ class RotationBuilderCard extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }).toList(),
+                                  );
+                                }).toList(),
                             ),
                           ),
                         ],
@@ -345,18 +328,6 @@ class RotationBuilderCard extends StatelessWidget {
   }
 
   Color _getShiftColor(String key, {required bool bg}) {
-    final cat = ShiftDisplayHelper.getShiftCategory(key);
-    switch (cat) {
-      case 'day':
-        return bg ? AppColors.amberSoft3 : AppColors.orangeAccent2;
-      case 'evening':
-        return bg ? AppColors.lavenderSoft : AppColors.violet;
-      case 'night':
-        return bg ? AppColors.indigoSoft : AppColors.indigo;
-      case 'off':
-        return bg ? AppColors.mintSoft : AppColors.secondaryButtonColor;
-      default:
-        return bg ? AppColors.mintSoft3 : AppColors.secondaryButtonColor;
-    }
+    return ShiftDisplayHelper.getShiftColor(key, bg: bg);
   }
 }

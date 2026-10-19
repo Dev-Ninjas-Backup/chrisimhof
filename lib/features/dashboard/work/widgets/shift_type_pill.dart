@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -68,17 +69,6 @@ class ShiftTypePill extends StatelessWidget {
   }
 
   String _formatShiftName(String key) {
-    final lower = key.toLowerCase();
-    if (lower == 'day') return 'Day';
-    if (lower == 'evening') return 'Evening';
-    if (lower == 'night') return 'Night';
-    if (lower == 'off') return 'Off';
-    return key
-        .split('_')
-        .map((word) {
-          if (word.isEmpty) return '';
-          return word[0].toUpperCase() + word.substring(1);
-        })
-        .join(' ');
+    return ShiftDisplayHelper.formatShiftName(key);
   }
 }

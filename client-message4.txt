@@ -1,0 +1,70 @@
+Hey Ansarul!
+
+No problem at all regarding the tutorial and the $500 price. Everything sounds good to me!
+
+I'll work on the final tutorial document sometime next week. To be honest, I'm starting to feel a little tired lately. We've been working almost nonstop on RYVENZA for the past 2–3 months, and I also have my regular job alongside all of this, so it's been taking quite a lot of my time.
+
+I'm going to take today to relax a little and get some rest. I'll look into the tutorial as soon as I can, probably during next week.
+
+In the meantime, could I ask you for a quick update on the remaining modifications?
+
+I've sent you quite a few requests and adjustments over the past few days, so I'd just like to have a clear overview of where things stand.
+
+For example, regarding the automatic 30-hour day closure, is everything completed, or is it still being worked on?
+
+Could you give me a quick summary of:
+
+What's already completed, including anything you haven't updated me on yet.
+
+What's currently in progress.
+
+What's still pending or hasn't been started yet.
+
+Basically, just a general update on all the recent requests, so I know exactly where we stand and what's left to do before the next APK update.
+
+There's absolutely no pressure or urgency. I just want to make sure we're both on the same page.
+
+And again, thank you so much to you and the whole team for all your hard work. I really appreciate everything you're doing for RYVENZA!
+
+I'll get back to you as soon as I can!
+
+
+
+
+
+
+
+
+Hi Ansarul,
+
+I just have two small things I'd like you to check regarding the work schedule feature in RYVENZA:
+
+1. Work Schedule Display on the Home Screen
+Currently, the home screen work schedule section always displays predefined names like "Day Shift", "Night Shift", or "Evening Shift".
+
+What I’d like is for the home screen to display the exact name the user assigns when customizing their schedule.
+
+Example: If a shift is named "Morning", "Evening", "Sunday Morning", "Vacation", "Rest Day", or any other label, that precise name should appear on the home screen.
+
+Objective: Users should see their personalized shift labels rather than generic defaults that may not reflect their actual routine. This should primarily be a display correction on the home screen UI.
+
+2. Issue with Work Schedule & Rotation Customization
+I tested creating a new rotation, but it looks like there may be a bug. Currently, I can change the rotation name, but almost nothing else functions properly—I'm unable to modify key settings or add new shift types.
+
+As previously discussed, users need the ability to:
+
+Edit rotation details: Change the rotation name, adjust the starting date/starting day of the week, and set the rotation length.
+
+Create custom shift types: Add as many unique shift types as needed (e.g., Morning, Evening, Night, Sunday Morning, Vacation, Rest Day, or custom entries).
+
+Customize visual identifiers: Freely assign letters and colors to each shift (e.g., replacing "A" with "S").
+
+Set shift hours: Add and customize specific working hours for each shift type.
+
+Save rotations: Ensure all custom parameters persist and save reliably.
+
+Currently, saving and updating these fields fails or remains unresponsive. Could you please investigate the rotation customization flow and schedule calendar to ensure full customization functions as intended?
+
+The core goal is complete flexibility—allowing users to define their rotation structure, labels, working hours, and colors without restriction, with those custom names carrying through cleanly to the home screen.
+
+Thanks again for all your hard work! I really appreciate it.

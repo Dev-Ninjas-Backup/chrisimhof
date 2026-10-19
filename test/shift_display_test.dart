@@ -145,5 +145,23 @@ void main() {
       expect(ShiftDisplayHelper.toCanonicalPatternCode('Repos'), 'Off');
       expect(ShiftDisplayHelper.toCanonicalPatternCode(''), 'Off');
     });
+
+    test('formatShiftName formats personalized custom and standard shifts correctly', () {
+      // Personalized custom shift labels
+      expect(ShiftDisplayHelper.formatShiftName('Morning'), 'Morning');
+      expect(ShiftDisplayHelper.formatShiftName('morning'), 'Morning');
+      expect(ShiftDisplayHelper.formatShiftName('Sunday Morning'), 'Sunday Morning');
+      expect(ShiftDisplayHelper.formatShiftName('sunday_morning'), 'Sunday Morning');
+      expect(ShiftDisplayHelper.formatShiftName('Vacation'), 'Vacation');
+      expect(ShiftDisplayHelper.formatShiftName('vacation'), 'Vacation');
+      expect(ShiftDisplayHelper.formatShiftName('Rest Day'), 'Rest Day');
+      expect(ShiftDisplayHelper.formatShiftName('rest_day'), 'Rest Day');
+
+      // Standard shifts return clean shift labels without appending 'shift'
+      expect(ShiftDisplayHelper.formatShiftName('Day'), 'Day');
+      expect(ShiftDisplayHelper.formatShiftName('Evening'), 'Evening');
+      expect(ShiftDisplayHelper.formatShiftName('Night'), 'Night');
+      expect(ShiftDisplayHelper.formatShiftName('Off'), 'Off');
+    });
   });
 }

@@ -150,6 +150,8 @@ class SplitStatusSection extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: AppColors.primaryTextColor,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 3),
             Text(
@@ -159,6 +161,8 @@ class SplitStatusSection extends StatelessWidget {
                 fontWeight: FontWeight.w400,
                 color: AppColors.textSoft,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             bottomWidget,
           ],

@@ -19,7 +19,9 @@ import 'package:chrisimhof/features/hydration/controller/hydration_controller.da
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
+import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 import 'package:chrisimhof/features/statistics/controller/statistics_controller.dart';
 
 class DashboardController extends GetxController with WidgetsBindingObserver {
@@ -242,7 +244,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     final workFitCard = cards?['workFit'] as Map<String, dynamic>?;
-    final rotationNameVal = apiData['rotationName'] as String? ??
+    String rotationNameVal = apiData['rotationName'] as String? ??
         workInfo?['rotationName'] as String? ??
         workInfo?['name'] as String? ??
         workInfo?['settings']?['defaultRotation'] as String? ??
@@ -254,11 +256,86 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     String workShiftCountdown = 'No shifts scheduled'.tr;
     double workProgress = 0.0;
 
-    if (workInfo != null && workInfo['shiftType'] != 'off') {
+    // Check if user has an active work rotation / custom schedule in WorkScheduleSettingsController
+    WorkScheduleSettingsController? settingsCtrl;
+    if (Get.isRegistered<WorkScheduleSettingsController>()) {
+      settingsCtrl = Get.find<WorkScheduleSettingsController>();
+    }
+
+    final hasCustomRotation = settingsCtrl != null &&
+        settingsCtrl.isEnabled.value &&
+        (settingsCtrl.hasRotationData.value || settingsCtrl.pattern.isNotEmpty);
+
+    String customStart = '';
+    String customEnd = '';
+
+    if (hasCustomRotation) {
+      final now = DateTime.now();
+      final todayShift = settingsCtrl.getShiftForDate(now);
+      final lowerShift = todayShift.trim().toLowerCase();
+
+      if (settingsCtrl.rotationName.value.isNotEmpty) {
+        rotationNameVal = settingsCtrl.rotationName.value;
+      }
+
+      if (lowerShift == 'off' || lowerShift == 'repos') {
+        workShift = 'Off Today'.tr;
+        workShiftCountdown = 'No shifts scheduled'.tr;
+        workProgress = 0.0;
+      } else {
+        // Display exact user-assigned shift name (e.g. "Morning", "Sunday Morning", "Vacation", "Rest Day", etc.)
+        workShift = ShiftDisplayHelper.formatShiftName(todayShift);
+
+        // Look up shift times from settingsCtrl.shiftTimes
+        final matchKey = settingsCtrl.shiftTimes.keys.firstWhere(
+          (k) =>
+              k.toLowerCase() == lowerShift ||
+              k.toLowerCase().replaceAll(RegExp(r'[\s_]+'), '') ==
+                  lowerShift.replaceAll(RegExp(r'[\s_]+'), ''),
+          orElse: () => '',
+        );
+
+        if (matchKey.isNotEmpty && settingsCtrl.shiftTimes[matchKey] != null) {
+          customStart = settingsCtrl.shiftTimes[matchKey]!['start'] ?? '';
+          customEnd = settingsCtrl.shiftTimes[matchKey]!['end'] ?? '';
+        }
+
+        final isVacationOrRest = lowerShift == 'vacation' ||
+            lowerShift == 'rest day' ||
+            lowerShift == 'rest_day' ||
+            lowerShift == 'congé' ||
+            lowerShift == 'conge';
+
+        if (isVacationOrRest) {
+          workShiftCountdown = 'No shifts scheduled'.tr;
+          workProgress = 0.0;
+        } else if (customStart.isNotEmpty &&
+            customEnd.isNotEmpty &&
+            customStart != customEnd &&
+            (customStart != '00:00' || customEnd != '00:00')) {
+          workShiftCountdown = '$customStart — $customEnd';
+        } else if (workInfo != null) {
+          final s = workInfo['shiftStart'] as String? ??
+              workInfo['shiftStartTime'] as String? ??
+              '';
+          final e = workInfo['shiftEnd'] as String? ??
+              workInfo['shiftEndTime'] as String? ??
+              '';
+          if (s.isNotEmpty && e.isNotEmpty && s != e) {
+            customStart = s;
+            customEnd = e;
+            workShiftCountdown = '$s — $e';
+          } else {
+            workShiftCountdown =
+                workFitCard?['subtitle'] as String? ?? 'Active shift'.tr;
+          }
+        } else {
+          workShiftCountdown =
+              workFitCard?['subtitle'] as String? ?? 'Active shift'.tr;
+        }
+      }
+    } else if (workInfo != null && workInfo['shiftType'] != 'off') {
       final shiftType = workInfo['shiftType'] as String? ?? 'Work';
-      final capShiftType = shiftType.isNotEmpty
-          ? shiftType[0].toUpperCase() + shiftType.substring(1)
-          : 'Work';
       final start = workInfo['shiftStart'] as String? ??
           workInfo['shiftStartTime'] as String? ??
           '';
@@ -266,56 +343,29 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
           workInfo['shiftEndTime'] as String? ??
           '';
 
-      workShift = '$capShiftType shift';
+      customStart = start;
+      customEnd = end;
+
+      // Check if WorkController has a personalized shift selected
+      String label = '';
+      if (Get.isRegistered<WorkController>()) {
+        final wc = Get.find<WorkController>();
+        if (wc.selectedShiftType.value.isNotEmpty &&
+            wc.selectedShiftType.value.toLowerCase() != 'off') {
+          label = ShiftDisplayHelper.formatShiftName(wc.selectedShiftType.value);
+        }
+      }
+      if (label.isEmpty) {
+        label = ShiftDisplayHelper.formatShiftName(shiftType);
+      }
+
+      workShift = label;
       if (start.isNotEmpty && end.isNotEmpty) {
         workShiftCountdown = '$start — $end';
       } else {
         workShiftCountdown =
-            workFitCard?['subtitle'] as String? ?? 'Active shift';
+            workFitCard?['subtitle'] as String? ?? 'Active shift'.tr;
       }
-
-      // Calculate progress dynamically based on time window
-      try {
-        if (start.isNotEmpty && end.isNotEmpty) {
-          final now = DateTime.now();
-          final startParts = start.split(':');
-          final endParts = end.split(':');
-          if (startParts.length == 2 && endParts.length == 2) {
-            final startHour = int.parse(startParts[0]);
-            final startMin = int.parse(startParts[1]);
-            final endHour = int.parse(endParts[0]);
-            final endMin = int.parse(endParts[1]);
-
-            final startTime = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              startHour,
-              startMin,
-            );
-            var endTime = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              endHour,
-              endMin,
-            );
-            if (endTime.isBefore(startTime)) {
-              endTime = endTime.add(const Duration(days: 1));
-            }
-
-            if (now.isAfter(startTime) && now.isBefore(endTime)) {
-              final totalMinutes = endTime.difference(startTime).inMinutes;
-              final elapsedMinutes = now.difference(startTime).inMinutes;
-              workProgress = (elapsedMinutes / totalMinutes).clamp(0.0, 1.0);
-            } else if (now.isAfter(endTime)) {
-              workProgress = 1.0;
-            } else {
-              workProgress = 0.0;
-            }
-          }
-        }
-      } catch (_) {}
     } else {
       workShift = workInfo?['shiftBadge'] as String? ??
           workFitCard?['subtitle'] as String? ??
@@ -324,6 +374,61 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
           'No shifts scheduled'.tr;
       workProgress = 0.0;
     }
+
+    // Calculate progress dynamically based on time window
+    try {
+      final activeStart = customStart.isNotEmpty
+          ? customStart
+          : (workInfo?['shiftStart'] as String? ??
+              workInfo?['shiftStartTime'] as String? ??
+              '');
+      final activeEnd = customEnd.isNotEmpty
+          ? customEnd
+          : (workInfo?['shiftEnd'] as String? ??
+              workInfo?['shiftEndTime'] as String? ??
+              '');
+      if (activeStart.isNotEmpty &&
+          activeEnd.isNotEmpty &&
+          activeStart != activeEnd) {
+        final now = DateTime.now();
+        final startParts = activeStart.split(':');
+        final endParts = activeEnd.split(':');
+        if (startParts.length == 2 && endParts.length == 2) {
+          final startHour = int.parse(startParts[0]);
+          final startMin = int.parse(startParts[1]);
+          final endHour = int.parse(endParts[0]);
+          final endMin = int.parse(endParts[1]);
+
+          final startTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            startHour,
+            startMin,
+          );
+          var endTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            endHour,
+            endMin,
+          );
+          if (endTime.isBefore(startTime)) {
+            endTime = endTime.add(const Duration(days: 1));
+          }
+
+          if (now.isAfter(startTime) && now.isBefore(endTime)) {
+            final totalMinutes = endTime.difference(startTime).inMinutes;
+            final elapsedMinutes = now.difference(startTime).inMinutes;
+            workProgress = (elapsedMinutes / totalMinutes).clamp(0.0, 1.0);
+          } else if (now.isAfter(endTime)) {
+            workProgress = 1.0;
+          } else {
+            workProgress = 0.0;
+          }
+        }
+      }
+    } catch (_) {}
 
     double hydrationProgress = 0.0;
     if (cards?['hydration']?['score'] != null) {
@@ -657,6 +762,16 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     try {
       final token = await SharedPreferencesHelper.getAccessToken();
       if (token == null || token.isEmpty) return;
+
+      // Eagerly ensure work schedule settings rotation is fetched if not already loaded
+      if (Get.isRegistered<WorkScheduleSettingsController>()) {
+        try {
+          final settings = Get.find<WorkScheduleSettingsController>();
+          if (!settings.hasRotationData.value && !settings.isRotationLoading.value) {
+            settings.fetchMyWorkRotation();
+          }
+        } catch (_) {}
+      }
 
       // 1. Fetch User Name from Profile
       String userName = 'User';

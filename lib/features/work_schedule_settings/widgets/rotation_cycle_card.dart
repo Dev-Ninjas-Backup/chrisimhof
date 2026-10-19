@@ -121,25 +121,24 @@ class RotationCycleCard extends StatelessWidget {
                 final date = controller.startDate.value;
                 final formatted =
                     '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-                final isEditable = !controller.hasRotationData.value;
                 return OutlinedButton.icon(
-                  onPressed: isEditable ? () => _pickStartDate(context) : null,
-                  icon: Icon(
+                  onPressed: () => _pickStartDate(context),
+                  icon: const Icon(
                     Icons.calendar_today_rounded,
                     size: 14,
-                    color: isEditable ? AppColors.secondaryButtonColor : AppColors.textSoft,
+                    color: AppColors.secondaryButtonColor,
                   ),
                   label: Text(
                     formatted,
                     style: getTextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: isEditable ? AppColors.secondaryButtonColor : AppColors.textSoft,
+                      color: AppColors.secondaryButtonColor,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(
-                      color: isEditable ? AppColors.secondaryButtonColor : AppColors.borderSoft,
+                    side: const BorderSide(
+                      color: AppColors.secondaryButtonColor,
                       width: 1,
                     ),
                     shape: RoundedRectangleBorder(
@@ -184,10 +183,7 @@ class RotationCycleCard extends StatelessWidget {
                 ),
               ),
               Obx(() {
-                final isTemplate =
-                    controller.selectedTemplateKey.value.isNotEmpty;
-                final isEditable = !controller.hasRotationData.value;
-                final isDisabled = isTemplate || !isEditable;
+                const isDisabled = false;
                 return Row(
                   children: [
                     _buildCycleAdjustBtn(
@@ -206,9 +202,7 @@ class RotationCycleCard extends StatelessWidget {
                         style: getTextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: isDisabled
-                              ? AppColors.textSoft
-                              : AppColors.primaryTextColor,
+                          color: AppColors.primaryTextColor,
                         ),
                       ),
                     ),

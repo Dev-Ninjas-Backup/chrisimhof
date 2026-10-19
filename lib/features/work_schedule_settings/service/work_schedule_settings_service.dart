@@ -83,6 +83,45 @@ class WorkScheduleSettingsService {
     return false;
   }
 
+  // POST /api/v1/calculator/work-rotation/templates/:id/apply
+  Future<bool> applyWorkRotationTemplate({
+    required String id,
+    required String startDate,
+    String? name,
+  }) async {
+    try {
+      final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+      final uri = Uri.parse(Urls.applyWorkRotationTemplate(id));
+      final Map<String, dynamic> bodyMap = {'startDate': startDate};
+      if (name != null && name.trim().isNotEmpty) {
+        bodyMap['name'] = name.trim();
+      }
+
+      debugPrint('Applying custom template: $uri body: ${jsonEncode(bodyMap)}');
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyMap),
+      );
+
+      debugPrint('Apply custom template status: ${response.statusCode}');
+      debugPrint('Apply custom template body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('WorkScheduleSettingsService.applyWorkRotationTemplate error: $e');
+    }
+    return false;
+  }
+
   // DELETE /api/v1/calculator/work-rotation/templates/:id
   Future<bool> deleteWorkRotationTemplate(String id) async {
     try {

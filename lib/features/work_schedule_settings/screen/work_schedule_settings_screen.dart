@@ -104,9 +104,32 @@ class WorkScheduleSettingsScreen extends StatelessWidget {
                               const SizedBox(height: 24),
 
                               CustomButton(
-                                text: 'Save to Templates'.tr,
-                                onTap: controller.saveCustomRotationTemplate,
+                                text: 'Save & Apply Schedule'.tr,
+                                onTap: controller.saveAndApplySchedule,
                                 icon: null,
+                              ),
+                              const SizedBox(height: 12),
+
+                              OutlinedButton(
+                                onPressed: controller.saveCustomRotationTemplate,
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(50),
+                                  side: const BorderSide(
+                                    color: AppColors.secondaryButtonColor,
+                                    width: 1.5,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Save as Template'.tr,
+                                  style: getTextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.secondaryButtonColor,
+                                  ),
+                                ),
                               ),
                               const SizedBox(height: 12),
 

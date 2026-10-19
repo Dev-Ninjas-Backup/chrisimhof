@@ -15,6 +15,19 @@ import 'package:get/get.dart';
 class ShiftDisplayHelper {
   static final RxMap<String, String> customShiftInitials = <String, String>{}.obs;
   static final RxMap<String, String> customDayCodes = <String, String>{}.obs;
+  static final RxMap<String, String> customShiftColors = <String, String>{}.obs;
+
+  static const List<Map<String, dynamic>> shiftColorPalette = [
+    {'name': 'Amber', 'color': Color(0xFFF59E0B), 'hex': '#F59E0B'},
+    {'name': 'Orange', 'color': Color(0xFFF97316), 'hex': '#F97316'},
+    {'name': 'Violet', 'color': Color(0xFF8B5CF6), 'hex': '#8B5CF6'},
+    {'name': 'Indigo', 'color': Color(0xFF6366F1), 'hex': '#6366F1'},
+    {'name': 'Blue', 'color': Color(0xFF3B82F6), 'hex': '#3B82F6'},
+    {'name': 'Teal', 'color': Color(0xFF0D9488), 'hex': '#0D9488'},
+    {'name': 'Emerald', 'color': Color(0xFF10B981), 'hex': '#10B981'},
+    {'name': 'Rose', 'color': Color(0xFFEC4899), 'hex': '#EC4899'},
+    {'name': 'Red', 'color': Color(0xFFEF4444), 'hex': '#EF4444'},
+  ];
 
   static bool _initialized = false;
 
@@ -25,6 +38,8 @@ class ShiftDisplayHelper {
       customShiftInitials.assignAll(initials);
       final dayCodes = await CustomRotationPrefs.getDayDisplayCodes();
       customDayCodes.assignAll(dayCodes);
+      final colors = await CustomRotationPrefs.getCustomShiftColors();
+      customShiftColors.assignAll(colors);
       _initialized = true;
     } catch (e) {
       debugPrint('ShiftDisplayHelper init error: $e');
@@ -48,6 +63,16 @@ class ShiftDisplayHelper {
       customDayCodes[key] = code.trim().toUpperCase();
     }
     await CustomRotationPrefs.setDayDisplayCodes(customDayCodes);
+  }
+
+  static Future<void> setCustomShiftColor(String shiftKey, String? hexColor) async {
+    final lowerKey = canonicalShiftKey(shiftKey);
+    if (hexColor == null || hexColor.trim().isEmpty) {
+      customShiftColors.remove(lowerKey);
+    } else {
+      customShiftColors[lowerKey] = hexColor.trim();
+    }
+    await CustomRotationPrefs.setCustomShiftColors(customShiftColors);
   }
 
   /// Strictly maps any shift name, localized initial/word, or custom code
@@ -100,6 +125,32 @@ class ShiftDisplayHelper {
 
   static String canonicalShiftKey(String shift) {
     return toCanonicalApiKey(shift);
+  }
+
+  /// Formats any shift key (e.g. 'morning', 'sunday_morning', 'vacation', 'rest_day', 'day')
+  /// into an exact, clean human-readable display label (e.g. 'Morning', 'Sunday Morning', 'Vacation', 'Rest Day').
+  /// Predefined shifts ('day', 'evening', 'night', 'off') are localized via .tr.
+  static String formatShiftName(String key) {
+    final trimmed = key.trim();
+    if (trimmed.isEmpty) return '';
+    final lower = trimmed.toLowerCase();
+    if (lower == 'day' || lower == 'jour') return 'Day'.tr;
+    if (lower == 'evening' ||
+        lower == 'après-midi' ||
+        lower == 'apres-midi' ||
+        lower == 'soir') {
+      return 'Evening'.tr;
+    }
+    if (lower == 'night' || lower == 'nuit') return 'Night'.tr;
+    if (lower == 'off' || lower == 'repos') return 'Off'.tr;
+
+    return trimmed
+        .split(RegExp(r'[_\s]+'))
+        .map((word) {
+          if (word.isEmpty) return '';
+          return word[0].toUpperCase() + word.substring(1);
+        })
+        .join(' ');
   }
 
   /// Returns the localized display code / initial for a shift.
@@ -188,7 +239,25 @@ class ShiftDisplayHelper {
     return 'custom';
   }
 
+  static Color? getCustomColor(String shift) {
+    final lowerKey = canonicalShiftKey(shift);
+    final hex = customShiftColors[lowerKey];
+    if (hex != null && hex.isNotEmpty) {
+      try {
+        final cleanHex = hex.replaceFirst('#', '');
+        final intVal = int.parse(cleanHex, radix: 16);
+        return cleanHex.length == 6 ? Color(0xFF000000 | intVal) : Color(intVal);
+      } catch (_) {}
+    }
+    return null;
+  }
+
   static Color getBackgroundColor(String shift) {
+    final custom = getCustomColor(shift);
+    if (custom != null) {
+      return custom.withValues(alpha: 0.16);
+    }
+
     final cat = getShiftCategory(shift);
     switch (cat) {
       case 'day':
@@ -205,6 +274,11 @@ class ShiftDisplayHelper {
   }
 
   static Color getTextColor(String shift) {
+    final custom = getCustomColor(shift);
+    if (custom != null) {
+      return custom;
+    }
+
     final cat = getShiftCategory(shift);
     switch (cat) {
       case 'day':
@@ -218,5 +292,9 @@ class ShiftDisplayHelper {
       default:
         return AppColors.secondaryButtonColor;
     }
+  }
+
+  static Color getShiftColor(String shift, {required bool bg}) {
+    return bg ? getBackgroundColor(shift) : getTextColor(shift);
   }
 }

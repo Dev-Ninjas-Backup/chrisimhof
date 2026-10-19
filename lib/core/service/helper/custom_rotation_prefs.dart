@@ -185,5 +185,24 @@ class CustomRotationPrefs {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_customShiftInitialsKey, jsonEncode(initials));
   }
+
+  // Custom shift colors (e.g. 'morning' -> '#3B82F6')
+  static const String _customShiftColorsKey = 'custom_shift_colors';
+  static Future<Map<String, String>> getCustomShiftColors() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString(_customShiftColorsKey) ?? '';
+    if (jsonStr.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, v.toString()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  static Future<void> setCustomShiftColors(Map<String, String> colors) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_customShiftColorsKey, jsonEncode(colors));
+  }
 }
 

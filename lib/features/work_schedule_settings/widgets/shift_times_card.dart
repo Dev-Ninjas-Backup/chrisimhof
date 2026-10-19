@@ -29,8 +29,6 @@ class ShiftTimesCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Obx(() {
-        final isEditable = !controller.hasRotationData.value;
-        final isCustom = controller.selectedTemplateKey.value.isEmpty;
         final shiftKeys = controller.shiftTimes.keys.toList();
 
         return Column(
@@ -41,28 +39,30 @@ class ShiftTimesCard extends StatelessWidget {
               final isLast = idx == shiftKeys.length - 1;
 
               final lower = key.toLowerCase();
+              final isStandard = lower == 'day' ||
+                  lower == 'evening' ||
+                  lower == 'night' ||
+                  lower == 'jour' ||
+                  lower == 'après-midi' ||
+                  lower == 'apres-midi' ||
+                  lower == 'nuit';
+              final isCustom = !isStandard;
+              const isEditable = true;
+
               IconData icon;
-              Color color;
-              Color bgColor;
+              final color = ShiftDisplayHelper.getTextColor(key);
+              final bgColor = ShiftDisplayHelper.getBackgroundColor(key);
               String? iconPath;
 
-              if (lower == 'day') {
+              if (lower == 'day' || lower == 'jour') {
                 icon = Icons.wb_sunny_rounded;
-                color = AppColors.amber;
-                bgColor = AppColors.amberSoft3.withValues(alpha: 0.4);
-              } else if (lower == 'evening') {
+              } else if (lower == 'evening' || lower == 'après-midi' || lower == 'apres-midi') {
                 icon = Icons.auto_awesome_rounded;
-                color = AppColors.violet;
-                bgColor = AppColors.lavenderSoft;
-              } else if (lower == 'night') {
+              } else if (lower == 'night' || lower == 'nuit') {
                 icon = Icons.nightlight_round;
                 iconPath = IconPath.sleep;
-                color = AppColors.indigo;
-                bgColor = AppColors.indigoSoft;
               } else {
                 icon = Icons.work_rounded;
-                color = AppColors.secondaryButtonColor;
-                bgColor = AppColors.mintSoft;
               }
 
               return _buildShiftTimeRow(
@@ -75,12 +75,12 @@ class ShiftTimesCard extends StatelessWidget {
                 start: times['start']!,
                 end: times['end']!,
                 shiftName: key,
-                showDivider: !isLast || (isCustom && isEditable),
-                isCustom: isCustom && isEditable,
+                showDivider: !isLast || true,
+                isCustom: isCustom,
                 isEditable: isEditable,
               );
             }),
-            if (isCustom && isEditable) _buildAddShiftButton(context),
+            _buildAddShiftButton(context),
           ],
         );
       }),
@@ -102,7 +102,7 @@ class ShiftTimesCard extends StatelessWidget {
     required bool isEditable,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         border: showDivider
             ? const Border(bottom: BorderSide(color: AppColors.borderSoft))
@@ -110,42 +110,69 @@ class ShiftTimesCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: iconPath != null
-                ? Image.asset(iconPath, color: color, width: 18, height: 18)
-                : Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(width: 12),
+          // Left Badge / Icon
           GestureDetector(
-            onTap: (isCustom && isEditable) ? () => _editShiftName(context, shiftName) : null,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: getTextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryTextColor,
-                  ),
-                ),
-                if (isCustom && isEditable) ...[
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.edit_rounded,
-                    size: 13,
-                    color: AppColors.textSoft,
-                  ),
-                ],
-              ],
+            onTap: isEditable ? () => _editShiftInitial(context, shiftName) : null,
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: color.withValues(alpha: 0.25)),
+              ),
+              alignment: Alignment.center,
+              child: iconPath != null
+                  ? Image.asset(iconPath, color: color, width: 17, height: 17)
+                  : isCustom
+                      ? Text(
+                          ShiftDisplayHelper.getDisplayCode(shiftName),
+                          style: getTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: color,
+                          ),
+                        )
+                      : Icon(icon, color: color, size: 17),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 10),
+
+          // Title with edit icon (Expanded to prevent overflow)
+          Expanded(
+            child: GestureDetector(
+              onTap: (isCustom && isEditable) ? () => _editShiftName(context, shiftName) : null,
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: getTextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTextColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (isCustom && isEditable) ...[
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.edit_rounded,
+                      size: 13,
+                      color: AppColors.textSoft,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // Time range selector
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -153,8 +180,8 @@ class ShiftTimesCard extends StatelessWidget {
                 onTap: isEditable ? () => _pickTime(context, shiftName, 'start') : null,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
+                    horizontal: 8,
+                    vertical: 5,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.gray50,
@@ -164,7 +191,7 @@ class ShiftTimesCard extends StatelessWidget {
                   child: Text(
                     start,
                     style: getTextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: isEditable ? AppColors.primaryTextColor : AppColors.textSoft,
                     ),
@@ -172,11 +199,11 @@ class ShiftTimesCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Text(
                   '–',
                   style: getTextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSoft,
                   ),
@@ -186,8 +213,8 @@ class ShiftTimesCard extends StatelessWidget {
                 onTap: isEditable ? () => _pickTime(context, shiftName, 'end') : null,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
+                    horizontal: 8,
+                    vertical: 5,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.gray50,
@@ -197,7 +224,7 @@ class ShiftTimesCard extends StatelessWidget {
                   child: Text(
                     end,
                     style: getTextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: isEditable ? AppColors.primaryTextColor : AppColors.textSoft,
                     ),
@@ -206,36 +233,46 @@ class ShiftTimesCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: isEditable ? () => _editShiftInitial(context, shiftName) : null,
-            child: Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: color.withValues(alpha: 0.3)),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                ShiftDisplayHelper.getDisplayCode(shiftName),
-                style: getTextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: color,
+
+          // For standard shifts: show initial badge
+          if (!isCustom) ...[
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: isEditable ? () => _editShiftInitial(context, shiftName) : null,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: color.withValues(alpha: 0.3)),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  ShiftDisplayHelper.getDisplayCode(shiftName),
+                  style: getTextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: color,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
+
+          // For custom shifts: Delete button
           if (isCustom && isEditable) ...[
-            const SizedBox(width: 12),
+            const SizedBox(width: 6),
             GestureDetector(
               onTap: () => _deleteShift(context, shiftName),
-              child: const Icon(
-                Icons.delete_outline_rounded,
-                color: AppColors.red,
-                size: 20,
+              behavior: HitTestBehavior.opaque,
+              child: const Padding(
+                padding: EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppColors.red,
+                  size: 19,
+                ),
               ),
             ),
           ],
@@ -354,6 +391,7 @@ class ShiftTimesCard extends StatelessWidget {
     final nameController = TextEditingController();
     String start = '08:00';
     String end = '16:00';
+    String selectedColorHex = '#3B82F6';
 
     showDialog(
       context: context,
@@ -511,6 +549,52 @@ class ShiftTimesCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'VISUAL COLOR'.tr,
+                    style: getTextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textSoft,
+                    ).copyWith(letterSpacing: 1.1),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ShiftDisplayHelper.shiftColorPalette.map((item) {
+                      final hex = item['hex'] as String;
+                      final color = item['color'] as Color;
+                      final isSelected = selectedColorHex == hex;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedColorHex = hex),
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? AppColors.white : Colors.transparent,
+                              width: 2,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: color.withValues(alpha: 0.6),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    )
+                                  ]
+                                : null,
+                          ),
+                          child: isSelected
+                              ? const Icon(Icons.check, size: 16, color: Colors.white)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ],
               ),
               actions: [
@@ -544,6 +628,7 @@ class ShiftTimesCard extends StatelessWidget {
                       return;
                     }
                     controller.addCustomShift(enteredName, start, end);
+                    ShiftDisplayHelper.setCustomShiftColor(enteredName, selectedColorHex);
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
@@ -574,115 +659,168 @@ class ShiftTimesCard extends StatelessWidget {
 
   void _editShiftName(BuildContext context, String oldKey) {
     final nameController = TextEditingController(text: controller.formatShiftName(oldKey));
+    final initialColor = ShiftDisplayHelper.customShiftColors[ShiftDisplayHelper.canonicalShiftKey(oldKey)] ?? '#3B82F6';
+    String selectedColorHex = initialColor;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            'Rename Shift'.tr,
-            style: getTextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primaryTextColor,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'SHIFT NAME'.tr,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Text(
+                'Edit Shift'.tr,
                 style: getTextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textSoft,
-                ).copyWith(letterSpacing: 1.1),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: nameController,
-                style: getTextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.primaryTextColor,
                 ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.gray50,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.borderSoft, width: 1.5),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'SHIFT NAME'.tr,
+                    style: getTextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textSoft,
+                    ).copyWith(letterSpacing: 1.1),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.secondaryButtonColor, width: 2),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: nameController,
+                    style: getTextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryTextColor,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.gray50,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.borderSoft, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.secondaryButtonColor, width: 2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'VISUAL COLOR'.tr,
+                    style: getTextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textSoft,
+                    ).copyWith(letterSpacing: 1.1),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ShiftDisplayHelper.shiftColorPalette.map((item) {
+                      final hex = item['hex'] as String;
+                      final color = item['color'] as Color;
+                      final isSelected = selectedColorHex == hex;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedColorHex = hex),
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? AppColors.white : Colors.transparent,
+                              width: 2,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: color.withValues(alpha: 0.6),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    )
+                                  ]
+                                : null,
+                          ),
+                          child: isSelected
+                              ? const Icon(Icons.check, size: 16, color: Colors.white)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Cancel'.tr,
+                    style: getTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSoft,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel'.tr,
-                style: getTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSoft,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final enteredName = nameController.text.trim();
-                if (enteredName.isEmpty) {
-                  EasyLoading.showError('Shift name cannot be empty'.tr);
-                  return;
-                }
-                if (enteredName.toLowerCase() == 'off') {
-                  EasyLoading.showError('"Off" is a reserved shift name'.tr);
-                  return;
-                }
+                ElevatedButton(
+                  onPressed: () {
+                    final enteredName = nameController.text.trim();
+                    if (enteredName.isEmpty) {
+                      EasyLoading.showError('Shift name cannot be empty'.tr);
+                      return;
+                    }
+                    if (enteredName.toLowerCase() == 'off') {
+                      EasyLoading.showError('"Off" is a reserved shift name'.tr);
+                      return;
+                    }
 
-                final oldNameFormatted = controller.formatShiftName(oldKey);
-                if (enteredName.toLowerCase() != oldKey.toLowerCase() &&
-                    enteredName.toLowerCase() != oldNameFormatted.toLowerCase()) {
-                  final duplicate = controller.shiftTimes.keys.any(
-                    (k) => k.toLowerCase() == enteredName.toLowerCase(),
-                  );
-                  if (duplicate) {
-                    EasyLoading.showError('A shift with this name already exists'.tr);
-                    return;
-                  }
-                }
+                    final oldNameFormatted = controller.formatShiftName(oldKey);
+                    if (enteredName.toLowerCase() != oldKey.toLowerCase() &&
+                        enteredName.toLowerCase() != oldNameFormatted.toLowerCase()) {
+                      final duplicate = controller.shiftTimes.keys.any(
+                        (k) => k.toLowerCase() == enteredName.toLowerCase(),
+                      );
+                      if (duplicate) {
+                        EasyLoading.showError('A shift with this name already exists'.tr);
+                        return;
+                      }
+                    }
 
-                controller.renameCustomShift(oldKey, enteredName);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondaryButtonColor,
-                foregroundColor: AppColors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                    controller.renameCustomShift(oldKey, enteredName);
+                    ShiftDisplayHelper.setCustomShiftColor(enteredName, selectedColorHex);
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.secondaryButtonColor,
+                    foregroundColor: AppColors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Save'.tr,
+                    style: getTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.white,
+                    ),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Save'.tr,
-                style: getTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.white,
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         );
       },
     );

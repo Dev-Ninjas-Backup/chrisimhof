@@ -1,3 +1,5 @@
+import 'package:chrisimhof/core/service/helper/shift_display_helper.dart';
+
 class UserWorkRotationModel {
   final String id;
   final String? name;
@@ -46,6 +48,8 @@ class UserWorkRotationModel {
             cleanKey = 'Evening';
           } else if (lower == 'night') {
             cleanKey = 'Night';
+          } else {
+            cleanKey = ShiftDisplayHelper.formatShiftName(key);
           }
           shiftTimesMap[cleanKey] = {
             'start': val['startTime']?.toString() ?? '00:00',
@@ -93,12 +97,15 @@ class UserWorkRotationModel {
           patternList.add('Off');
         } else {
           final matchKey = shiftTimesMap.keys.firstWhere(
-            (k) => k.toLowerCase() == lower,
+            (k) =>
+                k.toLowerCase() == lower ||
+                k.toLowerCase().replaceAll(RegExp(r'[\s_]+'), '') ==
+                    lower.replaceAll(RegExp(r'[\s_]+'), ''),
             orElse: () {
               if (lower == 'day') return 'Day';
               if (lower == 'evening') return 'Evening';
               if (lower == 'night') return 'Night';
-              return code;
+              return ShiftDisplayHelper.formatShiftName(code);
             },
           );
           patternList.add(matchKey);
@@ -129,12 +136,15 @@ class UserWorkRotationModel {
           overridesMap[dateKey] = 'Off';
         } else {
           final matchKey = shiftTimesMap.keys.firstWhere(
-            (k) => k.toLowerCase() == lower,
+            (k) =>
+                k.toLowerCase() == lower ||
+                k.toLowerCase().replaceAll(RegExp(r'[\s_]+'), '') ==
+                    lower.replaceAll(RegExp(r'[\s_]+'), ''),
             orElse: () {
               if (lower == 'day' || lower == 'd') return 'Day';
               if (lower == 'evening' || lower == 'e') return 'Evening';
               if (lower == 'night' || lower == 'n') return 'Night';
-              return codeStr;
+              return ShiftDisplayHelper.formatShiftName(codeStr);
             },
           );
           overridesMap[dateKey] = matchKey;

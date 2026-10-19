@@ -1,0 +1,86 @@
+client:
+Hey! I've been thinking about one last thing-
+We've reworked and planned quite a lot recently, and I think everything is now in a really good place.
+Visually, I don't plan to change anything else after this.
+There are just a few small points:
+Analytics page: I'd like to redesign/improve this page. I'll send you the current Analytics page so you
+can see what I mean. Could you please give me a small quote just for updating this page?
+Login screen: As you can see in the image I'm sending you, the "Log In" and "Create Account" buttons
+are positioned a bit too low. Would it be possible to move them slightly higher?
+First screen / welcome page: I think the current background has a bit too much color and doesn't
+really match the final RYVENZA visual identity. I think it could look cleaner and more premium with a
+white background, keeping the RYVENZA logo and main elements in green. Basically, just simplifying
+the colors rather than changing the whole design.
+Apart from these points, I'm happy with the visual direction and I don't plan to change anything else.
+Thanks!
+
+attachments: 
+client-attrachments/1.jpg
+client-attrachments/2.jpg
+
+
+me:
+Hey Chris,
+I understand. You'd like to make a few small adjustments to the Login screen and the first Welcome
+screen, and no worries at all.
+For these small visual changes, I don't want to charge you anything extra. I'm happy to include them.
+Regarding the Analytics page, if you're looking for a more extensive or advanced Analytics page with
+you in the eaty and mone reite ata, then tired to adjust the amount accordingly rile
+Please send me the Analytics page and the changes you'd like, and lil take a look.
+Thanks!
+
+
+client:
+First of all, thank you!
+Regarding the Analytics page, I'm currently trying to generate a design with Al that matches what I
+have in mind.
+Once I'm happy with the result, I'll send it to you. I'd also really like to get your opinion on it -
+whether you think the layout and structure make sense from your side, and especially whether it
+feels visually clear, intuitive, and very easy for users to understand.
+I don't want to overcomplicate the Analytics page. The goal is really to make the information useful
+while keeping everything simple and immediately understandable.
+
+me:
+Sure. Just send it to me whenever convenient. lil let you know my feedback.
+
+
+client:
+Hi again!
+Here are the documents for the new Analytics page I mentioned.
+Please have a look and let me know what you think, especially if everything seems clear, coherent,
+and easy to understand from a user perspective.
+Could you also already prepare a quote for implementing this new Analytics page based on these
+documents?
+Thank you!
+
+attachments:
+client-attrachments/RYVENZA_Analytics_Developer_Brief_EN-2.pdf
+client-attrachments/RYVENZA_Overview_Developer_Brief_EN.pdf
+
+me:
+Let me take a look at the details. I'll get back to you on this.
+
+client:
+One more small but important point:
+On the image, please remove the "Work Fitness" / "Fitness for Work" part.
+RYVENZA should not assess or indicate whether someone is fit or unfit for work. That is not
+something the app should determine.
+Could you also please check the entire app to make sure we haven't used this wording, or anything
+similar suggesting work fitness or ability to work, anywhere else?
+Work-related recommendations are completely fine - for example simple recommendations about
+reducing screen time, sleep, recovery, hydration, etc. I just want to avoid anything that could be
+interpreted as RYVENZA assessing whether a person is fit to work.
+So please remove this from the Analytics page and, if it appears elsewhere, from the rest of the app
+as well.
+Thank you!
+The third one with 70%
+
+attachments:
+client-attrachments/3.jpg
+
+client:
+Regarding the part I mentioned earlier, I've corrected it now.
+I'm sending you the updated version here.
+
+attachments:
+client-attrachments/4.jpg

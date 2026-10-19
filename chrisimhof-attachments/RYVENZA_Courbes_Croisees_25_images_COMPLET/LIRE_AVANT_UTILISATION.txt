@@ -1,0 +1,49 @@
+RYVENZA — MODÈLE DÉFINITIF : COURBES CROISÉES
+
+Visuel retenu par Christian : design d'origine nº 2,
+classé premier sur la planche « Mon classement pour RYVENZA ».
+Buste vert clair translucide, grandes courbes blanches et points lumineux blancs.
+
+25 IMAGES TRANSPARENTES
+Un seul dessin source, décliné en cinq résolutions et cinq profils de format/compression.
+Aucune nouvelle génération ou retouche du dessin, de la pose, des couleurs ou du cadrage.
+Seuls le redimensionnement et l'encodage varient entre les fichiers.
+Les formats avec perte peuvent produire de petites différences de couleur aux pixels.
+
+RÉSOLUTIONS, EN PIXELS
+512 × 512
+1024 × 1024
+1254 × 1254 — résolution native du rendu retenu.
+2048 × 2048 — agrandissement du fichier natif.
+4096 × 4096 — agrandissement du fichier natif.
+Les agrandissements ne créent pas de nouveaux détails natifs.
+
+FORMATS ET QUALITÉS
+PNG_sans_perte : recommandé pour l'intégration ; aucune perte d'image à la taille exportée.
+WEBP_qualite_95 : compression avec perte, réglage d'encodeur 95/100.
+WEBP_qualite_80 : compression avec perte, réglage d'encodeur 80/100, poids réduit.
+AVIF_qualite_95 : compression avec perte, réglage d'encodeur 95/100, si compatible.
+TIFF_sans_perte : format de travail, compression sans perte et canal alpha.
+Tous les fichiers contiennent un canal alpha. Aucun fond n'est ajouté.
+Les réglages « 80 » et « 95 » ne sont pas des mesures de qualité comparables entre formats.
+
+FICHIER CONSEILLÉ POUR LE DÉVELOPPEUR
+RYVENZA_Courbes_Croisees_1254x1254_PNG_sans_perte.png
+Ce PNG restitue exactement les pixels RGBA du rendu source retenu.
+Choisir un seul fichier selon la taille d'affichage et les formats pris en charge.
+Les variantes WebP peuvent servir à réduire le poids.
+Le nom « Courbes croisées » identifie le visuel définitif ; ne pas le confondre
+avec « Rythmes liés », qui était deuxième dans le classement.
+
+ENGLISH — DEVELOPER NOTES
+FINAL SELECTED ASSET: Crossed Curves, original design #2, ranked #1 on the comparison board.
+25 transparent images, all derived from ONE source artwork, with no redesign or new generation.
+Five square sizes: 512, 1024, 1254, 2048 and 4096 px.
+Native generated size is 1254 × 1254 px; 2048/4096 are resampled enlargements.
+Five export profiles: lossless PNG, WebP 95, WebP 80, AVIF 95, lossless TIFF.
+All retain alpha transparency. Lossy encoding can slightly change individual colour pixels.
+Suggested starting file: RYVENZA_Courbes_Croisees_1254x1254_PNG_sans_perte.png.
+The native PNG matches the source RGBA pixels exactly.
+
+Les images sont directement à la racine du ZIP, sans sous-dossiers.
+Le suffixe de chaque nom précise le format ou la qualité.

@@ -22,7 +22,7 @@ class WorkRotationPresetModel {
   factory WorkRotationPresetModel.fromJson(Map<String, dynamic> json) {
     final String? id = json['id'] as String?;
     final String key = json['key'] as String? ?? '';
-    final String label = json['label'] as String? ?? '';
+    final String label = json['label'] as String? ?? json['name'] as String? ?? '';
     final String description = json['description'] as String? ?? '';
     final int cycleWeeks = json['cycleWeeks'] as int? ?? 1;
     final bool isCustom = json['isCustom'] as bool? ?? false;
@@ -44,8 +44,8 @@ class WorkRotationPresetModel {
             cleanKey = 'Night';
           }
           shiftTimesMap[cleanKey] = {
-            'start': val['startTime']?.toString() ?? '00:00',
-            'end': val['endTime']?.toString() ?? '00:00',
+            'start': val['startTime']?.toString() ?? val['start']?.toString() ?? '00:00',
+            'end': val['endTime']?.toString() ?? val['end']?.toString() ?? '00:00',
           };
         }
       });

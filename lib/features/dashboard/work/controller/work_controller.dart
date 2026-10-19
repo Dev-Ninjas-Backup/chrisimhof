@@ -57,13 +57,22 @@ class WorkController extends GetxController {
       final dashboardController = Get.find<DashboardController>();
       final data = dashboardController.dashboardData.value;
       
-      final shift = data.workShift.toLowerCase();
-      if (shift.contains('day') || shift.contains('jour')) {
+      final rawShift = data.workShift.trim();
+      final lower = rawShift.toLowerCase();
+
+      if (lower == 'off' || lower == 'off today' || lower.contains('repos')) {
+        selectedShiftType.value = 'Off';
+      } else if (lower == 'day' || lower == 'jour') {
         selectedShiftType.value = 'Day';
-      } else if (shift.contains('evening') || shift.contains('après-midi') || shift.contains('apres-midi')) {
+      } else if (lower == 'evening' ||
+          lower == 'après-midi' ||
+          lower == 'apres-midi' ||
+          lower == 'soir') {
         selectedShiftType.value = 'Evening';
-      } else if (shift.contains('night') || shift.contains('nuit') || shift.contains('soir')) {
+      } else if (lower == 'night' || lower == 'nuit') {
         selectedShiftType.value = 'Night';
+      } else if (rawShift.isNotEmpty && rawShift != '--') {
+        selectedShiftType.value = rawShift;
       } else {
         selectedShiftType.value = 'Off';
       }
