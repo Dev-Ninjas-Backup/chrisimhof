@@ -163,12 +163,23 @@ class RotationListCard extends StatelessWidget {
   ) {
     return Obx(() {
       final activeKey = controller.activeRotationKey.value;
-      final currentRotationName = controller.rotationName.value;
+      final currentRotationName = controller.rotationName.value.trim();
 
       final bool isActive = (activeKey.isNotEmpty && activeKey == tmpl.key) ||
           (activeKey.isEmpty &&
               currentRotationName.isNotEmpty &&
               tmpl.label.toLowerCase() == currentRotationName.toLowerCase());
+
+      String displayName = tmpl.label.trim();
+      if (displayName.isEmpty || displayName.toLowerCase() == 'custom') {
+        if (isActive && currentRotationName.isNotEmpty) {
+          displayName = currentRotationName;
+        } else if (isActive && controller.activeRotationName.value.trim().isNotEmpty) {
+          displayName = controller.activeRotationName.value.trim();
+        } else if (displayName.isEmpty) {
+          displayName = 'Custom rotation'.tr;
+        }
+      }
 
       return InkWell(
         onTap: () {
@@ -224,7 +235,7 @@ class RotationListCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            tmpl.label.tr,
+                            displayName.tr,
                             style: getTextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,

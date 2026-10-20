@@ -1,0 +1,15 @@
+Hey, just a few things I noticed regarding the custom work shifts.
+First, as you can see, the custom shift doesn't display the name I gave it. It just says "Custom" with a
+pencil icon. Also, I can't rename or edit the three default shifts (Day, Evening, and Night). Ideally,
+users should be able to customize all of them, including their names.
+The second point is about setting up the shift rotation. Right now, I only see the option to configure it
+by week, but I think it needs to be a bit more intuitive.
+For example, the user should be able to select a specific starting date and say: "On this date, I'm
+working this shift." Then, from that date, the rotation should automatically follow the cycle they've
+configured.
+The idea is to make it really easy for users to understand exactly when their rotation starts and how
+it works.
+Because right now, even I'm getting a bit confused when trying to configure it, and I know how the
+app is supposed to work!
+I think we just need to make this part a little more logical and user-friendly, especially for someone
+setting up their work schedule for the first time.
