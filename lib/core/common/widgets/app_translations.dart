@@ -588,6 +588,16 @@ class AppTranslations extends Translations {
       'WEEK 1': 'WEEK 1',
       'Week 1': 'Week 1',
       'Week 1 Start Date': 'Week 1 Start Date',
+      'Rotation Start Date': 'Rotation Start Date',
+      'Your rotation begins on this date and repeats this cycle automatically.':
+          'Your rotation begins on this date and repeats this cycle automatically.',
+      'Rotation starts on:': 'Rotation starts on:',
+      'Assign each day\'s shift below. The pattern repeats every @weeks automatically.':
+          'Assign each day\'s shift below. The pattern repeats every @weeks automatically.',
+      'Change': 'Change',
+      'Starts here': 'Starts here',
+      'week': 'week',
+      'weeks': 'weeks',
       'WEEK 2': 'WEEK 2',
       'Week 2': 'Week 2',
       'WEEK 3': 'WEEK 3',
@@ -1595,6 +1605,16 @@ class AppTranslations extends Translations {
       'WEEK 1': 'SEMAINE 1',
       'Week 1': 'Semaine 1',
       'Week 1 Start Date': 'Date de début de la semaine 1',
+      'Rotation Start Date': 'Date de début de rotation',
+      'Your rotation begins on this date and repeats this cycle automatically.':
+          'Votre rotation commence à cette date et répète ce cycle automatiquement.',
+      'Rotation starts on:': 'Début de la rotation :',
+      'Assign each day\'s shift below. The pattern repeats every @weeks automatically.':
+          'Attribuez chaque poste ci-dessous. Le cycle se répète automatiquement toutes les @weeks.',
+      'Change': 'Modifier',
+      'Starts here': 'Début du cycle',
+      'week': 'semaine',
+      'weeks': 'semaines',
       'WEEK 2': 'SEMAINE 2',
       'Week 2': 'Semaine 2',
       'WEEK 3': 'SEMAINE 3',

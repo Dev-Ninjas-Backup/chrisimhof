@@ -143,7 +143,10 @@ class TemplateSelectionSheet extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      tmpl.label.tr,
+                                      (tmpl.label.trim().isNotEmpty && tmpl.label.trim().toLowerCase() != "custom"
+                                              ? tmpl.label.trim()
+                                              : "Custom rotation".tr)
+                                          .tr,
                                       style: getTextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,

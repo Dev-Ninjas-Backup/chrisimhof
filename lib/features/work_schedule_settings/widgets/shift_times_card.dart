@@ -141,7 +141,7 @@ class ShiftTimesCard extends StatelessWidget {
           // Title with edit icon (Expanded to prevent overflow)
           Expanded(
             child: GestureDetector(
-              onTap: (isCustom && isEditable) ? () => _editShiftName(context, shiftName) : null,
+              onTap: isEditable ? () => _editShiftName(context, shiftName) : null,
               behavior: HitTestBehavior.opaque,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -158,7 +158,7 @@ class ShiftTimesCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (isCustom && isEditable) ...[
+                  if (isEditable) ...[
                     const SizedBox(width: 4),
                     const Icon(
                       Icons.edit_rounded,
@@ -234,34 +234,32 @@ class ShiftTimesCard extends StatelessWidget {
             ],
           ),
 
-          // For standard shifts: show initial badge
-          if (!isCustom) ...[
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: isEditable ? () => _editShiftInitial(context, shiftName) : null,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: color.withValues(alpha: 0.3)),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  ShiftDisplayHelper.getDisplayCode(shiftName),
-                  style: getTextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: color,
-                  ),
+          // Initial badge (tap to customize initial/code for this shift)
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: isEditable ? () => _editShiftInitial(context, shiftName) : null,
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: color.withValues(alpha: 0.3)),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                ShiftDisplayHelper.getDisplayCode(shiftName),
+                style: getTextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: color,
                 ),
               ),
             ),
-          ],
+          ),
 
-          // For custom shifts: Delete button
-          if (isCustom && isEditable) ...[
+          // Delete button (allow deleting if more than 1 shift remains)
+          if (isEditable && controller.shiftTimes.length > 1) ...[
             const SizedBox(width: 6),
             GestureDetector(
               onTap: () => _deleteShift(context, shiftName),

@@ -25,7 +25,7 @@ void main() {
       settingsCtrl.hasRotationData.value = true;
       settingsCtrl.rotationName.value = 'Continental 4-Shift';
       settingsCtrl.weeks.value = 1;
-      settingsCtrl.startDate.value = DateTime.now();
+      settingsCtrl.startDate.value = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
 
       settingsCtrl.shiftTimes.assignAll({
         'Morning': {'start': '06:00', 'end': '14:00'},
@@ -70,7 +70,7 @@ void main() {
       settingsCtrl.isEnabled.value = true;
       settingsCtrl.hasRotationData.value = true;
       settingsCtrl.weeks.value = 1;
-      settingsCtrl.startDate.value = DateTime.now();
+      settingsCtrl.startDate.value = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
 
       final todayIndex = (DateTime.now().weekday - 1) % 7;
       final pattern = List.generate(7, (_) => 'Morning');
@@ -109,7 +109,7 @@ void main() {
       settingsCtrl.isEnabled.value = true;
       settingsCtrl.hasRotationData.value = true;
       settingsCtrl.weeks.value = 1;
-      settingsCtrl.startDate.value = DateTime.now();
+      settingsCtrl.startDate.value = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
       settingsCtrl.shiftTimes.assignAll({
         'Morning': {'start': '06:00', 'end': '14:00'},
         'Sunday Morning': {'start': '08:00', 'end': '16:00'},

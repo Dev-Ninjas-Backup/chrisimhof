@@ -21,11 +21,32 @@ class WorkRotationPresetModel {
 
   factory WorkRotationPresetModel.fromJson(Map<String, dynamic> json) {
     final String? id = json['id'] as String?;
-    final String key = json['key'] as String? ?? '';
-    final String label = json['label'] as String? ?? json['name'] as String? ?? '';
+    final String key = json['key'] as String? ?? (id ?? '');
+
+    // Thorough extraction of name/label across possible API fields
+    final String? rawName = (json['name'] as String?)?.trim();
+    final String? rawRotationName = (json['rotationName'] as String?)?.trim();
+    final String? rawLabel = (json['label'] as String?)?.trim();
+    final String? rawTitle = (json['title'] as String?)?.trim();
+
+    String label = '';
+    if (rawName != null && rawName.isNotEmpty && rawName.toLowerCase() != 'custom') {
+      label = rawName;
+    } else if (rawRotationName != null && rawRotationName.isNotEmpty && rawRotationName.toLowerCase() != 'custom') {
+      label = rawRotationName;
+    } else if (rawLabel != null && rawLabel.isNotEmpty && rawLabel.toLowerCase() != 'custom') {
+      label = rawLabel;
+    } else if (rawTitle != null && rawTitle.isNotEmpty && rawTitle.toLowerCase() != 'custom') {
+      label = rawTitle;
+    } else if (rawName != null && rawName.isNotEmpty) {
+      label = rawName;
+    } else if (rawLabel != null && rawLabel.isNotEmpty) {
+      label = rawLabel;
+    }
+
     final String description = json['description'] as String? ?? '';
     final int cycleWeeks = json['cycleWeeks'] as int? ?? 1;
-    final bool isCustom = json['isCustom'] as bool? ?? false;
+    final bool isCustom = json['isCustom'] as bool? ?? (id != null && id.isNotEmpty);
 
     // Parse shiftTimesJson
     final shiftTimesMap = <String, Map<String, String>>{};

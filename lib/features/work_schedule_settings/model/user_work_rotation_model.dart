@@ -27,7 +27,16 @@ class UserWorkRotationModel {
 
   factory UserWorkRotationModel.fromJson(Map<String, dynamic> json) {
     final String id = json['id'] as String? ?? '';
-    final String? name = json['name'] as String?;
+    final String? rawName = (json['name'] as String?)?.trim();
+    final String? rawRotationName = (json['rotationName'] as String?)?.trim();
+    final String? rawLabel = (json['label'] as String?)?.trim();
+    final String? name = (rawName != null && rawName.isNotEmpty)
+        ? rawName
+        : (rawRotationName != null && rawRotationName.isNotEmpty)
+            ? rawRotationName
+            : (rawLabel != null && rawLabel.isNotEmpty)
+                ? rawLabel
+                : null;
     final int cycleWeeks = json['cycleWeeks'] as int? ?? 1;
     final String startDate = json['startDate'] as String? ?? '';
     final String timezone = json['timezone'] as String? ?? '';

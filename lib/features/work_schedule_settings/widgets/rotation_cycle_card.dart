@@ -99,7 +99,7 @@ class RotationCycleCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Week 1 Start Date'.tr,
+                      'Rotation Start Date'.tr,
                       style: getTextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -108,7 +108,7 @@ class RotationCycleCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'App aligns rotation week to dates'.tr,
+                      'Your rotation begins on this date and repeats this cycle automatically.'.tr,
                       style: getTextStyle(
                         fontSize: 12,
                         color: AppColors.textSoft,
@@ -119,8 +119,12 @@ class RotationCycleCard extends StatelessWidget {
               ),
               Obx(() {
                 final date = controller.startDate.value;
+                final isFr = (Get.locale?.languageCode ?? 'en') == 'fr';
+                const weekdaysEn = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const weekdaysFr = ['Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.', 'Dim.'];
+                final wd = (isFr ? weekdaysFr : weekdaysEn)[date.weekday - 1];
                 final formatted =
-                    '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+                    '$wd ${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
                 return OutlinedButton.icon(
                   onPressed: () => _pickStartDate(context),
                   icon: const Icon(
