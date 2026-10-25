@@ -22,15 +22,29 @@ import 'package:chrisimhof/features/settings/main/widgets/time_format_bottom_she
 import 'package:chrisimhof/features/settings/main/widgets/timezone_bottom_sheet.dart';
 import 'package:chrisimhof/features/settings/main/widgets/weekly_sport_goal_bottom_sheet.dart';
 import 'package:chrisimhof/features/notifications/widgets/notification_preferences_bottom_sheet.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  static final GlobalKey _basicProfileKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final SettingsController controller = Get.find<SettingsController>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<TutorialController>()) {
+        Get.find<TutorialController>().registerKey(
+          TutorialTargetId.basicProfileCard,
+          _basicProfileKey,
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
@@ -43,7 +57,7 @@ class SettingsScreen extends StatelessWidget {
               16,
               8,
               16,
-              kNavBarTotalHeight + 18,
+              kNavBarTotalHeight + 260,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,6 +148,18 @@ class SettingsScreen extends StatelessWidget {
                               );
                             },
                           ),
+                          SettingsRowData(
+                            iconpath: IconPath.lifestyle,
+                            label: 'Replay tutorial',
+                            onTap: () {
+                              if (Get.isRegistered<TutorialController>()) {
+                                Get.find<TutorialController>().startTour();
+                              } else {
+                                final tc = Get.put(TutorialController(), permanent: true);
+                                tc.startTour();
+                              }
+                            },
+                          ),
                         ],
                       ),
                       sectionLabel('Baseline profile'.tr),
@@ -169,8 +195,10 @@ class SettingsScreen extends StatelessWidget {
                             (BaselineEnums.sportProfile[sportEnum] ??
                                 'Lightly active').tr;
 
-                        return SettingsGroup(
-                          accent: true,
+                        return KeyedSubtree(
+                          key: _basicProfileKey,
+                          child: SettingsGroup(
+                            accent: true,
                           rows: [
                             SettingsRowData(
                               iconpath: IconPath.sleep,
@@ -291,8 +319,9 @@ class SettingsScreen extends StatelessWidget {
                               },
                             ),
                           ],
-                        );
-                      }),
+                        ),
+                      );
+                    }),
                       const SectionHeaderWithBadge(label: 'Wearables', badge: 'Soon'),
                       const WearablesGroup(),
                       sectionLabel('More'.tr),

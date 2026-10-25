@@ -8,15 +8,28 @@ import 'package:chrisimhof/features/statistics/widgets/period_filter_bar.dart';
 import 'package:chrisimhof/features/statistics/widgets/rhythm_evolution_line_chart_card.dart';
 import 'package:chrisimhof/features/statistics/widgets/sleep_overview_stacked_chart_card.dart';
 import 'package:chrisimhof/features/statistics/widgets/top_scores_cards_grid.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
 
+  static final GlobalKey _historyTabsKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final StatisticsController controller = Get.find<StatisticsController>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<TutorialController>()) {
+        Get.find<TutorialController>().registerKey(
+          TutorialTargetId.historyTabs,
+          _historyTabsKey,
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -28,7 +41,10 @@ class StatisticsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12.0),
-              AnalyticsHeaderTabs(controller: controller),
+              KeyedSubtree(
+                key: _historyTabsKey,
+                child: AnalyticsHeaderTabs(controller: controller),
+              ),
               const SizedBox(height: 18.0),
 
               Obx(() {

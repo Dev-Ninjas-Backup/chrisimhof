@@ -1,6 +1,8 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,9 +10,21 @@ import 'package:get/get.dart';
 class SplitStatusSection extends StatelessWidget {
   const SplitStatusSection({super.key});
 
+  static final GlobalKey _workCardKey = GlobalKey();
+  static final GlobalKey _lastSleepCardKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<DashboardController>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<TutorialController>()) {
+        final tc = Get.find<TutorialController>();
+        tc.registerKey(TutorialTargetId.workCard, _workCardKey);
+        tc.registerKey(TutorialTargetId.lastSleepCard, _lastSleepCardKey);
+      }
+    });
+
     return Obx(() {
       final data = controller.dashboardData.value;
       return Row(
@@ -18,6 +32,7 @@ class SplitStatusSection extends StatelessWidget {
           // Left Card: WORK
           Expanded(
             child: _buildStatusCard(
+              cardKey: _workCardKey,
               headerIcon: Icons.work_outline,
               headerLabel: 'WORK'.tr,
               badgeText: data.workRotationName.isNotEmpty ? data.workRotationName : null,
@@ -44,6 +59,7 @@ class SplitStatusSection extends StatelessWidget {
           // Right Card: LAST SLEEP
           Expanded(
             child: _buildStatusCard(
+              cardKey: _lastSleepCardKey,
               headerIcon: Icons.nightlight_round,
               headerLabel: 'LAST SLEEP'.tr,
               titleText: data.lastSleepDuration,
@@ -80,6 +96,7 @@ class SplitStatusSection extends StatelessWidget {
   }
 
   Widget _buildStatusCard({
+    Key? cardKey,
     required IconData headerIcon,
     required String headerLabel,
     String? badgeText,
@@ -91,6 +108,7 @@ class SplitStatusSection extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        key: cardKey,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.white,

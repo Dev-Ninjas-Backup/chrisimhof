@@ -1,16 +1,29 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/features/nav_bar/controller/nav_controller.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CustomNavBar extends StatelessWidget {
   const CustomNavBar({super.key});
 
+  static final GlobalKey _navStatsKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final NavController controller = Get.find<NavController>();
     final double bottomInset = MediaQuery.paddingOf(context).bottom;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<TutorialController>()) {
+        Get.find<TutorialController>().registerKey(
+          TutorialTargetId.navStatsButton,
+          _navStatsKey,
+        );
+      }
+    });
 
     return Padding(
       padding: EdgeInsets.fromLTRB(18, 0, 18, bottomInset + 14),
@@ -35,11 +48,18 @@ class CustomNavBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: List.generate(controller.items.length, (index) {
                 final NavItemData item = controller.items[index];
-                return _NavItem(
+                final navWidget = _NavItem(
                   item: item,
                   isActive: activeIndex == index,
                   onTap: () => controller.changeTab(index),
                 );
+                if (index == 2) {
+                  return KeyedSubtree(
+                    key: _navStatsKey,
+                    child: navWidget,
+                  );
+                }
+                return navWidget;
               }),
             ),
           );

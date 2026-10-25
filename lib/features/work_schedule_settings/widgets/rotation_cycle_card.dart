@@ -1,5 +1,7 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,8 +11,19 @@ class RotationCycleCard extends StatelessWidget {
 
   const RotationCycleCard({super.key, required this.controller});
 
+  static final GlobalKey _rotationNameKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<TutorialController>()) {
+        Get.find<TutorialController>().registerKey(
+          TutorialTargetId.rotationNameField,
+          _rotationNameKey,
+        );
+      }
+    });
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -29,11 +42,13 @@ class RotationCycleCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Custom Rotation Name input field
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Rotation Name'.tr,
+          KeyedSubtree(
+            key: _rotationNameKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Rotation Name'.tr,
                 style: getTextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -88,7 +103,8 @@ class RotationCycleCard extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(height: 24, color: AppColors.borderSoft),
+        ),
+        const Divider(height: 24, color: AppColors.borderSoft),
 
           // Start date picker row
           Row(

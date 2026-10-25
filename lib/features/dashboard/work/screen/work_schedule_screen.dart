@@ -6,6 +6,8 @@ import 'package:chrisimhof/features/dashboard/work/widgets/todays_shift_card.dar
 import 'package:chrisimhof/features/dashboard/work/widgets/shift_type_grid.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/this_week_card.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/settings_tiles_card.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,9 +15,20 @@ import 'package:get/get.dart';
 class WorkScheduleScreen extends StatelessWidget {
   const WorkScheduleScreen({super.key});
 
+  static final GlobalKey _thisWeekKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<WorkController>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<TutorialController>()) {
+        Get.find<TutorialController>().registerKey(
+          TutorialTargetId.thisWeekCard,
+          _thisWeekKey,
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -37,7 +50,10 @@ class WorkScheduleScreen extends StatelessWidget {
               ShiftTypeGrid(controller: controller),
               const SizedBox(height: 24),
 
-              ThisWeekCard(controller: controller),
+              KeyedSubtree(
+                key: _thisWeekKey,
+                child: ThisWeekCard(controller: controller),
+              ),
               const SizedBox(height: 24),
 
               // Direct custom rotation shortcut (Feedback 08 Oct, Issue 08)

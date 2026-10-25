@@ -12,10 +12,17 @@ import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.
 import 'package:chrisimhof/features/recomendations/controller/recomendations_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
+
+  static final GlobalKey _bedtimeKey = GlobalKey();
+  static final GlobalKey _quickAddKey = GlobalKey();
+  static final GlobalKey _dailyIndicatorsKey = GlobalKey();
+  static final GlobalKey _forYouKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +30,15 @@ class DashboardScreen extends StatelessWidget {
     // Access the shared controllers so they are instantiated and can receive socket updates
     Get.find<RecommendationController>();
     Get.find<SleepController>();
+
+    final tutorialController = Get.put(TutorialController(), permanent: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tutorialController.registerKey(TutorialTargetId.bedtimeCard, _bedtimeKey);
+      tutorialController.registerKey(TutorialTargetId.quickAddSection, _quickAddKey);
+      tutorialController.registerKey(TutorialTargetId.dailyIndicators, _dailyIndicatorsKey);
+      tutorialController.registerKey(TutorialTargetId.forYouSection, _forYouKey);
+      tutorialController.checkAndAutoLaunch();
+    });
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -70,15 +86,27 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const BedtimeCard(),
+                      KeyedSubtree(
+                        key: _bedtimeKey,
+                        child: const BedtimeCard(),
+                      ),
                       const SizedBox(height: 24),
-                      const QuickAddSection(),
+                      KeyedSubtree(
+                        key: _quickAddKey,
+                        child: const QuickAddSection(),
+                      ),
                       const SizedBox(height: 24),
-                      const TodayProgressSection(),
+                      KeyedSubtree(
+                        key: _dailyIndicatorsKey,
+                        child: const TodayProgressSection(),
+                      ),
                       const SizedBox(height: 24),
                       SplitStatusSection(),
                       const SizedBox(height: 24),
-                      const ForYouSection(),
+                      KeyedSubtree(
+                        key: _forYouKey,
+                        child: const ForYouSection(),
+                      ),
                       const SizedBox(height: 28),
                       const EndDayButton(),
                     ],

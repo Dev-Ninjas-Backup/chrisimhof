@@ -231,21 +231,21 @@ class RotationListCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 5,
+                      runSpacing: 3,
                       children: [
-                        Flexible(
-                          child: Text(
-                            displayName.tr,
-                            style: getTextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryTextColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        Text(
+                          displayName.tr,
+                          style: getTextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryTextColor,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: 6),
                         if (tmpl.isCustom)
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -265,7 +265,6 @@ class RotationListCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                        const SizedBox(width: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -302,7 +301,7 @@ class RotationListCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 4),
+              const SizedBox(width: 2),
 
               // Edit button to customize/modify rotation
               IconButton(
@@ -316,8 +315,8 @@ class RotationListCard extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
+                  minWidth: 26,
+                  minHeight: 26,
                 ),
               ),
 
@@ -334,8 +333,8 @@ class RotationListCard extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
+                    minWidth: 26,
+                    minHeight: 26,
                   ),
                 ),
 

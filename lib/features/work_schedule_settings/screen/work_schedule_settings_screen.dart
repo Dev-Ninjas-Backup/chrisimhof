@@ -9,17 +9,27 @@ import 'package:chrisimhof/features/work_schedule_settings/widgets/rotation_buil
 import 'package:chrisimhof/features/work_schedule_settings/widgets/rotation_cycle_card.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/shift_times_card.dart';
 import 'package:chrisimhof/features/work_schedule_settings/widgets/upcoming_schedule_card.dart';
+import 'package:chrisimhof/features/tutorial/controller/tutorial_controller.dart';
+import 'package:chrisimhof/features/tutorial/model/tutorial_step.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class WorkScheduleSettingsScreen extends StatelessWidget {
   const WorkScheduleSettingsScreen({super.key});
 
+  static final GlobalKey _rotationsListKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<WorkScheduleSettingsController>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchMyWorkRotation();
+      if (Get.isRegistered<TutorialController>()) {
+        Get.find<TutorialController>().registerKey(
+          TutorialTargetId.rotationsListCard,
+          _rotationsListKey,
+        );
+      }
     });
 
     final daysOfWeek = [
@@ -81,7 +91,10 @@ class WorkScheduleSettingsScreen extends StatelessWidget {
                           children: [
                             _buildSectionTitle('ROTATIONS & TEMPLATES'.tr),
                             const SizedBox(height: 8),
-                            RotationListCard(controller: controller),
+                            KeyedSubtree(
+                              key: _rotationsListKey,
+                              child: RotationListCard(controller: controller),
+                            ),
                             const SizedBox(height: 24),
 
                             if (controller.isCreatingNewRotation.value) ...[
