@@ -108,8 +108,8 @@ class RecomendationsScreen extends StatelessWidget {
 
                       Text(
                         (data?.contextNote != null && data!.contextNote!.isNotEmpty)
-                            ? data.contextNote!
-                            : (data?.message ?? ''),
+                            ? _formatEmptyMessage(data.contextNote)
+                            : _formatEmptyMessage(data?.message),
                         style: getTextStyle2(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -159,5 +159,15 @@ class RecomendationsScreen extends StatelessWidget {
     } else {
       return count == 1 ? '1 action for today' : '$count actions for today';
     }
+  }
+
+  String _formatEmptyMessage(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return '';
+    final trimmed = raw.trim();
+    if (trimmed == 'Log sleep to see recommendations.' ||
+        trimmed == 'Log sleep to see recommendations') {
+      return 'Log sleep to see recommendations.'.tr;
+    }
+    return trimmed.tr;
   }
 }

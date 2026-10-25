@@ -170,13 +170,20 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         final timeVal = apiData['optimalBedtime']['time'] as String? ?? '';
         final sleepAsap = apiData['optimalBedtime']['sleepAsap'] as bool? ?? false;
         hoursUntilBed = (apiData['optimalBedtime']['hoursUntilBed'] as num?)?.toDouble() ?? 0.0;
-        if (timeVal.isEmpty && sleepAsap) {
+        final upperTime = timeVal.trim().toUpperCase();
+        if ((timeVal.isEmpty && sleepAsap) || upperTime == 'ASAP' || upperTime == 'MTNT' || upperTime == 'MTN') {
           optimalBedtime = 'ASAP';
         } else {
           optimalBedtime = timeVal.isNotEmpty ? timeVal : '--:--';
         }
       } else if (apiData['optimalBedtime'] is String) {
-        optimalBedtime = apiData['optimalBedtime'] as String;
+        final rawStr = (apiData['optimalBedtime'] as String).trim();
+        final upperStr = rawStr.toUpperCase();
+        if (upperStr == 'ASAP' || upperStr == 'MTNT' || upperStr == 'MTN') {
+          optimalBedtime = 'ASAP';
+        } else {
+          optimalBedtime = rawStr;
+        }
       }
     }
 
@@ -888,7 +895,13 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
   void updateSleepPrepStatus() {
     final current = dashboardData.value;
-    if (current.optimalBedtime == 'ASAP' || current.optimalBedtime.toLowerCase().contains('asap')) {
+    final upperBedtime = current.optimalBedtime.trim().toUpperCase();
+    if (upperBedtime == 'ASAP' ||
+        upperBedtime.contains('ASAP') ||
+        upperBedtime == 'MTNT' ||
+        upperBedtime.contains('MTNT') ||
+        upperBedtime == 'MTN' ||
+        upperBedtime.contains('MTN')) {
       dashboardData.value = current.copyWith(
         isSleepPrep: true,
         timeUntilBedtime: 'Sleep ASAP',

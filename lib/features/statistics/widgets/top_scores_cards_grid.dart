@@ -21,12 +21,14 @@ class TopScoresCardsGrid extends StatelessWidget {
       final circadianDiff = controller.circadianChange.value;
 
       final periodSubtext = controller.selectedPeriod.value == '30d'
-          ? 'vs 30 jours précédents'.tr
+          ? 'Par rapport aux 30 jours précédents'.tr
           : controller.selectedPeriod.value == '90d'
-              ? 'vs 90 jours précédents'.tr
+              ? 'Par rapport aux 90 jours précédents'.tr
               : controller.selectedPeriod.value == '1y'
-                  ? 'vs année précédente'.tr
-                  : 'vs 7 jours précédents'.tr;
+                  ? 'Par rapport à l\'année précédente'.tr
+                  : 'Par rapport aux 7 jours précédents'.tr;
+
+      final circadianBadgeValue = _extractVariation(circadianDiff);
 
       return Row(
         children: [
@@ -46,14 +48,27 @@ class TopScoresCardsGrid extends StatelessWidget {
               title: 'Stabilité circadienne'.tr,
               icon: Icons.wb_sunny_outlined,
               scoreText: '$circadian %',
-              diffText: circadianDiff.isNotEmpty ? circadianDiff : '',
-              isPositive: !circadianDiff.startsWith('-'),
+              diffText: circadianBadgeValue.isNotEmpty ? circadianBadgeValue : '',
+              isPositive: !circadianBadgeValue.startsWith('-'),
               subtext: periodSubtext,
             ),
           ),
         ],
       );
     });
+  }
+
+  String _extractVariation(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return '';
+    final match = RegExp(r'^([+-]?\d+)').firstMatch(trimmed);
+    if (match != null) {
+      return match.group(1)!;
+    }
+    if (trimmed.contains(' vs ')) {
+      return trimmed.split(' vs ').first.trim();
+    }
+    return trimmed;
   }
 
   Widget _buildSummaryCard({

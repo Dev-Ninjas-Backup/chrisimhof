@@ -1,0 +1,3 @@
+Hi Ansarul! I noticed that even when the app is set to French, it still displays
+"ASAP" for bedtime. Could you replace it with "MTNT" in the French version,
+as a short abbreviation for "Maintenant" (Now)? Thanks!

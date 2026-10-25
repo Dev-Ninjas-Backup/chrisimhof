@@ -161,6 +161,51 @@ class SleepOverviewStackedChartCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            const Divider(color: Color(0xFFF1F5F9), height: 1),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.history_toggle_off_rounded,
+                      size: 16,
+                      color: Color(0xFF64748B),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Dette de sommeil'.tr,
+                      style: getTextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '(${'7 derniers jours'.tr})',
+                      style: getTextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  controller.sleepDebtValue.value.isNotEmpty
+                      ? controller.sleepDebtValue.value
+                      : '0 h',
+                  style: getTextStyle2(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       );

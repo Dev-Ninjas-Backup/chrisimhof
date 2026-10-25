@@ -4,7 +4,6 @@ import 'package:chrisimhof/core/const/icon_path.dart';
 import 'package:chrisimhof/core/const/image_path.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/sleep_orbit_widget.dart';
-import 'package:chrisimhof/features/dashboard/main_dashboard/widgets/pulsing_rhythm_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -109,7 +108,7 @@ class BedtimeCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            data.optimalBedtime,
+                            data.displayOptimalBedtime,
                             style: getTextStyle2(
                               fontSize: 50,
                               fontWeight: FontWeight.w700,
@@ -138,11 +137,6 @@ class BedtimeCard extends StatelessWidget {
                               ),
                             ),
                           ],
-                          const Spacer(),
-                          PulsingRhythmBadge(
-                            score: data.rhythmScore,
-                            isSleepPrep: data.isSleepPrep,
-                          ),
                         ],
                       ),
                     ),
@@ -167,10 +161,10 @@ class BedtimeCard extends StatelessWidget {
     bool isMissed,
   ) {
     final String label = isLogged
-        ? "Logged tonight's sleep".tr
+        ? "Logged last sleep".tr
         : isMissed
             ? "Log sleep — it's not too late".tr
-            : "Log tonight's sleep".tr;
+            : "Log your last sleep".tr;
 
     return Container(
       decoration: const BoxDecoration(

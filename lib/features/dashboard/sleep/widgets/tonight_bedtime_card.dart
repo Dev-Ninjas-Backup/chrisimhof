@@ -1,7 +1,10 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/service/helper/time_format_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
+import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
+import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +20,80 @@ class TonightBedtimeCard extends StatelessWidget {
       String? apiSleepStart = (bedtimeMap?['sleepStart'] ?? bedtimeMap?['time']) as String?;
       String? apiWakeTime   = (bedtimeMap?['wakeTime'] ?? bedtimeMap?['sleepEnd']) as String?;
       final apiNote         = controller.tonightNote.value;
+
+      final isFr = (Get.locale?.languageCode ?? 'fr') == 'fr';
+
+      // --- Target sleep duration ---
+      int targetMinutes = 465;
+      if (Get.isRegistered<SettingsController>()) {
+        final st = Get.find<SettingsController>().sleepTargetMinutes.value;
+        if (st > 0) targetMinutes = st;
+      }
+      final targetHours = targetMinutes ~/ 60;
+      final targetMins = targetMinutes % 60;
+      final targetDuration = isFr
+          ? (targetMins == 0 ? '$targetHours h' : '$targetHours h $targetMins min')
+          : (targetMins == 0 ? '${targetHours}h' : '${targetHours}h ${targetMins}m');
+
+      // --- Next shift start time & morning shift detection ---
+      String nextShiftTime = '';
+      bool isMorningShift = false;
+      int shiftStartH = -1;
+      int shiftStartM = 0;
+
+      if (bedtimeMap?['nextShiftStart'] != null) {
+        nextShiftTime = bedtimeMap!['nextShiftStart'].toString();
+        final parts = nextShiftTime.split(':');
+        if (parts.length == 2) {
+          shiftStartH = int.tryParse(parts[0]) ?? -1;
+          shiftStartM = int.tryParse(parts[1]) ?? 0;
+          if (shiftStartH >= 4 && shiftStartH <= 9) {
+            isMorningShift = true;
+          }
+        }
+      } else if (Get.isRegistered<WorkController>()) {
+        final wc = Get.find<WorkController>();
+        final type = wc.selectedShiftType.value.toLowerCase();
+        if (type != 'off') {
+          shiftStartH = wc.startHour.value;
+          shiftStartM = wc.startMinute.value;
+          nextShiftTime = '${shiftStartH.toString().padLeft(2, '0')}:${shiftStartM.toString().padLeft(2, '0')}';
+          if (type.contains('morning') || type.contains('matin') || (shiftStartH >= 4 && shiftStartH <= 9)) {
+            isMorningShift = true;
+          }
+        }
+      }
+
+      if (nextShiftTime.isEmpty && Get.isRegistered<DashboardController>()) {
+        final dc = Get.find<DashboardController>();
+        final parts = dc.dashboardData.value.workShiftCountdown.split('—');
+        if (parts.isNotEmpty && parts.first.trim().contains(':')) {
+          nextShiftTime = parts.first.trim();
+          final tParts = nextShiftTime.split(':');
+          if (tParts.length == 2) {
+            shiftStartH = int.tryParse(tParts[0]) ?? -1;
+            shiftStartM = int.tryParse(tParts[1]) ?? 0;
+            if (shiftStartH >= 4 && shiftStartH <= 9) {
+              isMorningShift = true;
+            }
+          }
+        }
+      }
+
+      // Morning-shift default (Product rule: Wake = next shift - 1h30, Bedtime = wake - target duration)
+      if (isMorningShift && shiftStartH >= 0) {
+        final shiftTotalMinutes = shiftStartH * 60 + shiftStartM;
+        final wakeTotalMinutes = (shiftTotalMinutes - 90 + 1440) % 1440;
+        final bedTotalMinutes = (wakeTotalMinutes - targetMinutes + 1440) % 1440;
+
+        final calcWake =
+            '${(wakeTotalMinutes ~/ 60).toString().padLeft(2, '0')}:${(wakeTotalMinutes % 60).toString().padLeft(2, '0')}';
+        final calcBed =
+            '${(bedTotalMinutes ~/ 60).toString().padLeft(2, '0')}:${(bedTotalMinutes % 60).toString().padLeft(2, '0')}';
+
+        apiWakeTime = calcWake;
+        apiSleepStart = calcBed;
+      }
 
       // Fallback to shift-aware optimal bedtime from DashboardController if not yet in map
       if (apiSleepStart == null || apiSleepStart.isEmpty || apiSleepStart == '--:--') {
@@ -43,9 +120,23 @@ class TonightBedtimeCard extends StatelessWidget {
         bufferMinutes = Get.find<DashboardController>().dashboardData.value.bedtimeBufferMinutes;
       }
 
-      String bedtime = apiSleepStart ?? '--:--';
-      String wakeup  = apiWakeTime  ?? '--:--';
-      String note    = apiNote      ?? '';
+      final String bedtime = TimeFormatHelper.formatBedtime(apiSleepStart ?? '--:--');
+      final String wakeup  = apiWakeTime  ?? '--:--';
+
+      // Explanatory note text
+      String noteText;
+      if (nextShiftTime.isNotEmpty) {
+        final formattedShift = TimeFormatHelper.formatTime(nextShiftTime);
+        noteText = isFr
+            ? 'Adaptée à votre prochain shift à $formattedShift. Objectif : $targetDuration pour favoriser votre récupération avant le travail.'
+            : 'Adapted to your next shift at $formattedShift. Target: $targetDuration to promote your recovery before work.';
+      } else if (apiNote != null && apiNote.isNotEmpty) {
+        noteText = apiNote.tr;
+      } else {
+        noteText = isFr
+            ? 'Objectif : $targetDuration pour favoriser votre récupération avant le travail.'
+            : 'Target: $targetDuration to promote your recovery before work.';
+      }
 
       return Container(
         width: double.infinity,
@@ -93,7 +184,7 @@ class TonightBedtimeCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'TONIGHT\'S BEDTIME'.tr,
+                        'Recommended sleep window'.tr,
                         style: getTextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -115,7 +206,7 @@ class TonightBedtimeCard extends StatelessWidget {
                               const Icon(Icons.coffee_outlined, size: 10, color: AppColors.amberDark),
                               const SizedBox(width: 3),
                               Text(
-                                '+${bufferMinutes}m ${'caffeine delay'.tr}',
+                                '+$bufferMinutes m ${'caffeine delay'.tr}',
                                 style: getTextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w700,
@@ -156,9 +247,9 @@ class TonightBedtimeCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
-                    note,
+                    noteText,
                     style: getTextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

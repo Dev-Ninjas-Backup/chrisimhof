@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+
 class TimeFormatHelper {
   /// Converts a 24-hour time string (e.g. "21:30" or "08:00") into the desired format ("12h" or "24h").
   /// If [format] is "12h", returns e.g. "9:30 PM" or "8:00 AM".
@@ -38,4 +40,16 @@ class TimeFormatHelper {
     }
     return '$startTime–$endTime';
   }
+
+  /// Formats optimal/target bedtime string (e.g. "22:30", "ASAP").
+  /// Translates "ASAP" to localized string ("MTN" in French as abbreviation for Maintenant, "ASAP" in English).
+  static String formatBedtime(String rawBedtime) {
+    final upper = rawBedtime.trim().toUpperCase();
+    if (upper == 'ASAP' || upper == 'MTNT' || upper == 'MTN') {
+      final isFr = (Get.locale?.languageCode ?? 'en').toLowerCase().startsWith('fr');
+      return isFr ? 'MTN' : 'ASAP';
+    }
+    return rawBedtime;
+  }
 }
+

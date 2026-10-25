@@ -5,7 +5,6 @@ import 'package:chrisimhof/features/dashboard/work/controller/work_controller.da
 import 'package:chrisimhof/features/dashboard/work/widgets/todays_shift_card.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/shift_type_grid.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/this_week_card.dart';
-import 'package:chrisimhof/features/dashboard/work/widgets/shapes_today_card.dart';
 import 'package:chrisimhof/features/dashboard/work/widgets/settings_tiles_card.dart';
 import 'package:chrisimhof/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -39,9 +38,6 @@ class WorkScheduleScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               ThisWeekCard(controller: controller),
-              const SizedBox(height: 24),
-
-              ShapesTodayCard(controller: controller),
               const SizedBox(height: 24),
 
               // Direct custom rotation shortcut (Feedback 08 Oct, Issue 08)

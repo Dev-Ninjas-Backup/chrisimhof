@@ -10,6 +10,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:chrisimhof/core/common/controller/language_controller.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 class SettingsController extends GetxController {
   final isLoading = false.obs;
@@ -33,6 +34,7 @@ class SettingsController extends GetxController {
   final defaultDailyMealTarget = 3.obs;
   final timeFormat = '24h'.obs;
   final weeklySportGoal = 3.obs;
+  final userTimezone = ''.obs;
 
   Future<void> getProfile() async {
     try {
@@ -223,9 +225,35 @@ class SettingsController extends GetxController {
     }
   }
 
+  Future<void> loadTimezone() async {
+    try {
+      final savedTz = await SharedPreferencesHelper.getTimezone();
+      if (savedTz != null && savedTz.isNotEmpty) {
+        userTimezone.value = savedTz;
+      } else {
+        final tzInfo = await FlutterTimezone.getLocalTimezone();
+        final localTz = tzInfo.identifier;
+        userTimezone.value = localTz;
+        await SharedPreferencesHelper.saveTimezone(localTz);
+      }
+    } catch (e) {
+      userTimezone.value = 'UTC';
+    }
+  }
+
+  Future<void> updateTimezone(String newTimezone) async {
+    try {
+      userTimezone.value = newTimezone;
+      await SharedPreferencesHelper.saveTimezone(newTimezone);
+    } catch (e) {
+      debugPrint('Error saving timezone: $e');
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
+    loadTimezone();
     getProfile();
   }
 }

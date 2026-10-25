@@ -1,5 +1,6 @@
 import 'package:chrisimhof/core/const/app_colors.dart';
 import 'package:chrisimhof/core/const/global_text_style.dart';
+import 'package:chrisimhof/core/service/helper/time_format_helper.dart';
 import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:chrisimhof/features/statistics/controller/statistics_controller.dart';
 import 'package:chrisimhof/features/statistics/widgets/date_range_navigation_bar.dart';
@@ -848,7 +849,9 @@ class _DailyTimelineViewState extends State<DailyTimelineView> {
                               ),
                               if ((r['time'] as String).isNotEmpty)
                                 Text(
-                                  r['time'] as String,
+                                  TimeFormatHelper.formatBedtime(
+                                    r['time'] as String,
+                                  ),
                                   style: getTextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,

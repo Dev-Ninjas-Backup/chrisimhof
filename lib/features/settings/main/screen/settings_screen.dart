@@ -19,6 +19,7 @@ import 'package:chrisimhof/features/auth/baseline_setup/controller/baseline_setu
 import 'package:chrisimhof/features/auth/baseline_setup/service/baseline_enums.dart';
 import 'package:chrisimhof/features/settings/main/widgets/default_meal_target_bottom_sheet.dart';
 import 'package:chrisimhof/features/settings/main/widgets/time_format_bottom_sheet.dart';
+import 'package:chrisimhof/features/settings/main/widgets/timezone_bottom_sheet.dart';
 import 'package:chrisimhof/features/settings/main/widgets/weekly_sport_goal_bottom_sheet.dart';
 import 'package:chrisimhof/features/notifications/widgets/notification_preferences_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -105,6 +106,19 @@ class SettingsScreen extends StatelessWidget {
                             onTap: () {
                               Get.bottomSheet(
                                 TimeFormatBottomSheet(controller: controller),
+                                isScrollControlled: true,
+                              );
+                            },
+                          ),
+                          SettingsRowData(
+                            iconpath: IconPath.watch,
+                            label: 'Time zone',
+                            trailing: controller.userTimezone.value.isNotEmpty
+                                ? controller.userTimezone.value
+                                : 'UTC',
+                            onTap: () {
+                              Get.bottomSheet(
+                                TimezoneBottomSheet(controller: controller),
                                 isScrollControlled: true,
                               );
                             },

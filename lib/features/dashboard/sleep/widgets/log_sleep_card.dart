@@ -208,43 +208,6 @@ class LogSleepCard extends StatelessWidget {
             ),
           ),
 
-          // Sleep Note (optional)
-          Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.white.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.white.withValues(alpha: 0.12),
-              ),
-            ),
-            child: TextField(
-              controller: controller.noteController,
-              style: getTextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                color: AppColors.white,
-              ),
-              maxLines: 2,
-              minLines: 1,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Sleep note (optional)...'.tr,
-                hintStyle: getTextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.selectionGray,
-                ),
-                icon: const Icon(
-                  Icons.edit_note_rounded,
-                  color: AppColors.primaryButtonColor,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
-
           // Save sleep button
           CustomButton(
             text: 'Save Sleep'.tr,

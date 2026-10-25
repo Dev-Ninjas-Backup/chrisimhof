@@ -1,9 +1,16 @@
+import 'package:chrisimhof/core/service/helper/time_format_helper.dart';
+
 class DashboardModel {
   final DateTime date;
   final String userName;
   final String optimalBedtime;
   final String timeUntilBedtime;
   final int rhythmScore;
+
+  /// Returns localized bedtime display (e.g. "MTNT" for ASAP in French, "ASAP" in English, or "22:30").
+  String get displayOptimalBedtime =>
+      TimeFormatHelper.formatBedtime(optimalBedtime);
+
 
   // Quick Add values
   final double waterLiters;

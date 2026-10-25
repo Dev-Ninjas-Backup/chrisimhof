@@ -1,0 +1,32 @@
+Hi Ansarul, I hope you're doing well!
+I know you may not have time to reply or review everything straight away, so no rush.
+While testing the app, I noticed some translation errors, possible bugs, duplicated information and a
+few things that don't seem very logical. I've grouped everything into one PDF, with screenshots and
+explanations, to make it easier to review.
+I've also included the points I previously sent you as plain text a couple of days ago, so you can
+review everything together.
+Some points are straightforward corrections, while others need clarification from your side,
+particularly the recovery indicator and whether it duplicates the information already displayed on the
+home screen.
+Could you also run another check of the notifications, especially their delivery and timing? I've
+detailed the requested changes for the sleep-logging reminder, but I have the impression that one or
+two reminders may not be arriving or triggering correctly. I'm not certain yet, so it would be helpful to
+check that everything is working as intended.
+The requested timing adjustment concerns only the sleep-logging reminder. The other adaptive
+notifications should keep their current behavior, while being checked for any delivery issues.
+Please take a look when you have time and keep me updated. If anything in the PDF is unclear, let me
+know and I'll explain it.
+Thanks again for all your work. I'll keep testing and let you know if I notice anything else.
+
+attachment: /Users/saharaislam/Desktop/tahmid/chrisimhof/RYVENZA_Corrections_Application_22-10-2026-1.pdf
+
+
+
+
+
+
+Just one small thing regarding Point A on the first page, where it says "Optional".
+Personally, I think we should remove Point A completely, as I don't think it's really necessary. It would
+then disappear and no longer be mentioned anywhere in the app.
+What do you think? Does removing it entirely make sense to you, or do you think we should keep it
+for a specific reason?

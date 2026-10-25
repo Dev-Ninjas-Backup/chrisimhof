@@ -200,12 +200,15 @@ class NapsOverviewCard extends StatelessWidget {
                             color: Color(0xFF065F46),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 6,
+                                runSpacing: 4,
                                 children: [
                                   Text(
                                     '$duration min',
@@ -215,7 +218,6 @@ class NapsOverviewCard extends StatelessWidget {
                                       color: AppColors.primaryTextColor,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 6,
@@ -266,7 +268,7 @@ class NapsOverviewCard extends StatelessWidget {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         IconButton(
                           icon: const Icon(
                             Icons.delete_outline,
