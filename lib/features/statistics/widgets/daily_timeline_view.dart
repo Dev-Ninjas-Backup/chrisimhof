@@ -336,8 +336,8 @@ class _DailyTimelineViewState extends State<DailyTimelineView> {
                     final timeStr =
                         '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
                     final title = isNap
-                        ? 'Nap · ${dur}m'
-                        : 'Main Sleep · ${dur ~/ 60}h ${dur % 60}m';
+                        ? '${'Nap'.tr} · ${dur}m'
+                        : '${'Main Sleep'.tr} · ${dur ~/ 60}h ${dur % 60}m';
                     return _buildEventBar(
                       left: left,
                       width: width,
@@ -440,7 +440,21 @@ class _DailyTimelineViewState extends State<DailyTimelineView> {
                         : windowStart;
                     final left = calcLeft(time);
                     final mg = c['mg'] ?? 80;
-                    final drink = c['drinkType'] ?? 'Coffee';
+                    final rawDrink = (c['drinkType'] ?? 'Coffee').toString();
+                    final isFr = (Get.locale?.languageCode == 'fr');
+                    String drink = rawDrink;
+                    if (isFr) {
+                      final dLower = rawDrink.toLowerCase();
+                      if (dLower.contains('coffee')) {
+                        drink = 'Café';
+                      } else if (dLower.contains('tea')) {
+                        drink = 'Thé';
+                      } else if (dLower.contains('energy')) {
+                        drink = 'Boisson énergisante';
+                      } else if (dLower.contains('soda') || dLower.contains('cola')) {
+                        drink = 'Soda';
+                      }
+                    }
                     final timeStr =
                         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
                     return _buildEventDot(
@@ -473,8 +487,21 @@ class _DailyTimelineViewState extends State<DailyTimelineView> {
                     final timeStr =
                         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
                     final isFr = (Get.locale?.languageCode == 'fr');
+                    final hLower = heaviness.toLowerCase();
+                    String hTranslated = heaviness;
+                    if (isFr) {
+                      if (hLower.contains('light')) {
+                        hTranslated = 'léger';
+                      } else if (hLower.contains('heavy')) {
+                        hTranslated = 'copieux';
+                      } else if (hLower.contains('normal')) {
+                        hTranslated = 'normal';
+                      } else if (hLower.contains('snack')) {
+                        hTranslated = 'collation';
+                      }
+                    }
                     final displayLabel = isFr
-                        ? 'Repas (${heaviness.toLowerCase()})'
+                        ? 'Repas ($hTranslated)'
                         : '${heaviness.capitalizeFirst} meal';
                     return _buildEventDot(
                       left: left,

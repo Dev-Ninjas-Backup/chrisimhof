@@ -165,13 +165,32 @@ class RotationListCard extends StatelessWidget {
       final activeKey = controller.activeRotationKey.value;
       final currentRotationName = controller.rotationName.value.trim();
 
-      final bool isActive = (activeKey.isNotEmpty && activeKey == tmpl.key) ||
+      final bool isCustomActive = tmpl.isCustom &&
+          controller.hasRotationData.value &&
+          (controller.selectedTemplateKey.value.isEmpty ||
+              controller.selectedTemplateKey.value.toLowerCase() == 'custom' ||
+              controller.selectedTemplateKey.value == tmpl.key ||
+              activeKey == tmpl.key ||
+              activeKey.isEmpty);
+
+      final bool isActive = isCustomActive ||
+          (activeKey.isNotEmpty && activeKey == tmpl.key) ||
           (activeKey.isEmpty &&
               currentRotationName.isNotEmpty &&
               tmpl.label.toLowerCase() == currentRotationName.toLowerCase());
 
       String displayName = tmpl.label.trim();
-      if (displayName.isEmpty || displayName.toLowerCase() == 'custom') {
+      if (tmpl.isCustom) {
+        if (currentRotationName.isNotEmpty) {
+          displayName = currentRotationName;
+        } else if (displayName.isEmpty || displayName.toLowerCase() == 'custom') {
+          if (controller.activeRotationName.value.trim().isNotEmpty) {
+            displayName = controller.activeRotationName.value.trim();
+          } else {
+            displayName = 'Custom rotation'.tr;
+          }
+        }
+      } else if (displayName.isEmpty || displayName.toLowerCase() == 'custom') {
         if (isActive && currentRotationName.isNotEmpty) {
           displayName = currentRotationName;
         } else if (isActive && controller.activeRotationName.value.trim().isNotEmpty) {

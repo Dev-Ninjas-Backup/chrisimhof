@@ -10,6 +10,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:chrisimhof/core/common/controller/language_controller.dart';
 import 'package:chrisimhof/features/sports/controller/sports_controller.dart';
+import 'package:chrisimhof/core/service/work_settings_service.dart';
+import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 class SettingsController extends GetxController {
@@ -245,6 +248,13 @@ class SettingsController extends GetxController {
     try {
       userTimezone.value = newTimezone;
       await SharedPreferencesHelper.saveTimezone(newTimezone);
+      await WorkSettingsService.syncTimezoneSilently();
+      if (Get.isRegistered<WorkController>()) {
+        Get.find<WorkController>().timeZone.value = newTimezone;
+      }
+      if (Get.isRegistered<DashboardController>()) {
+        Get.find<DashboardController>().fetchDashboardData();
+      }
     } catch (e) {
       debugPrint('Error saving timezone: $e');
     }

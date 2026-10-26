@@ -410,6 +410,11 @@ class WorkScheduleSettingsService {
         bodyMap['sourceTemplateKey'] = sourceTemplateKey;
       }
 
+      final currentTz = await SharedPreferencesHelper.getTimezone();
+      if (currentTz != null && currentTz.isNotEmpty) {
+        bodyMap['timezone'] = currentTz;
+      }
+
       debugPrint('Save work rotation request body: ${jsonEncode(bodyMap)}');
 
       final response = await http.put(
