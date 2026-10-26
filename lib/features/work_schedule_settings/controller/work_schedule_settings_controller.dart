@@ -100,6 +100,9 @@ class WorkScheduleSettingsController extends GetxController {
         rotationNameController.text = rotation.name ?? '';
         weeks.value = rotation.cycleWeeks;
         selectedTemplateKey.value = rotation.sourceTemplateKey;
+        if (rotation.sourceTemplateKey.isEmpty || rotation.sourceTemplateKey == 'custom') {
+          activeRotationName.value = rotation.name ?? '';
+        }
         if (rotation.startDate.isNotEmpty) {
           startDate.value =
               DateTime.tryParse(rotation.startDate) ?? DateTime.now();
@@ -182,6 +185,8 @@ class WorkScheduleSettingsController extends GetxController {
         if (rotationName.value.isEmpty && (res.activeRotationName?.isNotEmpty ?? false)) {
           rotationName.value = res.activeRotationName!;
           rotationNameController.text = res.activeRotationName!;
+        } else if (rotationName.value.isNotEmpty && activeRotationName.value.isEmpty) {
+          activeRotationName.value = rotationName.value;
         }
       }
     } catch (e) {

@@ -17,9 +17,14 @@ import 'package:chrisimhof/core/service/work_settings_service.dart';
 
 const double kNavBarTotalHeight = 86;
 
-class NavbarScreen extends StatelessWidget {
+class NavbarScreen extends StatefulWidget {
   const NavbarScreen({super.key});
 
+  @override
+  State<NavbarScreen> createState() => _NavbarScreenState();
+}
+
+class _NavbarScreenState extends State<NavbarScreen> with WidgetsBindingObserver {
   static bool _languageApplied = false;
   static bool _timezoneSynced = false;
   static bool _fcmSynced = false;
@@ -30,6 +35,26 @@ class NavbarScreen extends StatelessWidget {
     StatisticsScreen(),
     SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Re-verify and sync timezone on app resume (DST change or travel)
+      WorkSettingsService.syncTimezoneSilently();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

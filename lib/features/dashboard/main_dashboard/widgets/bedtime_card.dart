@@ -35,17 +35,17 @@ class BedtimeCard extends StatelessWidget {
           children: [
             // ── Main content area ─────────────────────────────────────────────
             SizedBox(
-              height: 220,
+              height: 175,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   // ── Right: orbit + silhouette ────────────────────────────────
                   Positioned(
-                    top: 0,
-                    right: -4,
+                    top: 2,
+                    right: -2,
                     child: SleepOrbitWidget(
                       imagePath: ImagePath.circadianAvatar,
-                      avatarSize: 155,
+                      avatarSize: 135,
                       imageShiftFactor: 0.38,
                       optimalBedtime: data.optimalBedtime,
                       minutesToBedtime: data.minutesToBedtime,
@@ -57,9 +57,10 @@ class BedtimeCard extends StatelessWidget {
                   // ── Left: text column & badge ────────────────────────────────
                   Positioned.fill(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 16, 16),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Row(
                             children: [
@@ -106,11 +107,11 @@ class BedtimeCard extends StatelessWidget {
                               ],
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Text(
                             data.displayOptimalBedtime,
                             style: getTextStyle2(
-                              fontSize: 50,
+                              fontSize: 44,
                               fontWeight: FontWeight.w700,
                               color: AppColors.white,
                             ),
@@ -119,7 +120,7 @@ class BedtimeCard extends StatelessWidget {
                           Text(
                             _formatTimeUntilBedtime(data.timeUntilBedtime),
                             style: getTextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w400,
                               color: timeColor,
                             ),
@@ -160,11 +161,9 @@ class BedtimeCard extends StatelessWidget {
     bool isLogged,
     bool isMissed,
   ) {
-    final String label = isLogged
-        ? "Logged last sleep".tr
-        : isMissed
-            ? "Log sleep — it's not too late".tr
-            : "Log your last sleep".tr;
+    final String label = isMissed
+        ? "Log sleep — it's not too late".tr
+        : "Log your last sleep".tr;
 
     return Container(
       decoration: const BoxDecoration(
@@ -179,17 +178,13 @@ class BedtimeCard extends StatelessWidget {
             alpha: 0.04,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      IconPath.sleep,
-                      height: 20,
-                      width: 20,
-                    ),
+                    Image.asset(IconPath.sleep, height: 20, width: 20),
                     const SizedBox(width: 12),
                     Text(
                       label,

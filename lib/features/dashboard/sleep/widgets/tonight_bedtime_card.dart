@@ -3,8 +3,9 @@ import 'package:chrisimhof/core/const/global_text_style.dart';
 import 'package:chrisimhof/core/service/helper/time_format_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
-import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:chrisimhof/features/settings/main/controller/settings_controller.dart';
+import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -41,41 +42,67 @@ class TonightBedtimeCard extends StatelessWidget {
       int shiftStartH = -1;
       int shiftStartM = 0;
 
-      if (bedtimeMap?['nextShiftStart'] != null) {
-        nextShiftTime = bedtimeMap!['nextShiftStart'].toString();
-        final parts = nextShiftTime.split(':');
-        if (parts.length == 2) {
-          shiftStartH = int.tryParse(parts[0]) ?? -1;
-          shiftStartM = int.tryParse(parts[1]) ?? 0;
-          if (shiftStartH >= 4 && shiftStartH <= 9) {
-            isMorningShift = true;
+      // Priority 1: Direct backend session nextShiftStart
+      final rawNextShift = bedtimeMap?['nextShiftStart']?.toString();
+      if (rawNextShift != null && rawNextShift.contains(':')) {
+        nextShiftTime = rawNextShift;
+      }
+
+      // Priority 2: Work rotation calendar schedule (Check next upcoming non-off shift)
+      if (nextShiftTime.isEmpty && Get.isRegistered<WorkScheduleSettingsController>()) {
+        final wssc = Get.find<WorkScheduleSettingsController>();
+        if (wssc.isEnabled.value && (wssc.hasRotationData.value || wssc.upcomingScheduleDays.isNotEmpty)) {
+          final now = DateTime.now();
+          if (wssc.upcomingScheduleDays.isNotEmpty) {
+            final nextDay = wssc.upcomingScheduleDays.firstWhereOrNull((d) {
+              final type = d.shiftType.toLowerCase();
+              return type != 'off' && type != 'repos' && type != 'vacation' && d.shiftStartTime.isNotEmpty;
+            });
+            if (nextDay != null) {
+              nextShiftTime = nextDay.shiftStartTime;
+            }
           }
-        }
-      } else if (Get.isRegistered<WorkController>()) {
-        final wc = Get.find<WorkController>();
-        final type = wc.selectedShiftType.value.toLowerCase();
-        if (type != 'off') {
-          shiftStartH = wc.startHour.value;
-          shiftStartM = wc.startMinute.value;
-          nextShiftTime = '${shiftStartH.toString().padLeft(2, '0')}:${shiftStartM.toString().padLeft(2, '0')}';
-          if (type.contains('morning') || type.contains('matin') || (shiftStartH >= 4 && shiftStartH <= 9)) {
-            isMorningShift = true;
+          if (nextShiftTime.isEmpty) {
+            for (int i = 0; i < 7; i++) {
+              final checkDate = now.add(Duration(days: i));
+              final shiftCode = wssc.getShiftForDate(checkDate).trim().toLowerCase();
+              if (shiftCode.isNotEmpty && shiftCode != 'off' && shiftCode != 'repos' && shiftCode != 'vacation') {
+                final matchKey = wssc.shiftTimes.keys.firstWhereOrNull(
+                  (k) =>
+                      k.toLowerCase() == shiftCode ||
+                      k.toLowerCase().replaceAll(RegExp(r'[\s_]+'), '') ==
+                          shiftCode.replaceAll(RegExp(r'[\s_]+'), ''),
+                );
+                if (matchKey != null && wssc.shiftTimes[matchKey] != null) {
+                  final s = wssc.shiftTimes[matchKey]!['start'] ?? '';
+                  if (s.isNotEmpty && s != '00:00') {
+                    nextShiftTime = s;
+                    break;
+                  }
+                }
+              }
+            }
           }
         }
       }
 
+      // Priority 3: Dashboard active shift countdown if active today
       if (nextShiftTime.isEmpty && Get.isRegistered<DashboardController>()) {
         final dc = Get.find<DashboardController>();
         final parts = dc.dashboardData.value.workShiftCountdown.split('—');
         if (parts.isNotEmpty && parts.first.trim().contains(':')) {
           nextShiftTime = parts.first.trim();
-          final tParts = nextShiftTime.split(':');
-          if (tParts.length == 2) {
-            shiftStartH = int.tryParse(tParts[0]) ?? -1;
-            shiftStartM = int.tryParse(tParts[1]) ?? 0;
-            if (shiftStartH >= 4 && shiftStartH <= 9) {
-              isMorningShift = true;
-            }
+        }
+      }
+
+      // Parse shift start hours & morning shift flag
+      if (nextShiftTime.isNotEmpty) {
+        final tParts = nextShiftTime.split(':');
+        if (tParts.length == 2) {
+          shiftStartH = int.tryParse(tParts[0]) ?? -1;
+          shiftStartM = int.tryParse(tParts[1]) ?? 0;
+          if (shiftStartH >= 4 && shiftStartH <= 10) {
+            isMorningShift = true;
           }
         }
       }
@@ -134,8 +161,8 @@ class TonightBedtimeCard extends StatelessWidget {
         noteText = apiNote.tr;
       } else {
         noteText = isFr
-            ? 'Objectif : $targetDuration pour favoriser votre récupération avant le travail.'
-            : 'Target: $targetDuration to promote your recovery before work.';
+            ? 'Objectif : $targetDuration pour favoriser votre récupération.'
+            : 'Target: $targetDuration to promote your recovery.';
       }
 
       return Container(
