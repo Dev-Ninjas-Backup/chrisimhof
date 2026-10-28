@@ -91,7 +91,16 @@ class FcmService {
           iOS: darwinInit,
         ),
         onDidReceiveNotificationResponse: (response) {
-          _handleNotificationTap(null);
+          Map<String, dynamic>? payloadData;
+          if (response.payload != null && response.payload!.isNotEmpty) {
+            try {
+              final decoded = jsonDecode(response.payload!);
+              if (decoded is Map) {
+                payloadData = Map<String, dynamic>.from(decoded);
+              }
+            } catch (_) {}
+          }
+          _handleNotificationTap(null, payloadData);
         },
       );
 
@@ -293,7 +302,28 @@ class FcmService {
     );
   }
 
-  void _handleNotificationTap([RemoteMessage? message]) {
+  void _handleNotificationTap([
+    RemoteMessage? message,
+    Map<String, dynamic>? payloadData,
+  ]) {
+    final data = message?.data ?? payloadData ?? const <String, dynamic>{};
+    final route = data['route']?.toString().trim() ?? '';
+    final type = data['type']?.toString().trim() ?? '';
+
+    if (route.isNotEmpty && route.startsWith('/')) {
+      if (Get.currentRoute != route) {
+        Get.toNamed(route);
+      }
+      return;
+    }
+
+    if (type == 'SLEEP_REMINDER') {
+      if (Get.currentRoute != AppRoutes.sleepScreen) {
+        Get.toNamed(AppRoutes.sleepScreen);
+      }
+      return;
+    }
+
     if (Get.currentRoute != AppRoutes.notificationCenterScreen) {
       Get.toNamed(AppRoutes.notificationCenterScreen);
     }

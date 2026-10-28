@@ -42,6 +42,7 @@ class SleepController extends GetxController {
   }
 
   final tonightBedtime = Rxn<Map<String, dynamic>>();
+  final authoritativeSleepWindow = Rxn<Map<String, dynamic>>();
   final tonightNote = RxnString();
 
   /// From forYouPreview[sleep].body — e.g. "Aim for bed by 22:30 — your circadian window opens then."
@@ -77,6 +78,55 @@ class SleepController extends GetxController {
       final preview = dbController.forYouPreviewData.value;
       if (preview != null) updateFromForYouPreview(preview);
     }
+    fetchSleepSessionData();
+  }
+
+  /// Fetches authoritative sleep session data (optimalBedtime, nextSleepWindow,
+  /// nextShiftStart, isDayOffToday, tabSleep) from GET /api/v1/calculator/session/:id/sleep.
+  Future<void> fetchSleepSessionData() async {
+    try {
+      final sessionId = await SharedPreferencesHelper.getSessionId() ?? '';
+      Map<String, dynamic>? data;
+      if (sessionId.isNotEmpty) {
+        data = await SleepService().fetchSleepSession(sessionId);
+      }
+      data ??= await SleepService().fetchOptimalBedtime(
+        locale: Get.locale?.languageCode == 'fr' ? 'fr' : 'en',
+      );
+      if (data == null) return;
+
+      if (data['tabSleep'] is Map<String, dynamic>) {
+        updateFromLiveScoresTab(
+          Map<String, dynamic>.from(data['tabSleep'] as Map),
+        );
+      }
+
+      final nextWindow = data['nextSleepWindow'] is Map
+          ? Map<String, dynamic>.from(data['nextSleepWindow'] as Map)
+          : <String, dynamic>{};
+
+      if (data['optimalBedtime'] is Map) {
+        final optMap = data['optimalBedtime'] as Map;
+        final optTime = optMap['time']?.toString() ?? '';
+        if (optTime.isNotEmpty &&
+            (nextWindow['sleepStart'] == null ||
+                nextWindow['sleepStart'].toString().isEmpty)) {
+          nextWindow['sleepStart'] = optTime;
+        }
+      }
+
+      if (nextWindow.isNotEmpty || data['nextShiftStart'] != null) {
+        updateFromNextSleepWindow(
+          nextWindow,
+          nextShiftStart: data['nextShiftStart']?.toString(),
+          nextShiftType: data['nextShiftType']?.toString(),
+          nextShiftDate: data['nextShiftDate']?.toString(),
+          isDayOffToday: data['isDayOffToday'] as bool?,
+        );
+      }
+    } catch (e) {
+      debugPrint('SleepController.fetchSleepSessionData error: $e');
+    }
   }
 
   void _initBedtimeFromDashboard(DashboardController dbController) {
@@ -107,6 +157,7 @@ class SleepController extends GetxController {
   void resetSleepDayData() {
     forYouSleepBody.value = null;
     forYouSleepBedtime.value = null;
+    authoritativeSleepWindow.value = null;
     loggedNaps.clear();
     totalNapMinutes.value = 0;
     napDisplay.value = '0m';
@@ -608,33 +659,72 @@ class SleepController extends GetxController {
   }
 
   /// Updates bedtime and wakeup window from work.nextSleepWindow (shift-aware calculation)
-  void updateFromNextSleepWindow(Map<String, dynamic> sleepWindow) {
+  void updateFromNextSleepWindow(
+    Map<String, dynamic> sleepWindow, {
+    String? nextShiftStart,
+    String? nextShiftType,
+    String? nextShiftDate,
+    bool? isDayOffToday,
+  }) {
     try {
       final start =
           (sleepWindow['sleepStart'] ?? sleepWindow['time']) as String?;
       final end =
-          (sleepWindow['sleepEnd'] ?? sleepWindow['wakeTime']) as String?;
+          (sleepWindow['wakeTime'] ?? sleepWindow['sleepEnd']) as String?;
+      final note = sleepWindow['note'] as String?;
+
+      final currentMap = tonightBedtime.value != null
+          ? Map<String, dynamic>.from(tonightBedtime.value!)
+          : <String, dynamic>{};
 
       if (start != null && start.isNotEmpty) {
-        final currentMap = tonightBedtime.value != null
-            ? Map<String, dynamic>.from(tonightBedtime.value!)
-            : <String, dynamic>{};
         currentMap['sleepStart'] = start;
-        if (end != null && end.isNotEmpty) {
-          currentMap['wakeTime'] = end;
-          final wParts = end.split(':');
-          if (wParts.length == 2) {
-            wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
-            wakeupMinute.value = int.tryParse(wParts[1]) ?? wakeupMinute.value;
-          }
-        }
-        tonightBedtime.value = currentMap;
-
         final bParts = start.split(':');
         if (bParts.length == 2) {
           bedtimeHour.value = int.tryParse(bParts[0]) ?? bedtimeHour.value;
           bedtimeMinute.value = int.tryParse(bParts[1]) ?? bedtimeMinute.value;
         }
+      }
+      if (end != null && end.isNotEmpty) {
+        currentMap['wakeTime'] = end;
+        final wParts = end.split(':');
+        if (wParts.length == 2) {
+          wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
+          wakeupMinute.value = int.tryParse(wParts[1]) ?? wakeupMinute.value;
+        }
+      }
+      if (sleepWindow['sleepAt'] != null) {
+        currentMap['sleepAt'] = sleepWindow['sleepAt'];
+      }
+      if (note != null && note.isNotEmpty) {
+        currentMap['note'] = note;
+        tonightNote.value = note;
+      }
+
+      final resolvedNextShiftStart =
+          nextShiftStart ?? sleepWindow['nextShiftStart']?.toString();
+      if (resolvedNextShiftStart != null && resolvedNextShiftStart.isNotEmpty) {
+        currentMap['nextShiftStart'] = resolvedNextShiftStart;
+      }
+      final resolvedNextShiftType =
+          nextShiftType ?? sleepWindow['nextShiftType']?.toString();
+      if (resolvedNextShiftType != null && resolvedNextShiftType.isNotEmpty) {
+        currentMap['nextShiftType'] = resolvedNextShiftType;
+      }
+      final resolvedNextShiftDate =
+          nextShiftDate ?? sleepWindow['nextShiftDate']?.toString();
+      if (resolvedNextShiftDate != null && resolvedNextShiftDate.isNotEmpty) {
+        currentMap['nextShiftDate'] = resolvedNextShiftDate;
+      }
+      final resolvedIsDayOff =
+          isDayOffToday ?? (sleepWindow['isDayOffToday'] as bool?);
+      if (resolvedIsDayOff != null) {
+        currentMap['isDayOffToday'] = resolvedIsDayOff;
+      }
+
+      if (currentMap.isNotEmpty) {
+        authoritativeSleepWindow.value = Map<String, dynamic>.from(currentMap);
+        tonightBedtime.value = currentMap;
       }
     } catch (e) {
       debugPrint('SleepController updateFromNextSleepWindow error: $e');
@@ -670,26 +760,71 @@ class SleepController extends GetxController {
 
       // Handle tonightBedtime (supports String e.g. "20:15" or Map e.g. {"sleepStart": "20:15", "wakeTime": "04:00"})
       String? parsedBedtimeStr;
+      Map<String, dynamic> mergedBedtimeMap = tonightBedtime.value != null
+          ? Map<String, dynamic>.from(tonightBedtime.value!)
+          : <String, dynamic>{};
+
       if (tabData['tonightBedtime'] != null) {
         if (tabData['tonightBedtime'] is Map) {
           final map = Map<String, dynamic>.from(tabData['tonightBedtime']);
-          tonightBedtime.value = map;
+          mergedBedtimeMap.addAll(map);
           parsedBedtimeStr = (map['sleepStart'] ?? map['time']) as String?;
-          if (map['wakeTime'] != null && map['wakeTime'] is String) {
-            final wParts = (map['wakeTime'] as String).split(':');
-            if (wParts.length == 2) {
-              wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
-              wakeupMinute.value =
-                  int.tryParse(wParts[1]) ?? wakeupMinute.value;
-            }
-          }
         } else if (tabData['tonightBedtime'] is String) {
           parsedBedtimeStr = tabData['tonightBedtime'] as String;
-          final currentMap = tonightBedtime.value != null
-              ? Map<String, dynamic>.from(tonightBedtime.value!)
-              : <String, dynamic>{};
-          currentMap['sleepStart'] = parsedBedtimeStr;
-          tonightBedtime.value = currentMap;
+          mergedBedtimeMap['sleepStart'] = parsedBedtimeStr;
+        }
+      }
+
+      // Authoritative nextSleepWindow always takes precedence over legacy tabSleep.tonightBedtime
+      if (tabData['nextSleepWindow'] is Map) {
+        final nw = Map<String, dynamic>.from(tabData['nextSleepWindow'] as Map);
+        if (nw['sleepStart'] != null && nw['sleepStart'].toString().isNotEmpty) {
+          mergedBedtimeMap['sleepStart'] = nw['sleepStart'];
+        }
+        if (nw['wakeTime'] != null && nw['wakeTime'].toString().isNotEmpty) {
+          mergedBedtimeMap['wakeTime'] = nw['wakeTime'];
+        }
+        if (nw['note'] != null && nw['note'].toString().isNotEmpty) {
+          mergedBedtimeMap['note'] = nw['note'];
+        }
+        authoritativeSleepWindow.value = Map<String, dynamic>.from(mergedBedtimeMap);
+      } else if (authoritativeSleepWindow.value != null) {
+        final auth = authoritativeSleepWindow.value!;
+        if (auth['sleepStart'] != null && auth['sleepStart'].toString().isNotEmpty) {
+          mergedBedtimeMap['sleepStart'] = auth['sleepStart'];
+        }
+        if (auth['wakeTime'] != null && auth['wakeTime'].toString().isNotEmpty) {
+          mergedBedtimeMap['wakeTime'] = auth['wakeTime'];
+        }
+        if (auth['note'] != null && auth['note'].toString().isNotEmpty) {
+          mergedBedtimeMap['note'] = auth['note'];
+        }
+        if (auth['nextShiftStart'] != null) {
+          mergedBedtimeMap['nextShiftStart'] = auth['nextShiftStart'];
+        }
+        if (auth['nextShiftType'] != null) {
+          mergedBedtimeMap['nextShiftType'] = auth['nextShiftType'];
+        }
+        if (auth['nextShiftDate'] != null) {
+          mergedBedtimeMap['nextShiftDate'] = auth['nextShiftDate'];
+        }
+        if (auth['isDayOffToday'] != null) {
+          mergedBedtimeMap['isDayOffToday'] = auth['isDayOffToday'];
+        }
+      }
+
+      if (mergedBedtimeMap.isNotEmpty) {
+        tonightBedtime.value = mergedBedtimeMap;
+        parsedBedtimeStr =
+            (mergedBedtimeMap['sleepStart'] ?? mergedBedtimeMap['time'])
+                as String?;
+        if (mergedBedtimeMap['wakeTime'] != null &&
+            mergedBedtimeMap['wakeTime'] is String) {
+          final wParts = (mergedBedtimeMap['wakeTime'] as String).split(':');
+          if (wParts.length == 2) {
+            wakeupHour.value = int.tryParse(wParts[0]) ?? wakeupHour.value;
+            wakeupMinute.value = int.tryParse(wParts[1]) ?? wakeupMinute.value;
+          }
         }
       } else {
         tonightBedtime.value = null;
@@ -707,7 +842,9 @@ class SleepController extends GetxController {
         }
       }
 
-      tonightNote.value = tabData['tonightNote'] as String?;
+      tonightNote.value =
+          (mergedBedtimeMap['note'] as String?) ??
+          (tabData['tonightNote'] as String?);
 
       if (tabData['sleepDebt7d'] != null) {
         final debtData = tabData['sleepDebt7d'];

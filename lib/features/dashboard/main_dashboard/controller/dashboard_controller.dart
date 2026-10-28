@@ -15,6 +15,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
+import 'package:chrisimhof/features/dashboard/sleep/service/sleep_service.dart';
+import 'package:chrisimhof/core/service/work_settings_service.dart';
 import 'package:chrisimhof/features/hydration/controller/hydration_controller.dart';
 import 'package:chrisimhof/features/dashboard/caffeine/controller/caffeine_controller.dart';
 import 'package:chrisimhof/features/nutrition/controller/nutrition_controller.dart';
@@ -101,7 +103,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      debugPrint('DashboardController: App resumed, checking socket connection...');
+      debugPrint('DashboardController: App resumed, syncing timezone and checking socket connection...');
+      WorkSettingsService.syncTimezoneSilently();
       RealtimeSocketService().connectSocket();
       fetchDashboardData();
     }
@@ -259,6 +262,35 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
             ? Get.find<WorkController>().rotationName.value
             : '');
 
+    final bool isDayOffToday = (apiData['isDayOffToday'] as bool?) ??
+        (workInfo?['isDayOffToday'] as bool?) ??
+        false;
+    final String nextShiftStart = (apiData['nextShiftStart'] ??
+            workInfo?['nextShiftStart'] ??
+            apiData['nextSleepWindow']?['nextShiftStart'] ??
+            '')
+        .toString()
+        .trim();
+    final String nextShiftType = (apiData['nextShiftType'] ??
+            workInfo?['nextShiftType'] ??
+            '')
+        .toString()
+        .trim();
+    final String nextShiftDate = (apiData['nextShiftDate'] ??
+            workInfo?['nextShiftDate'] ??
+            '')
+        .toString()
+        .trim();
+
+    String formatNextShiftPreview() {
+      if (nextShiftStart.isEmpty) return '';
+      if (nextShiftType.isNotEmpty) {
+        final shiftLabel = ShiftDisplayHelper.formatShiftName(nextShiftType);
+        return '${'Next'.tr}: $shiftLabel · $nextShiftStart';
+      }
+      return '${'Next'.tr}: $nextShiftStart';
+    }
+
     String workShift = 'Off Today'.tr;
     String workShiftCountdown = 'No shifts scheduled'.tr;
     double workProgress = 0.0;
@@ -287,7 +319,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
       if (lowerShift == 'off' || lowerShift == 'repos') {
         workShift = 'Off Today'.tr;
-        workShiftCountdown = 'No shifts scheduled'.tr;
+        workShiftCountdown = nextShiftStart.isNotEmpty
+            ? formatNextShiftPreview()
+            : 'No shifts scheduled'.tr;
         workProgress = 0.0;
       } else {
         // Display exact user-assigned shift name (e.g. "Morning", "Sunday Morning", "Vacation", "Rest Day", etc.)
@@ -341,7 +375,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
               workFitCard?['subtitle'] as String? ?? 'Active shift'.tr;
         }
       }
-    } else if (workInfo != null && workInfo['shiftType'] != 'off') {
+    } else if (workInfo != null &&
+        workInfo['shiftType'] != 'off' &&
+        !isDayOffToday) {
       final shiftType = workInfo['shiftType'] as String? ?? 'Work';
       final start = workInfo['shiftStart'] as String? ??
           workInfo['shiftStartTime'] as String? ??
@@ -377,8 +413,10 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       workShift = workInfo?['shiftBadge'] as String? ??
           workFitCard?['subtitle'] as String? ??
           'Off Today'.tr;
-      workShiftCountdown = workInfo?['shiftDateDisplay'] as String? ??
-          'No shifts scheduled'.tr;
+      workShiftCountdown = nextShiftStart.isNotEmpty
+          ? formatNextShiftPreview()
+          : (workInfo?['shiftDateDisplay'] as String? ??
+              'No shifts scheduled'.tr);
       workProgress = 0.0;
     }
 
@@ -619,7 +657,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       workShift: workShift,
       workShiftCountdown: workShiftCountdown,
       workProgress: workProgress == 0.0
-          ? (workInfo != null && workInfo['shiftType'] != 'off' ? 0.35 : 0.0)
+          ? (workInfo != null && workInfo['shiftType'] != 'off' && !isDayOffToday ? 0.35 : 0.0)
           : workProgress,
       workRotationName: rotationNameVal,
       lastSleepDuration: lastSleepDuration,
@@ -632,9 +670,17 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       activeCaffeineAtBedtimeMg: activeCaffeineAtBedtimeMg,
     );
 
-    final sleepMap = (apiData['tabs']?['sleep'] ?? apiData['sleep']) as Map<String, dynamic>?;
+    final nextSleepWindow = (apiData['nextSleepWindow'] ??
+            apiData['work']?['nextSleepWindow'] ??
+            apiData['tabs']?['work']?['nextSleepWindow']) as Map<String, dynamic>?;
+
+    final sleepMap = (apiData['tabs']?['sleep'] ?? apiData['sleep'] ?? apiData['tabSleep']) as Map<String, dynamic>?;
     if (sleepMap != null) {
-      sleepTabData.value = Map<String, dynamic>.from(sleepMap);
+      final enrichedSleepMap = Map<String, dynamic>.from(sleepMap);
+      if (nextSleepWindow != null) {
+        enrichedSleepMap['nextSleepWindow'] = nextSleepWindow;
+      }
+      sleepTabData.value = enrichedSleepMap;
       if (Get.isRegistered<SleepController>()) {
         Get.find<SleepController>().updateFromLiveScoresTab(
           sleepTabData.value!,
@@ -642,11 +688,15 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       }
     }
 
-    final nextSleepWindow = (apiData['work']?['nextSleepWindow'] ??
-            apiData['tabs']?['work']?['nextSleepWindow'] ??
-            apiData['nextSleepWindow']) as Map<String, dynamic>?;
-    if (Get.isRegistered<SleepController>() && nextSleepWindow != null) {
-      Get.find<SleepController>().updateFromNextSleepWindow(nextSleepWindow);
+    if (Get.isRegistered<SleepController>() &&
+        (nextSleepWindow != null || nextShiftStart.isNotEmpty)) {
+      Get.find<SleepController>().updateFromNextSleepWindow(
+        nextSleepWindow ?? <String, dynamic>{},
+        nextShiftStart: nextShiftStart.isNotEmpty ? nextShiftStart : null,
+        nextShiftType: nextShiftType.isNotEmpty ? nextShiftType : null,
+        nextShiftDate: nextShiftDate.isNotEmpty ? nextShiftDate : null,
+        isDayOffToday: isDayOffToday,
+      );
     }
 
     // Cache forYouPreview for late-registering controllers
@@ -876,6 +926,48 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       }
       if (liveScoresDataMap != null) {
         mergedData.addAll(normalizeDashboardPayload(liveScoresDataMap));
+      }
+
+      // If session is in PENDING_WAKE or missing optimalBedtime/nextSleepWindow, fetch GET /api/v1/calculator/session/:id/sleep
+      if (storedSessionId != null &&
+          storedSessionId.isNotEmpty &&
+          (mergedData['optimalBedtime'] == null ||
+              mergedData['nextSleepWindow'] == null)) {
+        try {
+          final sleepSessionData = await SleepService().fetchSleepSession(
+            storedSessionId,
+          );
+          if (sleepSessionData != null) {
+            if (sleepSessionData['optimalBedtime'] != null) {
+              mergedData['optimalBedtime'] = sleepSessionData['optimalBedtime'];
+            }
+            if (sleepSessionData['nextSleepWindow'] != null) {
+              mergedData['nextSleepWindow'] =
+                  sleepSessionData['nextSleepWindow'];
+            }
+            if (sleepSessionData['isDayOffToday'] != null) {
+              mergedData['isDayOffToday'] = sleepSessionData['isDayOffToday'];
+            }
+            if (sleepSessionData['nextShiftStart'] != null) {
+              mergedData['nextShiftStart'] = sleepSessionData['nextShiftStart'];
+            }
+            if (sleepSessionData['nextShiftType'] != null) {
+              mergedData['nextShiftType'] = sleepSessionData['nextShiftType'];
+            }
+            if (sleepSessionData['nextShiftDate'] != null) {
+              mergedData['nextShiftDate'] = sleepSessionData['nextShiftDate'];
+            }
+            if (sleepSessionData['tabSleep'] is Map<String, dynamic>) {
+              final tabs = mergedData['tabs'] is Map<String, dynamic>
+                  ? Map<String, dynamic>.from(mergedData['tabs'] as Map)
+                  : <String, dynamic>{};
+              tabs['sleep'] ??= sleepSessionData['tabSleep'];
+              mergedData['tabs'] = tabs;
+            }
+          }
+        } catch (e) {
+          debugPrint('Dashboard: Sleep session fallback error: $e');
+        }
       }
 
       if (mergedData.isNotEmpty) {

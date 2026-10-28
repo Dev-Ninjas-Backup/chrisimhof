@@ -107,8 +107,16 @@ class TonightBedtimeCard extends StatelessWidget {
         }
       }
 
-      // Morning-shift default (Product rule: Wake = next shift - 1h30, Bedtime = wake - target duration)
-      if (isMorningShift && shiftStartH >= 0) {
+      // Morning-shift fallback (only if backend nextSleepWindow has not already provided sleepStart/wakeTime)
+      final bool hasBackendSleepWindow =
+          apiSleepStart != null &&
+          apiSleepStart.isNotEmpty &&
+          apiSleepStart != '--:--' &&
+          apiWakeTime != null &&
+          apiWakeTime.isNotEmpty &&
+          apiWakeTime != '--:--';
+
+      if (!hasBackendSleepWindow && isMorningShift && shiftStartH >= 0) {
         final shiftTotalMinutes = shiftStartH * 60 + shiftStartM;
         final wakeTotalMinutes = (shiftTotalMinutes - 90 + 1440) % 1440;
         final bedTotalMinutes = (wakeTotalMinutes - targetMinutes + 1440) % 1440;

@@ -5,6 +5,64 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class SleepService {
+  // GET /api/v1/calculator/session/{sessionId}/sleep
+  Future<Map<String, dynamic>?> fetchSleepSession(String sessionId) async {
+    try {
+      final uri = Uri.parse(Urls.sleepCalculator(sessionId));
+      final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+      if (accessToken.isEmpty || sessionId.isEmpty) return null;
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] is Map<String, dynamic>) {
+          return jsonData['data'] as Map<String, dynamic>;
+        }
+      }
+    } catch (e) {
+      debugPrint('SleepService.fetchSleepSession error: $e');
+    }
+    return null;
+  }
+
+  // GET /api/v1/calculator/optimal-bedtime
+  Future<Map<String, dynamic>?> fetchOptimalBedtime({String? locale}) async {
+    try {
+      final uri = Uri.parse(Urls.optimalBedtime).replace(
+        queryParameters: {
+          if (locale != null && locale.isNotEmpty) 'locale': locale,
+        },
+      );
+      final accessToken = await SharedPreferencesHelper.getAccessToken() ?? '';
+      if (accessToken.isEmpty) return null;
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] is Map<String, dynamic>) {
+          return jsonData['data'] as Map<String, dynamic>;
+        }
+      }
+    } catch (e) {
+      debugPrint('SleepService.fetchOptimalBedtime error: $e');
+    }
+    return null;
+  }
+
   // POST /api/v1/calculator/session/{sessionId}/sleep
   Future<Map<String, dynamic>> saveSleep({
     required String sessionId,

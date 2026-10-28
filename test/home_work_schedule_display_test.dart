@@ -1,4 +1,5 @@
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
+import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
 import 'package:chrisimhof/features/work_schedule_settings/controller/work_schedule_settings_controller.dart';
 import 'package:chrisimhof/features/work_schedule_settings/model/user_work_rotation_model.dart';
@@ -208,6 +209,61 @@ void main() {
 
       expect(model.overrides['2026-10-19'], 'Sunday Morning');
       expect(model.overrides['2026-10-20'], 'Vacation');
+    });
+
+    test('Day Off with nextShiftStart displays Off Today and Next shift preview', () {
+      final dashboardCtrl = Get.put(DashboardController());
+
+      dashboardCtrl.updateFromLiveScores({
+        'data': {
+          'isDayOffToday': true,
+          'nextShiftStart': '22:00',
+          'nextShiftType': 'night',
+          'nextShiftDate': '2026-10-29',
+          'workInfo': {
+            'shiftType': 'off',
+            'isDayOffToday': true,
+            'nextShiftStart': '22:00',
+            'nextShiftType': 'night',
+            'nextShiftDate': '2026-10-29',
+          },
+        },
+      }, useLocalCaches: false);
+
+      expect(dashboardCtrl.dashboardData.value.workShift, 'Off Today');
+      expect(dashboardCtrl.dashboardData.value.workShiftCountdown, 'Next: Night · 22:00');
+      expect(dashboardCtrl.dashboardData.value.workProgress, 0.0);
+    });
+
+    test('SleepController prioritizes nextSleepWindow over legacy tabSleep.tonightBedtime', () {
+      final sleepCtrl = Get.put(SleepController());
+
+      sleepCtrl.updateFromNextSleepWindow(
+        {
+          'sleepStart': '23:00',
+          'wakeTime': '06:45',
+          'note': 'Adjusted for upcoming Night Shift (22:00)',
+        },
+        nextShiftStart: '22:00',
+        nextShiftType: 'night',
+        isDayOffToday: true,
+      );
+
+      // Even if tabSleep.tonightBedtime has uncapped 06:30 -> 14:15, nextSleepWindow wins
+      sleepCtrl.updateFromLiveScoresTab({
+        'tonightBedtime': {
+          'sleepStart': '06:30',
+          'wakeTime': '14:15',
+        },
+      });
+
+      expect(sleepCtrl.tonightBedtime.value?['sleepStart'], '23:00');
+      expect(sleepCtrl.tonightBedtime.value?['wakeTime'], '06:45');
+      expect(sleepCtrl.tonightBedtime.value?['nextShiftStart'], '22:00');
+      expect(sleepCtrl.bedtimeHour.value, 23);
+      expect(sleepCtrl.bedtimeMinute.value, 0);
+      expect(sleepCtrl.wakeupHour.value, 6);
+      expect(sleepCtrl.wakeupMinute.value, 45);
     });
   });
 }

@@ -171,17 +171,28 @@ class RealtimeSocketService {
         );
       }
 
-      final sleepTabData = (data['tabs']?['sleep'] ?? data['sleep']) as Map<String, dynamic>?;
+      final nextSleepWindow = (data['nextSleepWindow'] ??
+              data['work']?['nextSleepWindow'] ??
+              data['tabs']?['work']?['nextSleepWindow']) as Map<String, dynamic>?;
+      final sleepTabData = (data['tabs']?['sleep'] ?? data['sleep'] ?? data['tabSleep']) as Map<String, dynamic>?;
       if (Get.isRegistered<SleepController>() && sleepTabData != null) {
         final sleepController = Get.find<SleepController>();
-        sleepController.updateFromLiveScoresTab(sleepTabData);
+        final enriched = Map<String, dynamic>.from(sleepTabData);
+        if (nextSleepWindow != null) {
+          enriched['nextSleepWindow'] = nextSleepWindow;
+        }
+        sleepController.updateFromLiveScoresTab(enriched);
       }
 
-      final nextSleepWindow = (data['work']?['nextSleepWindow'] ??
-              data['tabs']?['work']?['nextSleepWindow'] ??
-              data['nextSleepWindow']) as Map<String, dynamic>?;
-      if (Get.isRegistered<SleepController>() && nextSleepWindow != null) {
-        Get.find<SleepController>().updateFromNextSleepWindow(nextSleepWindow);
+      if (Get.isRegistered<SleepController>() &&
+          (nextSleepWindow != null || data['nextShiftStart'] != null)) {
+        Get.find<SleepController>().updateFromNextSleepWindow(
+          nextSleepWindow ?? <String, dynamic>{},
+          nextShiftStart: data['nextShiftStart']?.toString(),
+          nextShiftType: data['nextShiftType']?.toString(),
+          nextShiftDate: data['nextShiftDate']?.toString(),
+          isDayOffToday: data['isDayOffToday'] as bool?,
+        );
       }
 
       // Extract forYouPreview / recommendations

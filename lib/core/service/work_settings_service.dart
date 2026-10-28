@@ -28,13 +28,13 @@ class WorkSettingsService {
         debugPrint('[WorkSettings] Error getting local timezone via plugin: $e');
       }
 
-      debugPrint('[WorkSettings] Silently sending PATCH to ${Urls.createWorkSettings} with timezone: $deviceTimezone');
+      debugPrint('[WorkSettings] Silently sending PUT to ${Urls.createWorkSettings} with timezone: $deviceTimezone');
 
       final body = {
         "timezone": deviceTimezone,
       };
 
-      final response = await http.patch(
+      final response = await http.put(
         Uri.parse(Urls.createWorkSettings),
         headers: {
           'accept': '*/*',
@@ -44,8 +44,8 @@ class WorkSettingsService {
         body: jsonEncode(body),
       );
 
-      debugPrint('[WorkSettings] PATCH status: ${response.statusCode}');
-      debugPrint('[WorkSettings] PATCH response body: ${response.body}');
+      debugPrint('[WorkSettings] PUT status: ${response.statusCode}');
+      debugPrint('[WorkSettings] PUT response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> decoded = jsonDecode(response.body);

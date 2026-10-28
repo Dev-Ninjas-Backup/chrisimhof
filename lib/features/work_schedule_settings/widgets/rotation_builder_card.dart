@@ -217,26 +217,30 @@ class RotationBuilderCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Week Badge with calendar dates
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.mintSoft,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.secondaryButtonColor
-                                .withValues(alpha: 0.2),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
                           ),
-                        ),
-                        child: Text(
-                          '${'WEEK'.tr} ${weekIdx + 1} · ${_formatShortDate(weekStart)} – ${_formatShortDate(weekEnd)}',
-                          style: getTextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.secondaryButtonColor,
-                          ).copyWith(letterSpacing: 0.5),
+                          decoration: BoxDecoration(
+                            color: AppColors.mintSoft,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.secondaryButtonColor
+                                  .withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Text(
+                            '${'WEEK'.tr} ${weekIdx + 1} · ${_formatShortDate(weekStart)} – ${_formatShortDate(weekEnd)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: getTextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.secondaryButtonColor,
+                            ).copyWith(letterSpacing: 0.5),
+                          ),
                         ),
                       ),
 
@@ -302,7 +306,7 @@ class RotationBuilderCard extends StatelessWidget {
                         children: [
                           // Day name and date with start indicator
                           SizedBox(
-                            width: 86,
+                            width: 104,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
@@ -310,14 +314,18 @@ class RotationBuilderCard extends StatelessWidget {
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      weekdayName,
-                                      style: getTextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: isFirstDay
-                                            ? AppColors.secondaryButtonColor
-                                            : AppColors.primaryTextColor,
+                                    Flexible(
+                                      child: Text(
+                                        weekdayName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: getTextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: isFirstDay
+                                              ? AppColors.secondaryButtonColor
+                                              : AppColors.primaryTextColor,
+                                        ),
                                       ),
                                     ),
                                     if (isFirstDay) ...[
@@ -348,6 +356,8 @@ class RotationBuilderCard extends StatelessWidget {
                                 const SizedBox(height: 1),
                                 Text(
                                   dayDateStr,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: getTextStyle(
                                     fontSize: 11,
                                     fontWeight: isFirstDay
