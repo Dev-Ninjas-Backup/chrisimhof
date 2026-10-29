@@ -12,13 +12,14 @@
 5. [Work Settings & Timezone Synchronization (`PUT` on App Resume)](#5-work-settings--timezone-synchronization)
 6. [Morning Shift 90-Minute Pre-Shift Buffer & Adaptive Sleep Reminders](#6-morning-shift-90-minute-pre-shift-buffer--adaptive-sleep-reminders)
 7. [Weekly Sport Objective & Multi-Session Workouts](#7-weekly-sport-objective--multi-session-workouts)
-8. [Frontend Developer Integration Checklist (Flutter / Dart Examples)](#8-frontend-developer-integration-checklist)
+8. [Automatic 30-Hour Session Expiration & Morning Rollover Protocol](#8-automatic-30-hour-session-expiration--morning-rollover-protocol)
+9. [Frontend Developer Integration Checklist (Flutter / Dart Examples)](#9-frontend-developer-integration-checklist)
 
 ---
 
 ## 1. Executive Summary & Recent Changes
 
-Following Christian Imhof's review (25-Oct-2026), the backend has been updated to resolve several critical circadian calculation behaviors and API contracts:
+Following Christian Imhof's review (25-Oct-2026) and the 29-Oct session rollover update, the backend has been updated to resolve several critical circadian calculation behaviors and API contracts:
 
 1. **Shift Lookahead on Days Off (Point 02)**: On a Day Off, the backend queries the user's actual work rotation up to 14 days ahead. If the next shift is an Evening or Night shift, the sleep window reflects that upcoming shift (with circadian phase delay or chronotype baseline) instead of defaulting to an assumed `06:00` morning shift.
 2. **Shift Transitions & Awake Duration Cap (Point 03)**: Continuous wakefulness is strictly capped at **16.5 hours** ($\le 17\text{h}$) from the recorded wake time. Day-Off $\rightarrow$ Night-Shift transitions now recommend intermediate sleep tonight with phase delay (e.g. `00:30`), eliminating the bug that recommended sleeping after tomorrow's shift (`06:30` next morning = 22.5h awake).
@@ -26,6 +27,7 @@ Following Christian Imhof's review (25-Oct-2026), the backend has been updated t
 4. **`PUT /api/v1/calculator/work-settings` (Point 07)**: Added `PUT` route support (in addition to `PATCH`) for the Flutter mobile lifecycle resume sync. When timezone changes, it synchronizes across Profile, User, WorkRotation, active session, and invalidates Redis cache.
 5. **Morning Pre-Shift Buffer (90m)**: Wake times for morning shifts ($\le 13:59$) are automatically backed out as $\text{Shift Start} - 90\text{ minutes}$.
 6. **Multi-Session Sport Tracking**: Completed workouts count individual sessions toward weekly targets rather than distinct calendar days.
+7. **Automatic 30-Hour Inactive Session Rollover**: If an active session is older than 30 hours (e.g. user leaves app untouched for 48 hours), `GET /api/v1/calculator/session` and `GET /api/v1/dashboard` automatically finalize the expired day and return a fresh `PENDING_WAKE` session (`waitingForMainWake: true`) with a new `sessionId`. In addition, an hourly background cron sweeps and finalizes dormant sessions in PostgreSQL.
 
 ---
 
@@ -251,7 +253,70 @@ The weekly sport objective counts **individual completed workout sessions**, not
 
 ---
 
-## 8. Frontend Developer Integration Checklist
+## 8. Automatic 30-Hour Session Expiration & Morning Rollover Protocol
+
+### What Changed
+Previously, active circadian sessions stayed in status `ACTIVE` indefinitely if the user did not manually tap "End My Day" or submit a new wake. If a user left the app untouched for 48 hours, returning to the app served the 2-day-old active session with stale water, caffeine, and sport logs.
+
+Now, both **lazy evaluation on request** and an **hourly background cron worker** enforce session expiration:
+1. **30-Hour Inactive Expiration**: If an active session is older than 30 hours ($\text{now} \ge \text{expiresAt}$ or $\text{now} - \text{startedAt} \ge 30\text{h}$):
+   - The backend automatically finalizes the expired day (`status: 'FINALIZED'`, `closedBy: 'MANUAL'`, saves `Calculation` history, and emits `session_ended`).
+   - `GET /api/v1/calculator/session` immediately creates and returns a clean **`PENDING_WAKE`** session (`waitingForMainWake: true`) with a brand new `sessionId`.
+   - `GET /api/v1/dashboard` detects the expiration, auto-finalizes the session, and returns `hasActiveSession: false`, `sessionId: null`, and `dataSource: 'last_calculation'`.
+2. **Scheduled Sweeper**: A BullMQ/NestJS cron (`@Cron('0 * * * *')`) runs every hour to sweep and finalize dormant active sessions in PostgreSQL.
+
+---
+
+### Frontend Mobile Action (Flutter / Dart)
+
+To ensure local SharedPreferences and UI controllers stay 100% in sync with the backend rollover:
+
+#### 1. Session ID Invalidation & Tracking Reset
+In `DashboardController.fetchDashboardData()` and `SessionService.fetchAndStoreSessionId()`:
+```dart
+final String? newSessionId = dataMap['sessionId'] as String?;
+final String? storedSessionId = await SharedPreferencesHelper.getSessionId();
+
+// When session changes (e.g. 30h rollover or manual end), clear stale tracking caches
+if (newSessionId != null && newSessionId.isNotEmpty) {
+  if (storedSessionId != null && storedSessionId != newSessionId) {
+    debugPrint('[Session] Session ID changed from $storedSessionId to $newSessionId. Resetting local tracking data.');
+    await resetTrackingData(newSessionId: newSessionId);
+  } else {
+    await SharedPreferencesHelper.saveSessionId(newSessionId);
+  }
+}
+```
+
+#### 2. Handle `waitingForMainWake == true` / `status == 'PENDING_WAKE'`
+When the user opens the app after 30+ hours of inactivity:
+- `dataMap['status'] == 'PENDING_WAKE'` and `dataMap['waitingForMainWake'] == true`.
+- Clear local water, caffeine, meal, and workout logs:
+  ```dart
+  if (dataMap['waitingForMainWake'] == true || dataMap['status'] == 'PENDING_WAKE') {
+    await resetTrackingData(newSessionId: newSessionId);
+    // Display Morning Wake Prompt ("Good morning! What time did you wake up today?")
+  }
+  ```
+
+#### 3. Client-Side Resume 30-Hour Guard
+In `WidgetsBindingObserver.didChangeAppLifecycleState`:
+```dart
+@override
+void didChangeAppLifecycleState(AppLifecycleState state) {
+  if (state == AppLifecycleState.resumed) {
+    final DateTime? sessionStartedAt = SharedPreferencesHelper.getSessionStartedAt();
+    if (sessionStartedAt != null && DateTime.now().difference(sessionStartedAt).inHours >= 30) {
+      debugPrint('[Lifecycle] Active session exceeded 30h on app resume. Refreshing session...');
+      fetchDashboardData();
+    }
+  }
+}
+```
+
+---
+
+## 9. Frontend Developer Integration Checklist
 
 Use this checklist to verify your Flutter / Mobile client integration:
 

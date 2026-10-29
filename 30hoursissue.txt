@@ -1,0 +1,140 @@
+client text:
+Hi Ansarul,
+Quick question about the automatic 30-hour day closure feature. Is it still working?
+I left the app untouched for two days to test it, but the day didn't seem to close or reset
+automatically.
+I thought the app was supposed to automatically end the current day after 30 hours if the user
+hadn't done it manually.
+Could you check why this isn't happening and confirm how it's supposed to work?
+
+
+
+
+
+your analysis:
+1. Direct Answers to Your Questions
+A. Is it a "YES" or "NOT" from the Backend Developer?
+Verdict: It is a "NOT" (or at best, incomplete/misunderstood by the backend).
+
+The backend developer likely implemented session closure only upon saving a sleep entry (using the "Start a New Day" / isNewMainWake rollover flag) or on manual POST /end.
+If the user leaves the app untouched for 2 days (48 hours), no API calls occur. For an automatic 30-hour closure to work in this scenario, the backend must either:
+Have an automated server-side cron job querying sessions where startedAt < NOW() - 30h and marking them ENDED / FINALIZED, OR
+Perform a lazy evaluation on request: When the app opens and calls GET /api/v1/calculator/session, the backend must check if (activeSession.createdAt < NOW - 30h), immediately archive the old session, and return a new active session.
+Because Christian left the app for 2 days and the day was still ongoing, the backend's GET /api/v1/calculator/session simply fetched the user's existing database record where status remained 'ACTIVE'.
+B. Is it a SharedPreferences Issue on the Frontend?
+Verdict: YES, 100%! Your hunch about SharedPreferences is completely correct. Even if the backend had generated a new session ID after 30 hours, the frontend would still display the previous day's data as active because of how SharedPreferences and tab controllers are currently implemented:
+
+Persistent Local Caches Never Cleared on Resume:
+In 
+
+shared_preferences_helper.dart
+, the app stores:
+hydrationLogs (water intake list)
+caffeineLogs (all drinks logged)
+nutritionMeals (all meals logged)
+sportsTodayMetrics & sportsSessions (workouts logged today)
+resetTrackingData() is NEVER Called Automatically:
+In 
+
+dashboard_controller.dart
+, 
+
+resetTrackingData()
+ (which clears SharedPreferences) is only called when:
+The user manually taps "End My Day" (
+
+dashboard_controller.dart:L1110
+), OR
+The user saves a sleep log with "Start a New Day" turned ON (
+
+sleep_controller.dart:L336
+).
+When the user opens the app after 2 days, 
+
+fetchDashboardData()
+ runs, but it never calls resetTrackingData().
+Session ID Overwrite Without Invalidation:
+Look at 
+
+dashboard_controller.dart:L816-L821
+:
+dart
+final sessionId = dataMap['sessionId'] as String?;
+if (sessionId != null && sessionId.isNotEmpty) {
+  currentSessionId.value = sessionId;
+  await SharedPreferencesHelper.saveSessionId(sessionId);
+}
+Notice that it never compares sessionId != storedSessionId. Even if the backend sent a new session ID, the frontend does not notice the session has changed, so all individual controllers (
+
+HydrationController
+, 
+
+CaffeineController
+, 
+
+NutritionController
+) continue reading the stale SharedPreferences data from 2 days ago.
+No 30-Hour Client-Side Safety Check:
+There is currently zero code in the frontend measuring the time elapsed since session.createdAt / startedAt on app launch or resume.
+2. Summary of Why It Failed for Christian
+Christian leaves app idle for 48 hours
+                   │
+                   ▼
+App reopened after 2 days
+                   │
+        ┌──────────┴──────────┐
+        ▼                     ▼
+[Backend Issue]        [Frontend / SharedPreferences Issue]
+GET /calculator/session  1. SharedPreferences still holds 2-day-old
+returns existing active  caffeine, water, meals, and sport logs.
+session (no cron or      2. Frontend never calls resetTrackingData()
+lazy 30h check triggered 3. Controllers load stale SharedPreferences
+on the server).          4. Zero 30-hour elapsed-time guard on app resume.
+        │                     │
+        └──────────┬──────────┘
+                   ▼
+Screen displays 2-day-old active session with all previous logs!
+3. Required Fixes
+Frontend Fix (Can be implemented immediately as a safety net):
+Detect Session ID Rollover on Startup / Resume: In 
+
+DashboardController.fetchDashboardData()
+ and SessionService.fetchAndStoreSessionId()
+:
+Compare the returned sessionId against the previously stored storedSessionId.
+If storedSessionId != null && storedSessionId != sessionId, trigger resetTrackingData(newSessionId: sessionId) immediately.
+Client-Side 30-Hour Rollover Guard:
+Store sessionStartedAt in SharedPreferences.
+When the app is opened or resumed from background (
+
+didChangeAppLifecycleState
+):
+If DateTime.now().difference(sessionStartedAt).inHours >= 30 OR status == 'ENDED':
+Automatically trigger endMyDay() / resetTrackingData() and fetch/create a fresh session.
+Backend Action Item (To verify with the backend developer):
+Ask the backend developer:
+"When GET /api/v1/calculator/session is called, does it check if the active session's createdAt / startedAt is older than 30 hours? If a user hasn't opened the app for 48 hours, GET /api/v1/calculator/session must automatically mark the old session as FINALIZED/ENDED, create a new active session with a new sessionId, and return the fresh session."
+
+
+
+
+
+
+
+backend depeloper's updated doc:
+/Users/saharaislam/Desktop/tahmid/chrisimhof/API_INTEGRATION.md
+
+
+
+starting from this line in the doc:
+## 8. Automatic 30-Hour Session Expiration & Morning Rollover Protocol
+
+and:
+8. [Automatic 30-Hour Session Expiration & Morning Rollover Protocol](#8-automatic-30-hour-session-expiration--morning-rollover-protocol)
+9. [Frontend Developer Integration Checklist (Flutter / Dart Examples)](#9-frontend-developer-integration-checklist)
+
+and:
+Following Christian Imhof's review (25-Oct-2026) and the 29-Oct session rollover update, the backend has been updated to resolve several critical circadian calculation behaviors and API contracts:
+
+and:
+7. **Automatic 30-Hour Inactive Session Rollover**: If an active session is older than 30 hours (e.g. user leaves app untouched for 48 hours), `GET /api/v1/calculator/session` and `GET /api/v1/dashboard` automatically finalize the expired day and return a fresh `PENDING_WAKE` session (`waitingForMainWake: true`) with a new `sessionId`. In addition, an hourly background cron sweeps and finalizes dormant sessions in PostgreSQL.

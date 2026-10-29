@@ -47,6 +47,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   /// Active session details
   final RxnString currentSessionId = RxnString();
   final RxnString sessionStatus = RxnString();
+  final RxBool waitingForMainWake = false.obs;
 
   final Rx<DashboardModel> dashboardData = DashboardModel(
     date: DateTime.now(),
@@ -89,7 +90,10 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     fetchDashboardData();
     _updateTimer = Timer.periodic(
       const Duration(minutes: 1),
-      (_) => updateSleepPrepStatus(),
+      (_) {
+        updateSleepPrepStatus();
+        _checkActiveSession30hTimeout();
+      },
     );
   }
 
@@ -103,11 +107,60 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      debugPrint('DashboardController: App resumed, syncing timezone and checking socket connection...');
-      WorkSettingsService.syncTimezoneSilently();
-      RealtimeSocketService().connectSocket();
-      fetchDashboardData();
+      debugPrint('DashboardController: App resumed, checking 30h session expiration, syncing timezone and checking socket connection...');
+      _handleAppResume();
     }
+  }
+
+  Future<void> _handleAppResume() async {
+    try {
+      final DateTime? sessionStartedAt =
+          await SharedPreferencesHelper.getSessionStartedAt();
+      final DateTime? sessionExpiresAt =
+          await SharedPreferencesHelper.getSessionExpiresAt();
+      final now = DateTime.now();
+      final bool expiredByExpiresAt =
+          sessionExpiresAt != null && !now.isBefore(sessionExpiresAt);
+      final bool expiredBy30h =
+          sessionStartedAt != null &&
+          now.difference(sessionStartedAt).inHours >= 30;
+
+      if (expiredByExpiresAt || expiredBy30h) {
+        debugPrint(
+          '[Lifecycle] Active session exceeded 30h on app resume. Resetting local tracking data and refreshing session...',
+        );
+        await resetTrackingData();
+      }
+    } catch (e) {
+      debugPrint('[Lifecycle] Error checking 30h session expiration: $e');
+    }
+    WorkSettingsService.syncTimezoneSilently();
+    RealtimeSocketService().connectSocket();
+    await fetchDashboardData();
+  }
+
+  Future<void> _checkActiveSession30hTimeout() async {
+    if (isLoading.value || _isEndingDay) return;
+    try {
+      final DateTime? sessionStartedAt =
+          await SharedPreferencesHelper.getSessionStartedAt();
+      final DateTime? sessionExpiresAt =
+          await SharedPreferencesHelper.getSessionExpiresAt();
+      final now = DateTime.now();
+      final bool expiredByExpiresAt =
+          sessionExpiresAt != null && !now.isBefore(sessionExpiresAt);
+      final bool expiredBy30h =
+          sessionStartedAt != null &&
+          now.difference(sessionStartedAt).inHours >= 30;
+
+      if (expiredByExpiresAt || expiredBy30h) {
+        debugPrint(
+          '[Timer] Active session exceeded 30h while app is open. Refreshing session...',
+        );
+        await resetTrackingData();
+        await fetchDashboardData();
+      }
+    } catch (_) {}
   }
 
   Map<String, dynamic> normalizeDashboardPayload(Map<String, dynamic> payload) {
@@ -843,6 +896,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       }
 
       // 2. Fetch Session Data (for detailed logs history tabs)
+      final String? previousStoredSessionId =
+          await SharedPreferencesHelper.getSessionId();
+      bool didResetTrackingForRollover = false;
       Map<String, dynamic>? sessionData;
       try {
         final sessionUri = Uri.parse(Urls.createCalculatorSession).replace(
@@ -863,11 +919,51 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
           final decoded = jsonDecode(response.body) as Map<String, dynamic>;
           if (decoded['success'] == true && decoded['data'] != null) {
             final dataMap = decoded['data'] as Map<String, dynamic>;
-            final sessionId = dataMap['sessionId'] as String?;
+            final newSessionId = dataMap['sessionId'] as String?;
             final statusStr = dataMap['status'] as String?;
-            if (sessionId != null && sessionId.isNotEmpty) {
-              currentSessionId.value = sessionId;
-              await SharedPreferencesHelper.saveSessionId(sessionId);
+            final isWaitingForWake = dataMap['waitingForMainWake'] == true;
+            final startedAtStr =
+                (dataMap['startedAt'] ?? dataMap['createdAt']) as String?;
+            final expiresAtStr = dataMap['expiresAt'] as String?;
+
+            final bool sessionChanged = newSessionId != null &&
+                newSessionId.isNotEmpty &&
+                previousStoredSessionId != null &&
+                previousStoredSessionId.isNotEmpty &&
+                previousStoredSessionId != newSessionId;
+            final bool isPendingWake =
+                isWaitingForWake || statusStr == 'PENDING_WAKE';
+
+            waitingForMainWake.value = isPendingWake;
+
+            if (sessionChanged || isPendingWake) {
+              debugPrint(
+                '[Session] Session rollover or PENDING_WAKE detected (old=$previousStoredSessionId, new=$newSessionId, status=$statusStr, waitingForMainWake=$isWaitingForWake). Resetting local tracking data.',
+              );
+              await resetTrackingData(newSessionId: newSessionId);
+              didResetTrackingForRollover = true;
+            }
+
+            if (newSessionId != null && newSessionId.isNotEmpty) {
+              currentSessionId.value = newSessionId;
+              await SharedPreferencesHelper.saveSessionId(newSessionId);
+              if (sessionChanged) {
+                await RealtimeSocketService().connectSocket();
+              }
+            }
+            if (startedAtStr != null && startedAtStr.isNotEmpty) {
+              await SharedPreferencesHelper.saveSessionStartedAtIso(
+                startedAtStr,
+              );
+            } else if (sessionChanged || isPendingWake) {
+              await SharedPreferencesHelper.saveSessionStartedAt(
+                DateTime.now(),
+              );
+            }
+            if (expiresAtStr != null && expiresAtStr.isNotEmpty) {
+              await SharedPreferencesHelper.saveSessionExpiresAtIso(
+                expiresAtStr,
+              );
             }
             if (statusStr != null && statusStr.isNotEmpty) {
               sessionStatus.value = statusStr;
@@ -911,6 +1007,18 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       if (liveScoresDataMap == null) {
         try {
           dashboardDataMap = await _dashboardService.getDashboard();
+          if (!didResetTrackingForRollover) {
+            final dashInner = (dashboardDataMap['data'] is Map<String, dynamic>)
+                ? dashboardDataMap['data'] as Map<String, dynamic>
+                : dashboardDataMap;
+            if (dashInner['hasActiveSession'] == false) {
+              debugPrint(
+                '[Dashboard] hasActiveSession is false (session expired). Resetting local tracking data.',
+              );
+              await resetTrackingData();
+              didResetTrackingForRollover = true;
+            }
+          }
         } catch (e) {
           debugPrint('Dashboard: API fetch error: $e');
         }
@@ -1187,6 +1295,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       // Save new session ID from end session response if available
       if (newSessionId != null && newSessionId.isNotEmpty) {
         await SharedPreferencesHelper.saveSessionId(newSessionId);
+        await SharedPreferencesHelper.saveSessionStartedAt(DateTime.now());
         currentSessionId.value = newSessionId;
         debugPrint('endMyDay: saved new sessionId from response = $newSessionId');
       } else {

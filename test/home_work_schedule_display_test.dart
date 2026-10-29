@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/service/helper/shared_preferences_helper.dart';
 import 'package:chrisimhof/features/dashboard/main_dashboard/controller/dashboard_controller.dart';
 import 'package:chrisimhof/features/dashboard/sleep/controller/sleep_controller.dart';
 import 'package:chrisimhof/features/dashboard/work/controller/work_controller.dart';
@@ -264,6 +265,31 @@ void main() {
       expect(sleepCtrl.bedtimeMinute.value, 0);
       expect(sleepCtrl.wakeupHour.value, 6);
       expect(sleepCtrl.wakeupMinute.value, 45);
+    });
+
+    test('30-hour session rollover resets stale SharedPreferences and tracking data', () async {
+      final dashboardCtrl = Get.put(DashboardController());
+
+      // Seed 48-hour-old sessionStartedAt and stale tracking logs
+      final twoDaysAgo = DateTime.now().subtract(const Duration(hours: 48));
+      await SharedPreferencesHelper.saveSessionId('session_old_123');
+      await SharedPreferencesHelper.saveSessionStartedAt(twoDaysAgo);
+      await SharedPreferencesHelper.saveCaffeineLogs('[{"id":"1","title":"Espresso","timestamp":"2026-10-27T08:00:00Z","amountMg":80}]');
+      await SharedPreferencesHelper.saveSportsSessions('[{"id":"w1","title":"Run"}]');
+
+      final storedStartedAt = await SharedPreferencesHelper.getSessionStartedAt();
+      expect(storedStartedAt, isNotNull);
+      expect(DateTime.now().difference(storedStartedAt!).inHours >= 30, isTrue);
+
+      // Trigger rollover reset
+      await dashboardCtrl.resetTrackingData(newSessionId: 'session_new_456');
+
+      expect(await SharedPreferencesHelper.getCaffeineLogs(), '[]');
+      expect(await SharedPreferencesHelper.getSportsSessions(), '[]');
+      expect(dashboardCtrl.dashboardData.value.waterLiters, 0.0);
+      expect(dashboardCtrl.dashboardData.value.caffeineMg, 0);
+      expect(dashboardCtrl.dashboardData.value.mealsLogged, 0);
+      expect(dashboardCtrl.dashboardData.value.sportMinutes, 0);
     });
   });
 }
