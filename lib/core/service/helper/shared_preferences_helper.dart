@@ -1,3 +1,4 @@
+import 'package:chrisimhof/core/service/helper/timezone_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
@@ -5,6 +6,8 @@ class SharedPreferencesHelper {
   static const String _refreshTokenKey = 'refreshToken';
   static const String _isLoggedInKey = 'isLoggedIn';
   static const String _sessionIdKey = 'sessionId';
+  static const String _sessionStartedAtKey = 'sessionStartedAt';
+  static const String _sessionExpiresAtKey = 'sessionExpiresAt';
   static const String _languageKey = 'language';
 
   // Save language
@@ -59,6 +62,48 @@ class SharedPreferencesHelper {
   static Future<void> removeSessionId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(_sessionIdKey);
+    await prefs.remove(_sessionStartedAtKey);
+    await prefs.remove(_sessionExpiresAtKey);
+  }
+
+  // Save session startedAt timestamp (UTC ISO)
+  static Future<void> saveSessionStartedAtIso(String isoString) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_sessionStartedAtKey, isoString);
+  }
+
+  static Future<void> saveSessionStartedAt(DateTime dateTime) async {
+    await saveSessionStartedAtIso(
+      TimezoneHelper.formatToSessionUtcIso(dateTime),
+    );
+  }
+
+  static Future<DateTime?> getSessionStartedAt() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? raw = prefs.getString(_sessionStartedAtKey);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return TimezoneHelper.parseSessionUtcToLocal(raw);
+    } catch (_) {
+      return DateTime.tryParse(raw)?.toLocal();
+    }
+  }
+
+  // Save session expiresAt timestamp (UTC ISO)
+  static Future<void> saveSessionExpiresAtIso(String isoString) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_sessionExpiresAtKey, isoString);
+  }
+
+  static Future<DateTime?> getSessionExpiresAt() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? raw = prefs.getString(_sessionExpiresAtKey);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return TimezoneHelper.parseSessionUtcToLocal(raw);
+    } catch (_) {
+      return DateTime.tryParse(raw)?.toLocal();
+    }
   }
 
   // Save login status
@@ -80,6 +125,8 @@ class SharedPreferencesHelper {
     await prefs.remove(_refreshTokenKey);
     await prefs.remove(_isLoggedInKey);
     await prefs.remove(_sessionIdKey);
+    await prefs.remove(_sessionStartedAtKey);
+    await prefs.remove(_sessionExpiresAtKey);
   }
 
   // --- Caffeine Logs ---

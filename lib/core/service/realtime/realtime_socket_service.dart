@@ -307,12 +307,18 @@ class RealtimeSocketService {
     }
   }
 
-  void _handleSessionEnded(dynamic data) {
+  Future<void> _handleSessionEnded(dynamic data) async {
     try {
+      debugPrint(
+        '[Socket] session_ended received. Resetting stale local tracking data and refreshing session...',
+      );
+      await SharedPreferencesHelper.removeSessionId();
       if (Get.isRegistered<DashboardController>()) {
         final dashboardController = Get.find<DashboardController>();
-        dashboardController.fetchDashboardData();
+        await dashboardController.resetTrackingData();
+        await dashboardController.fetchDashboardData();
       }
+      await connectSocket();
     } catch (e) {
       debugPrint('Socket.io: Error handling session_ended: $e');
     }

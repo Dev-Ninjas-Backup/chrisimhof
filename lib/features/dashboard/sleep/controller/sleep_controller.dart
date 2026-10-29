@@ -370,12 +370,16 @@ class SleepController extends GetxController {
 
         if (returnedSessionId != null && returnedSessionId.isNotEmpty) {
           await SharedPreferencesHelper.saveSessionId(returnedSessionId);
+          if (isDayRollover) {
+            await SharedPreferencesHelper.saveSessionStartedAt(DateTime.now());
+          }
           await RealtimeSocketService().connectSocket();
         }
 
         try {
           if (Get.isRegistered<DashboardController>()) {
             final dashboardController = Get.find<DashboardController>();
+            dashboardController.waitingForMainWake.value = false;
             if (returnedSessionId != null && returnedSessionId.isNotEmpty) {
               dashboardController.currentSessionId.value = returnedSessionId;
             }
